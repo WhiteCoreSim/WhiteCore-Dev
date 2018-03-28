@@ -9,7 +9,7 @@ p {
   font-size: 15px;
   line-height: 29px;
   color: #8cbdf3; /*rgba(28, 54, 83, 0.6);*/
-  padding-bottom: 20px; }
+  padding: 5px 5px; }
 
 h1 {
   font-size: 50px; }
@@ -101,6 +101,26 @@ section.features, section.blog-intro, section.blog {
     height: 100px;
     width: 100px;
 }
+
+.error_content {
+  background: url("../images/slideshow_bg.jpg") no-repeat center center;
+  background-size: cover;
+}
+
+.text-center {
+  text-align: center;
+}
+.text-left {
+  text-align: left;
+}
+.text-right {
+  text-align: right;
+}
+.text-info {
+  white-space: pre-wrap;
+}
+
+
 /* ==========================================================================
 Global Styles
 ========================================================================== */
@@ -185,6 +205,10 @@ ul li {
   text-transform: capitalize;
   background-color: #000;
   border-radius: 4px; }
+
+legend {
+  color: #e4a1a1;
+}
 
 /* ==========================================================================
 Animations
@@ -437,8 +461,8 @@ Hero
 ========================================================================== */
 .hero {
   min-height: 750px;
-  background: url("../images/bg.jpg") center center;
-  background-size: cover;
+  background: url("../images/bg.jpg") top center;
+  /* background-size: cover; */
   position: relative; }
 
 .hero .down-arrow a {
@@ -653,7 +677,7 @@ Homescreen news
 .localnews {
   width: 100%;
   font-size: 12px;
-  background: transparent url(../images/icons/bg_white_01.png);
+  background: transparent url(../images/icons/bg_black_01.png);
   border: 1px solid transparent;
   -webkit-border-radius: 5px;
   -moz-border-radius: 5px;
@@ -826,7 +850,8 @@ Features-stack
     left: 50%;
     -webkit-transform: translateX(-50%);
         -ms-transform: translateX(-50%);
-            transform: translateX(-50%); }
+            transform: translateX(-50%);
+}
 
 /* ==========================================================================
 .toolbar
@@ -1002,7 +1027,8 @@ Login form
   padding: 15px 0;
   border-radius: 3px;
   width: 80%;
-  font-size: 13px; }
+  font-size: 13px;
+}
 .sign-up .signup-form .form-input-group {
   width: 80%;
   height: 55px;
@@ -1010,59 +1036,67 @@ Login form
   border-radius: 5px;
   border: solid 1px #E6E9EA;
   text-align: left;
-  position: relative; }
-  .sign-up .signup-form .form-input-group i {
-    color: #FF5274;
-    font-size: 14px; }
-  .sign-up .signup-form .form-input-group i:after {
-    content: "";
-    height: 30px;
-    width: 1px;
-    border-right: solid 1px #E6E9EA;
-    position: absolute;
-    top: 50%;
-    left: 30px;
-    -webkit-transform: translateY(-50%);
-        -ms-transform: translateY(-50%);
-            transform: translateY(-50%); }
-  .sign-up .signup-form .form-input-group i.fa-lock {
-    font-size: 18px;
-    position: absolute;
-    top: 50%;
-    -webkit-transform: translateY(-50%);
-        -ms-transform: translateY(-50%);
-            transform: translateY(-50%);
-    margin-left: 20px; }
-  .sign-up .signup-form .form-input-group i.fa-envelope {
-    font-size: 14px;
-    position: absolute;
-    top: 50%;
-    -webkit-transform: translateY(-50%);
-        -ms-transform: translateY(-50%);
-            transform: translateY(-50%);
-    margin-left: 20px; }
-  .sign-up .signup-form .form-input-group i.fa-user {
-    font-size: 14px;
-    position: absolute;
-    top: 50%;
-    -webkit-transform: translateY(-50%);
-        -ms-transform: translateY(-50%);
-            transform: translateY(-50%);
-    margin-left: 20px; }
-  .sign-up .signup-form .form-input-group input {
-    padding-left: 68px;
-    width: 100%;
-    height: 100%;
-    border-radius: 6px;
-    border: none; }
-  .sign-up .signup-form .form-input-group input::-webkit-input-placeholder {
-    color: #BCC1C3; }
-  .sign-up .signup-form .form-input-group input:-moz-placeholder {
-    color: #BCC1C3; }
-  .sign-up .signup-form .form-input-group input::-moz-placeholder {
-    color: #BCC1C3; }
-  .sign-up .signup-form .form-input-group input:-ms-input-placeholder {
-    color: #BCC1C3; }
+  position: relative;
+}
+.sign-up .signup-form .form-input-group i {
+  color: #FF5274;
+  font-size: 14px;
+}
+.sign-up .signup-form .form-input-group i:after {
+  content: "";
+  height: 30px;
+  width: 1px;
+  border-right: solid 1px #E6E9EA;
+  position: absolute;
+  top: 50%;
+  left: 30px;
+  -webkit-transform: translateY(-50%);
+      -ms-transform: translateY(-50%);
+          transform: translateY(-50%);
+}
+.sign-up .signup-form .form-input-group i.fa-lock {
+  font-size: 18px;
+  position: absolute;
+  top: 50%;
+  -webkit-transform: translateY(-50%);
+      -ms-transform: translateY(-50%);
+          transform: translateY(-50%);
+  margin-left: 20px;
+}
+.sign-up .signup-form .form-input-group i.fa-envelope {
+  font-size: 14px;
+  position: absolute;
+  top: 50%;
+  -webkit-transform: translateY(-50%);
+      -ms-transform: translateY(-50%);
+          transform: translateY(-50%);
+  margin-left: 20px;
+}
+.sign-up .signup-form .form-input-group i.fa-user {
+  font-size: 14px;
+  position: absolute;
+  top: 50%;
+  -webkit-transform: translateY(-50%);
+      -ms-transform: translateY(-50%);
+          transform: translateY(-50%);
+  margin-left: 20px;
+}
+.sign-up .signup-form .form-input-group input {
+  font-size: 20px;
+  padding-left: 68px;
+  width: 100%;
+  height: 100%;
+  border-radius: 6px;
+  border: none;
+}
+.sign-up .signup-form .form-input-group input::-webkit-input-placeholder {
+  color: #BCC1C3; }
+.sign-up .signup-form .form-input-group input:-moz-placeholder {
+  color: #BCC1C3; }
+.sign-up .signup-form .form-input-group input::-moz-placeholder {
+  color: #BCC1C3; }
+.sign-up .signup-form .form-input-group input:-ms-input-placeholder {
+  color: #BCC1C3; }
 
 /* ==========================================================================
 World map
@@ -1087,6 +1121,117 @@ div.mapregion {
   -moz-border-radius: 10px 10px 10px 10px;
   -webkit-border-radius: 10px 10px 10px 10px;
   border:4px solid #3b7971;
+}
+
+/* ==========================================================================
+Table formatting
+========================================================================== */
+.table-striped>tbody>tr:nth-of-type(odd) {
+  background-color: #2c2e35;
+}
+.table-striped>tbody>tr:nth-of-type(even) {
+  background-color: #373a42;
+}
+
+.dTable{
+  display: table;
+  width: 100%;
+}
+.dTableRow {
+  display: table-row;
+  margin-top: 5px;
+}
+.dTableHeading {
+  background-color: #ccc;
+  display: table-header-group;
+}
+.dTableCell, .divTableHead {
+  /*border: 1px solid #999999;*/
+  display: table-cell;
+  padding: 3px 10px;
+}
+.dTableHeading {
+  background-color: #ccc;
+  display: table-header-group;
+  font-weight: bold;
+}
+.dTableFoot {
+  background-color: #ccc;
+  display: table-footer-group;
+  font-weight: bold;
+}
+.dTableBody {
+  display: table-row-group;
+}
+
+
+.rTable {
+  display: block;
+  width: 100%;
+}
+.rTableHeading, .rTableBody, .rTableFoot, .rTableRow {
+  clear: both;
+}
+.rTableHead, .rTableFoot {
+  background-color: #DDD;
+  font-weight: bold;
+}
+.rTableCell, .rTableHead {
+  /*border: 1px solid #999999;*/
+  float: left;
+  height: 40px;
+  overflow: hidden;
+  padding: 3px 1.8%;
+  min-width: 15%;
+}
+.rTable:after {
+  visibility: hidden;
+  display: block;
+  font-size: 0;
+  content: " ";
+  clear: both;
+  height: 0;
+  }
+
+.table-list {
+  background-color: #26272b;
+  border: 1px solid #545454;
+}
+.listhead {
+  height: 35px;
+}
+th {
+  border-top: 1px solid #545454;
+  border-bottom: 1px solid #545454;
+  border-right: 1px solid #545454;
+}
+
+th:first-child {
+  border-left: 1px solid #545454;
+}
+
+/* ==========================================================================
+Help
+========================================================================== */
+.div10 {
+  height:10px;
+}
+.div20 {
+  height:20px;
+}
+img.viewerimage {
+    cursor: pointer;
+    width: 120px;
+    height: 120px;
+    margin: 3px;
+    border: 1px solid #292c37;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    -khtml-border-radius: 5px;
+    border-radius: 5px;
+    -webkit-box-shadow: #292c37 0 0 .25em;
+    -moz-box-shadow: #292c37 0 0 .25em;
+    box-shadow: #292c37 0 0 .25em;
 }
 
 /* ==========================================================================
@@ -1282,6 +1427,114 @@ Events (also used for news items)
     padding: 10px 0px 9px;
   }
 }
+
+/* ==========================================================================
+Specific containers
+========================================================================== */
+/* user_agent_profile */
+.profile_container {
+  display: inline-block;
+  margin-bottom: 15px;
+  background-color: #282929;
+  border: 1px solid #aaa;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  -khtml-border-radius: 5px;
+  border-radius: 5px;
+}
+.profile_picture_big img {
+  width:256px;
+  height:256px;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  -khtml-border-radius: 5px;
+  border-radius: 5px;
+}
+
+.parcel_picture_small img {
+  width:128px; height:128px;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  -khtml-border-radius: 5px;
+  border-radius: 5px;
+}
+
+.user_agent_profile_picture div {
+    position: relative;
+    margin: 0px;
+    padding:10px;
+    overflow: hidden;
+    border: 1px solid #333;
+    border-radius: 5px;
+    -khtml-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    box-shadow: 0px 2px 2px 0px rgba(0, 0, 0, 0.2) inset, 0px 2px 2px 0px rgba(255, 255, 255, 0.8);
+}
+
+.user_agent_profile_picture_text {
+    padding: 10px 10px;
+    background-color: #abe0e0 ;
+    color: #1c557f;
+  margin-top: 4px;
+    border: 1px solid #333;
+    border-radius: 5px;
+    -khtml-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+}
+
+
+/* region parcels_profile Caption */
+.parcel_picture img {
+  width:128px; height:128px;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  -khtml-border-radius: 5px;
+  border-radius: 5px;
+}
+
+.parcel_picture_text img {
+  width:18px; height:18px;
+  -webkit-border-radius: 2px;
+  -moz-border-radius: 2px;
+  -khtml-border-radius: 2px;
+  border-radius: 2px;
+}
+
+div.parcel_picture {
+    position: relative;
+    margin: 5px;
+    padding:5px;
+    overflow: hidden;
+    border: 1px solid #333;
+    border-radius: 5px;
+    -khtml-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+  box-shadow: 0px 2px 2px 0px rgba(0, 0, 0, 0.2) inset, 0px 2px 2px 0px rgba(255, 255, 255, 0.8);
+}
+
+.parcel_picture_text {
+    padding: 10px 10px;
+    background-color: #abe0e0 ;
+    color: #1c557f;
+  margin-top: 4px;
+    border: 1px solid #333;
+    border-radius: 5px;
+    -khtml-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+}
+
+/* Avatar Archive Carousel */
+.jcarousel-wc .jcarousel-container {
+    background: transparent;
+  width: 938px;
+  height: 170px;
+}
+
+
 
 /* ==========================================================================
 Footer

@@ -57,27 +57,6 @@ namespace WhiteCore.Modules.Web
             response = null;
             var vars = new Dictionary<string, object> ();
 
-            vars.Add ("DisplayLG1", "display: none;");
-            vars.Add ("DisplayLG2", "display: none;");
-            vars.Add ("DisplayLG3", "display: none;");
-            vars.Add ("DisplayLG4", "display: none;");
-            vars.Add ("DisplayLG5", "display: none;");
-            vars.Add ("DisplayLG6", "display: none;");
-            vars.Add ("DisplayLG7", "display: none;");
-            if (translator.LanguageName == "en")
-                vars ["DisplayLG1"] = "";
-            if (translator.LanguageName == "fr")
-                vars ["DisplayLG2"] = "";
-            if (translator.LanguageName == "de")
-                vars ["DisplayLG3"] = "";
-            if (translator.LanguageName == "it")
-                vars ["DisplayLG4"] = "";
-            if (translator.LanguageName == "es")
-                vars ["DisplayLG5"] = "";
-            if (translator.LanguageName == "nl")
-                vars ["DisplayLG6"] = "";
-            if (translator.LanguageName == "ru")
-                vars ["DisplayLG7"] = "";
 
             return vars;
         }

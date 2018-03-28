@@ -1,8 +1,49 @@
 <!-- User Profile -->
 
 
-<h2>{SystemName}: {UserProfileFor} {UserName}</h2>
-<div id="user_agent_profile_container">
+<h2>{UserProfileFor} {UserName}</h2>
+<div class="profile_container">
+
+<div class="col-xs-12">
+  <div class="col-xs-3">
+      <div class="profile_picture_big">
+        <a href="#">
+          <img title="{UserProfileFor}: {UserName} ({UserType})" src="{UserPictureURL}" alt="{UserProfileFor}: {UserName} ({UserType})" height="256" />
+        </a>
+<!--      <p class="user_agent_profile_picture_text">{UserProfileFor}: {UserName} ({UserType})</p>  -->
+    </div>
+  </div>
+  <div class="col-xs-9 text-left">
+    <div class="col-xs-12">
+      <div class="col-xs-6"><p>{IsOnlineText}</p></div>
+      <div class="col-xs-6"><p>{IsOnline}</p></div>
+    </div>
+    {IfUserIsOnlineBegin}
+    <div class="col-xs-12">
+      <div class="col-xs-6"><p>{OnlineLocationText}</p></div>
+      <div class="col-xs-6"><p>{OnlineLocation}</p></div>
+    </div>
+    {IfUserIsOnlineEnd}
+    <div class="col-xs-12">
+      <div class="col-xs-6"><p>{ResidentSince}</p></div>
+      <div class="col-xs-6"><p>{UserBorn}</p></div>
+    </div>
+    <div class="col-xs-12">
+      <div class="col-xs-6"><p>{AccountType}</p></div>
+      <div class="col-xs-6"><p>{UserType}</p></div>
+    </div>
+    <div class="col-xs-12">
+      <div class="col-xs-6"><p>{PartnersName}</p></div>
+      <div class="col-xs-6"><p>{UserPartner}</p></div>
+    </div>
+    <div class="col-xs-12">
+      <div class="col-xs-6"><p>{AboutMe}</p></div>
+      <div class="col-xs-6"><p>{UserAboutMe}</p></div>
+    </div>
+  </div>
+</div>
+
+ <!--
 <table id="user_agent_profile">
   <caption></caption>
 
@@ -24,7 +65,7 @@
 
   <tbody>
     <tr>
-      <td class="user_agent_profile_picture" rowspan="6"> <!-- we need a variable for rowspan -->
+      <td class="user_agent_profile_picture" rowspan="6">
 	    <div class="user_agent_profile_picture">
 	    <a href="#">
 	    <img height="256"
@@ -64,22 +105,24 @@
     </tr>
   </tbody>
 </table>
+-->
 </div>
+<span class="clear"></span>
 
 
 
-<h2>{SystemName}: {UsersGroupsText} by {UserName} ({GroupsJoined})</h2>
-<div id="group_profile_container">
+<h4>{UsersGroupsText} by {UserName} ({GroupsJoined})</h4>
+<div class="profile_container">
     <div class="prev-horiz-big">◄</div>
     <div class="next-horiz-big">►</div>
     <center>
     <div class="groupscarousel">
-    <ul id="groupcarousel" class="jcarousel-skin-aurora-bigsize jcarousel-bigsize">
+    <ul id="groupcarousel" class="jcarousel-wc-bigsize jcarousel-bigsize">
 {GroupsArrayBegin}
 	<li>
-	    <div class="group_profile_picture">
+	    <div class="profile_picture_small" id="group_picture">
 	    <a href="#">
-	    <img height="256"
+	    <img height="128"
 		     src="{GroupPictureURL}"
 		     alt="{GroupNameText}: {GroupName}"
 			 title="{GroupNameText}: {GroupName}" /></a>
@@ -94,11 +137,12 @@
 </div>
 
 <!-- Group Carousel -->
-<script src="../js/jquery.jcarousellite.js"></script>
+<link type="text/css" rel="stylesheet" href="css/jcarousellite.css">
+<script src="js/jquery.jcarousellite.js"></script>
 
 <script>
     jQuery(document).ready(function($) {
-      $('div.group_profile_picture').each(function(i) {
+      $('#group_picture').each(function(i) {
         var img_ = $('img', this);
         var img_height = img_.attr('height');
         var p_height = $('p', this).outerHeight();
@@ -112,7 +156,7 @@
     });
 
 
-    jQuery(document).ready(function($) {
+  /*  jQuery(document).ready(function($) {
       $('div.user_agent_profile_picture').each(function(i) {
         var img_ = $('img', this);
         var img_height = img_.attr('height');
@@ -125,6 +169,7 @@
         });
       });
     });
+    */
 
   $(function() {
       $('.groupscarousel').jCarouselLite({

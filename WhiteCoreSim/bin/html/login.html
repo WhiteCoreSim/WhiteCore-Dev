@@ -1,14 +1,4 @@
-<!-- params to replace
-SystemURL
-SystemName
-ErrorMessage
-Login
-UserNameText
-PasswordText
-ForgotPassword
-Submit
-
--->
+<!-- Main non logged in template -->
 <section class="sign-up section-padding text-center" id="download">
   <div class="container">
     <div class="row">
@@ -26,7 +16,7 @@ Submit
             <input type="password" class="" placeholder="{PasswordText}" required name="password">
           </div>
           <button type="submit" class="btn-fill sign-up-btn">{Submit}</button>
-          <a href="index.html?page=forgot_pass"><h5>{ForgotPassword}</h5></a>
+          <a id="forgotpass" href="index.html/page=forgot_pass"><h5>{ForgotPassword}</h5></a>
         </form>
       </div>
     </div>

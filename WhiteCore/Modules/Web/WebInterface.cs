@@ -68,6 +68,8 @@ namespace WhiteCore.Modules.Web
 
         // webpages and settings cacheing
         internal GridPage webPages;
+        internal GridPage userPages;
+        internal GridPage adminPages;
         internal WebUISettings webUISettings;
         public GridSettings gridSettings;
 
@@ -225,7 +227,10 @@ namespace WhiteCore.Modules.Web
                                          OSHttpResponse httpResponse)
         {
             byte [] response;
-            string filename = GetFileNameFromHTMLPath (path, httpRequest.Query);
+            bool isAuth = (Authenticator.CheckAuthentication (httpRequest));
+            bool isAdmin = (Authenticator.CheckAdminAuthentication (httpRequest));
+
+            string filename = GetFileNameFromHTMLPath (path, httpRequest.Query, isAuth);
             if (filename == null)
                 return MainServer.BlankResponse;
 
@@ -252,7 +257,7 @@ namespace WhiteCore.Modules.Web
                     WhiteCoreXmlDocument vars = GetXML (filename, httpRequest, httpResponse, requestParameters);
 
                     var xslt = new XslCompiledTransform ();
-                    if (File.Exists (path)) xslt.Load (GetFileNameFromHTMLPath (path, httpRequest.Query));
+                    if (File.Exists (path)) xslt.Load (GetFileNameFromHTMLPath (path, httpRequest.Query, isAuth));
                     else if (text != "") {
                         xslt.Load (new XmlTextReader (new StringReader (text)));
                     }
@@ -377,6 +382,8 @@ namespace WhiteCore.Modules.Web
                                      OSHttpResponse httpResponse, Dictionary<string, object> requestParameters,
                                      Dictionary<string, object> vars)
         {
+            bool isAuth = (Authenticator.CheckAuthentication (request));
+            bool isAdmin = (Authenticator.CheckAdminAuthentication (request));
             string html = CSHTMLCreator.BuildHTML (file, vars);
 
             string [] lines = html.Split ('\n');
@@ -388,7 +395,7 @@ namespace WhiteCore.Modules.Web
                     string [] split = line.Split (new string [] { "<!--#include file=\"", "\" -->" },
                                                 StringSplitOptions.RemoveEmptyEntries);
                     for (int i = 0; i < split.Length; i += 2) {
-                        string filename = GetFileNameFromHTMLPath (split [i+1], request.Query);
+                        string filename = GetFileNameFromHTMLPath (split [i+1], request.Query, isAuth);
                         if (filename != null) {
                             string response;
                             Dictionary<string, object> newVars = AddVarsForPage (filename, originalFileName,
@@ -403,7 +410,7 @@ namespace WhiteCore.Modules.Web
                     string [] split = line.Split (new string [] { "<!--#include folder=\"", "\" -->" },
                                                 StringSplitOptions.RemoveEmptyEntries);
                     for (int i = split.Length % 2 == 0 ? 0 : 1; i < split.Length; i += 2) {
-                        string filename = GetFileNameFromHTMLPath (split [i+1], request.Query).Replace ("index.html", "");
+                        string filename = GetFileNameFromHTMLPath (split [i+1], request.Query, isAuth).Replace ("index.html", "");
                         if (filename != null) {
                             if (Directory.Exists (filename)) {
                                 string response;
@@ -569,31 +576,38 @@ namespace WhiteCore.Modules.Web
             return mimeType;
         }
 
-        protected string GetFileNameFromHTMLPath (string path, Hashtable query)
+        protected string GetFileNameFromHTMLPath (string path, Hashtable query, bool isAuth)
         {
+            var mainpage = "index.html";
+            if (isAuth)
+                mainpage = "userindex.html";
+
             try {
                 string filePath = path.StartsWith ("/", StringComparison.Ordinal)
                                       ? path.Remove (0, 1) 
                                       : path;
+                if (filePath.StartsWith ("index.html", StringComparison.Ordinal))
+                    filePath = filePath.Remove (0, 10);
+
+                var reqPage = filePath.IndexOf ('?') >= 0 ? filePath.Substring (filePath.IndexOf ('?')) : "";
                 filePath = filePath.IndexOf ('?') >= 0 ? filePath.Substring (0, filePath.IndexOf ('?')) : filePath;
 
                 if (filePath == "")
-                    filePath = "index.html";
+                    filePath = mainpage;
                 if (filePath [filePath.Length - 1] == '/')
-                    filePath = filePath + "index.html";
+                    filePath = filePath + mainpage;
 
                 string file;
-                if (filePath.StartsWith ("local/", StringComparison.Ordinal))                      // local included files 
+                if (filePath.StartsWith ("local/", StringComparison.Ordinal))           // local included files 
                 {
-                    file = Path.Combine (m_localHtmlPath, filePath.Remove (0, 6));
-                }
-                else {                                                    // 'normal' page processing
+                    file = Path.Combine (m_localHtmlPath, filePath.Remove (0, 6));      // strip the 'local/' and add the correct path
+                } else {                                                                // 'normal' page processing
 
                     // try for files in the user data path first
                     file = Path.Combine (m_localHtmlPath, filePath);
                     if (Path.GetFileName (file) == "") {
-                        file = Path.Combine (file, "index.html");
-                        MainConsole.Instance.Info ("Using the Data/html page");
+                        file = Path.Combine (file, mainpage);
+                        MainConsole.Instance.Debug ("Using the Data/html page");
                     }
 
                     if (!File.Exists (file)) {
@@ -601,11 +615,11 @@ namespace WhiteCore.Modules.Web
                         //MainConsole.Instance.Info ("Using the bin page");
                         file = Path.Combine ("html/", filePath);
                         if (!Path.GetFullPath (file).StartsWith (Path.GetFullPath ("html/"), StringComparison.Ordinal)) {
-                            MainConsole.Instance.Info ("Using the Data/html page");
-                            return "html/index.html";
+                            MainConsole.Instance.Debug ("Using the default index page");
+                            return "html/" + mainpage;
                         }
                         if (Path.GetFileName (file) == "")
-                            file = Path.Combine (file, "index.html");
+                            file = Path.Combine (file, mainpage);
                     }
 
                     if (query.ContainsKey ("page")) {
@@ -673,6 +687,81 @@ namespace WhiteCore.Modules.Web
             return result;
         }
 
+        string GetTranslatedString (ITranslator translator, string name, GridPage page, bool isTooltip)
+        {
+	        string retVal = translator.GetTranslatedString (name);
+	        if (retVal == "UNKNOWN CHARACTER")
+		        return isTooltip ? page.MenuToolTip : page.MenuTitle;
+	        return retVal;
+        }
+
+        internal List<Dictionary<string, object>> BuildPageMenus (GridPage rootPage, OSHttpRequest httpRequest, ITranslator translator)
+        {
+            List<Dictionary<string, object>> pages = new List<Dictionary<string, object>> ();
+
+            rootPage.Children.Sort ((a, b) => a.MenuPosition.CompareTo (b.MenuPosition));
+
+            foreach (GridPage page in rootPage.Children) {
+                if (page.LoggedOutRequired && Authenticator.CheckAuthentication (httpRequest))
+                    continue;
+                if (page.LoggedInRequired && !Authenticator.CheckAuthentication (httpRequest))
+                    continue;
+                if (page.AdminRequired && !Authenticator.CheckAdminAuthentication (httpRequest, page.AdminLevelRequired))
+                    continue;
+
+                List<Dictionary<string, object>> childPages = new List<Dictionary<string, object>> ();
+                page.Children.Sort ((a, b) => a.MenuPosition.CompareTo (b.MenuPosition));
+                foreach (GridPage childPage in page.Children) {
+                    if (childPage.LoggedOutRequired && Authenticator.CheckAuthentication (httpRequest))
+                        continue;
+                    if (childPage.LoggedInRequired && !Authenticator.CheckAuthentication (httpRequest))
+                        continue;
+                    if (childPage.AdminRequired &&
+                        !Authenticator.CheckAdminAuthentication (httpRequest, childPage.AdminLevelRequired))
+                        continue;
+
+                    childPages.Add (new Dictionary<string, object>
+                                       {
+                                           {"ChildMenuItemID", childPage.MenuID},
+                                           {"ChildShowInMenu", childPage.ShowInMenu},
+                                           {"ChildMenuItemLocation", childPage.Location},
+                                           {
+                                               "ChildMenuItemTitleHelp",
+
+                                               GetTranslatedString (translator, childPage.MenuToolTip, childPage, true)
+                                           },
+                                           {
+                                               "ChildMenuItemTitle",
+
+                                               GetTranslatedString (translator, childPage.MenuTitle, childPage, false)
+                                           }
+                                       });
+
+                    //Add one for menu.js
+                    pages.Add (new Dictionary<string, object>
+                                  {
+                                      {"MenuItemID", childPage.MenuID},
+                                      {"ShowInMenu", false},
+                                      {"MenuItemLocation", childPage.Location}
+                                  });
+                }
+
+                pages.Add (new Dictionary<string, object>
+                              {
+                                  {"MenuItemID", page.MenuID},
+                                  {"ShowInMenu", page.ShowInMenu},
+                                  {"HasChildren", page.Children.Count > 0},
+                                  {"ChildrenMenuItems", childPages},
+                                  {"MenuItemLocation", page.Location},
+                                  {"MenuItemTitleHelp", GetTranslatedString (translator, page.MenuToolTip, page, true)},
+                                 {"MenuItemTitle", GetTranslatedString (translator, page.MenuTitle, page, false)},
+                        {"MenuItemToolTip", GetTranslatedString (translator, page.MenuToolTip, page, true)}
+                              });
+            }
+
+            return pages;
+
+        }
 
 
         internal GridPage GetGridPages ()
@@ -687,6 +776,34 @@ namespace WhiteCore.Modules.Web
             }
 
             return webPages;
+        }
+
+        internal GridPage GetUserPages ()
+        {
+	        if (userPages == null) {
+		        IGenericsConnector generics = Framework.Utilities.DataManager.RequestPlugin<IGenericsConnector> ();
+		        GridPage userPage = generics.GetGeneric<GridPage> (UUID.Zero, "WebPages", "User");
+		        if (userPage == null)
+			        userPage = new GridPage ();
+
+    		    return userPage;
+	        }
+
+	    return userPages;
+        }
+
+        internal GridPage GetAdminPages ()
+        {
+        	if (adminPages == null) {
+        		IGenericsConnector generics = Framework.Utilities.DataManager.RequestPlugin<IGenericsConnector> ();
+        		GridPage adminPage = generics.GetGeneric<GridPage> (UUID.Zero, "WebPages", "Admin");
+        		if (adminPage == null)
+        			adminPage = new GridPage ();
+
+        		return adminPage;
+        	}
+
+	        return adminPages;
         }
 
         internal WebUISettings GetWebUISettings ()
@@ -870,6 +987,8 @@ namespace WhiteCore.Modules.Web
     {
         public List<GridPage> Children = new List<GridPage> ();
         public bool ShowInMenu = false;
+        public bool ShowInUserMenu = false;
+        public bool ShowInAdminMenu = false;
         public int MenuPosition = -1;
         public string MenuID = "";
         public string MenuTitle = "";
@@ -889,6 +1008,8 @@ namespace WhiteCore.Modules.Web
             var mp = (OSDMap) map;
 
             ShowInMenu = mp ["ShowInMenu"];
+            ShowInUserMenu = mp ["ShowInUserMenu"];
+            ShowInAdminMenu = mp ["ShowInAdminMenu"];
             MenuPosition = mp ["MenuPosition"];
             MenuID = mp ["MenuID"];
             MenuTitle = mp ["MenuTitle"];
@@ -905,6 +1026,8 @@ namespace WhiteCore.Modules.Web
         public override void FromOSD (OSDMap map)
         {
             ShowInMenu = map ["ShowInMenu"];
+            ShowInUserMenu = map ["ShowInUserMenu"];
+            ShowInAdminMenu = map ["ShowInAdminMenu"];
             MenuPosition = map ["MenuPosition"];
             MenuID = map ["MenuID"];
             MenuTitle = map ["MenuTitle"];
@@ -922,6 +1045,8 @@ namespace WhiteCore.Modules.Web
             OSDMap map = new OSDMap ();
 
             map ["ShowInMenu"] = ShowInMenu;
+            map ["ShowInUserMenu"] = ShowInUserMenu;
+            map ["ShowInAdminMenu"] = ShowInAdminMenu;
             map ["MenuPosition"] = MenuPosition;
             map ["MenuID"] = MenuID;
             map ["MenuTitle"] = MenuTitle;

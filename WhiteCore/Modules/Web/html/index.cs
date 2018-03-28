@@ -32,66 +32,60 @@ namespace WhiteCore.Modules.Web
 {
     public class IndexMain : IWebInterfacePage
     {
-        public string[] FilePath
-        {
-            get
-            {
-                return new[]
+        public string [] FilePath {
+            get {
+                return new []
                            {
                                "html/index.html",
                                "html/js/menu.js"
-                           };
+                            };
             }
         }
 
-        public bool RequiresAuthentication
-        {
+        public bool RequiresAuthentication {
             get { return false; }
         }
 
-        public bool RequiresAdminAuthentication
-        {
+        public bool RequiresAdminAuthentication {
             get { return false; }
         }
 
-        public Dictionary<string, object> Fill(WebInterface webInterface, string filename, OSHttpRequest httpRequest,
+        public Dictionary<string, object> Fill (WebInterface webInterface, string filename, OSHttpRequest httpRequest,
                                                OSHttpResponse httpResponse, Dictionary<string, object> requestParameters,
                                                ITranslator translator, out string response)
         {
             response = null;
-            var vars = new Dictionary<string, object>();
+            var vars = new Dictionary<string, object> ();
 
             #region Find pages
 
-            List<Dictionary<string, object>> pages = new List<Dictionary<string, object>>();
+            List<Dictionary<string, object>> pages = new List<Dictionary<string, object>> ();
 
-            var settings = webInterface.GetWebUISettings();
-            var rootPage = webInterface.GetGridPages();
+            var settings = webInterface.GetWebUISettings ();
+            var rootPage = webInterface.GetGridPages ();
 
-            rootPage.Children.Sort((a, b) => a.MenuPosition.CompareTo(b.MenuPosition));
+            rootPage.Children.Sort ((a, b) => a.MenuPosition.CompareTo (b.MenuPosition));
 
-            foreach (GridPage page in rootPage.Children)
-            {
-                if (page.LoggedOutRequired && Authenticator.CheckAuthentication(httpRequest))
+            foreach (GridPage page in rootPage.Children) {
+                if (page.LoggedOutRequired && Authenticator.CheckAuthentication (httpRequest))
                     continue;
-                if (page.LoggedInRequired && !Authenticator.CheckAuthentication(httpRequest))
+                if (page.LoggedInRequired && !Authenticator.CheckAuthentication (httpRequest))
                     continue;
-                if (page.AdminRequired && !Authenticator.CheckAdminAuthentication(httpRequest, page.AdminLevelRequired))
+                if (page.AdminRequired && !Authenticator.CheckAdminAuthentication (httpRequest, page.AdminLevelRequired))
                     continue;
 
-                List<Dictionary<string, object>> childPages = new List<Dictionary<string, object>>();
-                page.Children.Sort((a, b) => a.MenuPosition.CompareTo(b.MenuPosition));
-                foreach (GridPage childPage in page.Children)
-                {
-                    if (childPage.LoggedOutRequired && Authenticator.CheckAuthentication(httpRequest))
+                List<Dictionary<string, object>> childPages = new List<Dictionary<string, object>> ();
+                page.Children.Sort ((a, b) => a.MenuPosition.CompareTo (b.MenuPosition));
+                foreach (GridPage childPage in page.Children) {
+                    if (childPage.LoggedOutRequired && Authenticator.CheckAuthentication (httpRequest))
                         continue;
-                    if (childPage.LoggedInRequired && !Authenticator.CheckAuthentication(httpRequest))
+                    if (childPage.LoggedInRequired && !Authenticator.CheckAuthentication (httpRequest))
                         continue;
                     if (childPage.AdminRequired &&
-                        !Authenticator.CheckAdminAuthentication(httpRequest, childPage.AdminLevelRequired))
+                        !Authenticator.CheckAdminAuthentication (httpRequest, childPage.AdminLevelRequired))
                         continue;
 
-                    childPages.Add(new Dictionary<string, object>
+                    childPages.Add (new Dictionary<string, object>
                                        {
                                            {"ChildMenuItemID", childPage.MenuID},
                                            {"ChildShowInMenu", childPage.ShowInMenu},
@@ -107,7 +101,7 @@ namespace WhiteCore.Modules.Web
                                        });
 
                     //Add one for menu.js
-                    pages.Add(new Dictionary<string, object>
+                    pages.Add (new Dictionary<string, object>
                                   {
                                       {"MenuItemID", childPage.MenuID},
                                       {"ShowInMenu", false},
@@ -115,7 +109,7 @@ namespace WhiteCore.Modules.Web
                                   });
                 }
 
-                pages.Add(new Dictionary<string, object>
+                pages.Add (new Dictionary<string, object>
                               {
                                   {"MenuItemID", page.MenuID},
                                   {"ShowInMenu", page.ShowInMenu},
@@ -123,40 +117,40 @@ namespace WhiteCore.Modules.Web
                                   {"ChildrenMenuItems", childPages},
                                   {"MenuItemLocation", page.Location},
                                   {"MenuItemTitleHelp", GetTranslatedString(translator, page.MenuToolTip, page, true)},
-                        {"MenuItemTitle", GetTranslatedString(translator, page.MenuTitle, page, false)},
+                                 {"MenuItemTitle", GetTranslatedString(translator, page.MenuTitle, page, false)},
                         {"MenuItemToolTip", GetTranslatedString(translator, page.MenuToolTip, page, true)}
                               });
             }
-            vars.Add("MenuItems", pages);
+            vars.Add ("MenuItems", pages);
 
             #endregion
 
             // Tooltips Urls
-            vars.Add("TooltipsWelcomeScreen", translator.GetTranslatedString("TooltipsWelcomeScreen"));
-            vars.Add("TooltipsWorldMap", translator.GetTranslatedString("TooltipsWorldMap"));
+            vars.Add ("TooltipsWelcomeScreen", translator.GetTranslatedString ("TooltipsWelcomeScreen"));
+            vars.Add ("TooltipsWorldMap", translator.GetTranslatedString ("TooltipsWorldMap"));
 
 
             // Index Page
-            vars.Add("HomeText", translator.GetTranslatedString("HomeText"));
-            vars.Add("HomeTextWelcome", translator.GetTranslatedString("HomeTextWelcome"));
-            vars.Add("HomeTextTips", translator.GetTranslatedString("HomeTextTips"));
-            vars.Add("WelcomeScreen", translator.GetTranslatedString("WelcomeScreen"));
-            vars.Add("WelcomeToText", translator.GetTranslatedString("WelcomeToText"));
+            vars.Add ("HomeText", translator.GetTranslatedString ("HomeText"));
+            vars.Add ("HomeTextWelcome", translator.GetTranslatedString ("HomeTextWelcome"));
+            vars.Add ("HomeTextTips", translator.GetTranslatedString ("HomeTextTips"));
+            vars.Add ("WelcomeScreen", translator.GetTranslatedString ("WelcomeScreen"));
+            vars.Add ("WelcomeToText", translator.GetTranslatedString ("WelcomeToText"));
 
-            if (PagesMigrator.RequiresUpdate() &&
-                PagesMigrator.CheckWhetherIgnoredVersionUpdate(settings.LastPagesVersionUpdateIgnored))
-                vars.Add("PagesUpdateRequired",
-                         translator.GetTranslatedString("Pages") + " " +
-                         translator.GetTranslatedString("DefaultsUpdated"));
+            if (PagesMigrator.RequiresUpdate () &&
+                PagesMigrator.CheckWhetherIgnoredVersionUpdate (settings.LastPagesVersionUpdateIgnored))
+                vars.Add ("PagesUpdateRequired",
+                         translator.GetTranslatedString ("Pages") + " " +
+                         translator.GetTranslatedString ("DefaultsUpdated"));
             else
-                vars.Add("PagesUpdateRequired", "");
-            if (SettingsMigrator.RequiresUpdate() &&
-                SettingsMigrator.CheckWhetherIgnoredVersionUpdate(settings.LastSettingsVersionUpdateIgnored))
-                vars.Add("SettingsUpdateRequired",
-                         translator.GetTranslatedString("Settings") + " " +
-                         translator.GetTranslatedString("DefaultsUpdated"));
+                vars.Add ("PagesUpdateRequired", "");
+            if (SettingsMigrator.RequiresUpdate () &&
+                SettingsMigrator.CheckWhetherIgnoredVersionUpdate (settings.LastSettingsVersionUpdateIgnored))
+                vars.Add ("SettingsUpdateRequired",
+                         translator.GetTranslatedString ("Settings") + " " +
+                         translator.GetTranslatedString ("DefaultsUpdated"));
             else
-                vars.Add("SettingsUpdateRequired", "");
+                vars.Add ("SettingsUpdateRequired", "");
 
             // user news inclusion
             if (settings.LocalFrontPage == "") {
@@ -168,23 +162,23 @@ namespace WhiteCore.Modules.Web
             }
 
             // Language Switcher
-            vars.Add ("Languages", webInterface.AvailableLanguages());
-            vars.Add("ShowLanguageTranslatorBar", !settings.HideLanguageTranslatorBar);
+            vars.Add ("Languages", webInterface.AvailableLanguages ());
+            vars.Add ("ShowLanguageTranslatorBar", !settings.HideLanguageTranslatorBar);
 
-            vars.Add("Maintenance", false);
-            vars.Add("NoMaintenance", true);
+            vars.Add ("Maintenance", false);
+            vars.Add ("NoMaintenance", true);
             return vars;
         }
 
-        string GetTranslatedString(ITranslator translator, string name, GridPage page, bool isTooltip)
+        string GetTranslatedString (ITranslator translator, string name, GridPage page, bool isTooltip)
         {
-            string retVal = translator.GetTranslatedString(name);
+            string retVal = translator.GetTranslatedString (name);
             if (retVal == "UNKNOWN CHARACTER")
                 return isTooltip ? page.MenuToolTip : page.MenuTitle;
             return retVal;
         }
 
-        public bool AttemptFindPage(string filename, ref OSHttpResponse httpResponse, out string text)
+        public bool AttemptFindPage (string filename, ref OSHttpResponse httpResponse, out string text)
         {
             text = "";
             return false;

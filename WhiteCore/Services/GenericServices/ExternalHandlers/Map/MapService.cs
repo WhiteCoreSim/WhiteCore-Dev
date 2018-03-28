@@ -168,7 +168,7 @@ namespace WhiteCore.Services
             byte[] response = MainServer.BlankResponse;
 
             string var = httpRequest.Query["var"].ToString();
-            string requestType = path.Substring (0, path.IndexOf ("?"));
+            string requestType = path.Substring (0, path.IndexOf ("?", StringComparison.Ordinal));
             if (requestType == "/MapAPI/get-region-coords-by-name")
             {
                 string resp = "var {0} = {\"x\":{1},\"y\":{2}};";
@@ -505,7 +505,7 @@ namespace WhiteCore.Services
         }
 
         // From MSDN
-        static ImageCodecInfo GetEncoderInfo(String mimeType)
+        static ImageCodecInfo GetEncoderInfo(string mimeType)
         {
             ImageCodecInfo [] encoders;
             try {

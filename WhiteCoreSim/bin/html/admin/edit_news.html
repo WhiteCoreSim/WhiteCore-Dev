@@ -16,6 +16,30 @@ Submit                   Submit
 <h2>{SystemName}: {EditNewsText}</h2>
 <div id="info_message" class="error_message"></div>
 <form id="edit_news_form" action="admin/edit_news.html" method="post">
+
+<div class="rTable">
+  <div class="rTableBody">
+    <div class="rTableRow">
+      <div class="rTableCell">
+        <p>{NewsItemTitle}</p>
+      </div>
+      <div class="rTableCell"><input id="NewsTitle" name="NewsTitle" size="119" type="text" value="{NewsTitle}" /></div>
+    </div>
+    <div class="rTableRow">
+      <div class="rTableCell">
+        <p>{NewsItemText}</p>
+      </div>
+      <div class="rTableCell"><textarea id="NewsText" cols="91" name="NewsText" rows="10">{NewsText}</textarea></div>
+    </div>
+    <div class="rTableRow">
+      <div class="rTableCell"> </div>
+      <div class="rTableCell"> </div>
+      <div class="rTableCell"><button id="Submit" name="Submit" type="Submit">{Submit}</button></div>
+    </div>
+  </div>
+</div>
+
+<!--
 <table id="edit_news">
   <caption></caption>
 
@@ -49,6 +73,8 @@ Submit                   Submit
     </tr>
   </tbody>
 </table>
+-->
+
 </form>
 
 <script>

@@ -14,111 +14,92 @@ Search              Search
 
 
 <div id="fullPage">
-<h2>{SystemName}: {RegionSearchText}</h2>
-<h3>{SearchForRegionText}</h3>
-<form id="region_search_form" action="region_search.html" method="POST">
-<table id="user_search">
-  <caption></caption>
+  <h2>{RegionSearchText}</h2>
+  <h3>{SearchForRegionText}</h3>
 
-  <thead>
+  <form id="region_search_form" action="region_search.html" method="POST">
+    <div class="col-xs-12" id="region_search">
+      <div class="col-xs-2 text-left"><p>{RegionNameText}*</p></div>
+      <div class="col-xs-2">
+        <input hidden label="Submit" type="hidden" id="Submit" name="Submit" value="Submit" />
+	      <input require="true" label="regionname" name="regionname" />
+		    <button class="btn btn-sm bit-info" id="search_btn" type="Submit" name="Submit" value="Submit">
+          {Search}
+        </button>
+	   </div>
+    </div>
+  </form>
+
+  <div class="col-xs-12">
+    <h3>{SearchResultForRegionText}</h3>
+    <table id="region_search_result_navigation_top">
+      <thead>
+        <tr>
+          <th><a class="fade" href="index.html?page=region_search&Start=0" target="_self" title="{FirstText}"><p class="nav">|&nbsp;<</p></a></th>
+    	  <th><a class="fade" href="index.html?page=region_search&Start={BackOne}" target="_self" title="{BackText}"><p class="nav"><</p></a></th>
+    	  <th><p>{CurrentPageText} {CurrentPage}</p></th>
+    	  <th><a class="fade" href="index.html?page=region_search&Start={NextOne}" target="_self" title="{NextText}"><p class="nav">></p></a></th>
+    	  <th><a class="fade" href="index.html?page=region_search&Start=-1" target="_self" title="{LastText}"><p class="nav">>&nbsp;|</p></a></th>
+        </tr>
+      </thead>
+  </table>
+  <table id="region_search_result">
+
+    <thead  class="listhead">
+      <tr>
+        <th class="user_search_result_left" style="width:200px"><p>{RegionNameText}</p></th>
+        <th class="user_search_result_left" style="width:100px"><p>{RegionLocXText}</p></th>
+        <th class="user_search_result_left" style="width:100px"><p>{RegionLocYText}</p></th>
+        <th class="user_search_result_left"></th>
+        <th class="user_search_result_right" style="width:50px"><p>{RegionOnlineText}</p></th>
+        <th class="user_search_result_right" style="width:150px"><p>{RegionMoreInfo}</p></th>
+      </tr>
+    </thead>
+    <tfoot class="listfoot">
+      <tr style="align:bottom;">
+        <th class="user_search_result_left"><p>{RegionNameText}</p></th>
+        <th class="user_search_result_left"><p>{RegionLocXText}</p></th>
+        <th class="user_search_result_left"><p>{RegionLocYText}</p></th>
+        <th class="user_search_result_left"></th>
+        <th class="user_search_result_right"><p>{RegionOnlineText}</p></th>
+        <th class="user_search_result_right"><p>{RegionMoreInfo}</p></th>
+      </tr>
+    </tfoot>
+    <tbody>
+
     <tr>
-      <th class="user_search_left"></th>
-      <th class="user_search_right"></th>
+    	<td colspan="5">
+    	  <div id="error_message" class="error_message">
+    	    <h3>{NoDetailsText}</h3>
+    	  </div>
+    	</td>
     </tr>
-  </thead>
-  <tfoot>
-    <tr>
-      <th class="user_search_left"></th>
-      <th class="user_search_right"></th>
-    </tr>
-  </tfoot>
 
-  <tbody>
-    <tr>
-      <td class="user_search_left"><p>{RegionNameText}*</p></td>
-      <td class="user_search_right">
-	    <input hidden label="Submit" type="hidden" id="Submit" name="Submit" value="Submit" />
-	    <input require="true" label="regionname" name="regionname" />
-		<button id="login_bouton" type="Submit" name="Submit" value="Submit">{Search}</button>
-	  </td>
-    </tr>
-  </tbody>
-</table>
-</form>
+  {RegionsListArrayBegin}
+      <tr>
+        <td class="user_search_result_left"><p>{RegionName}</p></td>
+        <td class="user_search_result_left"><p>{RegionLocX}</p></td>
+  	  <td class="user_search_result_left"><p>{RegionLocY}</p></td>
+   	  <td class="user_search_result_left"><p>{RegionInfo}</p></td>
+  	  <td class="user_search_result_right"><p>{RegionStatus}</p></td>
+       <td class="user_search_result_right"><a target="_self" class='regioninfo' href="regionprofile/?regionid={RegionID}"><p>{MoreInfoText}</p></a></td>
+      </tr>
+  {RegionsListArrayEnd}
 
-<h3>{SearchResultForRegionText}</h3>
-<table id="user_search_result_navigation_top">
-  <caption></caption>
+    </tbody>
+  </table>
+  <table id="user_search_result_navigation_bottom">
 
-  <thead>
-    <tr>
-      <th><a class="fade" href="index.html?page=region_search&Start=0" target="_self" title="{FirstText}"><p class="nav">|&nbsp;<</p></a></th>
-	  <th><a class="fade" href="index.html?page=region_search&Start={BackOne}" target="_self" title="{BackText}"><p class="nav"><</p></a></th>
-	  <th><p>{CurrentPageText} {CurrentPage}</p></th>
-	  <th><a class="fade" href="index.html?page=region_search&Start={NextOne}" target="_self" title="{NextText}"><p class="nav">></p></a></th>
-	  <th><a class="fade" href="index.html?page=region_search&Start=-1" target="_self" title="{LastText}"><p class="nav">>&nbsp;|</p></a></th>
-    </tr>
-  </thead>
-</table>
-<table id="user_search_result">
-  <caption></caption>
-
-  <thead  class="listhead">
-    <tr>
-      <th class="user_search_result_left" style="width:200px"><p>{RegionNameText}</p></th>
-      <th class="user_search_result_left" style="width:100px"><p>{RegionLocXText}</p></th>
-      <th class="user_search_result_left" style="width:100px"><p>{RegionLocYText}</p></th>
-      <th class="user_search_result_left"></th>
-      <th class="user_search_result_right" style="width:50px"><p>{RegionOnlineText}</p></th>
-      <th class="user_search_result_right" style="width:150px"><p>{RegionMoreInfo}</p></th>
-    </tr>
-  </thead>
-  <tfoot class="listfoot">
-    <tr style="align:bottom;">
-      <th class="user_search_result_left"><p>{RegionNameText}</p></th>
-      <th class="user_search_result_left"><p>{RegionLocXText}</p></th>
-      <th class="user_search_result_left"><p>{RegionLocYText}</p></th>
-      <th class="user_search_result_left"></th>
-      <th class="user_search_result_right"><p>{RegionOnlineText}</p></th>
-      <th class="user_search_result_right"><p>{RegionMoreInfo}</p></th>
-    </tr>
-  </tfoot>
-  <tbody>
-
-  <tr>
-  	<td colspan="5">
-  	  <div id="error_message" class="error_message">
-  	    <h3>{NoDetailsText}</h3>
-  	  </div>
-  	</td>
-  </tr>
-
-{RegionsListArrayBegin}
-    <tr>
-      <td class="user_search_result_left"><p>{RegionName}</p></td>
-      <td class="user_search_result_left"><p>{RegionLocX}</p></td>
-	  <td class="user_search_result_left"><p>{RegionLocY}</p></td>
- 	  <td class="user_search_result_left"><p>{RegionInfo}</p></td>
-	  <td class="user_search_result_right"><p>{RegionStatus}</p></td>
-     <td class="user_search_result_right"><a target="_self" class='regioninfo' href="regionprofile/?regionid={RegionID}"><p>{MoreInfoText}</p></a></td>
-    </tr>
-{RegionsListArrayEnd}
-
-  </tbody>
-</table>
-<table id="user_search_result_navigation_bottom">
-  <caption></caption>
-
-  <thead>
-    <tr>
-      <th><a class="fade" href="index.html?page=region_search&Start=0" target="_self" title="{FirstText}"><p class="nav">|&nbsp;<</p></a></th>
-	  <th><a class="fade" href="index.html?page=region_search&Start={BackOne}" target="_self" title="{BackText}"><p class="nav"><</p></a></th>
-	  <th><p>{CurrentPageText} {CurrentPage}</p></th>
-	  <th><a class="fade" href="index.html?page=region_search&Start={NextOne}" target="_self" title="{NextText}"><p class="nav">></p></a></th>
-	  <th><a class="fade" href="index.html?page=region_search&Start=-1" target="_self" title="{LastText}"><p class="nav">>&nbsp;|</p></a></th>
-    </tr>
-  </thead>
-</table>
+    <thead>
+      <tr>
+        <th><a class="fade" href="index.html?page=region_search&Start=0" target="_self" title="{FirstText}"><p class="nav">|&nbsp;<</p></a></th>
+  	  <th><a class="fade" href="index.html?page=region_search&Start={BackOne}" target="_self" title="{BackText}"><p class="nav"><</p></a></th>
+  	  <th><p>{CurrentPageText} {CurrentPage}</p></th>
+  	  <th><a class="fade" href="index.html?page=region_search&Start={NextOne}" target="_self" title="{NextText}"><p class="nav">></p></a></th>
+  	  <th><a class="fade" href="index.html?page=region_search&Start=-1" target="_self" title="{LastText}"><p class="nav">>&nbsp;|</p></a></th>
+      </tr>
+    </thead>
+  </table>
 
 <script>
   /* attach a submit handler to the form */
@@ -139,7 +120,13 @@ Search              Search
 
   $("li.fade, a.fade, a.regioninfo").hover(function(){$(this).fadeOut(150);$(this).fadeIn(150);});
 
-  $(document).ready(function(){$(".regioninfo").colorbox({iframe:true, width:"990px", height:"440px"});});
+  $(document).ready(function(){
+    $('#region_search_result').dataTable({
+      "order": [[ 0, "asc" ]],
+    });
+
+    $(".regioninfo").colorbox({iframe:true, width:"990px", height:"440px"});
+  });
 </script>
 
 </div>

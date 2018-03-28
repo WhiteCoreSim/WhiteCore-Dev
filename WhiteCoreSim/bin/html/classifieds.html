@@ -2,6 +2,7 @@
 
 <div id="fullPage">
   <h2>{SystemName}: {ClassifiedsText}</h2>
+  <div class="col-sm-10" style="margin-bottom:10px;">
 
   <form id="classifieds_search_form" action="classifieds.html" method="post">
 
@@ -12,25 +13,25 @@
 {CategoryTypeArrayEnd}
             </select>
 
-
           <input style="width:20px;" type="checkbox" id="display_pg" name="display_pg" value="on" {PG_checked}>
-          <label for="display_pg" class="for-check"><img src="/icons/general.png" alt="PG ratings" style="margin-bottom:3px;">&nbsp;&nbsp;{GeneralText}</label>
+          <label for="display_pg" class="for-check"><img src="/images/icons/general.png" alt="PG ratings" style="margin-bottom:3px;">&nbsp;&nbsp;{GeneralText}</label>
           {IsAuthenticatedBegin}
           <input style="width:20px;" type="checkbox" id="display_ma" name="display_ma" value="on" {MA_checked}>
-          <label for="display_ma" class="for-check"><img src="/icons/moderate.png" alt="MA ratings" style="margin-bottom:3px;">&nbsp;&nbsp;{MatureText}</label>
+          <label for="display_ma" class="for-check"><img src="/images/icons/moderate.png" alt="MA ratings" style="margin-bottom:3px;">&nbsp;&nbsp;{MatureText}</label>
           <input style="width:20px;" type="checkbox" id="display_ao" name="display_ao" value="on" {AO_checked}>
-          <label for="display_ao" class="for-check"><img src="/icons/adult.png" alt="AO ratings" style="margin-bottom:3px;">&nbsp;&nbsp;{AdultText}</label>
+          <label for="display_ao" class="for-check"><img src="/images/icons/adult.png" alt="AO ratings" style="margin-bottom:3px;">&nbsp;&nbsp;{AdultText}</label>
           {IsAuthenticatedEnd}
 
   				<input hidden type="hidden" label="Submit" id="Submit" name="Submit" value="Submit" />
-  				<button class="button" style="float:right;width:200;" id="Submit" type="Submit" name="Submit">{SearchText}</button>
+  				<button class="btn btn-info" style="float:right;width:200px;" id="Submitbtn" type="Submitbtn" name="Submitbtn">{SearchText}</button>
   			</p>
   	</div>
   </form>
+</div>
 
 
 
-  <table id="classifieds_list">
+<!--  <table id="classifieds_list">
 	  <thead class="listhead">
    		<tr>
    		  <th class="transactions_left"><p>{CreationDateText}</p></th>
@@ -58,10 +59,9 @@
     </tbody>
   </table>
 </div>
-
+-->
 
 <div class="container">
-  <div class="row">
     <div class="col-xs-12 col-sm-offset-2 col-sm-8">
             <ul class="event-list">
               {ClassifiedListArrayBegin}
@@ -95,9 +95,9 @@
         </tbody>
       </table>
     </div>
-  </div>
-</div>
 
+
+</div>
 
 <script>
   $(document).ready(function() {
@@ -106,6 +106,14 @@
     });
   });
 
+  /*$('#classifieds-category').on('change',function(){
+    var $form = $( this );
+    var url = $form.attr( 'action' );
+    $.post( url, $form.serialize(), function( data ) {
+      $("#fullPage").empty().append(data);
+    });
+  });
+  */
   /* attach a submit handler to the form */
   $("#classifieds_search_form").submit(function(event) {
 

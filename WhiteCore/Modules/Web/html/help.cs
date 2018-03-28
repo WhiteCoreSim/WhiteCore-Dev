@@ -69,7 +69,8 @@ namespace WhiteCore.Modules.Web
             vars.Add ("PocketMetaverse", "Pocket Metaverse (iPhone/iPad)");
             vars.Add ("Radegast", "Radegast");
             vars.Add ("MobileGridClient", "MobileGridClient (Android)");
-            vars.Add ("MoreInfo", translator.GetTranslatedString ("MoreInfo"));
+            //vars.Add ("MoreInfo", translator.GetTranslatedString ("MoreInfo"));
+            vars.Add ("MoreInfo", "Click image for login details, link for the viewer site");
             return vars;
         }
 

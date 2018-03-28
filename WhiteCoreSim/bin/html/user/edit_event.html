@@ -6,6 +6,74 @@
   <form id="edit_event_form" action="user/edit_event.html" method="post">
     <input hidden="true" label="eventid" id="eventid" name="eventid" value="{EventID}"/>
     <input type="hidden" label="Submit" id="Submit" name="Submit" value="Submit" />
+
+<div class="rTable">
+  <div class="rTableHeading">
+    <div class="rTableRow">
+      <div class="rTableHead">&nbsp;</div>
+      <div class="rTableHead">&nbsp;</div>
+      <div class="rTableHead">&nbsp;</div>
+      <div class="rTableHead">&nbsp;</div>
+    </div>
+  </div>
+  <div class="rTableBody">
+    <div class="rTableRow">
+      <div class="rTableCell">
+        <p>{EventNameText}</p>
+      </div>
+      <div class="rTableCell"><input id="eventName" name="eventName" size="119" type="text" value="{Name}" /></div>
+    </div>
+    <div class="rTableRow">
+      <div class="rTableCell"><label class="from" for="eventDate">{EventDateText}</label></div>
+      <div class="rTableCell"><input id="eventDate" style="width: 120px;" name="eventDate" type="text" value="{EventDate}" /></div>
+      <div class="rTableCell"><label class="to" for="eventTime">{EventTimeText}</label></div>
+      <div class="rTableCell"><select id="eventTime" name="eventTime">{EventTimesArrayBegin}
+          <option selected="selected" value="{Index}">{Value}</option>
+          {EventTimesArrayEnd}</select></div>
+    </div>
+    <div class="rTableRow">
+      <div class="rTableCell"><label class="to" for="eventDuration">{EventDurationText}</label></div>
+      <div class="rTableCell"><select id="eventDuration" name="eventDuration">{EventDurationsArrayBegin}
+          <option selected="selected" value="{Index}">{Value}</option>
+          {EventDurationsArrayEnd}</select></div>
+      <div class="rTableCell"><label class="from">{EventTimeInfoText}</label></div>
+    </div>
+    <div class="rTableRow">
+      <div class="rTableCell">
+        <p>{EventLocationText}</p>
+      </div>
+      <div class="rTableCell"><select id="eventLocation" name="eventLocation">{EventLocationsArrayBegin}
+          <option disabled="disabled" selected="selected" value="{Index}">{Value}</option>
+          {EventLocationsArrayEnd}</select></div>
+    </div>
+    <div class="rTableRow">
+      <div class="rTableCell"><label class="to" for="eventDuration">{EventCategoryText}</label></div>
+      <div class="rTableCell"><select id="eventCategory" name="eventCategory">{EventCategoriesArrayBegin}
+          <option selected="selected" value="{Index}">{Value}</option>
+          {EventCategoriesArrayEnd}</select></div>
+      <div class="rTableCell"><label class="to" for="eventCoverCharge">{EventCoverChargeText}</label></div>
+      <div class="rTableCell"><input id="eventCoverCharge" style="width: 80px;" name="eventCoverCharge" type="text" value="{EventCoverCharge}" /></div>
+    </div>
+    <div class="rTableRow">
+      <div class="rTableCell">
+        <p>{EventDescriptionText}</p>
+      </div>
+      <div class="rTableCell"><textarea id="eventDescription" cols="91" name="eventDescription" rows="10">              {Description}
+                      </textarea></div>
+    </div>
+    <div class="rTableRow">
+      <div class="rTableCell">&nbsp;</div>
+      <div class="rTableCell">&nbsp;</div>
+      <div class="rTableCell"><input id="Delete" style="width: 25px;" name="Delete" type="checkbox" />{Delete}</div>
+      <div class="rTableCell"><button id="Submit" name="Submit" type="Submit">{Submit}</button></div>
+    </div>
+  </div>
+</div>
+</form>
+
+
+
+    <!--
     <table id="edit_event">
       <thead>
         <tr>
@@ -84,7 +152,7 @@
       </tbody>
     </table>
   </form>
-
+-->
   <script>
     <!--  /* date picker */ -->
     $(function() {

@@ -3,6 +3,78 @@
 
 <h2>{SystemName}: {UserProfileFor} {UserName}</h2>
 <div id="user_agent_profile_container">
+
+  <p></p>
+<div class="rTable">&nbsp;
+
+  <div class="rTableBody">
+    <div class="rTableRow">
+      <div class="rTableCell">
+        <div class="user_agent_profile_picture"><a href="#"> <img title="{UserProfileFor}: {UserName} ({UserType})" src="{UserPictureURL}" alt="{UserProfileFor}: {UserName} ({UserType})" height="256" /></a>
+          <p class="user_agent_profile_picture_text">{UserProfileFor}: {UserName} ({UserType})</p>
+        </div>
+      </div>
+      <div class="rTableCell">
+        <p>{UserProfileFor}:</p>
+      </div>
+      <div class="rTableCell">
+        <p>{UserName}</p>
+      </div>
+    </div>
+    <div class="rTableRow">
+      <div class="rTableCell">
+        <p>{IsOnlineText}:</p>
+      </div>
+      <div class="rTableCell">
+        <p>{IsOnline}</p>
+      </div>
+    </div>
+    {IfUserIsOnlineBegin}
+    <div class="rTableRow">
+      <div class="rTableCell">
+        <p>{OnlineLocationText}:</p>
+      </div>
+      <div class="rTableCell">
+        <p>{OnlineLocation}</p>
+      </div>
+    </div>
+    {IfUserIsOnlineEnd}
+    <div class="rTableRow">
+      <div class="rTableCell">
+        <p>{ResidentSince}:</p>
+      </div>
+      <div class="rTableCell">
+        <p>{UserBorn}</p>
+      </div>
+    </div>
+    <div class="rTableRow">
+      <div class="rTableCell">
+        <p>{AccountType}:</p>
+      </div>
+      <div class="rTableCell">
+        <p>{UserType}</p>
+      </div>
+    </div>
+    <div class="rTableRow">
+      <div class="rTableCell">
+        <p>{PartnersName}:</p>
+      </div>
+      <div class="rTableCell">
+        <p>{UserPartner}</p>
+      </div>
+    </div>
+    <div class="rTableRow">
+      <div class="rTableCell">
+        <p>{AboutMe}:</p>
+      </div>
+      <div class="rTableCell">
+        <p>{UserAboutMe}</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+  <!--
 <table id="user_agent_profile">
   <caption></caption>
 
@@ -24,7 +96,7 @@
 
   <tbody>
     <tr>
-      <td class="user_agent_profile_picture" rowspan="6"> <!-- we need a variable for rowspan -->
+      <td class="user_agent_profile_picture" rowspan="6">
 	    <div class="user_agent_profile_picture">
 	    <a href="#">
 	    <img height="256"
@@ -64,6 +136,8 @@
     </tr>
   </tbody>
 </table>
+-->
+
 </div>
 
 <script type="text/javascript" rel="javasript">

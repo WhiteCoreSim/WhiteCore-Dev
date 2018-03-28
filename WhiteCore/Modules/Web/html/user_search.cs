@@ -27,6 +27,8 @@
 
 using System.Collections.Generic;
 using OpenMetaverse;
+using WhiteCore.Framework.DatabaseInterfaces;
+using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.Servers.HttpServer.Implementation;
 using WhiteCore.Framework.Services;
 using WhiteCore.Framework.Utilities;
@@ -62,7 +64,10 @@ namespace WhiteCore.Modules.Web
             var IsAdmin = Authenticator.CheckAdminAuthentication (httpRequest);
 
             string noDetails = translator.GetTranslatedString ("NoDetailsText");
-
+            IWebHttpTextureService webhttpService =
+	            webInterface.Registry.RequestModuleInterface<IWebHttpTextureService> ();
+            var profileservice = Framework.Utilities.DataManager.RequestPlugin<IProfileConnector> ();
+ 
             if (requestParameters.ContainsKey ("Submit")) {
                 IUserAccountService accountService = webInterface.Registry.RequestModuleInterface<IUserAccountService> ();
 
@@ -99,6 +104,9 @@ namespace WhiteCore.Modules.Web
                     }
                     if (searchUsersList.Count > 0) {
                         noDetails = "";
+                        var nopicUrl = "../images/icons/no_avatar.jpg";
+                        var picUrl = "";
+                        var userType = "Resident";
 
                         foreach (var user in users) {
                             if (!searchUsersList.Contains (user.PrincipalID))
@@ -107,9 +115,21 @@ namespace WhiteCore.Modules.Web
                             if (Utilities.IsSystemUser (user.PrincipalID))
                                 continue;
 
+                            picUrl = nopicUrl;
+                            userType = "Resident";
+
+                            var profile = profileservice.GetUserProfile (user.PrincipalID);
+                            if (profile != null) {
+                                userType = profile.MembershipGroup == "" ? "Resident" : profile.MembershipGroup;
+                            }
+                            if (webhttpService != null && profile.Image != UUID.Zero)
+                                picUrl = webhttpService.GetTextureURL (profile.Image);
+
                             usersList.Add (new Dictionary<string, object> {
                                 { "UserName", user.Name },
                                 { "UserID", user.PrincipalID },
+                                { "UserType", userType },
+                                { "UserPictureURL", picUrl},
                                 { "CanEdit", IsAdmin }
                             });
                         }

@@ -17,6 +17,68 @@ Save                          Save
 <h2>{SystemName}: {GridSettingsManager}</h2>
 <form id="gridsettings_manager_form" action="admin/gridsettings_manager.html" method="post">
 <div id="info_message" class="info"></div>
+
+<div class="rTable"><caption> </caption>
+  <div class="rTableBody">
+    <div class="rTableRow">
+      <div class="rTableCell">
+        <p>{GridnameText}</p>
+      </div>
+      <div class="rTableCell"><input id="Gridname" name="Gridname" size="119" type="text" value="{Gridname}" /></div>
+      <div class="rTableCell">
+        <p>{GridnickText}</p>
+      </div>
+      <div class="rTableCell"><input id="Gridnick" name="Gridnick" size="119" type="text" value="{Gridnick}" /></div>
+    </div>
+    <div class="rTableRow">
+      <div class="rTableCell">
+        <p>{GovernorNameText}</p>
+      </div>
+      <div class="rTableCell"><input id="GovernorName" name="GovernorName" size="119" type="text" value="{GovernorName}" /></div>
+      <div class="rTableCell">
+        <p>{MainlandEstateNameText}</p>
+      </div>
+      <div class="rTableCell"><input id="MainlandEstateName" name="MainlandEstateName" size="119" type="text" value="{MainlandEstateName}" /></div>
+    </div>
+    <div class="rTableRow">
+      <div class="rTableCell">
+        <p>{RealEstateOwnerNameText}</p>
+      </div>
+      <div class="rTableCell"><input id="RealEstateOwnerName" name="RealEstateOwnerName" size="119" type="text" value="{RealEstateOwnerName}" /></div>
+      <div class="rTableCell">
+        <p>{SystemEstateNameText}</p>
+      </div>
+      <div class="rTableCell"><input id="SystemEstateName" name="SystemEstateName" size="119" type="text" value="{SystemEstateName}" /></div>
+    </div>
+    <div class="rTableRow">
+      <div class="rTableCell">
+        <p>{BankerNameText}</p>
+      </div>
+      <div class="rTableCell"><input id="BankerName" name="BankerName" size="119" type="text" value="{BankerName}" /></div>
+      <div class="rTableCell">
+        <p>{MarketPlaceOwnerNameText}</p>
+      </div>
+      <div class="rTableCell"><input id="MarketplaceOwnerName" name="MarketplaceOwnerName" size="119" type="text" value="{MarketplaceOwnerName}" /></div>
+    </div>
+    <div class="rTableRow">
+      <div class="rTableCell">
+        <p>{WelcomeMessageText}</p>
+      </div>
+      <div class="rTableCell"><input id="WelcomeMessage" name="WelcomeMessage" size="119" type="text" value="{WelcomeMessage}" /></div>
+      <div class="rTableCell"> </div>
+      <div class="rTableCell"> </div>
+    </div>
+    <div class="rTableRow">
+      <div class="rTableCell"> </div>
+      <div class="rTableCell"> </div>
+      <div class="rTableCell"> </div>
+      <div class="rTableCell"><button id="Submit" style="width: 100px;" name="Submit" type="Submit">{Save}</button></div>
+    </div>
+  </div>
+</div>
+
+
+<!--
 <table id="settings_manager">
   <caption></caption>
 
@@ -76,6 +138,7 @@ Save                          Save
     </tr>
   </tbody>
 </table>
+-->
 </form>
 
 <script>

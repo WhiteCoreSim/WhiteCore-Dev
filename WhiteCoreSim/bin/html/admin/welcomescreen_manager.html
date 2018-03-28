@@ -31,6 +31,58 @@ ChangesSavedSuccessfully      Changes saved successfully
 <h2>{SystemName}: {WelcomeScreenManagerFor}</h2>
 <form id="welcomescreen_updater" action="admin/welcomescreen_manager.html" method="post">
 <div id="info_message" class="info_message"><h3></h3></div>
+
+<div class="rTable">
+  <div class="rTableBody">
+    <div class="rTableRow">
+      <div class="rTableCell">
+        <p>{GridStatus}</p>
+      </div>
+      <div class="rTableCell"><select id="GridStatus" name="GridStatus">
+        <option style="background-color: #00ff00;" value="1">{Online}</option>
+        <option style="background-color: #ff0000;" value="0">{Offline}</option>
+      </select></div>
+    </div>
+    <div class="rTableRow">
+      <div class="rTableCell">
+        <p id="specialwinstatus_label">{SpecialWindowStatusText}</p>
+      </div>
+      <div class="rTableCell"><select id="SpecialWindowStatus" name="SpecialWindowStatus">
+        <option style="background-color: #00ff00;" value="1">{Enabled}</option>
+        <option style="background-color: #ff0000;" value="0">{Disabled}</option>
+      </select></div>
+    </div>
+    <div class="rTableRow">
+      <div class="rTableCell">
+        <p>{SpecialWindowTitleText}</p>
+      </div>
+      <div class="rTableCell"><input id="SpecialWindowTitle" name="SpecialWindowTitle" size="119" type="text" value="{SpecialWindowTitle}" /></div>
+    </div>
+    <div class="rTableRow">
+      <div class="rTableCell">
+        <p>{SpecialWindowTextText}</p>
+      </div>
+      <div class="rTableCell"><textarea id="SpecialWindowText" cols="90" name="SpecialWindowText" rows="10">{SpecialWindowMessage}</textarea></div>
+    </div>
+    <div class="rTableRow">
+      <div class="rTableCell">
+        <p>{SpecialWindowColorText}</p>
+      </div>
+      <div class="rTableCell"><select id="boxcolor" name="SpecialWindowColor">
+        <option style="background-color: #ffffff;" value="white">white</option>
+        <option style="background-color: #00ff00;" value="green">green</option>
+        <option style="background-color: #ffff00;" value="yellow">yellow</option>
+        <option style="background-color: #ff0000;" value="red">red</option>
+      </select></div>
+    </div>
+    <div class="rTableRow">
+      <div class="rTableCell"> </div>
+      <div class="rTableCell"><button id="Submit" name="Submit" type="Submit">{Submit}</button></div>
+    </div>
+  </div>
+</div>
+
+<!--
 <table id="welcomescreen_manager">
   <caption></caption>
 
@@ -96,6 +148,8 @@ ChangesSavedSuccessfully      Changes saved successfully
     </tr>
   </tbody>
 </table>
+-->
+
 </form>
 
 <script>

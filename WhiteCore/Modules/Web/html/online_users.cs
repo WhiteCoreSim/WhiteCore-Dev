@@ -139,9 +139,9 @@ namespace WhiteCore.Modules.Web
 
             if (requestParameters.ContainsKey ("Order")) {
                 if (requestParameters ["Order"].ToString () == "RegionName")
-                    usersList.Sort ((a, b) => a ["UserRegion"].ToString ().CompareTo (b ["UserRegion"].ToString ()));
+                    usersList.Sort ((a, b) => string.Compare (a ["UserRegion"].ToString (), b ["UserRegion"].ToString (), System.StringComparison.Ordinal));
                 if (requestParameters ["Order"].ToString () == "UserName")
-                    usersList.Sort ((a, b) => a ["UserName"].ToString ().CompareTo (b ["UserName"].ToString ()));
+                    usersList.Sort ((a, b) => string.Compare (a ["UserName"].ToString (), b ["UserName"].ToString (), System.StringComparison.Ordinal));
             }
 
 

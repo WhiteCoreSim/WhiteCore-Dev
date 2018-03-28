@@ -1,102 +1,109 @@
 
 
 
-<h2>{SystemName}: {AddEventText}</h2>
+<h2>{AddEventText}</h2>
 <div id="info_message" class="error_message"></div>
 <div id="error_message" class="error">{ErrorMessage}</div>
+
+
 <form id="add_event_form" action="events/add_event.html" method="post">
-<table id="add_event">
-
-
-  <thead>
-    <tr>
-      <th class="text-centered"></th>
-      <th class="text-centered"></th>
-      <th class="text-centered"></th>
-      <th class="text-centered"></th>
-    </tr>
-  </thead>
-
-  <tbody>
-    <tr>
-      <td class="text-right"><p>{EventNameText}</p></td>
-      <td class="text-left" colspan="3"><input name="eventName" type="text" id="eventName" size="119"/></td>
-    </tr>
-    <tr>
-      <td class="text-right"><label class="from" for="eventDate">{EventDateText}</label></td>
-      <td class="text-left"><input type="text" style="width:120px;" name="eventDate" id="eventDate" value="{EventDate}" /></td>
-      <td class="text-right"><label class="to" for="eventTime">{EventTimeText}</label></td>
-      <td class="text-left">
-        <select name="eventTime" id="eventTime">
-        {EventTimesArrayBegin}
-          <option value="{Index}" {selected}>{Value}</option>
-        {EventTimesArrayEnd}
-            </select>
-      </td>
-    </tr>
-    <tr>
-      <td class="text-right"><label class="to" for="eventDuration">{EventDurationText}</label></td>
-      <td class="text-left">
-        <select name="eventDuration" id="eventDuration">
-        {EventDurationsArrayBegin}
-          <option value="{Index}" {selected}>{Value}</option>
-        {EventDurationsArrayEnd}
-        </select>
-      </td>
-      <td colspan="2"><label class="from">{EventTimeInfoText}</label></td>
-    </tr>
-    <tr>
-      <td class="text-right"><p>{EventLocationText}</p></td>
-      <td class="text-left" colspan="3">
-        <select name="eventLocation" id="eventLocation">
-        {EventLocationsArrayBegin}
-          <option value="{Index}" {disabled}>{Value}</option>
-        {EventLocationsArrayEnd}
-        </select>
-      </td>
-    </tr>
-    <tr>
-      <td class="txt-right"><label class="to" for="eventDuration">{EventCategoryText}</label></td>
-      <td class="text-left">
-        <select name="eventCategory" id="eventCategory">
-        {EventCategoriesArrayBegin}
-          <option value="{Index}" {selected}>{Value}</option>
-        {EventCategoriesArrayEnd}
-        </select>
-      </td>
-      <td class="text-right"><label class="to" for="eventCoverCharge">{EventCoverChargeText}</label></td>
-      <td >
-        <input type="text" style="width:80px;" name="eventCoverCharge" id="eventCoverCharge" value="{EventCoverCharge}" />
-      </td>
-    </tr>
-    <tr>
-      <td class="text-right"><p>{EventDescriptionText}</p></td>
-      <td class="text-left" colspan="3"><textarea name="eventDescription" cols="91" rows="10" id="eventDescription"></textarea></td>
-    </tr>
-    <tr>
-      <td></td>
-      <td></td>
-      <td class="text-right"></td><input type="hidden" label="Submit" id="Submit" name="Submit" value="Submit" />
-      <td class="text-left"><button id="Submit" name="Submit" type="Submit">{Submit}</button></td>
-    </tr>
-  </tbody>
-</table>
+<div id="add_event" class="col-xs-12 col-sm-10 col-sm-offset-1 text-left">
+  <div class="rTable">
+    <div class="rTableBody">
+      <div class="rTableRow">
+        <div class="rTableCell">
+          <label>{EventNameText}</label>
+        </div>
+        <div class="rTableCell" style="width:80%">
+          <input class="form-control" id="eventName" name="eventName" size="90" type="text" />
+        </div>
+      </div>
+      <div class="rTableRow">
+        <div class="rTableCell"></div>
+        <div class="rTableCell"><label>{EventTimeInfoText}</label></div>
+      </div>
+      <div class="rTableRow">
+        <div class="rTableCell"><label>{EventDateText}</label></div>
+        <div class="rTableCell input-group date" id="eventDate" style="width:22%;">
+          <input class="form-control" id="eventDateVal" name="eventDate" type="text" value="{EventDate}" />
+          <span class="input-group-addon">
+            <i class="glyphicon glyphicon-th"></i>
+          </span>
+        </div>
+        <div class="rTableCell text-right" style="width:140px;"><label>{EventTimeText}</label></div>
+        <div class="rTableCell">
+          <select class="form-control" id="eventTime" name="eventTime">
+          {EventTimesArrayBegin}
+            <option value="{Index}" {selected}>{Value}</option>
+          {EventTimesArrayEnd}
+          </select>
+        </div>
+      </div>
+      <div class="rTableRow">
+        <div class="rTableCell"><label>{EventDurationText}</label></div>
+        <div class="rTableCell">
+          <select class="form-control" id="eventDuration" name="eventDuration">
+          {EventDurationsArrayBegin}
+            <option value="{Index}" {selected}>{Value}</option>
+          {EventDurationsArrayEnd}
+          </select>
+        </div>
+      </div>
+      <div class="rTableRow">
+        <div class="rTableCell"><label>{EventLocationText}</label></div>
+        <div class="rTableCell">
+          <select class="form-control" id="eventLocation" name="eventLocation">
+            {EventLocationsArrayBegin}
+              <option disabled="disabled" value="{Index}">{Value}</option>
+            {EventLocationsArrayEnd}
+          </select>
+        </div>
+      </div>
+      <div class="rTableRow">
+        <div class="rTableCell"><label>{EventCategoryText}</label></div>
+        <div class="rTableCell">
+          <select class="form-control" id="eventCategory" name="eventCategory">
+            {EventCategoriesArrayBegin}
+              <option selected="selected" value="{Index}">{Value}</option>
+            {EventCategoriesArrayEnd}
+          </select>
+        </div>
+        <div class="rTableCell text-right"><label>{EventCoverChargeText}</label></div>
+        <div class="rTableCell">
+          <input class="form-control" id="eventCoverCharge" style="width: 80px;" name="eventCoverCharge" type="text" value="{EventCoverCharge}" />
+        </div>
+      </div>
+      <div class="rTableRow">
+        <div class="rTableCell"><label>{EventDescriptionText}</label></div>
+        <div class="rTableCell" style="height:auto;width:80%"">
+          <textarea class="form-control" id="eventDescription" cols="90" name="eventDescription" rows="10"></textarea>
+        </div>
+      </div>
+      <div class="rTableRow">
+        <div class="col-xs-3 col-xs-offset-9" style="margin-top:15px;margin-bottom:15px;">
+          <button class="btn btn-success" id="Submit" name="Submit" type="Submit">{Submit}</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 </form>
 
 <script>
-  $(function() {
-    $('#eventDate').datepick({
-      showTrigger: '<button type="button" class="trigger">...</button>'});
-  });
+  //$(function() {
+  //  $('#eventDate').datepicker({
+  //    showTrigger: '<button type="button" class="trigger">...</button>'});
+  //});
 
   <!--  /* date pickers */ -->
   $(function() {
-    $( "#eventDate" ).datepick({
+    $( "#eventDate" ).datepicker({
+      orientation: "bottom left",
       //defaultDate: "-1w",
       changeMonth: true,
       numberOfMonths: 3,
       onClose: function( selectedDate ) {
-        $( "#eventDate" ).datepick( "option", "minDate", selectedDate );
+        $( "#eventDate" ).datepicker( "option", "minDate", selectedDate );
       }
     });
   });

@@ -6,6 +6,69 @@
 
 <form id="estate_form" action="admin/estate_edit.html" method="post">
 <div style ="display: inline-block;">
+
+<div class="rTable">
+  <div class="rTableBody">
+    <div class="rTableRow">
+      <div class="rTableCell">
+        <p id="regname_label">{EstateNameText}*</p>
+      </div>
+      <div class="rTableCell"><input id="EstateName" maxlength="30" name="EstateName" size="25" type="text" value="{EstateName}" /></div>
+      <div class="rTableCell">
+        <p>{EstateOwnerText}:</p>
+      </div>
+      <div class="rTableCell"><select id="EstateOwner" style="width: 180px;" name="EstateOwner">{UserListArrayBegin}
+        <option selected="selected" value="{Index}">{Value}</option>
+      {UserListArrayEnd}</select></div>
+    </div>
+    <div class="rTableRow">
+      <div class="rTableCell">
+        <p id="gridcentery_label">{PricePerMeterText}</p>
+      </div>
+      <div class="rTableCell"><input id="PricePerMeter" style="width: 80px;" name="PricePerMeter" size="8" type="text" value="{PricePerMeter}" /></div>
+    </div>
+    <div class="rTableRow">
+      <div class="rTableCell">
+        <p id="gridcentery_label">{PublicAccessText}</p>
+      </div>
+      <div class="rTableCell"><select id="PublicAccess" name="PublicAccess">
+        {PublicAccessArrayBegin}
+          <option value="{Index}">{Value}</option>
+        {PublicAccessArrayEnd}</select></div>
+      <div class="rTableCell">
+        <p id="gridcentery_label">{AllowVoiceText}</p>
+      </div>
+      <div class="rTableCell"><select id="AllowVoice" name="AllowVoice">
+        {AllowVoiceArrayBegin}
+          <option value="{Index}">{Value}</option>
+        {AllowVoiceArrayEnd}</select></div>
+    </div>
+    <div class="rTableRow">
+      <div class="rTableCell">
+        <p id="gridcentery_label">{TaxFreeText}</p>
+      </div>
+      <div class="rTableCell"><select id="TaxFree" name="TaxFree">
+        {TaxFreeArrayBegin}
+          <option value="{Index}">{Value}</option>
+        {TaxFreeArrayEnd}</select></div>
+      <div class="rTableCell">
+        <p id="gridcentery_label">{AllowDirectTeleportText}</p>
+      </div>
+      <div class="rTableCell"><select id="AllowDirectTeleport" name="AllowDirectTeleport">{AllowDirectTeleportArrayBegin}
+        <option value="{Index}">{Value}</option>
+      {AllowDirectTeleportArrayEnd}</select></div>
+    </div>
+    <div class="rTableRow">
+      <div class="rTableCell"> </div>
+      <div class="rTableCell"> </div>
+      <div class="rTableCell"><input name="action" type="hidden" value="check" /> <button id="Submit" style="color: #888;" disabled="disabled" name="Submit" type="Submit">{Submit}</button></div>
+      <div class="rTableCell"> </div>
+      <div class="rTableCell"><button id="Cancel" name="Cancel" type="Cancel">{Cancel}</button></div>
+    </div>
+  </div>
+</div>
+
+  <!--
 <table>
   <tbody>
     <tr>
@@ -81,7 +144,9 @@
       </td>
     </tr>
   </tbody>
-</table></div>
+</table>
+-->
+</div>
 </form>
 
 <script>

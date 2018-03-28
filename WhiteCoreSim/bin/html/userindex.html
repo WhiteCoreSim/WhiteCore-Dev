@@ -1,0 +1,245 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<title>{SystemName}</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+	  <link type="text/css" rel="stylesheet" href="css/bootstrap.min.css" />
+  	<link type="text/css" rel="stylesheet" href="css/datatables.min.css" />
+		<link type="text/css" rel="stylesheet" href="css/bootstrap-datepicker.css" />
+<!--		<link rel="stylesheet" href="css/style.css" />  -->
+		<link rel="stylesheet" href="css/user.css" />
+
+	  <script src="js/jquery-2.2.3.min.js"></script>
+  	<script src="js/modernizr-2.8.3-respond-1.4.2.min.js"></script>
+
+	</head>
+	<body>
+
+		<!-- Sidebar -->
+			<div id="sbheader">
+
+				<div class="top">
+
+					<!-- Logo -->
+					<div id="logo">
+						<span class="image avatar48"><img src="{UserAvatarURL}" alt="" /></span>
+						<h1 id="title">{UserName}</h1>
+						<p>{UserType}</p>
+					</div>
+
+					<!-- Side Nav -->
+				  <nav class="navbar navbar-inverse">
+				    <div class="container">
+				      <div class="navbar-header">
+				        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+				          <span class="sr-only">Toggle navigation</span>
+				          <span class="icon-bar"></span>
+				          <span class="icon-bar"></span>
+				          <span class="icon-bar"></span>
+				        </button>
+				      </div>
+
+				      <div id="navbar" class="navbar-collapse collapse">
+								<ul class="nav navbar-nav" id="sidemenu">
+								{MenuItemsArrayBegin}
+								{IfShowInMenuBegin}
+							  	<li id="{MenuItemID}" alt="{MenuItemTitle}" title="{MenuItemTitleHelp}">{MenuItemTitle}
+									{IfHasChildrenBegin}
+										<ul class="drowdown" id="submenu">
+									{ChildrenMenuItemsArrayBegin}
+									{IfChildShowInMenuBegin}
+											<li id="{ChildMenuItemID}" alt="{ChildMenuItemTitle}" title="{ChildMenuItemTitleHelp}">{ChildMenuItemTitle}</li>
+									{IfChildShowInMenuEnd}
+									{ChildrenMenuItemsArrayEnd}
+										</ul>
+									{IfHasChildrenEnd}
+									</li>
+								{IfShowInMenuEnd}
+								{MenuItemsArrayEnd}
+								</ul>
+	<!--              <ul class="member-actions" id="member-actions">
+	                <li id="logout" title="Log out of WebUI"><a href="#" class="btn-white btn-small">Logout</a></li>
+	              </ul>  -->
+	            </div>
+	          </div>
+					</nav>
+
+				</div>
+
+				<div class="bottom">
+
+					<!-- Social Icons -->
+						<ul class="icons">
+							<li><a href="#" class="icon fa-twitter"><span class="label">Twitter</span></a></li>
+							<li><a href="#" class="icon fa-facebook"><span class="label">Facebook</span></a></li>
+							<li><a href="#" class="icon fa-github"><span class="label">Github</span></a></li>
+							<li><a href="#" class="icon fa-dribbble"><span class="label">Dribbble</span></a></li>
+							<li><a href="#" class="icon fa-envelope"><span class="label">Email</span></a></li>
+						</ul>
+
+				</div>
+
+			</div>
+
+		<!-- Main -->
+			<div id="main">
+
+		    <div class="navigation">
+		      <header>
+		        <div class="header-content">
+		<!--          <div class="logo">
+		          	<a href="#"><img src="../images/logo.png" alt="WhiteCore Sim logo"></a>
+							</div>
+							<div class="systemname">
+								<h3>{SystemName}</h3>
+							</div>
+			       	<div id="toolbar" class="toolbar">
+			      		<div class="toolbarsocial">
+			        		<ul class="toolbar-group">
+										<li><a href="https://twitter.com/whitecoresim" class="icon alt fa-twitter"><span class="label">Twitter</span></a></li>
+										<li><a href="#" class="icon alt fa-facebook"><span class="label">Facebook</span></a></li>
+										<li><a href="#" class="icon alt fa-youtube"><span class="label">YouTube</span></a></li>
+			        		</ul>
+				      	</div>
+				    	</div>  -->
+		          <div class="header-nav">
+		            <nav>
+		              <ul class="primary-nav" id="topmenu">
+									{MenuItemsArrayBegin}
+									{IfShowInMenuBegin}
+								  	<li id="{MenuItemID}" class="active" alt="{MenuItemTitle}" title="{MenuItemTitleHelp}">{MenuItemTitle}
+										{IfHasChildrenBegin}
+											<ul id="submenu">
+										{ChildrenMenuItemsArrayBegin}
+										{IfChildShowInMenuBegin}
+												<li id="{ChildMenuItemID}" alt="{ChildMenuItemTitle}" title="{ChildMenuItemTitleHelp}">{ChildMenuItemTitle}</li>
+										{IfChildShowInMenuEnd}
+										{ChildrenMenuItemsArrayEnd}
+											</ul>
+										{IfHasChildrenEnd}
+										</li>
+									{IfShowInMenuEnd}
+									{MenuItemsArrayEnd}
+		              </ul>
+		              <ul class="member-actions" id="member-actions">
+		                {IsNotAuthenticatedBegin}
+		                <li id="login" title="Log onto WebUI"><a href="#" class="login" >Log in</a></li>
+		                <li id="forgot_pass" title="Reset password">
+		                  <a class="forgotpass" href="#">
+		                    <img src="/images/reset_password.png"  title="Reset password"/>
+		                  </a>
+		                </li>
+		                <li id="register"><a href="#" class="btn-white btn-small">Sign up</a></li>
+		                {IsNotAuthenticatedEnd}
+		                {IsAuthenticatedBegin}
+		                <li id="logout" title="Log out of WebUI"><a href="#" class="btn-white btn-small">Logout</a></li>
+		                {IsAuthenticatedEnd}
+		              </ul>
+		          	</nav>
+		          </div>
+
+		      	  <div class="navicon">
+		        	  <a class="nav-toggle" href="#"><span></span></a>
+		        	</div>
+		      	</div>
+		      </header>
+		    </div>
+
+				<!-- Content -->
+					<section id="top" class="one dark cover">
+						<div class="container" id="content">
+       				<div id="loading">
+								<img src="../images/icons/loading.gif" alt="Loading..." />
+							</div>
+
+
+						</div>
+					</section>
+
+
+			</div>
+
+		<!-- Footer -->
+			<div id="footer">
+
+				<!-- Copyright -->
+					<ul class="copyright">
+            <li>Copyright &copy; ¬© 2018 WhiteCore Sim</li>
+            <li><a href="http://whitecore-sim.org/licensing/">Licence</a></li>
+            <li><a href="http://whitecore-sim.org/">WhiteCore Sim</a>.</li>
+					</ul>
+
+			</div>
+
+		<!-- Scripts -->
+    <script type="text/javascript" src="js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="js/usermenu.js"></script>
+		<script type="text/javascript" src="js/datatables.min.js"></script>
+  	<script type="text/javascript" src="js/bootstrap-datepicker.js"></script>
+
+<!--			<script src="assets/js/jquery.min.js"></script>
+			<script src="js/jquery.scrollzer.min.js"></script>
+			<script src="js/jquery.scrolly.min.js"></script>
+			<script src="js/skel.min.js"></script>
+			<script src="js/util.js"></script>
+			<script src="js/main.js"></script>  -->
+
+<script>
+		function tooltip() {$('#container *').tooltip({showURL: false});};
+
+		<!-- fade in -->
+	  $(document).ready(function() {
+
+			$('#container').fadeIn("slow");
+			var result = {};
+			// var sections = $("#menu li");
+			var loading = $("#loading");
+			var content = $("#content");
+
+			if (window.location.search)	{
+				// split up the query string and store in an associative array
+				var params = window.location.search.slice(1).split("&");
+				for (var i = 0; i < params.length; i++)	{
+					var tmp = params[i].split("=");
+					result[tmp[0]] = unescape(tmp[1]);
+				}
+			}
+			//load selected section
+			var pageName = result["page"];
+			var found = new Boolean(0);
+			switch(pageName) {
+	{MenuItemsArrayBegin}
+				case "{MenuItemID}":
+					content.load("{MenuItemLocation}" + window.location.search);
+					found = new Boolean(1);
+					break;
+	{MenuItemsArrayEnd}
+			}
+			if(found == 0)
+				content.load("userhome.html" + window.location.search);
+
+		});
+
+
+		// fade class
+		$("li.fade, a.fade").hover(function(){
+      $(this).fadeOut(150);
+      $(this).fadeIn(150);
+    });
+		$("a.logofade").hover(function(){
+      $(this).fadeOut(150);
+      $(this).fadeIn(150);
+    });
+		$("a.languageswitch, a.webprofile").hover(function(){
+      $(this).fadeOut(150);
+      $(this).fadeIn(150);
+    });
+		$("a.welcomescreen, a.world_map, a.copyright").hover(function(){
+      $(this).fadeOut(150);
+      $(this).fadeIn(150);
+    });
+	</script>
+
+	</body>
+</html>

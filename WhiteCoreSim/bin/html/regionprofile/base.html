@@ -2,6 +2,103 @@
 
 <h2>{SystemName}: {RegionInfoText}</h2>
 <div id="region_info_container">
+
+
+<p></p>
+<div class="rTable">&nbsp;
+	<div class="rTableBody">
+		<div class="rTableRow">
+			<div class="rTableCell">
+				<div class="region_info_picture" style="height: 256px;"><a class="regionslurl" title="{RegionNameText}: {RegionName}&lt;br /&gt;secondlife://{MainServerURL}/{RegionName}/128/128/50"> <img title="{RegionNameText}: {RegionName}" src="{RegionWorldViewURL}" alt="{RegionNameText}: {RegionName}" height="256" /></a>
+					<p class="region_info_picture_text">{RegionNameText}: {RegionName} ({RegionType})<br />{RegionLocationText}: X:&nbsp;{RegionLocX} Y:&nbsp;{RegionLocY}<br />secondlife://{RegionName}/128/128/50</p>
+				</div>
+			</div>
+			<div class="rTableCell">
+				<p>{RegionNameText}:</p>
+			</div>
+			<div class="rTableCell">
+				<p>{RegionName}</p>
+			</div>
+		</div>
+		<div class="rTableRow">
+			<div class="rTableCell">
+				<p>{RegionTypeText}:</p>
+			</div>
+			<div class="rTableCell">
+				<p>{RegionType}</p>
+			</div>
+		</div>
+		<div class="rTableRow">
+			<div class="rTableCell">
+				<p>{RegionMaturityText}:</p>
+			</div>
+			<div class="rTableCell">
+				<p>{RegionMaturity}</p>
+			</div>
+		</div>
+		<div class="rTableRow">
+			<div class="rTableCell">
+				<p>{RegionLocationText}:</p>
+			</div>
+			<div class="rTableCell">
+				<p>X:&nbsp;{RegionLocX}</p>
+			</div>
+			<div class="rTableCell">
+				<p>Y:&nbsp;{RegionLocY}</p>
+			</div>
+		</div>
+		<div class="rTableRow">
+			<div class="rTableCell">
+				<p>{RegionTerrainText}:</p>
+			</div>
+			<div class="rTableCell">
+				<p>{RegionTerrain}</p>
+			</div>
+		</div>
+		<div class="rTableRow">
+			<div class="rTableCell">
+				<p>{OwnerNameText}:</p>
+			</div>
+			<div class="rTableCell"><a class="agentinfo" title="{OwnerNameText}: {OwnerName}" href="/webprofile/?userid={OwnerUUID}">{OwnerName}</a></div>
+		</div>
+		<div class="rTableRow">
+			<div class="rTableCell">
+				<p>{RegionOnlineText}:</p>
+			</div>
+			<div class="rTableCell">
+				<p>{RegionOnline}</p>
+			</div>
+		</div>
+		<div class="rTableRow">
+			<div class="rTableCell">
+				<p>{NumberOfUsersInRegionText}:</p>
+			</div>
+			<div class="rTableCell">
+				<p>{NumberOfUsersInRegion}</p>
+			</div>
+		</div>
+		{UsersInRegionArrayBegin}
+		<div class="rTableRow">
+			<div class="rTableCell">
+				<p>{UserNameText}:</p>
+			</div>
+			<div class="rTableCell"><a class="webprofile" href="/webprofile/?userid={UserUUID}">{UserName}</a></div>
+		</div>
+		{UsersInRegionArrayEnd}
+		<div class="rTableRow">
+			<div class="rTableCell">
+				<p>{ParcelsInRegionText}:</p>
+			</div>
+			<div class="rTableCell">
+				<p>{NumberOfParcelsInRegion}</p>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+
+	<!--
 	<table id="region_info">
 	  <caption></caption>
 
@@ -85,6 +182,8 @@
     	</tr>
   	  </tbody>
   </table>
+
+-->
 </div>
 
 <script>
