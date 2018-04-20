@@ -66,74 +66,23 @@ namespace WhiteCore.Modules.Web
 
             #region Find pages
 
-            //List<Dictionary<string, object>> pages = new List<Dictionary<string, object>> ();
+            var IsAdmin = Authenticator.CheckAdminAuthentication (httpRequest);
 
             var settings = webInterface.GetWebUISettings ();
-            var rootPage = webInterface.GetGridPages ();
             var userPage = webInterface.GetUserPages ();
+            var userTopPage = webInterface.GetUserTopPages ();
 
-            var pages = webInterface.BuildPageMenus (rootPage, httpRequest, translator);
-            /*
-            rootPage.Children.Sort ((a, b) => a.MenuPosition.CompareTo (b.MenuPosition));
+            var mainmenu = webInterface.BuildPageMenus (userTopPage, httpRequest, translator);
+            vars.Add ("MenuItems", mainmenu);
 
-            foreach (GridPage page in rootPage.Children) {
-                if (page.LoggedOutRequired && Authenticator.CheckAuthentication (httpRequest))
-                    continue;
-                if (page.LoggedInRequired && !Authenticator.CheckAuthentication (httpRequest))
-                    continue;
-                if (page.AdminRequired && !Authenticator.CheckAdminAuthentication (httpRequest, page.AdminLevelRequired))
-                    continue;
+            var usermenu = webInterface.BuildPageMenus (userPage, httpRequest, translator);
 
-                List<Dictionary<string, object>> childPages = new List<Dictionary<string, object>> ();
-                page.Children.Sort ((a, b) => a.MenuPosition.CompareTo (b.MenuPosition));
-                foreach (GridPage childPage in page.Children) {
-                    if (childPage.LoggedOutRequired && Authenticator.CheckAuthentication (httpRequest))
-                        continue;
-                    if (childPage.LoggedInRequired && !Authenticator.CheckAuthentication (httpRequest))
-                        continue;
-                    if (childPage.AdminRequired &&
-                        !Authenticator.CheckAdminAuthentication (httpRequest, childPage.AdminLevelRequired))
-                        continue;
-
-                    childPages.Add (new Dictionary<string, object>
-                                       {
-                                           {"ChildMenuItemID", childPage.MenuID},
-                                           {"ChildShowInMenu", childPage.ShowInMenu},
-                                           {"ChildMenuItemLocation", childPage.Location},
-                                           {
-                                               "ChildMenuItemTitleHelp",
-                                               GetTranslatedString(translator, childPage.MenuToolTip, childPage, true)
-                                           },
-                                           {
-                                               "ChildMenuItemTitle",
-                                               GetTranslatedString(translator, childPage.MenuTitle, childPage, false)
-                                           }
-                                       });
-
-                    //Add one for menu.js
-                    pages.Add (new Dictionary<string, object>
-                                  {
-                                      {"MenuItemID", childPage.MenuID},
-                                      {"ShowInMenu", false},
-                                      {"MenuItemLocation", childPage.Location}
-                                  });
-                }
-
-                pages.Add (new Dictionary<string, object>
-                              {
-                                  {"MenuItemID", page.MenuID},
-                                  {"ShowInMenu", page.ShowInMenu},
-                                  {"HasChildren", page.Children.Count > 0},
-                                  {"ChildrenMenuItems", childPages},
-                                  {"MenuItemLocation", page.Location},
-                                  {"MenuItemTitleHelp", GetTranslatedString(translator, page.MenuToolTip, page, true)},
-                                 {"MenuItemTitle", GetTranslatedString(translator, page.MenuTitle, page, false)},
-                        {"MenuItemToolTip", GetTranslatedString(translator, page.MenuToolTip, page, true)}
-                              });
+            if (IsAdmin) {
+                var adminPage = webInterface.GetAdminPages ();
+                var adminmenu = webInterface.BuildPageMenus (adminPage, httpRequest, translator);
+                usermenu.AddRange (adminmenu);
             }
-            */
-
-            vars.Add ("MenuItems", pages);
+            vars.Add ("UserMenuItems", usermenu);
 
             #endregion
 

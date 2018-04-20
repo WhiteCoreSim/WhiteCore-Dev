@@ -35,16 +35,20 @@ namespace WhiteCore.Modules.Web
     {
         static GridPage _rootPage;
         static GridPage _userPage;
+        static GridPage _userTopPage;
         static GridPage _adminPage;
         public static readonly string Schema = "WebPages";
-        public static readonly uint CurrentVersion = 15;
+        public static readonly uint CurrentVersion = 16;
 
         static void InitializeDefaults ()
         {
             _rootPage = new GridPage ();
             _userPage = new GridPage ();
+            _userTopPage = new GridPage ();
             _adminPage = new GridPage ();
 
+
+/* original _rootPage options
             // home
             _rootPage.Children.Add (new GridPage {
                 ShowInMenu = true,
@@ -74,14 +78,6 @@ namespace WhiteCore.Modules.Web
                 MenuTitle = "MenuWorld",
                 MenuToolTip = "TooltipsMenuWorld",
                 Children = new List<GridPage> {
-/* not required                    new GridPage {
-                        ShowInMenu = true,
-                        MenuID = "world",
-                        Location = "world.html",
-                        MenuPosition = 0,
-                        MenuTitle = "MenuWorldMap",
-                        MenuToolTip = "TooltipsMenuWorldMap"
-                    }, */
                     new GridPage {
                         ShowInMenu = true,
                         MenuID = "region_map",
@@ -446,7 +442,7 @@ namespace WhiteCore.Modules.Web
             });
 
 
-            // these are non menu, indivual pages that can be called
+            // these are non menu, individual pages that can be called
             _rootPage.Children.Add (new GridPage {
                 ShowInMenu = false,
                 MenuID = "forgotpass",
@@ -537,6 +533,9 @@ namespace WhiteCore.Modules.Web
                 Location = "user/estate_edit.html"
             });
 
+ //end of original _rootPage options 
+            */
+
             //Things added, but not used
             /*pages.Add(new Dictionary<string, object> { { "MenuItemID", "tweets" }, 
                 { "ShowInMenu", false },
@@ -567,6 +566,89 @@ namespace WhiteCore.Modules.Web
                 { "MenuItemTitle", translator.GetTranslatedString("MenuNewsManager") } });*/
 
 
+            // Main menu options
+            // home
+            _rootPage.Children.Add (new GridPage {
+                ShowInMenu = true,
+                MenuID = "home",
+                Location = "home.html",
+                MenuPosition = 0,
+                MenuTitle = "MenuHome",
+                MenuToolTip = "TooltipsMenuHome"
+            });
+
+            // news
+            _rootPage.Children.Add (new GridPage {
+                ShowInMenu = true,
+                MenuID = "news",
+                Location = "news_list.html",
+                MenuPosition = 1,
+                MenuTitle = "MenuNews",
+                MenuToolTip = "TooltipsMenuNews"
+            });
+
+            // world map
+            _rootPage.Children.Add (new GridPage {
+                ShowInMenu = true,
+                MenuID = "world",
+                Location = "world.html",
+                MenuPosition = 2,
+                MenuTitle = "MenuWorld",
+                MenuToolTip = "TooltipsMenuWorld",
+            });
+
+            // help
+            _rootPage.Children.Add (new GridPage {
+                ShowInMenu = true,
+                MenuID = "help",
+                Location = "help.html",
+                MenuPosition = 3,
+                MenuTitle = "MenuHelp",
+                MenuToolTip = "TooltipsMenuHelp",
+            });
+
+            // Non menu options
+            // register
+            _rootPage.Children.Add (new GridPage {
+                ShowInMenu = false,
+                LoggedOutRequired = true,
+                MenuID = "register",
+                Location = "register.html",
+                MenuPosition = 9,
+                MenuTitle = "MenuRegister",
+                MenuToolTip = "TooltipsMenuRegister"
+            });
+
+            // Login
+            _rootPage.Children.Add (new GridPage {
+                ShowInMenu = false,
+                LoggedOutRequired = true,
+                MenuID = "login",
+                Location = "login.html",
+                MenuPosition = 10,
+                MenuTitle = "MenuLogin",
+                MenuToolTip = "TooltipsMenuLogin",
+            });
+
+            // logout
+            _rootPage.Children.Add (new GridPage {
+                ShowInMenu = false,
+                LoggedInRequired = true,
+                MenuID = "logout",
+                Location = "logout.html",
+                MenuPosition = 10,
+                MenuTitle = "MenuLogout",
+                MenuToolTip = "TooltipsMenuLogout"
+            });
+
+            // these are non menu, individual pages that can be called
+            _rootPage.Children.Add (new GridPage {
+                ShowInMenu = false,
+                MenuID = "forgotpass",
+                Location = "forgot_pass.html",
+                MenuPosition = 10,
+            });
+
             // User pages
 
             // users
@@ -574,7 +656,7 @@ namespace WhiteCore.Modules.Web
                 ShowInMenu = true,
                 LoggedInRequired = true,
                 MenuID = "account",
-                Location = "user_profile.html",
+                Location = "",
                 MenuPosition = 1,
                 MenuTitle = "MenuUser",
                 MenuToolTip = "TooltipsMenuUser",
@@ -582,27 +664,18 @@ namespace WhiteCore.Modules.Web
                     new GridPage {
                         ShowInMenu = true,
                         LoggedInRequired = true,
-                        MenuID = "online_users",
-                        Location = "online_users.html",
+                        MenuID = "user_profile",
+                        Location = "user_profile.html",
                         MenuPosition = 0,
-                        MenuTitle = "MenuOnlineUsers",
-                        MenuToolTip = "TooltipsMenuOnlineUsers"
-                    },
-                    new GridPage {
-                        ShowInMenu = true,
-                        LoggedInRequired = true,
-                        MenuID = "user_search",
-                        Location = "user_search.html",
-                        MenuPosition = 1,
-                        MenuTitle = "MenuUserSearch",
-                        MenuToolTip = "TooltipsMenuUserSearch"
+                        MenuTitle = "MenuUserProfile",
+                        MenuToolTip = "TooltipsMenuProfile"
                     },
                     new GridPage {
                         ShowInMenu = true,
                         LoggedInRequired = true,
                         MenuID = "user_purchases",
                         Location = "user/user_purchases.html",
-                        MenuPosition = 2,
+                        MenuPosition = 1,
                         MenuTitle = "MenuMyPurchases",
                         MenuToolTip = "TooltipsMenuPurchases"
 
@@ -612,36 +685,54 @@ namespace WhiteCore.Modules.Web
                         LoggedInRequired = true,
                         MenuID = "user_transactions",
                         Location = "user/user_transactions.html",
-                        MenuPosition = 3,
+                        MenuPosition = 2,
                         MenuTitle = "MenuMyTransactions",
                         MenuToolTip = "TooltipsMenuTransactions"
                     },
                     new GridPage {
                         ShowInMenu = true,
                         LoggedInRequired = true,
-                        MenuID = "user_events",
-                        Location = "user/events.html",
-                        MenuPosition = 4,
-                        MenuTitle = "MenuMyEvents",
-                        MenuToolTip = "TooltipsMenuEvents"
-                    },
-                    new GridPage {
-                        ShowInMenu = true,
-                        LoggedInRequired = true,
-                        MenuID = "user_regionmanager",
-                        Location = "user/region_manager.html",
+                        MenuID = "user_contact",
+                        Location = "user/contactinfo.html",
                         MenuPosition = 5,
-                        MenuTitle = "MenuRegionManager",
-                        MenuToolTip = "TooltipsMenuRegionManager"
+                        MenuTitle = "MenuContactInfo",
+                        MenuToolTip = "TooltipsMenuContactInfo"
                     },
                     new GridPage {
                         ShowInMenu = true,
                         LoggedInRequired = true,
-                        MenuID = "user_estatemanager",
-                        Location = "user/estate_manager.html",
+                        MenuID = "user_email",
+                        Location = "user/emailaddress.html",
                         MenuPosition = 6,
-                        MenuTitle = "MenuEstateManager",
-                        MenuToolTip = "TooltipsMenuEstateManager"
+                        MenuTitle = "MenuEmail",
+                        MenuToolTip = "TooltipsMenuEmail"
+                    },
+                    new GridPage {
+                        ShowInMenu = true,
+                        LoggedInRequired = true,
+                        MenuID = "user_password",
+                        Location = "user/password.html",
+                        MenuPosition = 7,
+                        MenuTitle = "MenuChangeUserInformation",
+                        MenuToolTip = "TooltipsMenuChangeUserInformation"
+                    },
+                    new GridPage {
+                        ShowInMenu = true,
+                        LoggedInRequired = true,
+                        MenuID = "user_partners",
+                        Location = "user/partners.html",
+                        MenuPosition = 7,
+                        MenuTitle = "MenuPartners",
+                        MenuToolTip = "TooltipsMenuPartners"
+                    },
+                    new GridPage {
+                        ShowInMenu = true,
+                        LoggedInRequired = true,
+                        MenuID = "delete_account",
+                        Location = "user/deleteaccount.html",
+                        MenuPosition = 4,
+                        MenuTitle = "MenuDeletAccount",
+                        MenuToolTip = "TooltipsMenuDeleteAccount"
                     },
                     new GridPage {
                         ShowInMenu = true,
@@ -663,55 +754,197 @@ namespace WhiteCore.Modules.Web
                 Location = "events/events.html",
                 MenuPosition = 2,
                 MenuTitle = "MenuEvents",
-                MenuToolTip = "TooltipsMenuEvents"
+                MenuToolTip = "TooltipsMenuEvents",
+                Children = new List<GridPage> {
+                    new GridPage {
+                        ShowInMenu = true,
+                        LoggedInRequired = true,
+                        MenuID = "user_events",
+                        Location = "user/events.html",
+                        MenuPosition = 1,
+                        MenuTitle = "MenuMyEvents",
+                        MenuToolTip = "TooltipsMenuEvents"
+                    },
+                }
             });
 
-            // classifieds
+            // shopping
             _userPage.Children.Add (new GridPage {
                 ShowInMenu = true,
-                LoggedInRequired = false,
-                MenuID = "classifieds",
-                Location = "classifieds.html",
+                LoggedInRequired = true,
+                MenuID = "usershopping",
+                Location = "",
                 MenuPosition = 3,
-                MenuTitle = "MenuClassifieds",
-                MenuToolTip = "TooltipsMenuClassifieds"
+                MenuTitle = "MenuShopping",
+                MenuToolTip = "TooltipsMenuShopping",
+                Children = new List<GridPage> {
+                    new GridPage {
+                        ShowInMenu = true,
+                        LoggedInRequired = false,
+                        MenuID = "classifieds",
+                        Location = "classifieds.html",
+                        MenuPosition = 1,
+                        MenuTitle = "MenuClassifieds",
+                        MenuToolTip = "TooltipsMenuClassifieds"
+                    },
+                    new GridPage {
+                        ShowInMenu = true,
+                        LoggedInRequired = false,
+                        MenuID = "marketplace",
+                        Location = "marketplace.html",
+                        MenuPosition = 2,
+                        MenuTitle = "MenuMarketplace",
+                        MenuToolTip = "TooltipsMenuMarketplace"
+                    },
+                }
             });
 
+            // land management
+            _userPage.Children.Add (new GridPage {
+                ShowInMenu = true,
+                LoggedInRequired = true,
+                MenuID = "userlandmanage",
+                Location = "userland.html",
+                MenuPosition = 4,
+                MenuTitle = "MenuUserLand",
+                MenuToolTip = "TooltipsMenuUserLand",
+                Children = new List<GridPage> {
+                    new GridPage {
+                        ShowInMenu = true,
+                        LoggedInRequired = true,
+                        MenuID = "user_regionmanager",
+                        Location = "user/region_manager.html",
+                        MenuPosition = 1,
+                        MenuTitle = "MenuRegionManager",
+                        MenuToolTip = "TooltipsMenuRegionManager"
+                    },
+                    new GridPage {
+                        ShowInMenu = true,
+                        LoggedInRequired = true,
+                        MenuID = "user_estatemanager",
+                        Location = "user/estate_manager.html",
+                        MenuPosition = 2,
+                        MenuTitle = "MenuEstateManager",
+                        MenuToolTip = "TooltipsMenuEstateManager"
+                    },
+                }
+            });
+
+            _userPage.Children.Add (new GridPage {
+                ShowInMenu = true,
+                LoggedInRequired = true,
+                MenuID = "userfriends",
+                Location = "l",
+                MenuPosition = 5,
+                MenuTitle = "MenuUserFriends",
+                MenuToolTip = "TooltipsMenuUserFriends",
+                Children = new List<GridPage> {
+                    new GridPage {
+                        ShowInMenu = true,
+                        LoggedInRequired = true,
+                        MenuID = "online_users",
+                        Location = "online_users.html",
+                        MenuPosition = 0,
+                        MenuTitle = "MenuOnlineUsers",
+                        MenuToolTip = "TooltipsMenuOnlineUsers"
+                    },
+                    new GridPage {
+                        ShowInMenu = true,
+                        LoggedInRequired = true,
+                        MenuID = "user_search",
+                        Location = "user_search.html",
+                        MenuPosition = 1,
+                        MenuTitle = "MenuUserSearch",
+                        MenuToolTip = "TooltipsMenuUserSearch"
+                    },
+                }
+            });
 
             // User - non menu pages
             _userPage.Children.Add (new GridPage {
+                ShowInMenu = false,
+                LoggedInRequired = true,
                 MenuID = "add_event",
-                ShowInMenu = false,
-                LoggedInRequired = true,
-                AdminRequired = false,
-                MenuPosition = 8,
-                Location = "events/add_event.html"
+                Location = "events/add_event.html",
+                MenuPosition = 8
             });
             _userPage.Children.Add (new GridPage {
+                ShowInMenu = false,
+                LoggedInRequired = true,
                 MenuID = "edit_event",
-                ShowInMenu = false,
-                LoggedInRequired = true,
-                MenuPosition = 8,
-                Location = "user/edit_event.html"
+                Location = "user/edit_event.html",
+                MenuPosition = 8
             });
             _userPage.Children.Add (new GridPage {
+                ShowInMenu = false,
+                LoggedInRequired = true,
                 MenuID = "user_regionedit",
-                ShowInMenu = false,
-                LoggedInRequired = true,
-                MenuPosition = 8,
-                Location = "user/region_edit.html"
+                Location = "user/region_edit.html",
+                MenuPosition = 8
             });
             _userPage.Children.Add (new GridPage {
-                MenuID = "user_estateedit",
                 ShowInMenu = false,
                 LoggedInRequired = true,
-                MenuPosition = 8,
-                Location = "user/estate_edit.html"
+                MenuID = "user_estateedit",
+                Location = "user/estate_edit.html",
+                MenuPosition = 8
             });
 
             // logout
-            _userPage.Children.Add (new GridPage {
+/*            _userPage.Children.Add (new GridPage {
+                ShowInMenu = false,
+                LoggedInRequired = true,
+                MenuID = "logout",
+                Location = "logout.html",
+                MenuPosition = 10,
+                MenuTitle = "MenuLogout",
+                MenuToolTip = "TooltipsMenuLogout"
+            });
+*/
+            // User top menu pages
+            _userTopPage.Children.Add (new GridPage {
                 ShowInMenu = true,
+                MenuID = "home",
+                Location = "userhome.html",
+                MenuPosition = 0,
+                MenuTitle = "MenuHome",
+                MenuToolTip = "TooltipsMenuHome"
+            });
+
+            // news
+            _userTopPage.Children.Add (new GridPage {
+                ShowInMenu = true,
+                MenuID = "news",
+                Location = "news_list.html",
+                MenuPosition = 1,
+                MenuTitle = "MenuNews",
+                MenuToolTip = "TooltipsMenuNews"
+            });
+
+            // world map
+            _userTopPage.Children.Add (new GridPage {
+                ShowInMenu = true,
+                MenuID = "world",
+                Location = "world.html",
+                MenuPosition = 2,
+                MenuTitle = "MenuWorld",
+                MenuToolTip = "TooltipsMenuWorld",
+            });
+
+            // help
+            _userTopPage.Children.Add (new GridPage {
+                ShowInMenu = true,
+                MenuID = "help",
+                Location = "help.html",
+                MenuPosition = 3,
+                MenuTitle = "MenuHelp",
+                MenuToolTip = "TooltipsMenuHelp",
+            });
+
+            // Non menu options
+            // logout
+            _userTopPage.Children.Add (new GridPage {
+                ShowInMenu = false,
                 LoggedInRequired = true,
                 MenuID = "logout",
                 Location = "logout.html",
@@ -831,7 +1064,7 @@ namespace WhiteCore.Modules.Web
             _adminPage.Children.Add (new GridPage {
                 ShowInMenu = true,
                 AdminRequired = true,
-                MenuID = "manager",
+                MenuID = "settings",
                 Location = "admin/settings.html",
                 MenuPosition = 8,
                 MenuTitle = "MenuSettings",
@@ -966,6 +1199,7 @@ namespace WhiteCore.Modules.Web
 
             generics.AddGeneric (UUID.Zero, Schema, "Root", _rootPage.ToOSD ());
             generics.AddGeneric (UUID.Zero, Schema, "User", _userPage.ToOSD ());
+            generics.AddGeneric (UUID.Zero, Schema, "UserTop", _userTopPage.ToOSD ());
             generics.AddGeneric (UUID.Zero, Schema, "Admin", _adminPage.ToOSD ());
             generics.AddGeneric (UUID.Zero, Schema + "Version", "", new OSDWrapper { Info = CurrentVersion }.ToOSD ());
         }

@@ -6,7 +6,8 @@
       <img class="logo" src="../images/WhiteCore_logo.png" alt="WhiteCore">
       <div class="hero-content text-center" style="padding-top:0;">
         <h1>Your own virtual world</h1>
-        <a href="#" class="btn btn-fill btn-large btn-margin-right">Get Started</a> <a href="#" class="btn btn-accent btn-large">Learn more</a>
+        <a href="#" class="btn btn-accent btn-large btn-margin-right" onclick="loadcontent('register');">Get Started</a>
+        <a href="#localcontent" class="btn btn-accent btn-large">Learn more</a>
         <p class="intro" style="margin-top:20px;">Design, build and explore your own virtual world</p>
       </div>
     </div>
@@ -22,184 +23,31 @@
         <div class="col-md-4">
             <article class="blog-post">
                 <figure>
-                    <a href="{ImageSRC}" class="single_image">
+                    <a href="{ImageSRC}" data-width="800" data-height="600" data-fancybox="images">
                         <div class="blog-img-wrap">
                             <div class="overlay">
                                 <i class="fa fa-search"></i>
                             </div>
-                            <img src="{ImageSRC}" alt=""/>
+                            <img class="single_image" src="{ImageSRC}" alt="{ImageTitle}"/>
                         </div>
                     </a>
                     <figcaption>
-                    <h2><a href="#" class="blog-category" data-toggle="tooltip" data-placement="top" data-original-title="See more posts">{ImageTitle}</a></h2>
-                    <p><a href="#" class="blog-post-title">{ImageInfo} <i class="fa fa-angle-right"></i></a></p>
+                      <h2><a href="#" class="blog-category" data-toggle="tooltip" data-placement="top" data-original-title="See more posts">{ImageTitle}</a></h2>
+                      <p><a href="#" class="blog-post-title">{ImageInfo} <i class="fa fa-angle-right"></i></a></p>
                     </figcaption>
                 </figure>
             </article>
         </div>
        {GalleryImagesArrayEnd}
 
-<!--
-        <div class="col-md-4">
-            <article class="blog-post">
-                <figure>
-                    <a href="local/images/gallery/welcome3.jpg" class="single_image">
-                        <div class="blog-img-wrap">
-                            <div class="overlay">
-                                <i class="fa fa-search"></i>
-                            </div>
-                            <img src="local/images/gallery/welcome3.jpg" alt=""/>
-                        </div>
-                    </a>
-                    <figcaption>
-                    <h2><a href="#" class="blog-category" data-toggle="tooltip" data-placement="top" data-original-title="See more posts">Product</a></h2>
-                    <p><a href="#" class="blog-post-title">Getting started with Sedna <i class="fa fa-angle-right"></i></a></p>
-                    </figcaption>
-                </figure>
-            </article>
-        </div>
-        <div class="col-md-4">
-            <article class="blog-post">
-                <figure>
-                    <a href="local/images/gallery/welcome6.jpg" class="single_image">
-                        <div class="blog-img-wrap">
-                            <div class="overlay">
-                                <i class="fa fa-search"></i>
-                            </div>
-                            <img src="local/images/gallery/welcome6.jpg" alt="Sedna blog image"/>
-                        </div>
-                    </a>
-                    <figcaption>
-                    <h2><a href="#" class="blog-category" data-toggle="tooltip" data-placement="top" data-original-title="See more posts">Technology</a></h2>
-                    <p><a href="#" class="blog-post-title">Why IE8 support is deminishing <i class="fa fa-angle-right"></i></a></p>
-                    </figcaption>
-                </figure>
-            </article>
-        </div>
-        <div class="col-md-4">
-            <article class="blog-post">
-                <figure>
-                    <a href="local/images/gallery/welcome7.jpg" class="single_image">
-                        <div class="blog-img-wrap">
-                            <div class="overlay">
-                                <i class="fa fa-search"></i>
-                            </div>
-                            <img src="local/images/gallery/welcome7.jpg" class="single_image" alt="Sedna blog image"/>
-                        </div>
-                    </a>
-                    <figcaption>
-                    <h2><a href="#" class="blog-category" data-toggle="tooltip" data-placement="top" data-original-title="See more posts">Product</a></h2>
-                    <p><a href="#" class="blog-post-title">Sedna tutorial: How to begin your <i class="fa fa-angle-right"></i></a></p>
-                    </figcaption>
-                </figure>
-            </article>
-        </div>
-        -->
         <a href="#" class="btn btn-ghost btn-accent btn-small">More images</a>
     </div>
 </div>
+<script>
+  $('[data-fancybox="images"]').fancybox({
+    padding: 4,
+  });
+</script>
+
 <!--</section> -->
 {IfShowSlideshowBarEnd}
-
-<!--
-{IfLocalPageBegin}
-    <section class="intro section-padding">
-        <div class="container">
-            <div class="row">
-
-<div class="localnews">
-	<iframe  src={LocalFrontPage} style="height:100%;width:100%;display:inline-block;"></iframe>
-</div>
-</div>
-</div>
-</section>
-{IfLocalPageEnd}
--->
-
-
-<!--<div class="homesidebar"> -->
-<!-- user login form -->
-<!--
-{IfUserLoginBegin}
-  <div class=homelogin>
-    <div id="error_message" class="error_message"><h3>{ErrorMessage}</h3></div>
-	<form action="login.html" id="login_form" method="POST">
-	<table id="login">
-   		<thead>
-    		<tr>
-      			<th class="login_left"></th>
-      			<th><h2>User Login</h2></th>
-    		</tr>
-  		</thead>
-
-  		<tfoot>
-    		<tr>
-      			<th class="login_left"></th>
-      			<th class="login_right"></th>
-    		</tr>
-  		</tfoot>
-
-  		<tbody>
-    		<tr>
-      			<td class="login_left"><p id="logname_label">{UserNameText}*</p></td>
-      			<td class="login_right"><input require="true" label="username" id="homelogin_input" name="username" type="text"/></td>
-    		</tr>
-    		<tr>
-      			<td class="login_left"><p id="password_label">{PasswordText}*</p></td>
-      			<td class="login_right"><input require="true" label="password" id="homelogin_input" type="password" name="password" /></td>
-    		</tr>
-    		<tr>
-      			<td class="login_left"><a href="index.html?page=forgot_pass"><p>{ForgotPassword}</p></a></td>
-      			<td class="login_right"><button id="login_bouton" type="Submit" name="Submit" value="Submit">{Submit}</button></td>
-    		</tr>
-  		</tbody>
-	</table>
-	</form>
-	</div>
-{IfUserLoginEnd}
--->
-
-	<!-- grid info -->
-<!--	<div class=homegrid>
-		<iframe class="gridstatus" src="welcomescreen/gridstatus.html" scrolling="no" style="overflow:hidden;width:300px;float:right;"></iframe>
-	</div>
-	<div class=homenews>
-		<iframe class="news" src="welcomescreen/news.html" scrolling="no" style="overflow:hidden;width:300px;height:120px;"></iframe>
-	</div>
-<div>
--->
-<!-- slide show -->
-<!--
-<script>
-  $(window).load(function() {
-    $('.flexsliderx').flexslider();
-  });
-
-
-//  $(function() {
-//    $('.slideshow1').cycle({
-//      cleartype: false,
-//      fx: 'fade',
-//      random: 1,
-//      containerResize:  0,
-//    });
-//  });
-
-      /* attach a submit handler to the form */
-      $("#login_form").submit(function(event) {
-
-      /* stop form from submitting normally */
-      event.preventDefault();
-      /* get some values from elements on the page: */
-      var $form = $( this ),
-          url = $form.attr( 'action' );
-      /* Send the data using post and put the results in a div */
-      $.post( url, $form.serialize(),
-          function( data ) {
-        $("#error_message").empty().append(data);
-      }
-    );
-    });
- </script>
-
--->

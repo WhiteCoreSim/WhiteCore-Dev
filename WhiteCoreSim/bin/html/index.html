@@ -11,22 +11,20 @@
 
   <link type="text/css" rel="stylesheet" href="css/normalize.min.css">
 	<link type="text/css" rel="stylesheet" href="css/bootstrap.min.css" >
-<!--  <link type="text/css" rel="stylesheet" href="css/datatables.min.css"> -->
-	<link type="text/css" rel="stylesheet" href="css/datatables.min.css">
-	<link type="text/css" rel="stylesheet" href="css/bootstrap-datepicker.css">
-  <link type="text/css" rel="stylesheet" href="css/jquery.fancybox.css">
+
+<!--	<link type="text/css" rel="stylesheet" href="css/datatables.min.css">
+	<link type="text/css" rel="stylesheet" href="css/bootstrap-datepicker.css"> -->
 <!--  <link type="text/css" rel="stylesheet" href="css/flexslider.css"> -->
+  <link type="text/css" rel="stylesheet" href="css/jquery.fancybox.css">
+
+  <link type="text/css" rel="stylesheet" href="css/style.css">
   <link type="text/css" rel="stylesheet" href="css/queries.css">
   <link type="text/css" rel="stylesheet" href="css/etline-font.css">
-  <link type="text/css" rel="stylesheet" href="css/animate.min.css">
   <link type="text/css" rel="stylesheet" href="css/font-awesome.css">
-  <link type="text/css" rel="stylesheet" href="css/style.css">
 
-<!--	<script src="js/jquery-3.1.1.min.js"></script>
-  <script src="js/jquery-migrate-3.0.0.js"></script> -->
-  <script src="js/jquery-2.2.3.min.js"></script>
+<!--  <script src="js/jquery-migrate-3.0.0.js"></script>
+  <script src="js/jquery-2.2.3.min.js"></script>-->
   <script src="js/modernizr-2.8.3-respond-1.4.2.min.js"></script>
-<!--	<style type="text/css">#old_container{display:none;}</style> -->
 
 </head>
 
@@ -34,7 +32,7 @@
 
 	{IfMaintenanceBegin}
   <section class="hero">
-	<!--#include file="/maintenance.html" -->
+	  <!--#include file="/maintenance.html" -->
 	</section>
 	{IfMaintenanceEnd}
 
@@ -44,11 +42,11 @@
     <section class="navigation">
       <header>
         <div class="header-content">
-<!--          <div class="logo">
-          	<a href="#"><img src="../images/logo.png" alt="WhiteCore Sim logo"></a>
-					</div> -->
+          <div class="logo">
+          	<img src="../images/logo.png" width="25" alt="WhiteCore Sim logo">
+					</div>
 					<div class="systemname">
-						<h3>{SystemName}</h3>
+						<h5>{SystemName}</h5>
 					</div>
 	       	<div id="toolbar" class="toolbar">
 	      		<div class="toolbarsocial">
@@ -60,38 +58,59 @@
 		      	</div>
 		    	</div>
           <div class="header-nav">
-            <nav>
-              <ul class="primary-nav" id="topmenu">
-							{MenuItemsArrayBegin}
-							{IfShowInMenuBegin}
-						  	<li id="{MenuItemID}" class="active" alt="{MenuItemTitle}" title="{MenuItemTitleHelp}">{MenuItemTitle}
-								{IfHasChildrenBegin}
-									<ul id="submenu">
-								{ChildrenMenuItemsArrayBegin}
-								{IfChildShowInMenuBegin}
-										<li id="{ChildMenuItemID}" alt="{ChildMenuItemTitle}" title="{ChildMenuItemTitleHelp}">{ChildMenuItemTitle}</li>
-								{IfChildShowInMenuEnd}
-								{ChildrenMenuItemsArrayEnd}
-									</ul>
-								{IfHasChildrenEnd}
-								</li>
-							{IfShowInMenuEnd}
-							{MenuItemsArrayEnd}
-              </ul>
-              <ul class="member-actions" id="member-actions">
-                {IsNotAuthenticatedBegin}
-                <li id="login" title="Log onto WebUI"><a href="#" class="login" >Log in</a></li>
-                <li id="forgot_pass" title="Reset password">
-                  <a class="forgotpass" href="#">
-                    <img src="/images/reset_password.png"  title="Reset password"/>
-                  </a>
-                </li>
-                <li id="register"><a href="#" class="btn-white btn-small">Sign up</a></li>
-                {IsNotAuthenticatedEnd}
-                {IsAuthenticatedBegin}
-                <li id="logout" title="Log out of WebUI"><a href="#" class="btn-white btn-small">Logout</a></li>
-                {IsAuthenticatedEnd}
-              </ul>
+            <nav class="navbar navbar-inverse">
+              <div class="container">
+<!--                <div class="navbar-header">
+                  <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target=" navbar-responsive-collapse" aria-expanded="false" aria-controls="navbar">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                  </button>
+                </div>  -->
+
+<!--                <div id="navbar" class="navbar-collapse collapse navbar-responsive-collapse">  -->
+                <div id="navbar">
+                  <ul class="primary-nav" id="topmenu">
+    							{MenuItemsArrayBegin}
+    							{IfShowInMenuBegin}
+                    {IfHasNoChildrenBegin}
+    						  	  <li href="#" id="{MenuItemID}" class="active" alt="{MenuItemTitle}" title="{MenuItemTitleHelp}">
+                      {MenuItemTitle}
+                    {IfHasNoChildrenEnd}
+    								{IfHasChildrenBegin}
+                      <li class="dropdown" id="{MenuItemID}" alt="{MenuItemTitle}" title="{MenuItemTitleHelp}">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{MenuItemTitle}<span class="caret"></span></a>
+    									  <ul class="dropdown-menu" id="submenu">
+    								    {ChildrenMenuItemsArrayBegin}
+    								      {IfChildShowInMenuBegin}
+    										  <li href="#" id="{ChildMenuItemID}" alt="{ChildMenuItemTitle}" title="{ChildMenuItemTitleHelp}">{ChildMenuItemTitle}</li>
+    								      {IfChildShowInMenuEnd}
+    								    {ChildrenMenuItemsArrayEnd}
+    									   </ul>
+                       </li>
+    								{IfHasChildrenEnd}
+    								</li>
+    							{IfShowInMenuEnd}
+    							{MenuItemsArrayEnd}
+                  </ul>
+
+                  <ul class="member-actions" id="member-actions">
+                    {IsNotAuthenticatedBegin}
+                    <li id="login" title="Log onto WebUI"><a href="#" class="login btn-white btn-xsmall" >Log in</a></li>
+                    <li id="forgot_pass" title="Reset password">
+                      <a class="forgotpass" href="#">
+                        <img src="/images/reset_password.png"  title="Reset password"/>
+                      </a>
+                    </li>
+                    <li id="register"><a href="#" class="btn-white btn-small">Sign up</a></li>
+                    {IsNotAuthenticatedEnd}
+                    {IsAuthenticatedBegin}
+                      <li id="logout" title="Log out of WebUI"><a href="#" class="btn-white btn-small">Logout</a></li>
+                    {IsAuthenticatedEnd}
+                  </ul>
+                </div>
+              </div>
           	</nav>
           </div>
 
@@ -116,6 +135,7 @@
       </header>
     </section>
 
+    <!-- content -->
     <div class="container" id="container">
       <div class="row">
         <div class="col-md-12">
@@ -166,6 +186,7 @@
   {IfNoMaintenanceEnd}
 
   {IfLocalPageBegin}
+  <a name="localcontent"></a>
   <section class="localnews_section section-padding">
     <div class="container">
       <div class="row">
@@ -215,20 +236,20 @@
 
 
 	<!-- Javascript -->
-
-    <script src="js/bootstrap.min.js"></script>
-    <script src="js/retina.js"></script>
-    <script src="js/jquery.fancybox.pack.js"></script>
-    <script src="js/scripts.js"></script>
+  <script src="js/jquery-3.1.1.min.js"></script>
+  <script src="js/retina.js"></script>
+  <script src="js/jquery.fancybox.min.js"></script>
+  <script src="js/bootstrap.min.js"></script>
+  <script src="js/scripts.js"></script>
 <!--    <script src="js/jquery.flexslider-min.js"></script> -->
-    <script src="js/classie.js"></script>
-    <script src="js/jquery.waypoints.min.js"></script>
+  <script src="js/classie.js"></script>
+  <script src="js/jquery.waypoints.min.js"></script>
 
   <script type="text/javascript" src="js/menu.js"></script>
-  <script type="text/javascript" src="js/jquery.colorbox.js"></script>
-	<script type="text/javascript" src="js/datatables.min.js"></script>
-  <script type="text/javascript" src="js/bootstrap-datepicker.js"></script>
-<!--	<script type="text/javascript" src="js/jquery.jclock.js"></script>
+<!--    <script type="text/javascript" src="js/jquery.colorbox.js"></script>
+<script type="text/javascript" src="js/datatables.min.js"></script>
+  <script type="text/javascript" src="js/bootstrap-datepicker.js"></script>  -->
+<!--	<script type="text/javascript" src="js/jquery.jclock.js"></script> -->
 	<!-- <script type="text/javascript" src="js/jquery.tooltip.js"></script> -->
 	<!-- Carousel  for avatars-->
 <!--	<script type="text/javascript" src="js/jquery.jcarousellite.js"></script> -->

@@ -25,10 +25,10 @@ $(document).ready(function() {
 
 	/***************** Initiate Fancybox ******************/
 
-	$('.single_image').fancybox({
+	/*$('.single_image').fancybox({
 		padding: 4,
 	});
-
+	*/
 	/***************** Tooltips ******************/
     $('[data-toggle="tooltip"]').tooltip();
 
@@ -47,6 +47,12 @@ $(document).ready(function() {
 
 	});
 
+	/* When user clicks the sidebar Icon */
+	$('#toggleSideNav').click(function() {
+		$('body').toggleClass('sbheader-visible');
+		event.preventDefault();
+	});
+
 	/***************** Header BG Scroll ******************/
 
 	$(function() {
@@ -55,24 +61,26 @@ $(document).ready(function() {
 
 			if (scroll >= 20) {
 				$('section.navigation').addClass('fixed');
+				$('section.top-navigation').addClass('fixed');
 				$('header').css({
 					"border-bottom": "none",
-					"padding": "35px 0"
+					"padding": "35px 0px 5px"
 				});
 				$('header .member-actions').css({
-					"top": "26px",
+					"top": "5px",
 				});
 				$('header .navicon').css({
 					"top": "34px",
 				});
 			} else {
 				$('section.navigation').removeClass('fixed');
+				$('section.top-navigation').removeClass('fixed');
 				$('header').css({
 					"border-bottom": "solid 1px rgba(255, 255, 255, 0.2)",
-					"padding": "50px 0"
+					"padding": "40px 0px 5px 0px"
 				});
 				$('header .member-actions').css({
-					"top": "41px",
+					"top": "5px",
 				});
 				$('header .navicon').css({
 					"top": "48px",

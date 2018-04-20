@@ -1,26 +1,20 @@
 $(document).ready(function(){
 	//References
-	var sections = $("#sidemenu li");
+	var topmenu = $("#topmenu li");
+	var usermenu = $("#sidemenu li");
 	var members = $("#member-actions li");
 	var loading = $("#loading");
 	var content = $("#content");
 
-	//Manage click events
-	sections.click(function(event){
-		//show the loading bar
+	// Top menu
+	topmenu.click(function(event){
 		showLoading();
-		//load selected section
 		switch(this.id){
-{MenuItemsArrayBegin}
+		{MenuItemsArrayBegin}
 			case "{MenuItemID}":
 		    content.load("{MenuItemLocation}" + window.location.search, hideLoading);
-				/*content.slideUp('swing',  function() {
-				    content.load("{MenuItemLocation}" + window.location.search, hideLoading);
-				    content.slideDown();
-				});*/
-
 				break;
-{MenuItemsArrayEnd}
+		{MenuItemsArrayEnd}
 			default:
 				//hide loading bar if there is no selected section
 				hideLoading();
@@ -29,24 +23,32 @@ $(document).ready(function(){
 		event.stopPropagation();
 	});
 
-	members.click(function(event){
-		//show the loading bar
-		//showLoading();
-		//load selected section
+	// User menu
+	usermenu.click(function(event){
+		showLoading();
 		switch(this.id){
-{MenuItemsArrayBegin}
+		{UserMenuItemsArrayBegin}
 			case "{MenuItemID}":
 		    content.load("{MenuItemLocation}" + window.location.search, hideLoading);
-				/*content.slideUp('swing',  function() {
-				    content.load("{MenuItemLocation}" + window.location.search, hideLoading);
-				    content.slideDown();
-				}); */
-
 				break;
-{MenuItemsArrayEnd}
+		{UserMenuItemsArrayEnd}
 			default:
 				//hide loading bar if there is no selected section
-				//hideLoading();
+				hideLoading();
+				break;
+		}
+		event.stopPropagation();
+	});
+
+	// logout
+	members.click(function(event){
+		switch(this.id){
+		{MenuItemsArrayBegin}
+			case "{MenuItemID}":
+		    content.load("{MenuItemLocation}" + window.location.search, hideLoading);
+				break;
+		{MenuItemsArrayEnd}
+			default:
 				break;
 		}
 		event.stopPropagation();
@@ -65,3 +67,20 @@ $(document).ready(function(){
 		loading.fadeTo(1000, 0);
 	};
 });
+
+// embedded page content
+function loadcontent(pageid){
+	var content = $("#content");
+
+	//load selected page
+	switch(pageid){
+		{UserMenuItemsArrayBegin}
+		case "{MenuItemID}":
+	    content.load("{MenuItemLocation}" + window.location.search);
+			break;
+		{UserMenuItemsArrayEnd}
+		default:
+			break;
+	}
+}
+

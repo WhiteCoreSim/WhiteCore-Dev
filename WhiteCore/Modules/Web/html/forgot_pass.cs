@@ -76,7 +76,7 @@ namespace WhiteCore.Modules.Web
 
                 // email user etc here...
                 if (account.Email == "") {
-                    response = "<h3>Sorry! Your account has no email details. Please contact the administrator to correct</h3>" +
+                    response = "<h3>Sorry! Your account has no email details.</h3><br /> Please contact the administrator to correct" +
                         "<script language=\"javascript\">" +
                         "setTimeout(function() {window.location.href = \"index.html\";}, 5000);" +
                         "</script>";
@@ -86,7 +86,7 @@ namespace WhiteCore.Modules.Web
 
                 var emailAddress = account.Email;
                 if (UserEmail != emailAddress) {
-                    response = "<h3>Sorry! Unable to authenticate your account. Please contact the administrator to correct</h3>" +
+                    response = "<h3>Sorry! Unable to authenticate your account.</h3><br />Please contact the administrator to correct" +
                         "<script language=\"javascript\">" +
                         "setTimeout(function() {window.location.href = \"index.html\";}, 5000);" +
                         "</script>";

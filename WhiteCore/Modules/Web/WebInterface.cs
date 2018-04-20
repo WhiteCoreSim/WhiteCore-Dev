@@ -54,9 +54,9 @@ namespace WhiteCore.Modules.Web
     public class WebInterface : IService, IWebInterfaceModule
     {
         #region Declares
-		
-		#pragma warning disable 0649
-		// Putting this here to clear out some warnings - 29082016 Fly-man-
+
+#pragma warning disable 0649
+        // Putting this here to clear out some warnings - 29082016 Fly-man-
 
         protected const int CLIENT_CACHE_TIME = 86400;  // 1 day
         protected uint _port = 8002;                    // assuming grid mode here
@@ -69,6 +69,7 @@ namespace WhiteCore.Modules.Web
         // webpages and settings cacheing
         internal GridPage webPages;
         internal GridPage userPages;
+        internal GridPage userTopPages;
         internal GridPage adminPages;
         internal WebUISettings webUISettings;
         public GridSettings gridSettings;
@@ -126,7 +127,7 @@ namespace WhiteCore.Modules.Web
             foreach (var trans in _translators) {
                 if (trans.LanguageName == "sk")         // skip the skeleton template
                     continue;
-                
+
                 languages.Add (new Dictionary<string, object> {
                     {"Href", "?language=" + trans.LanguageName},
                     {"Code", trans.LanguageName},
@@ -172,7 +173,7 @@ namespace WhiteCore.Modules.Web
                 _defaultTranslator = _translators.FirstOrDefault (t => t.LanguageName == defaultLanguage);
                 if (_defaultTranslator == null)
                     _defaultTranslator = _translators [0];
- 
+
             }
             if (_enabled) {
                 Registry.RegisterModuleInterface<IWebInterfaceModule> (this);
@@ -288,13 +289,13 @@ namespace WhiteCore.Modules.Web
                 }
             } else {
                 // static files
-                if (!File.Exists(filename))
+                if (!File.Exists (filename))
                     return MainServer.BadRequest;
-                
+
                 httpResponse.ContentType = GetContentType (filename, httpResponse);
                 if (httpResponse.ContentType == null)
                     return MainServer.BadRequest;
-                
+
                 response = File.ReadAllBytes (filename);
             }
             return response;
@@ -392,10 +393,11 @@ namespace WhiteCore.Modules.Web
                 string line = lines [pos];
                 string cleanLine = line.Trim ();
                 if (cleanLine.StartsWith ("<!--#include file=", StringComparison.Ordinal)) {
+                    line = " " + line;  // ensure at least one space is before the key
                     string [] split = line.Split (new string [] { "<!--#include file=\"", "\" -->" },
                                                 StringSplitOptions.RemoveEmptyEntries);
                     for (int i = 0; i < split.Length; i += 2) {
-                        string filename = GetFileNameFromHTMLPath (split [i+1], request.Query, isAuth);
+                        string filename = GetFileNameFromHTMLPath (split [i + 1], request.Query, isAuth);
                         if (filename != null) {
                             string response;
                             Dictionary<string, object> newVars = AddVarsForPage (filename, originalFileName,
@@ -410,7 +412,8 @@ namespace WhiteCore.Modules.Web
                     string [] split = line.Split (new string [] { "<!--#include folder=\"", "\" -->" },
                                                 StringSplitOptions.RemoveEmptyEntries);
                     for (int i = split.Length % 2 == 0 ? 0 : 1; i < split.Length; i += 2) {
-                        string filename = GetFileNameFromHTMLPath (split [i+1], request.Query, isAuth).Replace ("index.html", "");
+                        line = " " + line;  // ensure at least one space is before the key
+                        string filename = GetFileNameFromHTMLPath (split [i + 1], request.Query, isAuth).Replace ("index.html", "");
                         if (filename != null) {
                             if (Directory.Exists (filename)) {
                                 string response;
@@ -584,7 +587,7 @@ namespace WhiteCore.Modules.Web
 
             try {
                 string filePath = path.StartsWith ("/", StringComparison.Ordinal)
-                                      ? path.Remove (0, 1) 
+                                      ? path.Remove (0, 1)
                                       : path;
                 if (filePath.StartsWith ("index.html", StringComparison.Ordinal))
                     filePath = filePath.Remove (0, 10);
@@ -626,7 +629,7 @@ namespace WhiteCore.Modules.Web
                         var subdir = "";
                         if (query.ContainsKey ("subdir"))
                             subdir = query ["subdir"] + "/";
-                        var wpage =  "html/" + subdir + query ["page"] + ".html";
+                        var wpage = "html/" + subdir + query ["page"] + ".html";
 
                         if (_pages.ContainsKey (wpage)) {
                             file = _pages [wpage].FilePath [0];
@@ -689,10 +692,10 @@ namespace WhiteCore.Modules.Web
 
         string GetTranslatedString (ITranslator translator, string name, GridPage page, bool isTooltip)
         {
-	        string retVal = translator.GetTranslatedString (name);
-	        if (retVal == "UNKNOWN CHARACTER")
-		        return isTooltip ? page.MenuToolTip : page.MenuTitle;
-	        return retVal;
+            string retVal = translator.GetTranslatedString (name);
+            if (retVal == "UNKNOWN CHARACTER")
+                return isTooltip ? page.MenuToolTip : page.MenuTitle;
+            return retVal;
         }
 
         internal List<Dictionary<string, object>> BuildPageMenus (GridPage rootPage, OSHttpRequest httpRequest, ITranslator translator)
@@ -725,15 +728,11 @@ namespace WhiteCore.Modules.Web
                                            {"ChildMenuItemID", childPage.MenuID},
                                            {"ChildShowInMenu", childPage.ShowInMenu},
                                            {"ChildMenuItemLocation", childPage.Location},
-                                           {
-                                               "ChildMenuItemTitleHelp",
-
-                                               GetTranslatedString (translator, childPage.MenuToolTip, childPage, true)
+                                           {"ChildMenuItemTitleHelp",
+                                                GetTranslatedString (translator, childPage.MenuToolTip, childPage, true)
                                            },
-                                           {
-                                               "ChildMenuItemTitle",
-
-                                               GetTranslatedString (translator, childPage.MenuTitle, childPage, false)
+                                           {"ChildMenuItemTitle",
+                                                GetTranslatedString (translator, childPage.MenuTitle, childPage, false)
                                            }
                                        });
 
@@ -751,11 +750,12 @@ namespace WhiteCore.Modules.Web
                                   {"MenuItemID", page.MenuID},
                                   {"ShowInMenu", page.ShowInMenu},
                                   {"HasChildren", page.Children.Count > 0},
+                                  {"HasNoChildren", page.Children.Count == 0},
                                   {"ChildrenMenuItems", childPages},
                                   {"MenuItemLocation", page.Location},
                                   {"MenuItemTitleHelp", GetTranslatedString (translator, page.MenuToolTip, page, true)},
-                                 {"MenuItemTitle", GetTranslatedString (translator, page.MenuTitle, page, false)},
-                        {"MenuItemToolTip", GetTranslatedString (translator, page.MenuToolTip, page, true)}
+                                  {"MenuItemTitle", GetTranslatedString (translator, page.MenuTitle, page, false)},
+                                  {"MenuItemToolTip", GetTranslatedString (translator, page.MenuToolTip, page, true)}
                               });
             }
 
@@ -780,30 +780,44 @@ namespace WhiteCore.Modules.Web
 
         internal GridPage GetUserPages ()
         {
-	        if (userPages == null) {
+            if (userPages == null) {
+                IGenericsConnector generics = Framework.Utilities.DataManager.RequestPlugin<IGenericsConnector> ();
+                GridPage userPage = generics.GetGeneric<GridPage> (UUID.Zero, "WebPages", "User");
+                if (userPage == null)
+                    userPage = new GridPage ();
+
+                return userPage;
+            }
+
+            return userPages;
+        }
+
+        internal GridPage GetUserTopPages ()
+        {
+	        if (userTopPages == null) {
 		        IGenericsConnector generics = Framework.Utilities.DataManager.RequestPlugin<IGenericsConnector> ();
-		        GridPage userPage = generics.GetGeneric<GridPage> (UUID.Zero, "WebPages", "User");
-		        if (userPage == null)
-			        userPage = new GridPage ();
+		        GridPage userTopPages = generics.GetGeneric<GridPage> (UUID.Zero, "WebPages", "UserTop");
+		        if (userTopPages == null)
+			        userTopPages = new GridPage ();
 
-    		    return userPage;
-	        }
+		        return userTopPages;
+	        }  
 
-	    return userPages;
+	        return userTopPages;
         }
 
         internal GridPage GetAdminPages ()
         {
-        	if (adminPages == null) {
-        		IGenericsConnector generics = Framework.Utilities.DataManager.RequestPlugin<IGenericsConnector> ();
-        		GridPage adminPage = generics.GetGeneric<GridPage> (UUID.Zero, "WebPages", "Admin");
-        		if (adminPage == null)
-        			adminPage = new GridPage ();
+            if (adminPages == null) {
+                IGenericsConnector generics = Framework.Utilities.DataManager.RequestPlugin<IGenericsConnector> ();
+                GridPage adminPage = generics.GetGeneric<GridPage> (UUID.Zero, "WebPages", "Admin");
+                if (adminPage == null)
+                    adminPage = new GridPage ();
 
-        		return adminPage;
-        	}
+                return adminPage;
+            }
 
-	        return adminPages;
+            return adminPages;
         }
 
         internal WebUISettings GetWebUISettings ()
@@ -891,7 +905,7 @@ namespace WhiteCore.Modules.Web
             ID = -1,
             Text = "No news to report",         // should use translatore here //    translator.GetTranslatedString ("NoNews"))
             NewsDateTime = DateTime.Now,
-            Day = DateTime.Now.ToString("dd"),
+            Day = DateTime.Now.ToString ("dd"),
             DayName = DateTime.Now.ToString ("dddd"),
             Month = DateTime.Now.ToString ("MMM"),
             Title = "No news to report"
@@ -911,7 +925,7 @@ namespace WhiteCore.Modules.Web
             map ["Title"] = Title;
             map ["Text"] = Text;
             map ["Time"] = NewsDateTime;
-            map ["Day"] = NewsDateTime.ToString("dd");
+            map ["Day"] = NewsDateTime.ToString ("dd");
             map ["DayName"] = NewsDateTime.ToString ("dddd");
             map ["Month"] = NewsDateTime.ToString ("MMM");
             map ["ID"] = ID;
@@ -1005,7 +1019,7 @@ namespace WhiteCore.Modules.Web
 
         public GridPage (OSD map)
         {
-            var mp = (OSDMap) map;
+            var mp = (OSDMap)map;
 
             ShowInMenu = mp ["ShowInMenu"];
             ShowInUserMenu = mp ["ShowInUserMenu"];
@@ -1260,6 +1274,7 @@ namespace WhiteCore.Modules.Web
         public bool WebRegistration = false;
         public bool HideSlideshowBar = false;
         public string LocalFrontPage = "local/frontpage.html";
+        public string LocalUserFrontPage = "local/userfrontpage.html";
         public string LocalCSS = "local/";
 
         public WebUISettings ()
@@ -1281,6 +1296,7 @@ namespace WhiteCore.Modules.Web
             WebRegistration = mp ["WebRegistration"];
             HideSlideshowBar = mp ["HideSlideshowBar"];
             LocalFrontPage = mp ["LocalFrontPage"];
+            LocalUserFrontPage = mp ["LocalUserFrontPage"];
             LocalCSS = mp ["LocalCSS"];
         }
 
@@ -1295,6 +1311,7 @@ namespace WhiteCore.Modules.Web
             WebRegistration = map ["WebRegistration"];
             HideSlideshowBar = map ["HideSlideshowBar"];
             LocalFrontPage = map ["LocalFrontPage"];
+            LocalUserFrontPage= map ["LocalUserFrontPage"];
             LocalCSS = map ["LocalCSS"];
         }
 
@@ -1311,6 +1328,7 @@ namespace WhiteCore.Modules.Web
             map ["WebRegistration"] = WebRegistration;
             map ["HideSlideshowBar"] = HideSlideshowBar;
             map ["LocalFrontPage"] = LocalFrontPage;
+            map ["LocalUserFrontPage"] = LocalFrontPage;
             map ["LocalCSS"] = LocalCSS;
 
             return map;

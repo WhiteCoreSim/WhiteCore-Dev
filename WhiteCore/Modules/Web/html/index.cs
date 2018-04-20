@@ -59,11 +59,14 @@ namespace WhiteCore.Modules.Web
 
             #region Find pages
 
-            List<Dictionary<string, object>> pages = new List<Dictionary<string, object>> ();
+            //List<Dictionary<string, object>> pages = new List<Dictionary<string, object>> ();
 
             var settings = webInterface.GetWebUISettings ();
             var rootPage = webInterface.GetGridPages ();
+            var pages = webInterface.BuildPageMenus (rootPage, httpRequest, translator);
+            vars.Add ("MenuItems", pages);
 
+            /*
             rootPage.Children.Sort ((a, b) => a.MenuPosition.CompareTo (b.MenuPosition));
 
             foreach (GridPage page in rootPage.Children) {
@@ -121,8 +124,9 @@ namespace WhiteCore.Modules.Web
                         {"MenuItemToolTip", GetTranslatedString(translator, page.MenuToolTip, page, true)}
                               });
             }
-            vars.Add ("MenuItems", pages);
 
+            vars.Add ("MenuItems", pages);
+            */
             #endregion
 
             // Tooltips Urls
@@ -161,6 +165,16 @@ namespace WhiteCore.Modules.Web
                 vars.Add ("LocalFrontPage", settings.LocalFrontPage);
             }
 
+            // registration access
+            /*bool allowRegistration = settings.WebRegistration;
+            if (!allowRegistration) {
+                vars.Add ("ErrorMessage", "");
+                vars.Add ("RegistrationText", translator.GetTranslatedString ("RegistrationText"));
+                vars.Add ("RegistrationsDisabled", translator.GetTranslatedString ("RegistrationsDisabled"));
+                vars.Add ("Registrations", false);
+                vars.Add ("NoRegistrations", true);
+            }
+*/
             // Language Switcher
             vars.Add ("Languages", webInterface.AvailableLanguages ());
             vars.Add ("ShowLanguageTranslatorBar", !settings.HideLanguageTranslatorBar);

@@ -1,5 +1,5 @@
 <!-- Main non logged in template -->
-<section class="sign-up section-padding text-center" id="download">
+<section class="sign-up text-center">
   <div class="container">
     <div class="row">
       <div id="error_message" class="error_message"><h3>{ErrorMessage}</h3></div>
@@ -16,7 +16,7 @@
             <input type="password" class="" placeholder="{PasswordText}" required name="password">
           </div>
           <button type="submit" class="btn-fill sign-up-btn">{Submit}</button>
-          <a id="forgotpass" href="index.html/page=forgot_pass"><h5>{ForgotPassword}</h5></a>
+          <a id="forgotpass" href="#" onclick="loadcontent('forgot_pass');"><h5>{ForgotPassword}</h5></a>
         </form>
       </div>
     </div>
