@@ -26,7 +26,10 @@
  */
 
 using System.Collections.Generic;
+using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.Servers.HttpServer.Implementation;
+using WhiteCore.Framework.Services;
+using WhiteCore.Framework.Utilities;
 
 namespace WhiteCore.Modules.Web
 {
@@ -55,9 +58,54 @@ namespace WhiteCore.Modules.Web
         {
             response = null;
             var vars = new Dictionary<string, object> ();
+            // worldview
+            var webTextureService = webInterface.Registry.RequestModuleInterface<IWebHttpTextureService> ();
 
+            var worldViewConfig =
+	                webInterface.Registry.RequestModuleInterface<ISimulationBase> ().ConfigSource.Configs ["WorldViewModule"];
+            bool worldViewEnabled = false;
+            if (worldViewConfig != null)
+                    worldViewEnabled = worldViewConfig.GetBoolean ("Enabled", true);
+
+            // get region list
+            List<Dictionary<string, object>> RegionListVars = new List<Dictionary<string, object>> ();
+            var sortBy = new Dictionary<string, bool> ();
+            sortBy.Add ("RegionName", true);
+            var regionData = Framework.Utilities.DataManager.RequestPlugin<IRegionData> ();
+            var regions = regionData.Get (0, RegionFlags.Hyperlink | RegionFlags.Foreign | RegionFlags.Hidden,
+                                          null, 10, sortBy);
+            foreach (var region in regions) {
+                string info;
+                info = (region.RegionArea < 1000000) ? region.RegionArea + " m2" : (region.RegionArea / 1000000) + " km2";
+                info = info + ", " + region.RegionTerrain;
+
+                var regionviewURL = "";
+                if (webTextureService != null && worldViewEnabled && region.IsOnline)
+                    regionviewURL = webTextureService.GetRegionWorldViewURL (region.RegionID);
+
+                RegionListVars.Add (new Dictionary<string, object> {
+                    { "RegionLocX", region.RegionLocX / Constants.RegionSize },
+                    { "RegionLocY", region.RegionLocY / Constants.RegionSize },
+                    { "RegionName", region.RegionName },
+                    { "RegionInfo", info},
+                    { "RegionStatus", region.IsOnline ? "Online" : "Offline"},
+                    { "RegionID", region.RegionID },
+                    { "RegionURI", region.RegionURI },
+                    { "RegionWorldViewURL", regionviewURL}
+                });
+            }
+
+            vars.Add ("RegionList", RegionListVars);
+            vars.Add ("RegionText", translator.GetTranslatedString ("Region"));
+            vars.Add ("MoreInfoText", translator.GetTranslatedString ("MoreInfoText"));
+
+            vars.Add ("MainServerURL", webInterface.GridURL);
             vars.Add ("WorldMap", translator.GetTranslatedString ("WorldMap"));
             vars.Add ("WorldMapText", translator.GetTranslatedString ("WorldMapText"));
+
+            var settings = webInterface.GetWebUISettings ();
+            vars.Add ("MapCenterX", settings.MapCenter.X);
+            vars.Add ("MapCenterY", settings.MapCenter.Y);
 
             return vars;
         }

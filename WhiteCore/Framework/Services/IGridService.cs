@@ -25,7 +25,6 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
 using System.Collections.Generic;
 using System.Net;
 using OpenMetaverse;
@@ -62,7 +61,7 @@ namespace WhiteCore.Framework.Services
         /// <param name="majorProtocolVersion"></param>
         /// <param name="minorProtocolVersion"></param>
         /// <returns></returns>
-        /// <exception cref="System.Exception">Thrown if region registration failed</exception>
+        /// <exception>Thrown if region registration failed</exception>
         RegisterRegion RegisterRegion (GridRegion regionInfos, UUID oldSessionID, string password,
                                       int majorProtocolVersion, int minorProtocolVersion);
 
@@ -71,7 +70,7 @@ namespace WhiteCore.Framework.Services
         /// </summary>
         /// <param name="region"></param>
         /// <returns></returns>
-        /// <exception cref="System.Exception">Thrown if region deregistration failed</exception>
+        /// <exception>Thrown if region deregistration failed</exception>
         bool DeregisterRegion (GridRegion region);
 
         /// <summary>
@@ -266,7 +265,7 @@ namespace WhiteCore.Framework.Services
         {
             Error = map ["Error"];
             OSDArray n = (OSDArray)map ["Neighbors"];
-            Neighbors = n.ConvertAll<GridRegion> (
+            Neighbors = n.ConvertAll (
                 (osd) =>
                 {
                     GridRegion r = new GridRegion ();
@@ -281,7 +280,7 @@ namespace WhiteCore.Framework.Services
                 Region.FromOSD ((OSDMap)map ["Region"]);
             }
             if (map.ContainsKey ("URIs"))
-                URIs = ((OSDMap)map ["URIs"]).ConvertMap<List<string>> ((o) => ((OSDArray)o).ConvertAll<string> ((oo) => oo));
+                URIs = ((OSDMap)map ["URIs"]).ConvertMap ((o) => ((OSDArray)o).ConvertAll<string> ((oo) => oo));
         }
     }
 
@@ -457,7 +456,7 @@ namespace WhiteCore.Framework.Services
             return (RegionID != UUID.Zero) && RegionID.Equals (region.RegionID);
         }
 
-        public override bool Equals (Object obj)
+        public override bool Equals (object obj)
         {
             if (obj == null)
                 return false;
@@ -503,9 +502,10 @@ namespace WhiteCore.Framework.Services
         /// <returns></returns>
         public bool PointIsInRegion (int x, int y)
         {
-            if (x > RegionLocX && y > RegionLocY &&
-                x < RegionLocX + RegionSizeX &&
-                y < RegionLocY + RegionSizeY)
+            var rMaxX = RegionLocX + RegionSizeX - 1;
+            var rMaxY = RegionLocY + RegionSizeY - 1;
+
+            if (x >= RegionLocX && x < rMaxX && y >= RegionLocY && y < rMaxY)
                 return true;
             return false;
         }
@@ -579,7 +579,7 @@ namespace WhiteCore.Framework.Services
 
             if (map.ContainsKey ("serverHttpPort"))
             {
-                UInt32 port = map ["serverHttpPort"].AsUInteger ();
+                uint port = map ["serverHttpPort"].AsUInteger ();
                 HttpPort = port;
             }
 

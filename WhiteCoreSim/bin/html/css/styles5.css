@@ -733,7 +733,8 @@ button {
 
 /* Container */
 #container {
-	width: 960px;
+  /*width: 960px;  old*/
+  width:90%;
 	margin: 0pt auto;
 }
 

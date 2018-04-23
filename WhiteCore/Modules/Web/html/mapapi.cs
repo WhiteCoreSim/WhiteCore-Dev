@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (c) Contributors, http://whitecore-sim.org/, http://aurora-sim.org
+ * Copyright (c) Contributors, http://whitecore-sim.org/, http://aurora-sim.org/
  * See CONTRIBUTORS.TXT for a full list of copyright holders.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -9,7 +9,7 @@
  *     * Redistributions in binary form must reproduce the above copyright
  *       notice, this list of conditions and the following disclaimer in the
  *       documentation and/or other materials provided with the distribution.
- *     * Neither the name of the WhiteCore-Sim Project nor the
+ *     * Neither the name of the Aurora-Sim Project nor the
  *       names of its contributors may be used to endorse or promote products
  *       derived from this software without specific prior written permission.
  *
@@ -27,17 +27,17 @@
 
 using System.Collections.Generic;
 using WhiteCore.Framework.Servers.HttpServer.Implementation;
+using WhiteCore.Framework.Services;
 
 namespace WhiteCore.Modules.Web
 {
-    public class WorldMapPage : IWebInterfacePage
+    public class MapAPIPage : IWebInterfacePage
     {
         public string [] FilePath {
             get {
-                return new []
-                           {
-                               "html/world_map.html"
-                           };
+                return new [] {
+                    "html/map/mapapi.js"
+                };
             }
         }
 
@@ -55,12 +55,16 @@ namespace WhiteCore.Modules.Web
         {
             response = null;
             var vars = new Dictionary<string, object> ();
+            var mapService = webInterface.Registry.RequestModuleInterface<IMapService> ();
+            if (mapService != null) {
+                string mapUrl = mapService.MapServiceURL;
+                string mapAPIUrl = mapService.MapServiceAPIURL;
 
-            vars.Add ("WorldMap", translator.GetTranslatedString ("WorldMap"));
+                vars.Add ("WorldMapServiceURL", mapUrl.Remove (mapUrl.Length - 1));
+                vars.Add ("WorldMapAPIServiceURL", mapAPIUrl.Remove (mapAPIUrl.Length - 1));
+                vars.Add ("MainServerURL", webInterface.GridURL);
 
-            var settings = webInterface.GetWebUISettings ();
-            vars.Add ("GridCenterX", settings.MapCenter.X);
-            vars.Add ("GridCenterY", settings.MapCenter.Y);
+            }
 
             return vars;
         }
