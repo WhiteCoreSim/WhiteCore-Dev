@@ -853,6 +853,12 @@ msgstr "Nieuws Manager"
 msgid "NewsTitleText"
 msgstr "Nieuws Titel"
 
+msgid "Next3Days"
+msgstr "Komende 3 dagen"
+
+msgid "Next7Days"
+msgstr "Komende 7 dagen"
+
 msgid "Next10Hours"
 msgstr "Komende 10 uur"
 

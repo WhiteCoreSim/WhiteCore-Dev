@@ -853,6 +853,12 @@ msgstr "Gestionnaire des News"
 msgid "NewsTitleText"
 msgstr "Title de la News"
 
+msgid "Next3Days"
+msgstr "Suivant 3 journées"
+
+msgid "Next7Days"
+msgstr "Suivant 7 journées"
+
 msgid "Next10Hours"
 msgstr "Suivant 10 heures"
 

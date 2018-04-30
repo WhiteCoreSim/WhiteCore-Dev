@@ -246,6 +246,14 @@ namespace WhiteCore.Modules.Web
 
             // build timeframes
             var timeframes = new List<Dictionary<string, object>> ();
+            timeframes.Add(new Dictionary<string, object> {
+                {"Value", translator.GetTranslatedString("Next7Days")},
+                {"Index","168"},
+                {"selected", timeframe == 168 ? "selected" : "" } });
+            timeframes.Add(new Dictionary<string, object> {
+                {"Value", translator.GetTranslatedString("Next3Days")},
+                {"Index","72"},
+                {"selected", timeframe == 72 ? "selected" : "" } });
             timeframes.Add (new Dictionary<string, object> {
                 {"Value", translator.GetTranslatedString("Next24Hours")},
                 {"Index","24"},
