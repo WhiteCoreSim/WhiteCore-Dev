@@ -565,8 +565,10 @@ namespace WhiteCore.DataManager.MySQL
 
         public override bool DeleteByTime(string table, string key)
         {
+            // the only call here is to delete any "tokens.validity < now. i.e. expired tokens 
+            // validity is a unix_timestamp saved as an int
             QueryFilter filter = new QueryFilter();
-            filter.andLessThanEqFilters["(UNIX_TIMESTAMP(`" + key.Replace("`", "") + "`) - UNIX_TIMESTAMP())"] = 0;
+            filter.andLessThanEqFilters["(`" + key.Replace("`", "") + "` - UNIX_TIMESTAMP())"] = 0;
 
             return Delete(table, filter);
         }

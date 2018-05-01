@@ -715,9 +715,11 @@ namespace WhiteCore.DataManager.SQLite
 
         public override bool DeleteByTime(string table, string key)
         {
+            // the only call here is to delete any "tokens.validity < now". i.e. expired tokens 
+            // validity is a unix_tiestamp saved as an int
             QueryFilter filter = new QueryFilter();
             filter.andLessThanEqFilters[
-                "(datetime(" + key.Replace("`", "") + ", 'localtime') - datetime('now', 'localtime'))"] = 0;
+                "(datetime(" + key.Replace("`", "") + ", 'unixepoch') - datetime(strftime('%s','now', 'unixepoch'))"] = 0;
 
             return Delete(table, filter);
         }
