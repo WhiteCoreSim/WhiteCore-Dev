@@ -46,6 +46,7 @@ $.namespace('$.wc.maps');
 $.wc.maps.config = {
     wc_base_url: "{MainServerURL}",
     tile_url: "{WorldMapServiceURL}",
+    base_regionsize: "{WorldRegionSize}",
 
     // Default Destination Information
     default_title: "Welcome to WhiteCore Sim",
@@ -57,7 +58,7 @@ $.wc.maps.config = {
 
     // The maximum width/height of the WhiteCore grid in regions:
     // 2^20 regions on a side = 1,048,786    ("This should be enough for anyone")
-    // *NOTE: This must be a power of 2 and divisible by 2^(max zoom) = 256
+    // *NOTE: This must be a power of 2 and divisible by 2^(max zoom) = 256 (default region size)
     map_grid_edge_size: 1048576,
 
 }
@@ -255,9 +256,6 @@ function gotoWCURL(x, y, lmap)
     var int_x = Math.floor(x);
     var int_y = Math.floor(y);
 
-    var local_x = Math.round((x - int_x) * 256);
-    var local_y = Math.round((y - int_y) * 256);
-
     // Add a dynamic script to get this region name, and then trigger a URL change
     // based on the results
     var scriptURL ="{WorldMapAPIServiceURL}/get-region-name-by-coords?var=wcRegionName&grid_x=" + encodeURIComponent(int_x) + "&grid_y=" + encodeURIComponent(int_y);
@@ -267,14 +265,22 @@ function gotoWCURL(x, y, lmap)
         if (wcRegionName == null || wcRegionName.error)
             return;
 
-        var url = "hop://" + encodeURIComponent(wcRegionName) + "/" + local_x + "/" + local_y;
+        var locx = parseInt(wcRegionName.xloc);
+        var locy = parseInt(wcRegionName.yloc);
+        var xsize = parseInt(wcRegionName.xsize);
+        var ysize = parseInt(wcRegionName.ysize);
+        var regionSize = $.wc.maps.config.base_regionsize;
+
+        var local_x = Math.round((x - int_x) * regionSize) + ((int_x - locx) * regionSize);
+        var local_y = Math.round((y - int_y) * regionSize) + ((int_y - locy) * regionSize);
+        var url = "hop://" + $.wc.maps.config.wc_base_url + '/' + encodeURIComponent(wcRegionName.regionName) + "/" + local_x + "/" + local_y + "/50";
 
         var debugInfo = '';
         if (wcDebugMap) {
             debugInfo = ' x: ' + int_x + ' y: ' + int_y;
         }
 
-        var content = '<div><h3 style="text-align:center;"><a href="' + url + '">' + wcRegionName + '</a></h3>'
+        var content = '<div><h3 style="text-align:center;"><a href="' + url + '">' + wcRegionName.regionName + '</a></h3>'
         + debugInfo
         + '<div class="buttons"><a href="' + url + '"><img class="btn-teleport"></img></a></div></div>';
         var popup = L.popup().setLatLng([y, x]).setContent(content).openOn(lmap);

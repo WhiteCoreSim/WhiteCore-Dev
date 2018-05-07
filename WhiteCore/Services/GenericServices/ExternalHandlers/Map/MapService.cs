@@ -162,20 +162,23 @@ namespace WhiteCore.Services
         {
             byte [] response = MainServer.BlankResponse;
 
-            string var = httpRequest.Query ["var"].ToString ();
-            string requestType = path.Substring (0, path.IndexOf ("?", StringComparison.Ordinal));
+            var resp = "var {0} = {{regionName:\"{1}\",xloc:\"{2}\",yloc:\"{3}\",xsize:\"{4}\",ysize:\"{5}\"}};";
+            var varName = httpRequest.Query ["var"].ToString ();
+            var requestType = path.Substring (0, path.IndexOf ("?", StringComparison.Ordinal));
+
             if (requestType == "/MapAPI/get-region-coords-by-name") {
-                string resp = "var {0} = {\"x\":{1},\"y\":{2}};";
                 string sim_name = httpRequest.Query ["sim_name"].ToString ();
                 var region = m_gridService.GetRegionByName (null, sim_name);
                 if (region == null)
-                    resp = "var " + var + " = {error: true};";
-                else
-                    resp = "var " + var + " = {\"x\":" + region.RegionLocX + ",\"y\":" + region.RegionLocY + "};";
+                    resp = "var " + varName + "={error: true};";
+                else {
+                    resp = string.Format (resp, varName, region.RegionName,
+                                          region.RegionLocX / Constants.RegionSize , region.RegionLocY / Constants.RegionSize,
+                                          region.RegionSizeX, region.RegionSizeY);
+                }
                 response = System.Text.Encoding.UTF8.GetBytes (resp);
                 httpResponse.ContentType = "text/javascript";
             } else if (requestType == "/MapAPI/get-region-name-by-coords") {
-                string resp = "var {0} = \"{1}\";";
                 int grid_x = int.Parse (httpRequest.Query ["grid_x"].ToString ());
                 int grid_y = int.Parse (httpRequest.Query ["grid_y"].ToString ());
                 var region = m_gridService.GetRegionByPosition (null,
@@ -191,15 +194,20 @@ namespace WhiteCore.Services
                     bool found = false;
                     foreach (var r in regions) {
                         if (r.PointIsInRegion (grid_x * Constants.RegionSize, grid_y * Constants.RegionSize)) {
-                            resp = string.Format (resp, var, r.RegionName);
+                            resp = string.Format (resp, varName, r.RegionName,
+							        			  r.RegionLocX / Constants.RegionSize, r.RegionLocY / Constants.RegionSize,
+									        	  r.RegionSizeX, r.RegionSizeY);
                             found = true;
                             break;
                         }
                     }
                     if (!found)
-                        resp = "var " + var + " = {error: true};";
-                } else
-                    resp = string.Format (resp, var, region.RegionName);
+                        resp = "var " + varName + "={error: true};";
+                } else {
+                    resp = string.Format (resp, varName, region.RegionName,
+										  region.RegionLocX / Constants.RegionSize, region.RegionLocY / Constants.RegionSize,
+										  region.RegionSizeX, region.RegionSizeY);
+                }
                 response = System.Text.Encoding.UTF8.GetBytes (resp);
                 httpResponse.ContentType = "text/javascript";
             }
