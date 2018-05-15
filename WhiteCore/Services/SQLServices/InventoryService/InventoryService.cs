@@ -294,6 +294,15 @@ namespace WhiteCore.Services.SQLServices.InventoryService
             }))
                 CreateFolder (principalID, rootFolder.ID, (int)FolderType.VMMListings, "Marketplace Listings");
 
+            // IWC / HG Suitcase for going outside the boxes
+            // Unused at the moment but implementing for future use
+
+            if (!Array.Exists(sysFolders, delegate (InventoryFolderBase f) {
+                if (f.Type == (short)FolderType.HGSuitcase) return true;
+                return false;
+            }))
+                CreateFolder(principalID, rootFolder.ID, (int)FolderType.HGSuitcase, "My Suitcase");
+
             if (createDefaultItems && m_LibraryService != null) {
                 defaultItems = new List<InventoryItemBase> ();
                 InventoryFolderBase bodypartFolder = GetFolderForType (principalID, InventoryType.Unknown, FolderType.BodyPart);
