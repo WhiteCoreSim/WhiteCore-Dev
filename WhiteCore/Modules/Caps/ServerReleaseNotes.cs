@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright (c) Contributors, http://whitecore-sim.org/, http://aurora-sim.org, http://opensimulator.org/
  * See CONTRIBUTORS.TXT for a full list of copyright holders.
  *
@@ -54,15 +54,17 @@ namespace WhiteCore.Modules.Caps
         public void AddRegion(IScene scene)
         {
             m_scene = scene;
-            m_scene.EventManager.OnRegisterCaps += RegisterCaps;
         }
 
         public void RemoveRegion(IScene scene)
         {
+            m_scene.EventManager.OnRegisterCaps -= RegisterCaps;
+            m_scene = null;
         }
 
         public void RegionLoaded(IScene scene)
         {
+            m_scene.EventManager.OnRegisterCaps += RegisterCaps;
         }
 
         public Type ReplaceableInterface
@@ -86,17 +88,22 @@ namespace WhiteCore.Modules.Caps
             OSDMap retVal = new OSDMap();
             retVal["ServerReleaseNotes"] = CapsUtil.CreateCAPS("ServerReleaseNotes", "");
 
-            server.AddStreamHandler(new GenericStreamHandler("POST", retVal["ServerReleaseNotes"],
-                                                             delegate(string path, Stream request,
+            server.AddStreamHandler(new GenericStreamHandler("GET", retVal["ServerReleaseNotes"],
+                                                             delegate (string path, Stream request,
                                                                       OSHttpRequest httpRequest,
                                                                       OSHttpResponse httpResponse)
-                                                             { return ProcessServerReleaseNotes(agentID); }));
+                                                             { return ProcessServerReleaseNotes(request, httpResponse, agentID); }));
 
             return retVal;
         }
-        
-        private byte[] ProcessServerReleaseNotes(UUID agentID)
+
+        private byte[] ProcessServerReleaseNotes(Stream request, OSHttpResponse response, UUID AgentId)
         {
+            response.StatusCode = 301;
+            response.RedirectLocation = Utilities.GetServerReleaseNotesURL();
+            response.ContentType = "text/plain";
+            response.KeepAlive = false;
+
             OSDMap osd = new OSDMap { { "ServerReleaseNotes", new OSDString(Utilities.GetServerReleaseNotesURL()) } };
             return OSDParser.SerializeLLSDXmlBytes(osd);
         }
