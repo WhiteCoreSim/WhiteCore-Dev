@@ -6755,32 +6755,38 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             UUID key = new UUID();
             if (UUID.TryParse(id, out key))
             {
-                IScenePresence presence = World.GetScenePresence(key);
-                IParcelManagementModule parcelManagement = World.RequestModuleInterface<IParcelManagementModule>();
-                if (presence != null) // object is an avatar
+                try
                 {
-                    if (parcelManagement != null)
+                    IScenePresence presence = World.GetScenePresence(key);
+                    IParcelManagementModule parcelManagement = World.RequestModuleInterface<IParcelManagementModule>();
+                    if (presence != null) // object is an avatar
                     {
-                        if (m_host.OwnerID
-                            == parcelManagement.GetLandObject(
-                                presence.AbsolutePosition.X, presence.AbsolutePosition.Y).LandData.OwnerID)
-                            return 1;
-                    }
-                }
-                else // object is not an avatar
-                {
-                    ISceneChildEntity obj = World.GetSceneObjectPart(key);
-                    if (obj != null)
                         if (parcelManagement != null)
                         {
                             if (m_host.OwnerID
                                 == parcelManagement.GetLandObject(
-                                    obj.AbsolutePosition.X, obj.AbsolutePosition.Y).LandData.OwnerID)
+                                presence.AbsolutePosition.X, presence.AbsolutePosition.Y).LandData.OwnerID)
                                 return 1;
                         }
+                        else // object is not an avatar
+                        {
+                            ISceneChildEntity obj = World.GetSceneObjectPart(key);
+                            if (obj != null)
+                                if (parcelManagement != null)
+                                {
+                                    if (m_host.OwnerID == parcelManagement.GetLandObject(obj.AbsolutePosition.X, obj.AbsolutePosition.Y).LandData.OwnerID)
+                                        return 1;
+                                }
+                        }
+                    }
+                }
+                catch (NullReferenceException)
+                {
+                    // lots of places to get nulls
+                    // eg, presence.AbsolutePosition
+                    return 0;
                 }
             }
-
             return 0;
         }
 
@@ -13680,11 +13686,16 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
 
         public LSL_String llJsonGetValue(LSL_String json, LSL_List specifiers)
         {
-            OSD o = OSDParser.DeserializeJson(json);
-            OSD specVal = JsonGetSpecific(o, specifiers, 0);
-            if (specVal != null)
+            try
+            {
+                OSD o = OSDParser.DeserializeJson(json);
+                OSD specVal = JsonGetSpecific(o, specifiers, 0);
                 return specVal.AsString();
-            return string.Empty;
+            }
+            catch (Exception)
+            {
+                return ScriptBaseClass.JSON_INVALID;
+            }
         }
 
         public LSL_List llJson2List(LSL_String json)
