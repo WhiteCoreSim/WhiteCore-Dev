@@ -104,6 +104,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.Runtime
         public static readonly LSL_Types.LSLInteger AGENT_CROUCHING = 1024;
         public static readonly LSL_Types.LSLInteger AGENT_BUSY = 2048;
         public static readonly LSL_Types.LSLInteger AGENT_ALWAYS_RUN = 4096;
+        public static readonly LSL_Types.LSLInteger AGENT_AUTOPILOT = 8192;
 
         //Particle Systems
         public static readonly LSL_Types.LSLInteger PSYS_PART_INTERP_COLOR_MASK = 1;
@@ -681,6 +682,8 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.Runtime
         public static readonly LSL_Types.LSLInteger PARCEL_DETAILS_ID = 5;
         public static readonly LSL_Types.LSLInteger PARCEL_DETAILS_PRIVACY = 6; //Old name
         public static readonly LSL_Types.LSLInteger PARCEL_DETAILS_SEE_AVATARS = 6;
+        public static readonly LSL_Types.LSLInteger PARCEL_DETAILS_ANY_AVATAR_SOUNDS = 7;
+        public static readonly LSL_Types.LSLInteger PARCEL_DETAILS_GROUP_SOUNDS = 8;
 
         // constants for llSetClickAction
         public static readonly LSL_Types.LSLInteger CLICK_ACTION_NONE = 0;
