@@ -12,7 +12,9 @@ Mono V3.x    : Checkout http://www.go-mono.com/mono-downloads/download.html for 
 
 Building
 ========
-Cd the the downloaded directory.
+Cd into the downloaded directory.
+
+Make sure you have the WhiteCoreSim/WhiteCore-LibOMV downloaded and unpacked as well in this folder.
 
 *nix (inc Mac)
 --------------
@@ -26,9 +28,9 @@ Windows
 Run(Execute) the  'runprebuild.bat' batch file.  This will ask several questions 
 with the option to build at the end.
 
-
 A large amount of compile information will be shown but when completed, 
 no errors should be indicated.
+
 NOTE:  Some warnings may be shown (37 at last count) but these do not present 
 any problem or prevent operation of the servers. 
 (These will be corrected and removed as time permits)
@@ -56,7 +58,6 @@ For an existing installation
 ----------------------------
 Copy the 'WhiteCoreSim/bin' subdirectory to your existing WhiteCore installation, replacing the 'bin' directory there.
 
-
 Restart as per normal using the appropriate script file.
 Answer 'No' if asked to re-configure at startup.
 
@@ -65,3 +66,7 @@ Checkout the ReadMe.txt file for the rest
 Rowan
 <greythane@gmail.com>
 May 2014
+
+Fly-Man-
+<fly.man.opensim@gmail.com>
+Jul 2018

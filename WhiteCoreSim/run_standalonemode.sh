@@ -13,7 +13,7 @@ screen -S Sim -d -m mono WhiteCore.exe -skipconfig
 sleep 3
 screen -list
 echo "To view the Sim console, use the command : screen -r Sims"
-echo "To detach fron the console use the command : ctrl+a d  ...ctrl+a [command mode],  d [detach]"
+echo "To detach from the console use the command : ctrl+a d  ...ctrl+a [command mode],  d [detach]"
 echo
 
 

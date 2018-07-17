@@ -17,5 +17,5 @@ sleep 3
 screen -list
 echo "To view the Grid server console, use the command : screen -r Grid"
 echo "To view the Sim server console,  use the command : screen -r Sim"
-echo "To detach fron the console use the command : ctrl+a d  ..ctrl+a > command mode,  d > detach.."
+echo "To detach from the console use the command : ctrl+a d  ..ctrl+a > command mode,  d > detach.."
 echo
