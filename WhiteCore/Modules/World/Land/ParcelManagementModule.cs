@@ -57,7 +57,7 @@ namespace WhiteCore.Modules.Land
 
         //Land types set with flags in ParcelOverlay.
         //Only one of these can be used.
-        public const float BAN_LINE_SAFETY_HEIGHT = 100;
+        public const float BAN_LINE_SAFETY_HEIGHT = 5000;   // 07-2018 Changed to severe height
         public const int LAND_RESULT_NO_DATA = -1;          // The request they made had no data
         public const int LAND_RESULT_SINGLE = 0;            // The request they made contained only a single piece of land
         public const int LAND_RESULT_MULTIPLE = 1;          // The request they made contained more than a single piece of land
