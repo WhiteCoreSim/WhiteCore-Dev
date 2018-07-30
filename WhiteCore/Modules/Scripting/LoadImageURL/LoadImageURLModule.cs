@@ -155,58 +155,97 @@ namespace WhiteCore.Modules.Scripting
 
         void HttpRequestReturn (IAsyncResult result)
         {
-            RequestState state = (RequestState)result.AsyncState;
-            WebRequest request = state.Request;
-            Stream stream = null;
-            byte [] imageJ2000 = new byte [0];
-            HttpWebResponse response = (HttpWebResponse)request.EndGetResponse (result);
-
-            try {
-                if (response != null && response.StatusCode == HttpStatusCode.OK) {
-                    stream = response.GetResponseStream ();
-                    if (stream != null) {
-                        Bitmap image = new Bitmap (stream);
-                        Size newsize;
-
-                        // TODO: make this a bit less hard coded
-                        if ((image.Height < 64) && (image.Width < 64)) {
-                            newsize = new Size (32, 32);
-                        } else if ((image.Height < 128) && (image.Width < 128)) {
-                            newsize = new Size (64, 64);
-                        } else if ((image.Height < 256) && (image.Width < 256)) {
-                            newsize = new Size (128, 128);
-                        } else if ((image.Height < 512 && image.Width < 512)) {
-                            newsize = new Size (256, 256);
-                        } else if ((image.Height < 1024 && image.Width < 1024)) {
-                            newsize = new Size (512, 512);
-                        } else {
-                            newsize = new Size (1024, 1024);
-                        }
-
-                        Bitmap resize = new Bitmap (image, newsize);
-
-                        try {
-                            imageJ2000 = OpenJPEG.EncodeFromImage (resize, true);
-                        } catch (Exception) {
-                            MainConsole.Instance.Error (
-                                "[Load image url]: OpenJpeg Encode Failed.  Empty byte data returned!");
-                        }
-                    } else {
-                        MainConsole.Instance.WarnFormat ("[Load image url] No data returned");
-                    }
-                }
-
-            } catch (WebException) {
-            } catch (ArgumentException) {
-            } finally {
-                if (stream != null) {
-                    stream.Close ();
-                }
-                if (response != null)
-                    response.Dispose ();
+            if (m_textureManager == null)
+            {
+                MainConsole.Instance.WarnFormat("[LOADIMAGEURLMODULE]: No texture manager. Can't function.");
+                return;
             }
 
-            MainConsole.Instance.DebugFormat ("[Load image url] Returning {0} bytes of image data for request {1}",
+            RequestState state = (RequestState)result.AsyncState;
+            WebRequest request = (WebRequest)state.Request;
+            Stream stream = null;
+            byte [] imageJ2000 = new byte [0];
+            Size newSize = new Size(0, 0);
+            HttpWebResponse response = null;
+
+            try
+            {
+                response = (HttpWebResponse)request.EndGetResponse(result);
+                if (response != null && response.StatusCode == HttpStatusCode.OK)
+                {
+                    stream = response.GetResponseStream();
+                    if (stream != null)
+                    {
+                        try
+                        {
+                            using (Bitmap image = new Bitmap(stream))
+                            {
+                                // TODO: make this a bit less hard coded
+                                if ((image.Height < 64) && (image.Width < 64))
+                                {
+                                    newSize.Width = 32;
+                                    newSize.Height = 32;
+                                }
+                                else if ((image.Height < 128) && (image.Width < 128))
+                                {
+                                    newSize.Width = 64;
+                                    newSize.Height = 64;
+                                }
+                                else if ((image.Height < 256) && (image.Width < 256))
+                                {
+                                    newSize.Width = 128;
+                                    newSize.Height = 128;
+                                }
+                                else if ((image.Height < 512 && image.Width < 512))
+                                {
+                                    newSize.Width = 256;
+                                    newSize.Height = 256;
+                                }
+                                else if ((image.Height < 1024 && image.Width < 1024))
+                                {
+                                    newSize.Width = 512;
+                                    newSize.Height = 512;
+                                }
+                                else
+                                {
+                                    newSize.Width = 1024;
+                                    newSize.Height = 1024;
+                                }
+
+                                using (Bitmap resize = new Bitmap(image, newSize))
+                                {
+                                    imageJ2000 = OpenJPEG.EncodeFromImage(resize, false);
+                                }
+                            }
+                        }
+                        catch (Exception)
+                        {
+                            MainConsole.Instance.Error("[LOADIMAGEURLMODULE]: OpenJpeg Conversion Failed.  Empty byte data returned!");
+                        }
+                    }
+                    else
+                    {
+                        MainConsole.Instance.WarnFormat("[LOADIMAGEURLMODULE] No data returned");
+                    }
+                }
+            }
+            catch (WebException)
+            {
+            }
+            catch (ArgumentException)
+            {
+            }
+            finally
+            {
+                if (stream != null)
+                {
+                    stream.Close();
+                }
+                if (response != null)
+                    response.Dispose();
+            }
+
+            MainConsole.Instance.DebugFormat ("[LOADIMAGEURLMODULE] Returning {0} bytes of image data for request {1}",
                                              imageJ2000.Length, state.RequestID);
             m_textureManager.ReturnData (state.RequestID, imageJ2000);
         }

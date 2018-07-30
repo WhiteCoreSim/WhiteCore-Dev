@@ -396,7 +396,7 @@ namespace WhiteCore.Modules.Scripting
                         byte [] result = new byte [0];
 
                         try {
-                            result = OpenJPEG.EncodeFromImage (joint, true);
+                            result = OpenJPEG.EncodeFromImage (joint, false);
                         } catch (Exception) {
                             MainConsole.Instance.Error (
                                 "[Dynamic texture]: OpenJpeg Encode Failed.  Empty byte data returned!");
