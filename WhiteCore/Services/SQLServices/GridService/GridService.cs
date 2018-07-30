@@ -799,7 +799,7 @@ namespace WhiteCore.Services.SQLServices.GridService
             if (name.EndsWith ("#", StringComparison.Ordinal))
                 name = name.TrimEnd ('#');
 
-            List<GridRegion> rdatas = m_Database.Get (name + "%", scopeIDs, start, count);
+            List<GridRegion> rdatas = m_Database.Get ("%" + name + "%", scopeIDs, start, count);
 
             if (rdatas != null)
             {
