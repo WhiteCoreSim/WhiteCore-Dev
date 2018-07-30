@@ -2224,13 +2224,13 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             if (UUID.TryParse(id, out key))
             {
                 UserAccount account = World.UserAccountService.GetUserAccount(World.RegionInfo.AllScopeIDs, key);
-                if (null == account)
+                if (account != null)
                 {
-                    return "";
+                    return account.Name;                    
                 }
                 else
                 {
-                    return account.Name;
+                    return "";
                 }
             }
             else
