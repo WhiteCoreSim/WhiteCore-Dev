@@ -2697,7 +2697,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
         ///     Convert a unix time to a llGetTimestamp() like string
         /// </summary>
         /// <returns></returns>
-        public LSL_String osUnixTimeToTimestamp(long time)
+        public LSL_String osUnixTimeToTimestamp(LSL_Integer time)
         {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.VeryLow, "osUnixTimeToTimestamp", m_host, "OSSL",
                                                    m_itemID)) return new LSL_String();
