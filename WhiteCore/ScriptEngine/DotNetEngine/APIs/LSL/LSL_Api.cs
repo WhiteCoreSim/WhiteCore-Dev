@@ -8279,17 +8279,29 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             }
             tempFloat = 66.66667f * (revolutions - 1.0f);
             shapeBlock.PathRevolutions = (byte)tempFloat;
-            // limits on radiusoffset depend on revolutions and hole size (how?) seems like the maximum range is 0 to 1
-            if (radiusoffset < 0f)
+            // limits on radiusoffset depend on revolutions and hole size
+            float taper_y_magnitude = (float)Math.Abs(taper_a.y);
+            if (radiusoffset * taper_a.y < 0)
             {
-                radiusoffset = 0f;
+                taper_y_magnitude = 0;
             }
-            if (radiusoffset > 1f)
+            float holesize_y_mag = (float)Math.Abs(holesize.y);
+            float max_radius_mag = 1f - holesize_y_mag * (1f - taper_y_magnitude) / (1f - holesize_y_mag);
+            if (Math.Abs(radiusoffset) > max_radius_mag)
             {
-                radiusoffset = 1f;
+                radiusoffset = Math.Sign(radiusoffset) * max_radius_mag;
             }
             tempFloat = 100.0f * radiusoffset;
             shapeBlock.PathRadiusOffset = (sbyte)tempFloat;
+            float min_skew_mag = (float)(1f - 1f / (revolutions * holesize.x + 1f));
+            if (Math.Abs(revolutions - 1.0) < 0.001)
+            {
+                min_skew_mag = 0f;
+            }
+            if (Math.Abs(skew) < min_skew_mag)
+            {
+                skew = min_skew_mag * Math.Sign(skew);
+            }
             if (skew < -0.95f)
             {
                 skew = -0.95f;
@@ -9688,7 +9700,14 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
 
         public LSL_List llGetPhysicsMaterial()
         {
-            return new LSL_List(m_host.GravityMultiplier, m_host.Restitution, m_host.Friction, m_host.Density);
+            var result = new LSL_List();
+
+            result.Add(new LSL_Float(m_host.GravityMultiplier));
+            result.Add(new LSL_Float(m_host.Restitution));
+            result.Add(new LSL_Float(m_host.Friction));
+            result.Add(new LSL_Float(m_host.Density));
+
+            return result;
         }
 
         public void llSetPhysicsMaterial(LSL_Integer bits, LSL_Float density, LSL_Float friction, LSL_Float restitution,
