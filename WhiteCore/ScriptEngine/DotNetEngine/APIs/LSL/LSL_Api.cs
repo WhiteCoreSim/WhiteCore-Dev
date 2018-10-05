@@ -12082,7 +12082,12 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID)) 
                 return 0;
 
-            ISceneChildEntity part = World.GetSceneObjectPart(new UUID(object_id));
+            UUID id;
+            if (!UUID.TryParse(object_id, out id))
+            {
+                return 0;
+            }
+            ISceneChildEntity part = World.GetSceneObjectPart(id);
             if (part == null)
             {
                 return 0;
