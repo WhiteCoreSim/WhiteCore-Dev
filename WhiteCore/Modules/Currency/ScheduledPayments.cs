@@ -992,7 +992,7 @@ namespace WhiteCore.Modules.Currency
                     if (payMembers.Count == 0)      // no one to pay??
                         continue;
 
-                    int memberShare = grpBalance.Balance / payMembers.Count;         // this should be integer division so truncated (5 /4 = 1)
+                    int memberShare = grpBalance.ParcelDirectoryFee / payMembers.Count;         // this should be integer division so truncated (5 /4 = 1)
                     if (memberShare == 0)                                                       // share of fee < 1 per user
                         memberShare = 1;
 
@@ -1051,7 +1051,8 @@ namespace WhiteCore.Modules.Currency
             MainConsole.Instance.Warn ("[Currency]: Processing of Group dividends commenced");
 
             // * Group Disbursments
-            // - If there's money in the group it will have to be divided by the people that have the "Accountability" role task
+            // - If there's money in the group after any payments (parcel directory fees)it will have to be
+            //    divided by the people that have the "Accountability" role task
             // - Check how many users there are with that role task
             // - Divide the amount of money by the amount of users (make sure the amount is a whole number)
             // - Create Task for each user to be payed
@@ -1074,7 +1075,7 @@ namespace WhiteCore.Modules.Currency
                     var groupName = groupRec.GroupName;
 
                     grpBalance = moneyModule.GetGroupBalance (groupID);
-                    if (grpBalance.ParcelDirectoryFee <= 0)
+                    if (grpBalance.Balance <= 0)
                         continue;
 
                     // find how many members are accountable for fees and pay them dividends
@@ -1091,7 +1092,7 @@ namespace WhiteCore.Modules.Currency
                     if (payMembers.Count == 0)      // no one to pay??
                         continue;
 
-                    int dividend = grpBalance.ParcelDirectoryFee / payMembers.Count;    // this should be integer division so truncated (5 /4 = 1)
+                    int dividend = grpBalance.Balance / payMembers.Count;    // this should be integer division so truncated (5 /4 = 1)
                     if (dividend == 0)                                                  // insufficient funds < 1 per user
                         continue;
 

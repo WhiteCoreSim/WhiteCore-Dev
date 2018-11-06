@@ -27,7 +27,6 @@
 
 using System;
 using System.Collections.Generic;
-using WhiteCore.DataManager.Migration;
 using WhiteCore.Framework.Utilities;
 
 namespace WhiteCore.DataManager.Migration.Migrators.Currency
@@ -92,7 +91,10 @@ namespace WhiteCore.DataManager.Migration.Migrators.Currency
                     IndexDef(new string[1] { "PurchaseID" }, IndexType.Primary)
                 ));
 
-            // Group currency
+            // Group currency 
+            RenameColumns.Add("TierCredits", "TotalTierCredits");
+            RenameColumns.Add("TierDebit", "TotalTierDebit");
+
             AddSchema("group_currency", ColDefs(
                 ColDef("GroupID", ColumnTypes.UUID),
                 ColDef("Balance", ColumnTypes.Integer30),

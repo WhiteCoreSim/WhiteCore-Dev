@@ -109,7 +109,7 @@ namespace WhiteCore.Modules.Avatar.Groups
                     List<GroupAccountHistory> history = moneyModule.GetGroupTransactions (groupID, agentID, currentInterval,
                                                            intervalDays);
 
-                    //We don't want payments, we only want stipends which we sent to users
+                    // We don't want payments, we only want stipends which we sent to users
                     history = (
                         from h in history
                         where h.Stipend

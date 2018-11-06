@@ -93,6 +93,8 @@ namespace WhiteCore.Modules.Currency
             Framework.Utilities.DataManager.RegisterPlugin(Name, this);
 
             m_config = new BaseCurrencyConfig(config);
+            m_userInfoService = m_registry.RequestModuleInterface<IAgentInfoService>();
+            m_userAccountService = m_registry.RequestModuleInterface<IUserAccountService> ();
 
             Init(m_registry, Name, "", "/currency/", "CurrencyServerURI");
 
@@ -182,40 +184,44 @@ namespace WhiteCore.Modules.Currency
         }
 
         public bool GroupCurrencyTransfer(UUID groupID, UUID userId, bool payUser, string toObjectName, UUID fromObjectID,
-            string fromObjectName, int amount, string description, TransactionType type, UUID transactionID)
+                                          string fromObjectName, int amount, string description, TransactionType transType, UUID transactionID)
         {
+            // Groups (legacy) should not receive stipends
+            if (transType == TransactionType.StipendPayment) 
+                return false;
+
             GroupBalance gb = new GroupBalance {
                 StartingDate = DateTime.UtcNow
             };
 
-            // Not sure if a group will receive a system payment but..
-            UserCurrency fromCurrency = userId == UUID.Zero ? null : GetUserCurrency(userId);
+            // Not sure if a group will receive a system payment (UUID = Zero) but..
+            UserCurrency fromuserCurrency = userId == UUID.Zero ? null : GetUserCurrency(userId);
 
-            // Groups (legacy) should not receive stipends
-            if (type == TransactionType.StipendPayment) 
-                return false;
-
-            if (fromCurrency != null)
+            if (fromuserCurrency != null)
             {
                 // Normal users cannot have a credit balance.. check to see whether they have enough money
-                if ((int)fromCurrency.Amount - amount < 0)
+                if ((int)fromuserCurrency.Amount - amount < 0)
                     return false; // Not enough money
             }
 
-            // is thiis a payment to the group or to the user?
-            if (payUser)
+            // is this a payment from a user to the group or from the group to the user?
+            if (payUser) {
+                gb.TotalTierDebit += amount;          // not sure if this the correct place yet? Total of group payments
                 amount = -1 * amount;
+            }
+            else
+                gb.TotalTierCredits += amount;        // .. total of group receipts
 
-            uint fromBalance = 0;
-            if (fromCurrency != null) {
+            uint userBalance = 0;
+            if (fromuserCurrency != null) {
                 // user payment
-                fromCurrency.Amount -= (uint)amount;
-                UserCurrencyUpdate (fromCurrency, true);
-                fromBalance = fromCurrency.Amount;
+                fromuserCurrency.Amount -= (uint)amount;
+                UserCurrencyUpdate (fromuserCurrency, true);
+                userBalance = fromuserCurrency.Amount;
             }
 
             // track specific group fees
-            switch (type)
+            switch (transType)
             {
             case TransactionType.GroupJoin:
                 gb.GroupFee += amount;
@@ -228,25 +234,15 @@ namespace WhiteCore.Modules.Currency
                 break;
             }
 
-            if (payUser)
-                gb.TotalTierDebit -= amount;          // not sure if this the correct place yet? Are these currency or land credits?
-            else
-                gb.TotalTierCredits += amount;        // .. or this?
 
             // update the group balance
             gb.Balance += amount;                
             GroupCurrencyUpdate(groupID, gb, true);
 
-            //Must send out notifications to the users involved so that they get the updates
-            if (m_userInfoService == null)
-            {
-                m_userInfoService = m_registry.RequestModuleInterface<IAgentInfoService>();
-                m_userAccountService = m_registry.RequestModuleInterface<IUserAccountService> ();
-            }
-            if (m_userInfoService != null)
-            {
-                UserInfo agentInfo = userId == UUID.Zero ? null : m_userInfoService.GetUserInfo(userId.ToString());
-                UserAccount agentAccount = m_userAccountService.GetUserAccount(null, userId);
+            // Must send out notifications to the users involved so that they get the updates
+            if (m_userInfoService != null) {
+                UserInfo agentInfo = userId == UUID.Zero ? null : m_userInfoService.GetUserInfo (userId.ToString ());
+                UserAccount agentAccount = m_userAccountService.GetUserAccount (null, userId);
                 var groupService = Framework.Utilities.DataManager.RequestPlugin<IGroupsServiceConnector> ();
                 var groupInfo = groupService.GetGroupRecord (userId, groupID, null);
                 var groupName = "Unknown";
@@ -254,29 +250,46 @@ namespace WhiteCore.Modules.Currency
                 if (groupInfo != null)
                     groupName = groupInfo.GroupName;
 
+                // record the group transaction
                 if (m_config.SaveTransactionLogs)
-                    AddGroupTransactionRecord(
-                        (transactionID == UUID.Zero ? UUID.Random() : transactionID), 
+                    AddGroupTransactionRecord (
+                        (transactionID == UUID.Zero ? UUID.Random () : transactionID),
                         description,
                         groupID,
-                        groupName, 
+                        groupName,
                         userId,
                         (agentAccount == null ? "System" : agentAccount.Name),
                         amount,
-                        type,
+                        transType,
                         gb.TotalTierCredits,        // assume this it the 'total credit for the group but it may be land tier credit??
-                        (int) fromBalance,          // this will be zero if this isa system <> group transaction
+                        (int)userBalance,          // this will be zero if this isa system <> group transaction
                         toObjectName,
                         fromObjectName,
                         (agentInfo == null ? UUID.Zero : agentInfo.CurrentRegionID)
                     );
 
-                if (agentInfo != null && agentInfo.IsOnline)
-                {
-                    SendUpdateMoneyBalanceToClient(userId, transactionID, agentInfo.CurrentRegionURI, fromBalance,
-                    "You paid " + groupName + " " +InWorldCurrency + amount);
+                var paidToMsg = "";
+                var paidFromMsg = "";
+                var paidDesc = (description == "" ? "" : " for " + description);
+
+                if (amount > 0) {
+                    paidToMsg =
+                        (groupInfo == null ? " received " : groupName + " paid you ") + InWorldCurrency + amount + paidDesc;
+                    paidFromMsg = "You paid " +
+                        (groupInfo == null ? "" : groupName + " ") + InWorldCurrency + amount + paidDesc;
+                }
+
+                if (payUser) {
+                    if (agentInfo != null && agentInfo.IsOnline) {
+                        SendUpdateMoneyBalanceToClient (userId, transactionID, agentInfo.CurrentRegionURI, userBalance, paidToMsg);
+                    }
+                } else {
+                    if (fromObjectID != UUID.Zero) {
+                        SendUpdateMoneyBalanceToClient (fromObjectID, transactionID, agentInfo.CurrentRegionURI, (uint) amount, paidFromMsg);
+                    }
                 }
             }
+
             return true;
         }
 
@@ -609,11 +622,6 @@ namespace WhiteCore.Modules.Currency
             UserCurrencyUpdate(toCurrency, true);
 
             //Must send out notifications to the users involved so that they get the updates
-            if (m_userInfoService == null)
-            {
-                m_userInfoService = m_registry.RequestModuleInterface<IAgentInfoService>();
-                m_userAccountService = m_registry.RequestModuleInterface<IUserAccountService> ();
-            }
             if (m_userInfoService != null)
             {
                 UserInfo toUserInfo = m_userInfoService.GetUserInfo(toID.ToString());
