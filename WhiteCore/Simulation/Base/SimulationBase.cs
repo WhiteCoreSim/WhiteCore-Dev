@@ -372,7 +372,7 @@ namespace WhiteCore.Simulation.Base
         /// </summary>
         public virtual void SetUpHTTPServer()
         {
-            m_Port = m_config.Configs["Network"].GetUInt("http_listener_port", 9000);
+            m_Port = m_config.Configs["Network"].GetUInt("http_listener_port", 8002);
             m_BaseHTTPServer = GetHttpServer(m_Port);
             MainServer.Instance = m_BaseHTTPServer;
         }
