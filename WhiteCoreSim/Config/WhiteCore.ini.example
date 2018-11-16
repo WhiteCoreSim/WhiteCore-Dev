@@ -1,4 +1,4 @@
-;; This file is the setup template for the WhiteCore server 
+;; This file is the setup template for the WhiteCore simulator
 ;;   when the configurator is used
 ;;
 ;;  ##  You DO NOT need to change anything here  ##
@@ -10,7 +10,7 @@
 [Startup]
 ;; Directory path for all data
 ;; Normally this will be the '../Data' directory, but you can change this to anywhere on your hard drive
-;; Default is "" 
+;; Default is ""
 DataDirectory = ""
 
 ;; Set this to true if you want to log crashes to disk
@@ -38,7 +38,7 @@ IniDirectory = "Sim/Modules"
 ;; Time between each timer to run (in minutes)
 ;timer_time = 20
 
-;; Should WhiteCore wait until all modules have finished starting up before allowing 
+;; Should WhiteCore wait until all modules have finished starting up before allowing
 ;; logins and use of the console?
 ;; Default is true
 CompleteStartupAfterAllModulesLoad = true
@@ -55,7 +55,7 @@ RegionRestartCausesShutdown = false
 [Network]
 
 ;; Advanced configs
-http_listener_port = 9000
+http_listener_port = 8002
 
 ;; For UDP connections, you know what it is if you need it
 ;internal_ip = "0.0.0.0"
@@ -88,11 +88,11 @@ Console = LocalConsole
 
 ;; If you want to save your log file to a specific location, set your desired path
 ;; Default is commented out >> The Logfile will be saved in the 'Data' folder
-;LogPath = 
+;LogPath =
 
 ;; If you want to append a string to the log file name
 ;; Default is commented out
-;LogAppendName = 
+;LogAppendName =
 
 ;; Please note that all the configuration files have been moved to the "Sim" folder and organized from there.
 ;; Please do NOT edit below this line unless you know what you are doing with it!

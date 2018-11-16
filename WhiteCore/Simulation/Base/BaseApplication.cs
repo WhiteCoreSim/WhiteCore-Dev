@@ -203,7 +203,7 @@ namespace WhiteCore.Simulation.Base
                     string gridName = "WhiteCore-Sim";
                     string welcomeMessage = "";
                     string allowAnonLogin = "true";
-                    uint port = 9000;
+                    uint port = 8002;
                     uint gridPort = 8002;
 
                     Console.ForegroundColor = ConsoleColor.Green;
@@ -226,9 +226,9 @@ namespace WhiteCore.Simulation.Base
 
                         Console.WriteLine ("\nHttp Port for the region server");
                         Console.ForegroundColor = ConsoleColor.Cyan;
-                        Console.WriteLine ("Default is 9000");
+                        Console.WriteLine ("Default is 8002");
                         Console.ResetColor ();
-                        port = uint.Parse (ReadLine ("Choose the port", "9000"));
+                        port = uint.Parse (ReadLine ("Choose the port", "8002"));
                     }
 
                     if (isStandalone) {

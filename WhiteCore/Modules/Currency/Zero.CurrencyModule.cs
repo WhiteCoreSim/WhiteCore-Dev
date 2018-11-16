@@ -130,7 +130,7 @@ namespace WhiteCore.Modules.Currency
             // To use the following you need to add:
             // -helperuri <ADDRESS TO HERE OR grid MONEY SERVER>
             // to the command line parameters you use to start up your client
-            // This commonly looks like -helperuri http://127.0.0.1:9000/
+            // This commonly looks like -helperuri http://127.0.0.1:8002/
             MainServer.Instance.AddXmlRPCHandler("getCurrencyQuote", quote_func);
             MainServer.Instance.AddXmlRPCHandler("buyCurrency", buy_func);
             MainServer.Instance.AddXmlRPCHandler("preflightBuyLandPrep", preflightBuyLandPrep_func);

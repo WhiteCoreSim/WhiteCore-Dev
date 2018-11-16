@@ -1,4 +1,4 @@
-;; This file is the setup template for the WhiteCore Grid server 
+;; This file is the setup template for the WhiteCore Grid server
 ;;   when the configurator is used
 ;;
 ;;  ##  You DO NOT need to change anything here  ##
@@ -39,7 +39,7 @@ Console = LocalConsole
 
 ;; If you want to save your log file to a specific location, set your desired path
 ;; Default is commented out >> Logfile are saved in the 'Data' folder
-;LogPath = 
+;LogPath =
 
 ;; These are the settings for the remote console, unneeded if not using the remote console
 ;RemoteConsoleUser =
@@ -49,7 +49,7 @@ Console = LocalConsole
 [Startup]
 ;; Directory path for all data
 ;; Normally this will be the '../Data' directory, but you can change this to anywhere on your hard drive
-;; Default is "" 
+;; Default is ""
 DataDirectory = ""
 
 ;; Set this to true if you want to log crashes to disk
@@ -82,7 +82,7 @@ AutoRestartOnCrash = false
 Enabled = true
 DoRemote = false
 
-;; The number of services that will register with the 
+;; The number of services that will register with the
 ;; grid service
 ;; Leave this alone unless you know what you're doing
 ;DefaultURICount = 11
