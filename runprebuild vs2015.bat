@@ -14,7 +14,7 @@ rem ## Default Visual Studio edition
 set vstudio=2015
 
 rem ## Default Framework
-set framework=4_5
+set framework=4_7_2
 
 rem ## Default architecture (86 (for 32bit), 64)
 :CheckArch

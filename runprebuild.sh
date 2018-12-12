@@ -87,7 +87,7 @@ fi
 # Configuring WhiteCore-Sim
 if ! ${VERSIONONLY:=true}; then
   echo "Configuring WhiteCore-Sim $ARCH $CONFIG build"
-  mono ./Prebuild.exe /target vs2010 /targetframework v4_5 /conditionals "LINUX;NET_4_5"
+  mono ./Prebuild.exe /target vs2010 /targetframework v4_7 /conditionals "LINUX;NET_4_7"
 fi
 
 # Update version info
