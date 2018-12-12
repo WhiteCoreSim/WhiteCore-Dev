@@ -199,7 +199,63 @@
       </Files>
     </Project>
 
+	<Project name="OpenMetaverse.Rendering.Meshmerizer" path="Whitecore-LibOMV/OpenMetaverse.Rendering.Meshmerizer" type="Library" frameworkVersion="v4_5">
+      <Configuration name="Debug" platform="x86">
+        <Options>
+          <OutputPath>../../WhiteCoreSim/bin/</OutputPath>
+        </Options>
+      </Configuration>
+      <Configuration name="Release" platform="x86">
+        <Options>
+          <OutputPath>../../WhiteCoreSim/bin/</OutputPath>
+        </Options>
+      </Configuration>
+      <Configuration name="Debug" platform="x64">
+        <Options>
+          <OutputPath>../../WhiteCoreSim/bin/</OutputPath>
+        </Options>
+      </Configuration>
+      <Configuration name="Release" platform="x64">
+        <Options>
+          <OutputPath>../../WhiteCoreSim/bin/</OutputPath>
+        </Options>
+      </Configuration>
+
+      <Configuration name="Debug" platform="x86">
+        <Options>
+          <OutputPath>../../WhiteCoreSim/bin/</OutputPath>
+        </Options>
+      </Configuration>
+      <Configuration name="Release" platform="x86">
+        <Options>
+          <OutputPath>../../WhiteCoreSim/bin/</OutputPath>
+        </Options>
+      </Configuration>
+      <Configuration name="Debug" platform="x64">
+        <Options>
+          <OutputPath>../../WhiteCoreSim/bin/</OutputPath>
+        </Options>
+      </Configuration>
+      <Configuration name="Release" platform="x64">
+        <Options>
+          <OutputPath>../../WhiteCoreSim/bin/</OutputPath>
+        </Options>
+      </Configuration>
+	  
+      <ReferencePath>../bin/</ReferencePath>
+      <Reference name="System"/>
+      <Reference name="System.Drawing"/>
+      <Reference name="OpenMetaverse"/>
+      <Reference name="OpenMetaverseTypes"/>
+      <Reference name="PrimMesher"/>
+      <Files>
+        <Match pattern="*.cs" recurse="true">
+          <Exclude name="obj" pattern="obj"/>
+        </Match>
+      </Files>
+    </Project>
     <!-- WhiteCore Libraries -->
+	
     <Project frameworkVersion="v4_5" name="WhiteCore.Framework" path="WhiteCore/Framework" type="Library">
       <Configuration name="Debug" platform="x86">
         <Options>
