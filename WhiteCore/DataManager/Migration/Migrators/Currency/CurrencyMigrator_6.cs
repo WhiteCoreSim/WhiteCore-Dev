@@ -27,34 +27,42 @@
 
 using System;
 using System.Collections.Generic;
-using WhiteCore.DataManager.Migration;
 using WhiteCore.Framework.Utilities;
 
 namespace WhiteCore.DataManager.Migration.Migrators.Currency
 {
-    public class CurrencyMigrator_5 : Migrator
+    public class CurrencyMigrator_6 : Migrator
     {
-        public CurrencyMigrator_5()
+        public CurrencyMigrator_6 ()
         {
-            Version = new Version(0, 0, 5);
+            Version = new Version (0, 0, 6);
             MigrationName = "SimpleCurrency";
 
-            Schema = new List<SchemaDefinition>();
+            Schema = new List<SchemaDefinition> ();
 
             //
             // Change summary: 19 May 2018
-            //
             //   Change 2 columns in the group_currency table to fix
             //   a bug with the group currency not being stored correctly
-            //
+            // Updated 13 Nov 2018
+            //   Change all integer fields to Integer11 rather than the strange Integer30
+            // 
 
-            AddSchema("user_currency", ColDefs(
-                ColDef("PrincipalID", ColumnTypes.UUID),
-                ColDef("Amount", ColumnTypes.Integer30),
-                ColDef("LandInUse", ColumnTypes.Integer30),
-                ColDef("Tier", ColumnTypes.Integer30),
-                ColDef("IsGroup", ColumnTypes.TinyInt1),            // this will be deprecated
-                ColDef("StipendsBalance", ColumnTypes.Integer11)),
+            AddSchema ("user_currency", ColDefs (
+                ColDef ("PrincipalID", ColumnTypes.UUID),
+                ColDef ("Amount", ColumnTypes.Integer11),
+                ColDef ("LandInUse", ColumnTypes.Integer11),
+                ColDef ("Tier", ColumnTypes.Integer11),
+                ColDef ("IsGroup", ColumnTypes.TinyInt1),            // this will be deprecated
+                new ColumnDefinition {
+                    Name = "StipendsBalance",
+                    Type = new ColumnTypeDef {
+                        Type = ColumnType.Integer,
+                        Size = 11,
+                        defaultValue = "0"
+                    }
+                }
+            ),
                 IndexDefs(
                     IndexDef(new string[1] {"PrincipalID"}, IndexType.Primary)
                 ));
@@ -67,11 +75,11 @@ namespace WhiteCore.DataManager.Migration.Migrators.Currency
                 ColDef("FromName", ColumnTypes.String128),
                 ColDef("ToPrincipalID", ColumnTypes.UUID),
                 ColDef("ToName", ColumnTypes.String128),
-                ColDef("Amount", ColumnTypes.Integer30),
+                ColDef("Amount", ColumnTypes.Integer11),
                 ColDef("TransType", ColumnTypes.Integer11),
-                ColDef("Created", ColumnTypes.Integer30),
-                ColDef("ToBalance", ColumnTypes.Integer30),
-                ColDef("FromBalance", ColumnTypes.Integer30),
+                ColDef("Created", ColumnTypes.Integer11),
+                ColDef("ToBalance", ColumnTypes.Integer11),
+                ColDef("FromBalance", ColumnTypes.Integer11),
                 ColDef("FromObjectName", ColumnTypes.String50),
                 ColDef("ToObjectName", ColumnTypes.String50),
                 ColDef("RegionID", ColumnTypes.UUID)),
@@ -84,24 +92,27 @@ namespace WhiteCore.DataManager.Migration.Migrators.Currency
                 ColDef("PurchaseID", ColumnTypes.UUID),
                 ColDef("PrincipalID", ColumnTypes.UUID),
                 ColDef("IP", ColumnTypes.String64),
-                ColDef("Amount", ColumnTypes.Integer30),
-                ColDef("RealAmount", ColumnTypes.Integer30),
-                ColDef("Created", ColumnTypes.Integer30),
-                ColDef("Updated", ColumnTypes.Integer30)),
+                ColDef("Amount", ColumnTypes.Integer11),
+                ColDef("RealAmount", ColumnTypes.Integer11),
+                ColDef("Created", ColumnTypes.Integer11),
+                ColDef("Updated", ColumnTypes.Integer11)),
                 IndexDefs(
                     IndexDef(new string[1] { "PurchaseID" }, IndexType.Primary)
                 ));
 
-            // Group currency
+            // Group currency 
+            RenameColumns.Add("TierCredits", "TotalTierCredits");
+            RenameColumns.Add("TierDebits", "TotalTierDebits");
+
             AddSchema("group_currency", ColDefs(
                 ColDef("GroupID", ColumnTypes.UUID),
-                ColDef("Balance", ColumnTypes.Integer30),
-                ColDef("GroupFee", ColumnTypes.Integer30),
-                ColDef("LandFee", ColumnTypes.Integer30),
-                ColDef("ObjectFee", ColumnTypes.Integer30),
-                ColDef("ParcelDirectoryFee", ColumnTypes.Integer30),
-                ColDef("TotalTierCredits", ColumnTypes.Integer30),  // Changed from TierCredits
-                ColDef("TotalTierDebit", ColumnTypes.Integer30)),   // Changed from TierDebit
+                ColDef("Balance", ColumnTypes.Integer11),
+                ColDef("GroupFee", ColumnTypes.Integer11),
+                ColDef("LandFee", ColumnTypes.Integer11),
+                ColDef("ObjectFee", ColumnTypes.Integer11),
+                ColDef("ParcelDirectoryFee", ColumnTypes.Integer11),
+                ColDef("TotalTierCredits", ColumnTypes.Integer11),   // Changed from TierCredits
+                ColDef("TotalTierDebits", ColumnTypes.Integer11)),   // Changed from TierDebits
                 IndexDefs(
                     IndexDef(new string[1] {"GroupID"}, IndexType.Primary)
                 ));
@@ -114,11 +125,11 @@ namespace WhiteCore.DataManager.Migration.Migrators.Currency
                 ColDef("GroupName", ColumnTypes.String128),
                 ColDef("AgentID", ColumnTypes.UUID),
                 ColDef("AgentName", ColumnTypes.String128),
-                ColDef("Amount", ColumnTypes.Integer30),
+                ColDef("Amount", ColumnTypes.Integer11),
                 ColDef("TransType", ColumnTypes.Integer11),
-                ColDef("Created", ColumnTypes.Integer30),
-                ColDef("GroupBalance", ColumnTypes.Integer30),
-                ColDef("AgentBalance", ColumnTypes.Integer30),
+                ColDef("Created", ColumnTypes.Integer11),
+                ColDef("GroupBalance", ColumnTypes.Integer11),
+                ColDef("AgentBalance", ColumnTypes.Integer11),
                 ColDef("FromObjectName", ColumnTypes.String50),
                 ColDef("ToObjectName", ColumnTypes.String50),
                 ColDef("RegionID", ColumnTypes.UUID)),

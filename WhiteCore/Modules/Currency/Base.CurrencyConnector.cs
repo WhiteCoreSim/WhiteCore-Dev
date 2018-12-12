@@ -129,7 +129,7 @@ namespace WhiteCore.Modules.Currency
                 ObjectFee = 0,
                 ParcelDirectoryFee = 0,
                 TotalTierCredits = 0,
-                TotalTierDebit = 0,
+                TotalTierDebits = 0,
                 Balance = 0,
                 StartingDate = DateTime.UtcNow
             };
@@ -206,7 +206,7 @@ namespace WhiteCore.Modules.Currency
 
             // is this a payment from a user to the group or from the group to the user?
             if (payUser) {
-                gb.TotalTierDebit += amount;          // not sure if this the correct place yet? Total of group payments
+                gb.TotalTierDebits += amount;          // not sure if this the correct place yet? Total of group payments
                 amount = -1 * amount;
             }
             else
@@ -823,7 +823,7 @@ namespace WhiteCore.Modules.Currency
             int.TryParse (queryResults [4], out gb.ObjectFee);
             int.TryParse (queryResults [5], out gb.ParcelDirectoryFee);
             int.TryParse (queryResults [6], out gb.TotalTierCredits);
-            int.TryParse (queryResults [7], out gb.TotalTierDebit);
+            int.TryParse (queryResults [7], out gb.TotalTierDebits);
 
             gb.StartingDate = DateTime.UtcNow;
 
@@ -883,7 +883,7 @@ namespace WhiteCore.Modules.Currency
                     { "ObjectFee", gb.ObjectFee },
                     { "ParcelDirectoryFee", gb.ParcelDirectoryFee },
                     { "TotalTierCredits", gb.TotalTierCredits },
-                    { "TotalTierDebit", gb.TotalTierDebit },
+                    { "TotalTierDebits", gb.TotalTierDebits },
                     { "Balance", gb.Balance }
                 },
                     null,
@@ -899,7 +899,7 @@ namespace WhiteCore.Modules.Currency
                 GD.Update (_GROUPREALM,
                     new Dictionary<string, object> {
                     { "TotalTierCredits", gb.TotalTierCredits },
-                    { "TotalTierDebit", gb.TotalTierDebit }
+                    { "TotalTierDebits", gb.TotalTierDebits }
                 },
                     null,
                     new QueryFilter {

@@ -1032,7 +1032,7 @@ namespace WhiteCore.ClientStack
         }
 
         public void SendGroupAccountingSummary(IClientAPI sender, UUID groupID, UUID requestID, int moneyAmt,
-                                               int totalTierDebit,
+                                               int totalTierDebits,
                                                int totalTierCredits, string startDate, int currentInterval,
                                                int intervalLength,
                                                string taxDate, string lastTaxDate, int parcelDirectoryFee,
@@ -1048,7 +1048,7 @@ namespace WhiteCore.ClientStack
                                   {
                                       Balance = moneyAmt,
                                       TotalCredits = totalTierCredits,
-                                      TotalDebits = totalTierDebit,
+                                      TotalDebits = totalTierDebits,
                                       StartDate = Utils.StringToBytes(startDate + '\n'),
                                       CurrentInterval = currentInterval,
                                       GroupTaxCurrent = groupTaxFee,

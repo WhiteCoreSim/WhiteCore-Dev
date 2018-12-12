@@ -194,7 +194,7 @@ namespace WhiteCore.Modules.Avatar.Groups
                         groupID,
                         requestID,
                         groupBalance.Balance,
-                        groupBalance.TotalTierDebit,
+                        groupBalance.TotalTierDebits,
                         groupBalance.TotalTierCredits,
                         Util.BuildYMDDateString (groupBalance.StartingDate.AddDays (-currentInterval * intervalDays)),
                         currentInterval,
