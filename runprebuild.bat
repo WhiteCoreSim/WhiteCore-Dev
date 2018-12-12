@@ -36,8 +36,9 @@ rem ## Determine native framework
 set framework=4_5
 for /f "tokens=4-5 delims=. " %%i in ('ver') do set VERSION=%%i.%%j
 if %version% == 10.0 (
-	set framework=4_5
+	set framework=4_7_2
 	echo Windows 10
+	rem ## As of April update 2018
 )
 if %version% == 6.3 (
 	set framework=4_5
@@ -63,7 +64,6 @@ if %version% == 5.1 (
 	set framework=3_5
 	echo hmmm... Windows XP
 )
-
 
 rem ## If not requested, skip the prompting
 if "%1" =="" goto final
