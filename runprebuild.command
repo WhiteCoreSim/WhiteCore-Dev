@@ -4,6 +4,8 @@
 #
 # May 2016
 # Rowan Deppeler <greythane@gmail.com>
+#
+# Updated Dec 2018 to use NET 4.6 framework and msbuild (included in Mono V5+)
 
 # find and change to the current folder (bash does not start here by default)
 WCSDIR="${0%/*}"
@@ -94,7 +96,7 @@ fi
 # Configuring WhiteCore-Sim
 if ! ${VERSIONONLY:=true}; then
   echo "Configuring WhiteCore-Sim $ARCH $CONFIG build"
-  mono ./Prebuild.exe /target vs2015 /targetframework v4_6 /conditionals "LINUX;NET_4_7"
+  mono ./Prebuild.exe /target vs2015 /targetframework v4_6 /conditionals "LINUX"
 fi
 
 # Update version info
@@ -106,11 +108,11 @@ fi
 # Build WhiteCore-Sim
 if ${BUILD:=true} ; then
   echo Building WhiteCore-Sim
-  xbuild  WhiteCore.sln /property:Configuration="$CONFIG" /property:Platform="$ARCH"
+  msbuild  WhiteCore.sln /property:Configuration="$CONFIG" /property:Platform="$ARCH"
   echo Finished Building WhiteCore
   echo Thank you for choosing WhiteCore-Sim
   echo Please report any errors to our Github Issue Tracker https://github.com/WhiteCoreSim/WhiteCore-Dev/issues
 else
   echo "WhiteCore-Sim has been configured to compile with $ARCH $CONFIG options"
-  echo "To manually build, enter 'xbuild WhiteCore.sln' at the command prompt"
+  echo "To manually build, enter 'msbuild WhiteCore.sln' at the command prompt"
 fi

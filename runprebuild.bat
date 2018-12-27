@@ -149,7 +149,7 @@ if %configuration%==release set cfg=/p:Configuration=Release
 if %configuration%==debug set cfg=/p:Configuration=Debug
 set filename=Compile.VS%vstudio%.net%framework%.%bits%.%configuration%.bat
 
-echo %fpath% WhiteCore.sln %args% %cfg% > %filename% /p:DefineConstants="ISWIN;NET_%framework%"
+echo %fpath% WhiteCore.sln %args% %cfg% > %filename% /p:DefineConstants="ISWIN"
 
 echo.
 set /p compile_at_end="Done, %filename% created. Compile now? (y,n) [%compile_at_end%]"
