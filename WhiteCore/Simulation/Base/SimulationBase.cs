@@ -372,7 +372,14 @@ namespace WhiteCore.Simulation.Base
         /// </summary>
         public virtual void SetUpHTTPServer()
         {
-            m_Port = m_config.Configs["Network"].GetUInt("http_listener_port", 8002);
+             m_Port = m_config.Configs ["Network"].GetUInt ("http_listener_port", 8002);
+             var standalone = m_config.Configs ["GridInfoService"].GetUInt("GridInfoInHandlerPort", 0) == 0;
+            if (standalone) {
+                var noweb = m_config.Configs ["WebInterface"].GetString ("Module", "None") == "None";
+                if (noweb)
+                    m_Port = m_config.Configs ["Network"].GetUInt ("region_base_port", 9000);
+            }
+
             m_BaseHTTPServer = GetHttpServer(m_Port);
             MainServer.Instance = m_BaseHTTPServer;
         }
