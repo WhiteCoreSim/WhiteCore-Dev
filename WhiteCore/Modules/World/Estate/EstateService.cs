@@ -656,9 +656,10 @@ namespace WhiteCore.Modules.Estate
                              TeleportFlags.Godlike |
                              TeleportFlags.NineOneOne;
 
-            //If the user wants to force landing points on crossing, we act like they are not crossing, otherwise, check the child property and that the ViaRegionID is set
-            bool isCrossing = !forceLandingPointsOnCrossing && (Sp != null && Sp.IsChildAgent &&
-                              ((tpflags & TeleportFlags.ViaRegionID) == TeleportFlags.ViaRegionID));
+            // If the user wants to force landing points on crossing, we act like they are not crossing,
+            //  otherwise, check the child property and that the ViaRegionID is set
+            bool isCrossing = !forceLandingPointsOnCrossing && 
+                                (Sp != null && Sp.IsChildAgent && ((tpflags & TeleportFlags.ViaRegionID) == TeleportFlags.ViaRegionID));
             bool directTeleport = (tpflags & allowableFlags) != 0;
 
             // If the estate does not allow direct teleporting, move them to the nearest landing point

@@ -138,7 +138,11 @@ namespace WhiteCore.Services.DataService
                 args.SnapshotID,
                 OSDParser.SerializeLLSDXmlString(args.Bitmap),
                 (int) args.Category,
-                args.ScopeID
+                args.ScopeID,
+                args.UserLookAt.X,         
+                args.UserLookAt.Y,
+                args.UserLookAt.Z,
+                (int) args.LandingType
             }).Select(Values => Values.ToArray()).ToList();
 
             GD.InsertMultiple(m_SearchParcelTable, insertValues);
@@ -165,7 +169,7 @@ namespace WhiteCore.Services.DataService
         {
             List<LandData> Lands = new List<LandData>();
 
-            for (int i = 0; i < Query.Count; i += 24)
+            for (int i = 0; i < Query.Count; i += 28)
             {
                 LandData landData = new LandData ();
 
@@ -178,6 +182,7 @@ namespace WhiteCore.Services.DataService
                 var posY = (float)Convert.ToDecimal (Query[i + 4], Culture.NumberFormatInfo);
                 var posZ = (float)Convert.ToDecimal (Query[i + 5], Culture.NumberFormatInfo);
                 landData.UserLocation = new Vector3 (posX, posY, posZ);
+
 
                 // UserLocation =
                 //     new Vector3(float.Parse(Query[i + 3]), float.Parse(Query[i + 4]), float.Parse(Query[i + 5])),
@@ -214,6 +219,14 @@ namespace WhiteCore.Services.DataService
                                         : (ParcelCategory) int.Parse(Query[i + 22]);
                 landData.ScopeID = UUID.Parse(Query[i + 23]);
 
+                // additional stuff 20190225 -greythane-
+                var laposX = (float)Convert.ToDecimal (Query [i + 24], Culture.NumberFormatInfo);
+                var laposY = (float)Convert.ToDecimal (Query [i + 25], Culture.NumberFormatInfo);
+                var laposZ = (float)Convert.ToDecimal (Query [i + 26], Culture.NumberFormatInfo);
+                landData.UserLookAt = new Vector3 (laposX, laposY, laposZ);
+
+                landData.LandingType = (byte) int.Parse(Query[i + 27]);
+
                 Lands.Add(landData);
             }
             return Lands;
@@ -238,7 +251,7 @@ namespace WhiteCore.Services.DataService
             //Cant find it, return
             if (Query.Count == 0)
             {
-                //Try fake parcel ID for compatibility reasons, 
+                // Try fake parcel ID for compatibility reasons, 
                 // given that they were saved into the database with 
                 // classifieds and picks (plus it's not hard to keep this here).
                 ulong RegionHandle = 0;

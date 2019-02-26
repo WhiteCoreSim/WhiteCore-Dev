@@ -2122,6 +2122,8 @@ namespace WhiteCore.Modules.Land
                     LandData d = o.LandData.Copy ();
                     if (d.UserLocation == Vector3.Zero)
                         d.UserLocation = GetParcelCenterAtGround (o);
+                    if (d.UserLookAt == Vector3.Zero)
+                        d.UserLookAt = new Vector3(0, 1, 0);
                     d.RegionID = o.RegionUUID;
                     return d;
                 }));
