@@ -76,7 +76,7 @@ namespace WhiteCore.Framework.Configuration
             string gridIniFileName = "MyGrid.ini";
 
             List<string> sources = new List<string> ();
-            string basePath = Util.configDir ();
+            string basePath = Constants.DEFAULT_CONFIG_DIR;
 
             if (argvSource != null) {
                 IConfig startupConfig = argvSource.Configs ["Startup"];
