@@ -54,6 +54,10 @@ WhiteCore.sln.cache
 # Addons
 
 addon-modules/*/
+# IRC chat module
+WhiteCoreSim/bin/Glacier2.dll
+WhiteCoreSim/bin/Ice.dll
+
 
 # Binary
 
@@ -72,6 +76,7 @@ WhiteCoreSim/bin/CSJ2K.dll
 WhiteCoreSim/bin/OpenMetaverse.dll
 WhiteCoreSim/bin/OpenMetaverse.StructuredData.dll
 WhiteCoreSim/bin/OpenMetaverseTypes.dll
+WhiteCoreSim/bin/OpenMetaverse.Rendering.Meshmerizer.dll
 
 # Data files
 
