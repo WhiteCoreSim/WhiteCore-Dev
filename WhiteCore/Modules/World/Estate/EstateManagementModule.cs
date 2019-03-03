@@ -639,7 +639,7 @@ namespace WhiteCore.Modules.Estate
                     if (x.Extension == ".oar") // It's an oar file
                     {
                         if (File.Exists(filename))
-                            filename = DateTime.UtcNow.ToString("yyyMMdd") + filename;
+                            filename = DateTime.UtcNow.ToString("yyyyMMdd") + filename;
 
                         // save OAR to a local file
                         FileStream input = new FileStream (filename, FileMode.CreateNew);
@@ -726,18 +726,23 @@ namespace WhiteCore.Modules.Estate
         {
             // Save terrain here
             ITerrainModule terr = m_scene.RequestModuleInterface<ITerrainModule> ();
+            var simBase = m_scene.RequestModuleInterface<ISimulationBase> ();
+            var dataDir = simBase.DefaultDataPath;
+            var regionName = m_scene.RegionInfo.RegionName.Replace(" ","_");
+            var terrFile = dataDir + "/" + regionName + "_terrain.raw";
+            terrFile = PathHelpers.VerifyOSPath (terrFile);
 
             if (terr != null)
             {
                 MainConsole.Instance.Warn ("[Estate Manager]: Got Request to Send Terrain in region " +
                 m_scene.RegionInfo.RegionName);
-                if (File.Exists (Util.dataDir () + "/terrain.raw"))
-                    File.Delete (Util.dataDir () + "/terrain.raw");
-                terr.SaveToFile (Util.dataDir () + "/terrain.raw");
+                if (File.Exists (terrFile))
+                    File.Delete (terrFile);
+                terr.SaveToFile (terrFile);
 
                 FileStream input = null;
                 try {
-                    input = new FileStream (Util.dataDir () + "/terrain.raw", FileMode.Open);
+                    input = new FileStream (terrFile, FileMode.Open);
                     byte [] bdata = new byte [input.Length];
                     input.Read (bdata, 0, (int)input.Length);
                     input.Close ();
@@ -745,7 +750,7 @@ namespace WhiteCore.Modules.Estate
                     remote_client.SendAlertMessage ("Terrain file written, starting download...");
                     IXfer xfer = m_scene.RequestModuleInterface<IXfer> ();
                     if (xfer != null)
-                        xfer.AddNewFile ("terrain.raw", bdata);
+                        xfer.AddNewFile (terrFile, bdata);
                 } catch {
                     if (input != null)
                         input.Close ();
@@ -753,7 +758,7 @@ namespace WhiteCore.Modules.Estate
 
                 // Tell client about it
                 MainConsole.Instance.Warn ("[Estate Manager]: Sending Terrain to " + remote_client.Name);
-                remote_client.SendInitiateDownload ("terrain.raw", clientFileName);
+                remote_client.SendInitiateDownload (terrFile, clientFileName);
             }
         }
 
