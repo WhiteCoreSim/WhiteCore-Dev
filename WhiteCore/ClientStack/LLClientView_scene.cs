@@ -1557,16 +1557,39 @@ namespace WhiteCore.ClientStack
             OutPacket (sendAgentDataUpdate, ThrottleOutPacketType.AvatarInfo);
         }
 
+
         /// <summary>
-        ///     Send an alert message to the client.  On the Linden client (tested 1.19.1.4), this pops up a brief duration
-        ///     blue information box in the bottom right hand corner.
+        /// A convenience function for sending simple alert messages to the client.
         /// </summary>
-        /// <param name="message"></param>
+        /// <param name="message">Message</param>
         public void SendAlertMessage (string message)
         {
+            SendAlertMessage (message, string.Empty, new OSD ());
+        }
+
+
+        /// <summary>
+        ///     Send an alert message to the client.  
+        ///     This pops up a brief duration information box in the bottom right hand corner.
+        /// </summary>
+        /// <param name="message"></param>
+        /// <param name="infoMessage"></param>
+        /// <param name="extraParams"></param>
+        public void SendAlertMessage (string message, string infoMessage, OSD extraParams)
+        {
             AlertMessagePacket alertPack = (AlertMessagePacket)PacketPool.Instance.GetPacket (PacketType.AlertMessage);
-            alertPack.AlertData = new AlertMessagePacket.AlertDataBlock { Message = Util.StringToBytes256 (message) };
-            alertPack.AlertInfo = new AlertMessagePacket.AlertInfoBlock [0];
+            alertPack.AlertData = new AlertMessagePacket.AlertDataBlock();
+            alertPack.AlertData.Message = Util.StringToBytes256 (message);          
+
+            // Info message
+            alertPack.AlertInfo = new AlertMessagePacket.AlertInfoBlock [1];        
+            alertPack.AlertInfo [0] = new AlertMessagePacket.AlertInfoBlock ();
+            alertPack.AlertInfo [0].Message = Util.StringToBytes256 (infoMessage);
+            alertPack.AlertInfo [0].ExtraParams = OSDParser.SerializeLLSDXmlBytes (extraParams);
+
+            // 20190301 -greythane-  we now have an agentInfoblock in the OMV libary due to changes to the specifications
+            alertPack.AgentInfo = new AlertMessagePacket.AgentInfoBlock [0];         
+
             OutPacket (alertPack, ThrottleOutPacketType.AvatarInfo);
         }
 
