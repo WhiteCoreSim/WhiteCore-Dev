@@ -94,13 +94,12 @@ re-start..
 Questions?
 ==========
 Checkout the #whitecore-support irc channel on freenode,
-or check into the Google+ AuroraSim/WhiteCoreSim group at 
-https://plus.google.com/communitites/113034607546142208907
+or check into the MeWe community for WhiteCore https://mewe.com/group/5cb284545da1780ba88ca30d where a friendly group is happy to answer questions.
 
 Rowan Deppeler
 <greythane @ gmail.com>
 
-June 2014
+April 2019
 =======================
 
 For licensing information, please see the relevant licenses.
