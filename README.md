@@ -50,7 +50,7 @@ Support is available from various sources.
 
 * Check out <http://whitecore-sim.org> for the latest developments, downloads and forum
 
-* Google + community for WhiteCore with a friendly bunch that is happy to answer questions. Find it at <https://plus.google.com/communities/113034607546142208907?cfem=1>
+* MeWe community for WhiteCore with a friendly bunch that is happy to answer questions. Find it at <https://mewe.com/group/5cb284545da1780ba88ca30d>
 
 ## Configuration
 WhiteCore is configured to run 'Out of the Box'.
