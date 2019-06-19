@@ -2179,7 +2179,7 @@ namespace WhiteCore.BotManager
         {
         }
 
-        public void SendAbortXferPacket(ulong xferID)
+        public void SendAbortXferPacket(ulong xferID, int result)
         {
         }
 

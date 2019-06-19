@@ -277,10 +277,11 @@ namespace WhiteCore.ClientStack
             return true;
         }
 
-        public void SendAbortXferPacket (ulong xferID)
+        public void SendAbortXferPacket (ulong xferID, int result)
         {
             AbortXferPacket xferItem = (AbortXferPacket)PacketPool.Instance.GetPacket (PacketType.AbortXfer);
             xferItem.XferID.ID = xferID;
+            xferItem.XferID.Result = result;
             OutPacket (xferItem, ThrottleOutPacketType.Transfer);
         }
 
