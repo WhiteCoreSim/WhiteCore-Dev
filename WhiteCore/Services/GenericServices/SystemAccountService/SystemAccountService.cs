@@ -143,21 +143,34 @@ namespace WhiteCore.Services.GenericServices.SystemAccountService
 
         public void Start (IConfigSource config, IRegistryCore registry)
         {
-        }
-
-        public void FinishedStartup ()
-        {
             m_accountService = m_registry.RequestModuleInterface<IUserAccountService> ();
 
             // these are only valid if we are local
             if (m_accountService.IsLocalConnector) {
-                // check and/or create default RealEstate user
-                CheckSystemUserInfo ();
+				// check and/or create default RealEstate user
+				CheckSystemUserInfo ();
 
                 // if this is the initial run, create the grid system user
                 var users = m_accountService.NumberOfUserAccounts (null, "");
                 if (users == 0)
-                    CreateGridOwnerUser ();
+
+					CreateGridOwnerUser ();
+            }
+}
+
+        public void FinishedStartup ()
+        {
+         //   m_accountService = m_registry.RequestModuleInterface<IUserAccountService> ();
+
+            // these are only valid if we are local
+            if (m_accountService.IsLocalConnector) {
+                // check and/or create default RealEstate user
+         //       CheckSystemUserInfo ();
+
+                // if this is the initial run, create the grid system user
+         //       var users = m_accountService.NumberOfUserAccounts (null, "");
+         //       if (users == 0)
+         //           CreateGridOwnerUser ();
                 
                 AddCommands ();
             }
@@ -272,7 +285,10 @@ namespace WhiteCore.Services.GenericServices.SystemAccountService
         void SaveSystemUserPassword (string userType, string userName, string password)
         {
             var simBase = m_registry.RequestModuleInterface<ISimulationBase> ();
-            string passFile = Path.Combine (simBase.DefaultDataPath, userType + ".txt");
+            string logpath = MainConsole.Instance.LogPath;
+            if (logpath == "")
+                logpath = simBase.DefaultDataPath;
+            string passFile = Path.Combine (logpath, userType + ".txt");
             string userInfo = userType + " user";
 
             if (File.Exists (passFile))
