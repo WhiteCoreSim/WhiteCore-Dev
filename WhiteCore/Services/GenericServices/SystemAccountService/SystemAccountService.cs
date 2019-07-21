@@ -160,18 +160,8 @@ namespace WhiteCore.Services.GenericServices.SystemAccountService
 
         public void FinishedStartup ()
         {
-         //   m_accountService = m_registry.RequestModuleInterface<IUserAccountService> ();
-
             // these are only valid if we are local
             if (m_accountService.IsLocalConnector) {
-                // check and/or create default RealEstate user
-         //       CheckSystemUserInfo ();
-
-                // if this is the initial run, create the grid system user
-         //       var users = m_accountService.NumberOfUserAccounts (null, "");
-         //       if (users == 0)
-         //           CreateGridOwnerUser ();
-                
                 AddCommands ();
             }
 
