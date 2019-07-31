@@ -68,7 +68,7 @@ namespace WhiteCore.Modules.Web
             response = null;
             var vars = new Dictionary<string, object>();
 
-            UserAccount account = null;
+            UserAccount userAcct = new UserAccount();
             if (httpRequest.Query.ContainsKey ("regionid"))
             {
                 var regionService = webInterface.Registry.RequestModuleInterface<IGridService> ();
@@ -76,29 +76,29 @@ namespace WhiteCore.Modules.Web
 
                 UUID userid = region.EstateOwner;
 
-                account = webInterface.Registry.RequestModuleInterface<IUserAccountService>().
+                userAcct = webInterface.Registry.RequestModuleInterface<IUserAccountService>().
                     GetUserAccount(null, userid);
 
                 //IEstateConnector estateConnector = Framework.Utilities.DataManager.RequestPlugin<IEstateConnector> ();
                 //EstateSettings estate = estateConnector.GetEstateSettings (region.RegionID);
             }
-            if (account == null)
+            if (!userAcct.Valid)
                 return vars;
 
             // There is no harm in showing the system users here, actually it is required
             //if ( Utilities.IsSytemUser(account.PrincipalID))
             //    return vars;
 
-            vars.Add("UserName", account.Name);
+            vars.Add("UserName", userAcct.Name);
             //  TODO: User Profile inworld shows this as the standard mm/dd/yyyy
             //  Do we want this to be localised into the users Localisation or keep it as standard ?
             //
             // greythane, Oct 2014 - Not sure why we need to keep the US format here?  A lot of us don't live there :)  
             //  vars.Add("UserBorn", Culture.LocaleDate(Util.ToDateTime(account.Created)));
-            vars.Add("UserBorn", Util.ToDateTime(account.Created).ToShortDateString());  
+            vars.Add("UserBorn", Util.ToDateTime(userAcct.Created).ToShortDateString());  
 
             IUserProfileInfo profile = Framework.Utilities.DataManager.RequestPlugin<IProfileConnector>().
-                                              GetUserProfile(account.PrincipalID);
+                                              GetUserProfile(userAcct.PrincipalID);
             if (profile != null)
             {
                 vars.Add ("UserType", profile.MembershipGroup == "" ? "Resident" : profile.MembershipGroup);
@@ -106,9 +106,9 @@ namespace WhiteCore.Modules.Web
                 {
                     if (profile.Partner != UUID.Zero)
                     {
-                        account = webInterface.Registry.RequestModuleInterface<IUserAccountService> ().
+                        var partnerAcct = webInterface.Registry.RequestModuleInterface<IUserAccountService> ().
                                            GetUserAccount (null, profile.Partner);
-                        vars.Add ("UserPartner", account.Name);
+                        vars.Add ("UserPartner", partnerAcct.Name);
                     } else
                         vars.Add ("UserPartner", "No partner");
                     vars.Add ("UserAboutMe", profile.AboutText == "" ? "Nothing here" : profile.AboutText);
@@ -130,17 +130,17 @@ namespace WhiteCore.Modules.Web
 
 
             UserAccount ourAccount = Authenticator.GetAuthentication(httpRequest);
-            if (ourAccount != null)
+            if (ourAccount.Valid)
             {
                 IFriendsService friendsService = webInterface.Registry.RequestModuleInterface<IFriendsService>();
-                var friends = friendsService.GetFriends(account.PrincipalID);
+                var friends = friendsService.GetFriends(userAcct.PrincipalID);
                 UUID friendID = UUID.Zero;
                 if (friends.Any(f => UUID.TryParse(f.Friend, out friendID) && friendID == ourAccount.PrincipalID))
                 {
                     IAgentInfoService agentInfoService =
                         webInterface.Registry.RequestModuleInterface<IAgentInfoService>();
                     IGridService gridService = webInterface.Registry.RequestModuleInterface<IGridService>();
-                    UserInfo ourInfo = agentInfoService.GetUserInfo(account.PrincipalID.ToString());
+                    UserInfo ourInfo = agentInfoService.GetUserInfo(userAcct.PrincipalID.ToString());
                     if (ourInfo != null && ourInfo.IsOnline)
                         vars.Add("OnlineLocation", gridService.GetRegionByUUID(null, ourInfo.CurrentRegionID).RegionName);
                     vars.Add("UserIsOnline", ourInfo != null && ourInfo.IsOnline);

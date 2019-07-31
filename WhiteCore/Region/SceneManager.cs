@@ -1322,9 +1322,8 @@ namespace WhiteCore.Region
 			var regInfo = scene.RegionInfo;
             var ownerName = "Unknown";
 			var estateOwner = scene.UserAccountService.GetUserAccount (null, regInfo.EstateSettings.EstateOwner);
-            if (estateOwner != null)
+            if (estateOwner.Valid)
                 ownerName = estateOwner.Name;
-                
 
 			if ((MainConsole.Instance.ConsoleScene == null) &&
 				(m_scenes.IndexOf (scene) == 0)) {

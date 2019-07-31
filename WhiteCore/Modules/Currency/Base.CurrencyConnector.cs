@@ -258,7 +258,7 @@ namespace WhiteCore.Modules.Currency
                         groupID,
                         groupName,
                         userId,
-                        (agentAccount == null ? "System" : agentAccount.Name),
+                        (agentAccount.Valid ? agentAccount.Name : "System"),
                         amount,
                         transType,
                         gb.TotalTierCredits,        // assume this it the 'total credit for the group but it may be land tier credit??
@@ -639,8 +639,8 @@ namespace WhiteCore.Modules.Currency
                         type,
                         toCurrency.Amount, 
                         (fromCurrency == null ? 0 : fromCurrency.Amount),
-                        (toAccount == null ? "System" : toAccount.Name), 
-                        (fromAccount == null ? "System" : fromAccount.Name),
+                        (toAccount.Valid ? toAccount.Name : "System"), 
+                        (fromAccount.Valid ? fromAccount.Name : "System"),
                         toObjectName,
                         fromObjectName,
                         (fromUserInfo == null ? UUID.Zero : fromUserInfo.CurrentRegionID)
@@ -652,10 +652,10 @@ namespace WhiteCore.Modules.Currency
 
                 if (amount > 0) {
                     paidFromMsg = 
-                        (fromAccount == null ? " received " : fromAccount.Name + " paid you ") +
+                        (fromAccount.Valid ? (fromAccount.Name + " paid you ") : " received ") +
                         InWorldCurrency + amount + paidDesc;
                     paidToMsg = "You paid " +
-                        (toAccount == null ? "" : toAccount.Name + " ") +
+                        (toAccount.Valid ? toAccount.Name + " " : "") +
                         InWorldCurrency + amount + paidDesc;
                 }
 
@@ -663,7 +663,7 @@ namespace WhiteCore.Modules.Currency
                 {
                     if (toUserInfo != null && toUserInfo.IsOnline)
                         SendUpdateMoneyBalanceToClient(toID, transactionID, toUserInfo.CurrentRegionURI, toCurrency.Amount, 
-                                                       toAccount == null ? "" : (toAccount.Name + " paid you ") +
+                                                       toAccount.Valid ? (toAccount.Name + " paid you ") : "" +
                                                        InWorldCurrency + amount + paidDesc);
                 } else
                 {
@@ -788,8 +788,8 @@ namespace WhiteCore.Modules.Currency
         void UserCurrencyCreate(UUID agentId)
         {
 			// Check if this agent has a user account, if not assume its a bot and exit
-			UserAccount account = m_registry.RequestModuleInterface<IUserAccountService>().GetUserAccount(new List<UUID> { UUID.Zero }, agentId);
-            if (account != null)
+            UserAccount userAcct = m_registry.RequestModuleInterface<IUserAccountService>().GetUserAccount(new List<UUID> { UUID.Zero }, agentId);
+            if (userAcct.Valid)
             {
                 GD.Insert(_REALM, new object[] {agentId.ToString(), 0, 0, 0, 0, 0});
             }

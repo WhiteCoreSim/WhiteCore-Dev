@@ -69,38 +69,39 @@ namespace WhiteCore.Modules.Web
             var vars = new Dictionary<string, object>();
 
             string username = filename.Split('/').LastOrDefault();
-            UserAccount account = null;
+            UserAccount userAcct = new UserAccount ();
+
             if (httpRequest.Query.ContainsKey("userid"))
             {
                 string userid = httpRequest.Query["userid"].ToString();
 
-                account = webInterface.Registry.RequestModuleInterface<IUserAccountService>().
+                userAcct = webInterface.Registry.RequestModuleInterface<IUserAccountService>().
                                        GetUserAccount(null, UUID.Parse(userid));
             }
             else if (httpRequest.Query.ContainsKey("name") || username.Contains('.'))
             {
                 string name = httpRequest.Query.ContainsKey("name") ? httpRequest.Query["name"].ToString() : username;
                 name = name.Replace('.', ' ');
-                account = webInterface.Registry.RequestModuleInterface<IUserAccountService>().
+                userAcct = webInterface.Registry.RequestModuleInterface<IUserAccountService>().
                                        GetUserAccount(null, name);
             }
             else
             {
                 username = username.Replace("%20", " ");
-                account = webInterface.Registry.RequestModuleInterface<IUserAccountService>().
+                userAcct = webInterface.Registry.RequestModuleInterface<IUserAccountService>().
                                        GetUserAccount(null, username);
             }
 
-            if (account == null)
+            if (!userAcct.Valid)
                 return vars;
 
             // User found....
-            vars.Add("UserName", account.Name);
+            vars.Add("UserName", userAcct.Name);
 
             IProfileConnector profileConnector = Framework.Utilities.DataManager.RequestPlugin<IProfileConnector>();
             IUserProfileInfo profile = profileConnector == null
                                            ? null
-                                           : profileConnector.GetUserProfile(account.PrincipalID);
+                                           : profileConnector.GetUserProfile(userAcct.PrincipalID);
             IWebHttpTextureService webhttpService =
                 webInterface.Registry.RequestModuleInterface<IWebHttpTextureService>();
 
@@ -111,9 +112,9 @@ namespace WhiteCore.Modules.Web
 
                 if (profile.Partner != UUID.Zero)
                 {
-                    account = webInterface.Registry.RequestModuleInterface<IUserAccountService>().
+                    var partnerAcct = webInterface.Registry.RequestModuleInterface<IUserAccountService>().
                                            GetUserAccount(null, profile.Partner);
-                    vars.Add("UserPartner", account.Name);
+                    vars.Add("UserPartner", partnerAcct.Name);
                 }
                 else
                     vars.Add("UserPartner", "No partner");
@@ -130,8 +131,8 @@ namespace WhiteCore.Modules.Web
                         url = webhttpService.GetTextureURL(pick.SnapshotUUID);
 
                     Vector3 pickLoc = pick.GlobalPos;
-                    pickLoc.X /= WhiteCore.Framework.Utilities.Constants.RegionSize;
-                    pickLoc.Y /= WhiteCore.Framework.Utilities.Constants.RegionSize;
+                    pickLoc.X /= Framework.Utilities.Constants.RegionSize;
+                    pickLoc.Y /= Framework.Utilities.Constants.RegionSize;
 
                     picks.Add(new Dictionary<string, object>
                                   {

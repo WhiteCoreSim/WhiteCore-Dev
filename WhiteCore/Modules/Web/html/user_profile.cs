@@ -67,8 +67,8 @@ namespace WhiteCore.Modules.Web
                 webInterface.Registry.RequestModuleInterface<IWebHttpTextureService> ();
 
             //string username = filename.Split('/').LastOrDefault();
-            UserAccount account = Authenticator.GetAuthentication (httpRequest);
-            if (account == null)
+            UserAccount userAcct = Authenticator.GetAuthentication (httpRequest);
+            if (!userAcct.Valid)
                 return vars;
 
             /* Allow access to the syatem user info - needed for Estate owner Profiles of regions
@@ -77,23 +77,23 @@ namespace WhiteCore.Modules.Web
                 return vars;
             */
 
-            vars.Add ("UserName", account.Name);
+            vars.Add ("UserName", userAcct.Name);
             //  TODO: User Profile inworld shows this as the standard mm/dd/yyyy
             //  Do we want this to be localised into the users Localisation or keep it as standard ?
             //
             //  vars.Add("UserBorn", Culture.LocaleDate(Util.ToDateTime(account.Created)));
-            vars.Add ("UserBorn", Util.ToDateTime (account.Created).ToShortDateString ());
+            vars.Add ("UserBorn", Util.ToDateTime (userAcct.Created).ToShortDateString ());
 
             IUserProfileInfo profile = Framework.Utilities.DataManager.RequestPlugin<IProfileConnector> ().
-                GetUserProfile (account.PrincipalID);
+                GetUserProfile (userAcct.PrincipalID);
             string picUrl = "../images/icons/no_avatar.jpg";
             if (profile != null) {
                 vars.Add ("UserType", profile.MembershipGroup == "" ? "Resident" : profile.MembershipGroup);
 
                 if (profile.Partner != UUID.Zero) {
-                    account = webInterface.Registry.RequestModuleInterface<IUserAccountService> ().
+                    var partnerAcct = webInterface.Registry.RequestModuleInterface<IUserAccountService> ().
                         GetUserAccount (null, profile.Partner);
-                    vars.Add ("UserPartner", account.Name);
+                    vars.Add ("UserPartner", partnerAcct.Name);
                 } else
                     vars.Add ("UserPartner", "No partner");
                 vars.Add ("UserAboutMe", profile.AboutText == "" ? "Nothing here" : profile.AboutText);
@@ -110,14 +110,14 @@ namespace WhiteCore.Modules.Web
 
             // TODO:  This is only showing online status if you are logged in ??
             UserAccount ourAccount = Authenticator.GetAuthentication (httpRequest);
-            if (ourAccount != null) {
+            if (ourAccount.Valid) {
                 IFriendsService friendsService = webInterface.Registry.RequestModuleInterface<IFriendsService> ();
-                var friends = friendsService.GetFriends (account.PrincipalID);
+                var friends = friendsService.GetFriends (userAcct.PrincipalID);
                 UUID friendID = UUID.Zero;
                 if (friends.Any (f => UUID.TryParse (f.Friend, out friendID) && friendID == ourAccount.PrincipalID)) {
                     IAgentInfoService agentInfoService = webInterface.Registry.RequestModuleInterface<IAgentInfoService> ();
                     IGridService gridService = webInterface.Registry.RequestModuleInterface<IGridService> ();
-                    UserInfo ourInfo = agentInfoService.GetUserInfo (account.PrincipalID.ToString ());
+                    UserInfo ourInfo = agentInfoService.GetUserInfo (userAcct.PrincipalID.ToString ());
                     if (ourInfo != null && ourInfo.IsOnline)
                         vars.Add ("OnlineLocation", gridService.GetRegionByUUID (null, ourInfo.CurrentRegionID).RegionName);
                     vars.Add ("UserIsOnline", ourInfo != null && ourInfo.IsOnline);
@@ -143,10 +143,10 @@ namespace WhiteCore.Modules.Web
             List<Dictionary<string, object>> groups = new List<Dictionary<string, object>> ();
 
             if (groupsConnector != null) {
-                var groupsIn = groupsConnector.GetAgentGroupMemberships (account.PrincipalID, account.PrincipalID);
+                var groupsIn = groupsConnector.GetAgentGroupMemberships (userAcct.PrincipalID, userAcct.PrincipalID);
                 if (groupsIn != null) {
                     foreach (var grp in groupsIn) {
-                        var grpData = groupsConnector.GetGroupProfile (account.PrincipalID, grp.GroupID);
+                        var grpData = groupsConnector.GetGroupProfile (userAcct.PrincipalID, grp.GroupID);
                         string url = "../images/icons/no_groups.jpg";
                         if (grpData != null) {
                             if (webhttpService != null && grpData.InsigniaID != UUID.Zero)

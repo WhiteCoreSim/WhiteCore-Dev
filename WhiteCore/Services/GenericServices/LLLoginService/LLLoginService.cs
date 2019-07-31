@@ -259,14 +259,14 @@ namespace WhiteCore.Services
                 return response;
 
             try {
-                UserAccount account = m_UserAccountService.GetUserAccount (null, firstName, lastName);
-                if (account == null) {
+                UserAccount userAcct = m_UserAccountService.GetUserAccount (null, firstName, lastName);
+                if (!userAcct.Valid) {
                     MainConsole.Instance.InfoFormat ("[LLogin service]: Set Level failed, user {0} {1} not found",
                                                     firstName, lastName);
                     return response;
                 }
 
-                if (account.UserLevel < 200) {
+                if (userAcct.UserLevel < 200) {
                     MainConsole.Instance.InfoFormat ("[LLogin service]: Set Level failed, reason: user level too low");
                     return response;
                 }
@@ -276,7 +276,7 @@ namespace WhiteCore.Services
                 //
                 // We don't support clear passwords here
                 //
-                string token = m_AuthenticationService.Authenticate (account.PrincipalID, "UserAccount", passwd, 30);
+                string token = m_AuthenticationService.Authenticate (userAcct.PrincipalID, "UserAccount", passwd, 30);
                 UUID secureSession = UUID.Zero;
                 if ((token == string.Empty) || (token != string.Empty && !UUID.TryParse (token, out secureSession))) {
                     MainConsole.Instance.InfoFormat ("[LLogin service]: SetLevel failed, reason: authentication failed");
@@ -305,27 +305,27 @@ namespace WhiteCore.Services
             //
             // Get the account and check that it exists
             //
-            UserAccount account = AgentID != UUID.Zero
+            UserAccount userAcct = AgentID != UUID.Zero
                                       ? m_UserAccountService.GetUserAccount (null, AgentID)
                                       : m_UserAccountService.GetUserAccount (null, name);
 
-            if (account == null) {
+            if (!userAcct.Valid) {
                 return false;
             }
 
             IAgentInfo agent = null;
             IAgentConnector agentData = Framework.Utilities.DataManager.RequestPlugin<IAgentConnector> ();
             if (agentData != null) {
-                agent = agentData.GetAgent (account.PrincipalID);
+                agent = agentData.GetAgent (userAcct.PrincipalID);
                 if (agent == null) {
-                    agentData.CreateNewAgent (account.PrincipalID);
-                    agent = agentData.GetAgent (account.PrincipalID);
+                    agentData.CreateNewAgent (userAcct.PrincipalID);
+                    agent = agentData.GetAgent (userAcct.PrincipalID);
                 }
             }
 
             foreach (ILoginModule module in LoginModules) {
                 object data;
-                if (module.Login (null, account, agent, authType, passwd, out data) != null) {
+                if (module.Login (null, userAcct, agent, authType, passwd, out data) != null) {
                     return false;
                 }
             }
@@ -357,62 +357,64 @@ namespace WhiteCore.Services
                 "[LLogin service]: Login request for {0} from {1} with user agent {2} starting in {3}",
                 Name, clientIP.Address, realViewer, startLocation);
 
-            UserAccount account = AgentID != UUID.Zero
+            UserAccount userAcct = AgentID != UUID.Zero
                                       ? m_UserAccountService.GetUserAccount (null, AgentID)
                                       : m_UserAccountService.GetUserAccount (null, Name);
-            if (account == null && m_AllowAnonymousLogin) {
+
+            // no user but allow anomymouse logins?
+            if (!userAcct.Valid && m_AllowAnonymousLogin) {
                 m_UserAccountService.CreateUser (Name, passwd.StartsWith ("$1$", StringComparison.Ordinal) ? passwd.Remove (0, 3) : passwd, "");
-                account = m_UserAccountService.GetUserAccount (null, Name);
+                userAcct = m_UserAccountService.GetUserAccount (null, Name);
             }
-            if (account == null) {
+            if (!userAcct.Valid) {
                 MainConsole.Instance.InfoFormat ("[LLogin service]: Login failed for user {0}: no account found", Name);
                 return LLFailedLoginResponse.AccountProblem;
             }
 
-            if (account.UserLevel < 0) //No allowing anyone less than 0
+            if (userAcct.UserLevel < 0) // No allowing anyone less than 0
             {
                 MainConsole.Instance.InfoFormat (
                     "[LLogin service]: Login failed for user {0}, reason: user is banned",
-                    account.Name);
+                    userAcct.Name);
                 return LLFailedLoginResponse.PermanentBannedProblem;
             }
 
-            if (account.UserLevel < m_MinLoginLevel) {
+            if (userAcct.UserLevel < m_MinLoginLevel) {
                 MainConsole.Instance.InfoFormat (
                     "[LLogin service]: Login failed for user {1}, reason: login is blocked for user level {0}",
-                    account.UserLevel, account.Name);
+                    userAcct.UserLevel, userAcct.Name);
                 return LLFailedLoginResponse.LoginBlockedProblem;
             }
 
             IAgentInfo agent = null;
             IAgentConnector agentData = Framework.Utilities.DataManager.RequestPlugin<IAgentConnector> ();
             if (agentData != null) {
-                agent = agentData.GetAgent (account.PrincipalID);
+                agent = agentData.GetAgent (userAcct.PrincipalID);
                 if (agent == null) {
-                    agentData.CreateNewAgent (account.PrincipalID);
-                    agent = agentData.GetAgent (account.PrincipalID);
+                    agentData.CreateNewAgent (userAcct.PrincipalID);
+                    agent = agentData.GetAgent (userAcct.PrincipalID);
                 }
             } else {
                 MainConsole.Instance.ErrorFormat ("[LLogin service]: Login failed for user {1}, reason: {0}",
-                                                 account.Name, "Unable to retrieve agen connector");
+                                                 userAcct.Name, "Unable to retrieve agen connector");
                 return LLFailedLoginResponse.GridProblem;
             }
 
             requestData ["ip"] = clientIP.ToString ();
             foreach (ILoginModule module in LoginModules) {
                 object data;
-                if ((response = module.Login (requestData, account, agent, authType, passwd, out data)) != null) {
+                if ((response = module.Login (requestData, userAcct, agent, authType, passwd, out data)) != null) {
                     MainConsole.Instance.InfoFormat (
                         "[LLogin service]: Login failed for user {1}, reason: {0}",
-                        (data != null ? data.ToString () : (response is LLFailedLoginResponse) ? (response as LLFailedLoginResponse).Value : "Unknown"), account.Name);
+                        (data != null ? data.ToString () : (response is LLFailedLoginResponse) ? (response as LLFailedLoginResponse).Value : "Unknown"), userAcct.Name);
                     return response;
                 }
                 if (data != null)
-                    secureSession = (UUID)data; //TODO: NEED TO FIND BETTER WAY TO GET THIS DATA
+                    secureSession = (UUID)data; // TODO: NEED TO FIND BETTER WAY TO GET THIS DATA
             }
 
             try {
-                string DisplayName = account.Name;
+                string DisplayName = userAcct.Name;
                 AvatarAppearance avappearance = null;
                 IProfileConnector profileData = Framework.Utilities.DataManager.RequestPlugin<IProfileConnector> ();
 
@@ -422,23 +424,23 @@ namespace WhiteCore.Services
                 if (m_RequireInventory && m_InventoryService == null) {
                     MainConsole.Instance.WarnFormat (
                         "[LLogin service]: Login failed for user {0}, reason: inventory service not set up",
-                        account.Name);
+                        userAcct.Name);
                     return LLFailedLoginResponse.InventoryProblem;
                 }
-                List<InventoryFolderBase> inventorySkel = m_InventoryService.GetInventorySkeleton (account.PrincipalID);
+                List<InventoryFolderBase> inventorySkel = m_InventoryService.GetInventorySkeleton (userAcct.PrincipalID);
                 if (m_RequireInventory && ((inventorySkel == null) || (inventorySkel.Count == 0))) {
                     List<InventoryItemBase> defaultItems;
-                    m_InventoryService.CreateUserInventory (account.PrincipalID, m_DefaultUserAvatarArchive == "",
+                    m_InventoryService.CreateUserInventory (userAcct.PrincipalID, m_DefaultUserAvatarArchive == "",
                                                            out defaultItems);
-                    inventorySkel = m_InventoryService.GetInventorySkeleton (account.PrincipalID);
+                    inventorySkel = m_InventoryService.GetInventorySkeleton (userAcct.PrincipalID);
                     if (m_RequireInventory && ((inventorySkel == null) || (inventorySkel.Count == 0))) {
                         MainConsole.Instance.InfoFormat (
                             "[LLogin service]: Login failed for user {0}, reason: unable to retrieve user inventory",
-                            account.Name);
+                            userAcct.Name);
                         return LLFailedLoginResponse.InventoryProblem;
                     }
                     if (defaultItems.Count > 0) {
-                        avappearance = new AvatarAppearance (account.PrincipalID);
+                        avappearance = new AvatarAppearance (userAcct.PrincipalID);
                         avappearance.SetWearable ((int)WearableType.Shape,
                                                  new AvatarWearable (defaultItems [0].ID, defaultItems [0].AssetID));
                         avappearance.SetWearable ((int)WearableType.Skin,
@@ -451,15 +453,15 @@ namespace WhiteCore.Services
                                                  new AvatarWearable (defaultItems [4].ID, defaultItems [4].AssetID));
                         avappearance.SetWearable ((int)WearableType.Pants,
                                                  new AvatarWearable (defaultItems [5].ID, defaultItems [5].AssetID));
-                        m_AvatarService.SetAppearance (account.PrincipalID, avappearance);
+                        m_AvatarService.SetAppearance (userAcct.PrincipalID, avappearance);
                     }
                 }
 
                 if (profileData != null) {
-                    IUserProfileInfo UPI = profileData.GetUserProfile (account.PrincipalID);
+                    IUserProfileInfo UPI = profileData.GetUserProfile (userAcct.PrincipalID);
                     if (UPI == null) {
-                        profileData.CreateNewProfile (account.PrincipalID);
-                        UPI = profileData.GetUserProfile (account.PrincipalID);
+                        profileData.CreateNewProfile (userAcct.PrincipalID);
+                        UPI = profileData.GetUserProfile (userAcct.PrincipalID);
                         UPI.AArchiveName = m_DefaultUserAvatarArchive;
                         UPI.IsNewUser = true;
                         //profileData.UpdateUserProfile(UPI); //It gets hit later by the next thing
@@ -469,13 +471,13 @@ namespace WhiteCore.Services
                                              ? UPI.AArchiveName
                                              : m_DefaultUserAvatarArchive;
                     if (UPI.IsNewUser && archiveName != "") {
-                        AvatarArchive arch = m_ArchiveService.LoadAvatarArchive (archiveName, account.PrincipalID);
+                        AvatarArchive arch = m_ArchiveService.LoadAvatarArchive (archiveName, userAcct.PrincipalID);
                         UPI.AArchiveName = "";
                         if (arch != null) {
                             avappearance = arch.Appearance;
-                            m_AvatarService.SetAppearance (account.PrincipalID, avappearance);
+                            m_AvatarService.SetAppearance (userAcct.PrincipalID, avappearance);
                             //Must reload this, as we created a new folder
-                            inventorySkel = m_InventoryService.GetInventorySkeleton (account.PrincipalID);
+                            inventorySkel = m_InventoryService.GetInventorySkeleton (userAcct.PrincipalID);
                         }
                     }
                     if (UPI.IsNewUser) {
@@ -487,25 +489,25 @@ namespace WhiteCore.Services
                 }
 
                 // Get active gestures
-                List<InventoryItemBase> gestures = m_InventoryService.GetActiveGestures (account.PrincipalID);
+                List<InventoryItemBase> gestures = m_InventoryService.GetActiveGestures (userAcct.PrincipalID);
                 //MainConsole.Instance.DebugFormat("[LLogin service]: {0} active gestures", gestures.Count);
 
                 //Now get the logged in status, then below make sure to kill the previous agent if we crashed before
-                UserInfo guinfo = m_agentInfoService.GetUserInfo (account.PrincipalID.ToString ());
+                UserInfo guinfo = m_agentInfoService.GetUserInfo (userAcct.PrincipalID.ToString ());
                 //
                 // Clear out any existing CAPS the user may have
                 //
                 if (m_CapsService != null) {
                     IAgentProcessing agentProcessor = m_registry.RequestModuleInterface<IAgentProcessing> ();
                     if (agentProcessor != null) {
-                        IClientCapsService clientCaps = m_CapsService.GetClientCapsService (account.PrincipalID);
+                        IClientCapsService clientCaps = m_CapsService.GetClientCapsService (userAcct.PrincipalID);
                         if (clientCaps != null) {
                             IRegionClientCapsService rootRegionCaps = clientCaps.GetRootCapsService ();
                             if (rootRegionCaps != null)
                                 agentProcessor.LogoutAgent (rootRegionCaps, !m_AllowDuplicateLogin);
                         }
                     } else
-                        m_CapsService.RemoveCAPS (account.PrincipalID);
+                        m_CapsService.RemoveCAPS (userAcct.PrincipalID);
                 }
 
                 //
@@ -513,38 +515,38 @@ namespace WhiteCore.Services
                 //
                 GridRegion home = null;
                 if (guinfo != null && (guinfo.HomeRegionID != UUID.Zero) && m_GridService != null)
-                    home = m_GridService.GetRegionByUUID (account.AllScopeIDs, guinfo.HomeRegionID);
+                    home = m_GridService.GetRegionByUUID (userAcct.AllScopeIDs, guinfo.HomeRegionID);
 
                 if (guinfo == null || guinfo.HomeRegionID == UUID.Zero) //Give them a default home and last
                 {
                     bool positionSet = false;
                     if (guinfo == null)
-                        guinfo = new UserInfo { UserID = account.PrincipalID.ToString () };
+                        guinfo = new UserInfo { UserID = userAcct.PrincipalID.ToString () };
                     GridRegion DefaultRegion = null, FallbackRegion = null, SafeRegion = null;
                     if (m_GridService != null) {
                         if (m_DefaultHomeRegion != "") {
-                            DefaultRegion = m_GridService.GetRegionByName (account.AllScopeIDs, m_DefaultHomeRegion);
+                            DefaultRegion = m_GridService.GetRegionByName (userAcct.AllScopeIDs, m_DefaultHomeRegion);
                             if (DefaultRegion != null)
                                 guinfo.HomeRegionID = guinfo.CurrentRegionID = DefaultRegion.RegionID;
                             guinfo.HomePosition = guinfo.CurrentPosition = m_DefaultHomeRegionPos;
                             positionSet = true;
                         }
                         if (guinfo.HomeRegionID == UUID.Zero) {
-                            List<GridRegion> DefaultRegions = m_GridService.GetDefaultRegions (account.AllScopeIDs);
+                            List<GridRegion> DefaultRegions = m_GridService.GetDefaultRegions (userAcct.AllScopeIDs);
                             DefaultRegion = DefaultRegions.Count == 0 ? null : DefaultRegions [0];
 
                             if (DefaultRegion != null)
                                 guinfo.HomeRegionID = guinfo.CurrentRegionID = DefaultRegion.RegionID;
 
                             if (guinfo.HomeRegionID == UUID.Zero) {
-                                List<GridRegion> Fallback = m_GridService.GetFallbackRegions (account.AllScopeIDs, 0, 0);
+                                List<GridRegion> Fallback = m_GridService.GetFallbackRegions (userAcct.AllScopeIDs, 0, 0);
                                 FallbackRegion = Fallback.Count == 0 ? null : Fallback [0];
 
                                 if (FallbackRegion != null)
                                     guinfo.HomeRegionID = guinfo.CurrentRegionID = FallbackRegion.RegionID;
 
                                 if (guinfo.HomeRegionID == UUID.Zero) {
-                                    List<GridRegion> Safe = m_GridService.GetSafeRegions (account.AllScopeIDs, 0, 0);
+                                    List<GridRegion> Safe = m_GridService.GetSafeRegions (userAcct.AllScopeIDs, 0, 0);
                                     SafeRegion = Safe.Count == 0 ? null : Safe [0];
 
                                     if (SafeRegion != null)
@@ -572,11 +574,11 @@ namespace WhiteCore.Services
                 Vector3 position = Vector3.Zero;
                 Vector3 lookAt = Vector3.Zero;
                 TeleportFlags tpFlags = TeleportFlags.ViaLogin;
-                GridRegion destination = FindDestination (account, guinfo, session, startLocation, home, out tpFlags,
+                GridRegion destination = FindDestination (userAcct, guinfo, session, startLocation, home, out tpFlags,
                                                          out where, out position, out lookAt);
                 if (destination == null) {
                     MainConsole.Instance.InfoFormat (
-                        "[LLogin service]: Login failed for user {0}, reason: destination not found", account.Name);
+                        "[LLogin service]: Login failed for user {0}, reason: destination not found", userAcct.Name);
                     return LLFailedLoginResponse.DeadRegionProblem;
                 }
 
@@ -587,55 +589,55 @@ namespace WhiteCore.Services
                 //
                 if (m_AvatarService != null) {
                     bool loadedArchive;
-                    avappearance = m_AvatarService.GetAndEnsureAppearance (account.PrincipalID, m_DefaultUserAvatarArchive, out loadedArchive);
+                    avappearance = m_AvatarService.GetAndEnsureAppearance (userAcct.PrincipalID, m_DefaultUserAvatarArchive, out loadedArchive);
                     if (loadedArchive)
                         //Must reload this, as we created a new folder
-                        inventorySkel = m_InventoryService.GetInventorySkeleton (account.PrincipalID);
+                        inventorySkel = m_InventoryService.GetInventorySkeleton (userAcct.PrincipalID);
                 } else
-                    avappearance = new AvatarAppearance (account.PrincipalID);
+                    avappearance = new AvatarAppearance (userAcct.PrincipalID);
 
                 if ((m_forceUserToWearFolderName != "") && (m_forceUserToWearFolderOwnerUUID.Length == 36)) {
                     UUID userThatOwnersFolder;
                     if (UUID.TryParse (m_forceUserToWearFolderOwnerUUID, out userThatOwnersFolder)) {
-                        avappearance = WearFolder (avappearance, account.PrincipalID, userThatOwnersFolder);
+                        avappearance = WearFolder (avappearance, userAcct.PrincipalID, userThatOwnersFolder);
                     }
                 }
 
                 //Makes sure that all links are properly placed in the current outfit folder for v2 viewers
-                FixCurrentOutFitFolder (account.PrincipalID, ref avappearance);
+                FixCurrentOutFitFolder (userAcct.PrincipalID, ref avappearance);
 
                 #endregion
 
                 List<UUID> friendsToInform = new List<UUID> ();
                 if (m_FriendsService != null)
-                    friendsToInform = m_FriendsService.GetFriendOnlineStatuses (account.PrincipalID, true);
+                    friendsToInform = m_FriendsService.GetFriendOnlineStatuses (userAcct.PrincipalID, true);
 
                 //
                 // Instantiate/get the simulation interface and launch an agent at the destination
                 //
                 string reason = "", seedCap = "";
-                AgentCircuitData aCircuit = LaunchAgentAtGrid (destination, tpFlags, account, session,
+                AgentCircuitData aCircuit = LaunchAgentAtGrid (destination, tpFlags, userAcct, session,
                                                               secureSession, position, where,
                                                               clientIP, friendsToInform, out where, out reason, out seedCap,
                                                               out destination);
 
                 if (aCircuit == null) {
                     MainConsole.Instance.InfoFormat ("[LLogin service]: Login failed for user {1}, reason: {0}", reason,
-                                                    account.Name);
+                                                    userAcct.Name);
                     return new LLFailedLoginResponse (LoginResponseEnum.InternalError, reason, false);
                 }
 
                 // Get Friends list 
                 List<FriendInfo> friendsList = new List<FriendInfo> ();
                 if (m_FriendsService != null)
-                    friendsList = m_FriendsService.GetFriends (account.PrincipalID);
+                    friendsList = m_FriendsService.GetFriends (userAcct.PrincipalID);
 
                 // Set them as logged in now, they are ready, and fire the logged in event now, as we're all done
-                m_agentInfoService.SetLastPosition (account.PrincipalID.ToString (), destination.RegionID, position,
+                m_agentInfoService.SetLastPosition (userAcct.PrincipalID.ToString (), destination.RegionID, position,
                                                    lookAt, destination.ServerURI);
-                m_agentInfoService.SetLoggedIn (account.PrincipalID.ToString (), true, destination.RegionID,
+                m_agentInfoService.SetLoggedIn (userAcct.PrincipalID.ToString (), true, destination.RegionID,
                                                destination.ServerURI);
-                m_agentInfoService.FireUserStatusChangeEvent (account.PrincipalID.ToString (), true, destination.RegionID);
+                m_agentInfoService.FireUserStatusChangeEvent (userAcct.PrincipalID.ToString (), true, destination.RegionID);
 
                 //
                 // Finally, fill out the response and return it
@@ -653,12 +655,12 @@ namespace WhiteCore.Services
 
 
                 ArrayList eventNotifications = new ArrayList ();
-                BuildEventNotifications (account.PrincipalID, ref eventNotifications);
+                BuildEventNotifications (userAcct.PrincipalID, ref eventNotifications);
 
                 if (m_FriendsService != null)
-                    m_FriendsService.SendFriendOnlineStatuses (account.PrincipalID, true);
+                    m_FriendsService.SendFriendOnlineStatuses (userAcct.PrincipalID, true);
 
-                response = new LLLoginResponse (account, aCircuit, guinfo, destination, inventorySkel,
+                response = new LLLoginResponse (userAcct, aCircuit, guinfo, destination, inventorySkel,
                                                friendsList.ToArray (), m_InventoryService, m_LibraryService,
                                                where, startLocation, position, lookAt, gestures, home, clientIP,
                                                MaxMaturity, MaturityRating,
@@ -672,9 +674,9 @@ namespace WhiteCore.Services
                 return response;
             } catch (Exception e) {
                 MainConsole.Instance.WarnFormat ("[LLogin service]: Exception processing login for {0} : {1}", Name, e);
-                if (account != null) {
-                    //Revert their logged in status if we got that far
-                    m_agentInfoService.SetLoggedIn (account.PrincipalID.ToString (), false, UUID.Zero, "");
+                if (userAcct.Valid) {
+                    // Revert their logged in status if we got that far
+                    m_agentInfoService.SetLoggedIn (userAcct.PrincipalID.ToString (), false, UUID.Zero, "");
                 }
                 return LLFailedLoginResponse.InternalError;
             }

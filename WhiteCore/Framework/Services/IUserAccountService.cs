@@ -34,18 +34,35 @@ namespace WhiteCore.Framework.Services
 {
     public class UserAccount : AllScopeIDImpl, BaseCacheAccount
     {
+        string m_name;
+        UUID m_uuid;
+
         public int Created;
         public string Email;
-
-        public string Name { get; set; }
-
-        public UUID PrincipalID { get; set; }
-
         public int UserFlags = Constants.USER_FLAG_GUEST;
         public int UserLevel = Constants.USER_NORMAL;
+        public bool Valid = false;
 
         public UserAccount ()
         {
+            m_name = "Unknown User";
+        }
+
+
+        public string Name {
+            get { return m_name; }
+            set {
+                m_name = value;
+                Valid = true;
+            }
+        }
+
+        public UUID PrincipalID {
+            get { return m_uuid; }
+            set {
+                m_uuid = value;
+                Valid = true;
+            }
         }
 
         public UserAccount (UUID principalID)
@@ -60,6 +77,7 @@ namespace WhiteCore.Framework.Services
             Name = name;
             Email = email;
             Created = Util.UnixTimeSinceEpoch ();
+            Valid = true;
         }
 
         public UserAccount (UUID scopeID, UUID principalID, string name, string email)
@@ -69,6 +87,7 @@ namespace WhiteCore.Framework.Services
             Name = name;
             Email = email;
             Created = Util.UnixTimeSinceEpoch ();
+            Valid = true;
         }
 
         public string FirstName

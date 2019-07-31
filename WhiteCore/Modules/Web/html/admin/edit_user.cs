@@ -69,10 +69,10 @@ namespace WhiteCore.Modules.Web
                             : UUID.Parse (requestParameters ["userid"].ToString ());
 
             IUserAccountService userService = webInterface.Registry.RequestModuleInterface<IUserAccountService> ();
-            UserAccount account = null;
+            UserAccount userAcct = new UserAccount();
 
             if (userService != null)
-                account = userService.GetUserAccount (null, userID);
+                userAcct = userService.GetUserAccount (null, userID);
 
             var agentService = Framework.Utilities.DataManager.RequestPlugin<IAgentConnector> ();
             IAgentInfo agent = agentService.GetAgent (userID);
@@ -88,9 +88,9 @@ namespace WhiteCore.Modules.Web
                 int UserFlags = WebHelpers.UserTypeToUserFlags (UserType);
 
                 // set the user account type
-                if (account != null) {
-                    account.UserFlags = UserFlags;
-                    userService.StoreUserAccount (account);
+                if (userAcct.Valid) {
+                    userAcct.UserFlags = UserFlags;
+                    userService.StoreUserAccount (userAcct);
                 } else {
                     response = "User account not found - Unable to update!'";
                     return null;
@@ -104,8 +104,7 @@ namespace WhiteCore.Modules.Web
                     return null;
                 }
 
-                IProfileConnector profileData =
-                    Framework.Utilities.DataManager.RequestPlugin<IProfileConnector> ();
+                IProfileConnector profileData = Framework.Utilities.DataManager.RequestPlugin<IProfileConnector> ();
                 if (profileData != null) {
                     IUserProfileInfo profile = profileData.GetUserProfile (userID);
                     if (profile == null) {
@@ -147,9 +146,9 @@ namespace WhiteCore.Modules.Web
                      requestParameters ["Submit"].ToString () == "SubmitEmailChange") {
                 string email = requestParameters ["email"].ToString ();
 
-                if (account != null) {
-                    account.Email = email;
-                    userService.StoreUserAccount (account);
+                if (userAcct.Valid) {
+                    userAcct.Email = email;
+                    userService.StoreUserAccount (userAcct);
                     response = "Successfully updated email";
                 } else
                     response = "No authentication service was available to change the email details!";
@@ -160,9 +159,9 @@ namespace WhiteCore.Modules.Web
             if (requestParameters.ContainsKey ("Submit") &&
                      requestParameters ["Submit"].ToString () == "SubmitDeleteUser") {
                 string username = requestParameters ["username"].ToString ();
-                if (account != null) {
-                    if (username == account.Name) {
-                        userService.DeleteUser (account.PrincipalID, account.Name, "", false, false);
+                if (userAcct.Valid) {
+                    if (username == userAcct.Name) {
+                        userService.DeleteUser (userAcct.PrincipalID, userAcct.Name, "", false, false);
                         response = "User has been successfully deleted";
                     } else
                         response = "The user name did not match!";
@@ -223,7 +222,7 @@ namespace WhiteCore.Modules.Web
             // Login as user
             if (requestParameters.ContainsKey ("Submit") &&
                 requestParameters ["Submit"].ToString () == "SubmitLoginAsUser") {
-                Authenticator.ChangeAuthentication (httpRequest, account);
+                Authenticator.ChangeAuthentication (httpRequest, userAcct);
                 webInterface.Redirect (httpResponse, "/");
                 return vars;
             }
@@ -232,11 +231,11 @@ namespace WhiteCore.Modules.Web
             if (requestParameters.ContainsKey ("Submit") &&
                 requestParameters ["Submit"].ToString () == "SubmitKickUser") {
                 string message = requestParameters ["KickMessage"].ToString ();
-                if (account != null) {
+                if (userAcct.Valid) {
                     IGridWideMessageModule messageModule =
                         webInterface.Registry.RequestModuleInterface<IGridWideMessageModule> ();
                     if (messageModule != null)
-                        messageModule.KickUser (account.PrincipalID, message);
+                        messageModule.KickUser (userAcct.PrincipalID, message);
                     response = "User has been kicked.";
                 } else
                     response = "Unable to determine user to  kick!";
@@ -247,11 +246,11 @@ namespace WhiteCore.Modules.Web
             if (requestParameters.ContainsKey ("Submit") &&
                 requestParameters ["Submit"].ToString () == "SubmitMessageUser") {
                 string message = requestParameters ["Message"].ToString ();
-                if (account != null) {
+                if (userAcct.Valid) {
                     IGridWideMessageModule messageModule =
                         webInterface.Registry.RequestModuleInterface<IGridWideMessageModule> ();
                     if (messageModule != null) {
-                        messageModule.MessageUser (account.PrincipalID, message);
+                        messageModule.MessageUser (userAcct.PrincipalID, message);
                         response = "User has been sent the message.";
                     }
                 } else 
@@ -285,15 +284,15 @@ namespace WhiteCore.Modules.Web
             IAgentInfoService agentInfoService = webInterface.Registry.RequestModuleInterface<IAgentInfoService> ();
             if (agentInfoService != null) {
                 UserInfo Info = null;
-                if (account != null)
-                    Info = agentInfoService.GetUserInfo (account.PrincipalID.ToString ());
+                if (userAcct.Valid)
+                    Info = agentInfoService.GetUserInfo (userAcct.PrincipalID.ToString ());
                 userOnline = Info != null && Info.IsOnline;
             }
 
-            if (account != null) {
-                vars.Add ("EmailValue", account.Email);
-                vars.Add ("UserID", account.PrincipalID);
-                vars.Add ("UserName", account.Name);
+            if (userAcct.Valid) {
+                vars.Add ("EmailValue", userAcct.Email);
+                vars.Add ("UserID", userAcct.PrincipalID);
+                vars.Add ("UserName", userAcct.Name);
             } else {
                 vars.Add ("EmailValue", "");
                 vars.Add ("UserID", "");

@@ -135,12 +135,12 @@ namespace WhiteCore.Modules.Chat
 
             if (m_TransferModule != null) {
                 if (client == null) {
-                    UserAccount account = m_Scene.UserAccountService.GetUserAccount (m_Scene.RegionInfo.AllScopeIDs,
+                    UserAccount fromAcct = m_Scene.UserAccountService.GetUserAccount (m_Scene.RegionInfo.AllScopeIDs,
                                                                                     im.FromAgentID);
-                    if (account != null)
-                        im.FromAgentName = account.Name;
+                    if (fromAcct.Valid)
+                        im.FromAgentName = fromAcct.Name;
                     else
-                        im.FromAgentName = im.FromAgentName + "(No account found for this user)";
+                        im.FromAgentName = im.FromAgentName + " (No account found for this user)";
                 } else
                     im.FromAgentName = client.Name;
 
@@ -163,12 +163,12 @@ namespace WhiteCore.Modules.Chat
             }
 
             if (m_TransferModule != null) {
-                UserAccount account = m_Scene.UserAccountService.GetUserAccount (m_Scene.RegionInfo.AllScopeIDs,
+                UserAccount fromAcct = m_Scene.UserAccountService.GetUserAccount (m_Scene.RegionInfo.AllScopeIDs,
                                                                                 msg.FromAgentID);
-                if (account != null)
-                    msg.FromAgentName = account.Name;
+                if (fromAcct.Valid)
+                    msg.FromAgentName = fromAcct.Name;
                 else
-                    msg.FromAgentName = msg.FromAgentName + "(No account found for this user)";
+                    msg.FromAgentName = msg.FromAgentName + " (No account found for this user)";
 
                 IScenePresence presence = null;
                 if (m_Scene.TryGetScenePresence (msg.ToAgentID, out presence)) {

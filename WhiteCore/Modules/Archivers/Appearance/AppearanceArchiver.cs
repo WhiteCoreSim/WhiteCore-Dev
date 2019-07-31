@@ -68,8 +68,8 @@ namespace WhiteCore.Modules.Archivers
         public AvatarArchive LoadAvatarArchive (string fileName, UUID principalID)
         {
             AvatarArchive archive = new AvatarArchive ();
-            UserAccount account = userAccountService.GetUserAccount (null, principalID);
-            if (account == null) {
+            UserAccount userAcct = userAccountService.GetUserAccount (null, principalID);
+            if (!userAcct.Valid) {
                 MainConsole.Instance.Error ("[Avatar Archiver]: User not found!");
                 return null;
             }
@@ -88,13 +88,13 @@ namespace WhiteCore.Modules.Archivers
 
             appearance.Owner = principalID;
 
-            InventoryFolderBase AppearanceFolder = inventoryService.GetFolderForType (account.PrincipalID,
+            InventoryFolderBase AppearanceFolder = inventoryService.GetFolderForType (userAcct.PrincipalID,
                                                                                      InventoryType.Wearable,
                                                                                      FolderType.Clothing);
 
             if (AppearanceFolder == null) {
                 AppearanceFolder = new InventoryFolderBase (); // does not exist so...
-                AppearanceFolder.Owner = account.PrincipalID;
+                AppearanceFolder.Owner = userAcct.PrincipalID;
                 AppearanceFolder.ID = UUID.Random ();
                 AppearanceFolder.Type = (short)FolderType.Clothing;
             }
@@ -103,7 +103,7 @@ namespace WhiteCore.Modules.Archivers
 
             InventoryFolderBase folderForAppearance
                 = new InventoryFolderBase (
-                    UUID.Random (), archive.FolderName, account.PrincipalID,
+                    UUID.Random (), archive.FolderName, userAcct.PrincipalID,
                 (short)FolderType.None, AppearanceFolder.ID, 1);
 
             inventoryService.AddFolder (folderForAppearance);
@@ -112,8 +112,8 @@ namespace WhiteCore.Modules.Archivers
 
             try {
                 LoadAssets (archive.AssetsMap);
-                appearance = CopyWearablesAndAttachments (account.PrincipalID, UUID.Zero, appearance, folderForAppearance,
-                                                         account.PrincipalID, archive.ItemsMap, out items);
+                appearance = CopyWearablesAndAttachments (userAcct.PrincipalID, UUID.Zero, appearance, folderForAppearance,
+                                                         userAcct.PrincipalID, archive.ItemsMap, out items);
             } catch (Exception ex) {
                 MainConsole.Instance.Warn ("[AvatarArchiver]: Error loading assets and items, " + ex);
             }
@@ -148,13 +148,13 @@ namespace WhiteCore.Modules.Archivers
         public bool SaveAvatarArchive (string fileName, UUID principalID, string folderName,
             UUID snapshotUUID, bool isPublic, bool isPortable)
         {
-            UserAccount account = userAccountService.GetUserAccount (null, principalID);
-            if (account == null) {
+            UserAccount userAcct = userAccountService.GetUserAccount (null, principalID);
+            if (!userAcct.Valid) {
                 MainConsole.Instance.Error ("[Avatar Archiver]: User not found!");
                 return false;
             }
 
-            AvatarAppearance appearance = avatarService.GetAppearance (account.PrincipalID);
+            AvatarAppearance appearance = avatarService.GetAppearance (userAcct.PrincipalID);
             if (appearance == null) {
                 MainConsole.Instance.Error ("[Avatar Archiver] Appearance not found!");
                 return false;
@@ -311,8 +311,8 @@ namespace WhiteCore.Modules.Archivers
                 userName = cmdparams [3] + " " + cmdparams [4];
             }
 
-            UserAccount account = userAccountService.GetUserAccount (null, userName);
-            if (account == null) {
+            UserAccount userAcct = userAccountService.GetUserAccount (null, userName);
+            if (!userAcct.Valid) {
                 MainConsole.Instance.Info ("[Avatar Archiver]: Sorry, unable to find an account for " + userName + "!");
                 return;
             }
@@ -341,9 +341,9 @@ namespace WhiteCore.Modules.Archivers
             if (fileName == "")
                 return;
 
-            AvatarArchive archive = LoadAvatarArchive (fileName, account.PrincipalID);
+            AvatarArchive archive = LoadAvatarArchive (fileName, userAcct.PrincipalID);
             if (archive != null)
-                avatarService.SetAppearance (account.PrincipalID, archive.Appearance);
+                avatarService.SetAppearance (userAcct.PrincipalID, archive.Appearance);
         }
 
         /// <summary>
@@ -392,8 +392,8 @@ namespace WhiteCore.Modules.Archivers
                 return;
             }
 
-            UserAccount account = userAccountService.GetUserAccount (null, userName);
-            if (account == null) {
+            UserAccount userAcct = userAccountService.GetUserAccount (null, userName);
+            if (!userAcct.Valid) {
                 MainConsole.Instance.Error ("[Avatar Archiver]: User '" + userName + "' not found!");
                 return;
             }
@@ -426,7 +426,7 @@ namespace WhiteCore.Modules.Archivers
                 else
                     UUID.TryParse (picUUID, out snapshotUUID);
             }
-            SaveAvatarArchive (fileName, account.PrincipalID, foldername, snapshotUUID, isPublic, isPortable);
+            SaveAvatarArchive (fileName, userAcct.PrincipalID, foldername, snapshotUUID, isPublic, isPortable);
         }
 
         #endregion

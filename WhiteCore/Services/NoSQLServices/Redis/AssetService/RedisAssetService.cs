@@ -632,9 +632,9 @@ namespace WhiteCore.RedisServices.AssetService
                 var accountService = m_registry.RequestModuleInterface<IUserAccountService> ();
                 if (accountService != null)
                 {
-                    var account = accountService.GetUserAccount (null, asset.CreatorID);
-                    if (account != null)
-                        creatorName = account.Name;
+                    var creatorAcct = accountService.GetUserAccount (null, asset.CreatorID);
+                    if (creatorAcct.Valid)
+                        creatorName = creatorAcct.Name;
                 }
             }
 

@@ -528,11 +528,11 @@ namespace WhiteCore.Modules.Currency
         {
             string name = MainConsole.Instance.Prompt("User Name (First Last) ");
 
-            UserAccount account = m_userAccountService.GetUserAccount(new List<UUID> {UUID.Zero}, name);
-            if (account == null)
+            UserAccount userAcct = m_userAccountService.GetUserAccount(new List<UUID> {UUID.Zero}, name);
+            if (!userAcct.Valid)
                 MainConsole.Instance.Info("Sorry, unable to locate account for " + name);
 
-            return account;
+            return userAcct;
         }
 
         uint GetAmount(string prompt)
@@ -558,8 +558,8 @@ namespace WhiteCore.Modules.Currency
 
         protected void AddMoney(IScene scene, string[] cmd)
         {
-            UserAccount account = GetUserAccount ();
-            if (account == null)
+            UserAccount userAcct = GetUserAccount ();
+            if (!userAcct.Valid)
                 return;
 
             uint amount = GetAmount("Amount of " + m_connector.InWorldCurrency + " to add?");
@@ -567,23 +567,23 @@ namespace WhiteCore.Modules.Currency
                 return;
 
             // log the transfer
-            m_connector.UserCurrencyTransfer(account.PrincipalID, UUID.Zero, amount, "Money transfer", TransactionType.SystemGenerated, UUID.Zero);
+            m_connector.UserCurrencyTransfer(userAcct.PrincipalID, UUID.Zero, amount, "Money transfer", TransactionType.SystemGenerated, UUID.Zero);
 
-            var currency = m_connector.GetUserCurrency(account.PrincipalID);
-            MainConsole.Instance.Info(account.Name + " now has " + StrUserBalance((int)currency.Amount));
+            var currency = m_connector.GetUserCurrency(userAcct.PrincipalID);
+            MainConsole.Instance.Info(userAcct.Name + " now has " + StrUserBalance((int)currency.Amount));
 
             if (m_userInfoService != null) {
-                UserInfo toUserInfo = m_userInfoService.GetUserInfo (account.PrincipalID.ToString ());
+                UserInfo toUserInfo = m_userInfoService.GetUserInfo (userAcct.PrincipalID.ToString ());
                 if (toUserInfo != null && toUserInfo.IsOnline)
-                    m_connector.SendUpdateMoneyBalanceToClient(account.PrincipalID, UUID.Zero, toUserInfo.CurrentRegionURI, (currency.Amount), "");
+                    m_connector.SendUpdateMoneyBalanceToClient(userAcct.PrincipalID, UUID.Zero, toUserInfo.CurrentRegionURI, (currency.Amount), "");
             }
 
         }
 
         protected void SetMoney(IScene scene, string[] cmd)
         {
-            UserAccount account = GetUserAccount ();
-            if (account == null)
+            UserAccount userAcct = GetUserAccount ();
+            if (!userAcct.Valid)
                 return;
 
             uint amount = GetAmount("Set user's balance to " + m_connector.InWorldCurrency + " ?");
@@ -596,31 +596,31 @@ namespace WhiteCore.Modules.Currency
                 }
             }
 
-            var currency = m_connector.GetUserCurrency(account.PrincipalID);
+            var currency = m_connector.GetUserCurrency(userAcct.PrincipalID);
             var balAdjust = amount - currency.Amount;
 
             // log the transfer
-            m_connector.UserCurrencyTransfer(account.PrincipalID, UUID.Zero, balAdjust, "Set user money", TransactionType.SystemGenerated, UUID.Zero);
+            m_connector.UserCurrencyTransfer(userAcct.PrincipalID, UUID.Zero, balAdjust, "Set user money", TransactionType.SystemGenerated, UUID.Zero);
 
-            currency = m_connector.GetUserCurrency(account.PrincipalID);
-            MainConsole.Instance.Info(account.Name + " now has " + StrUserBalance((int)currency.Amount));
+            currency = m_connector.GetUserCurrency(userAcct.PrincipalID);
+            MainConsole.Instance.Info(userAcct.Name + " now has " + StrUserBalance((int)currency.Amount));
 
             if (m_userInfoService != null) {
-                UserInfo toUserInfo = m_userInfoService.GetUserInfo (account.PrincipalID.ToString ());
+                UserInfo toUserInfo = m_userInfoService.GetUserInfo (userAcct.PrincipalID.ToString ());
                 if (toUserInfo != null && toUserInfo.IsOnline)
-                    m_connector.SendUpdateMoneyBalanceToClient(account.PrincipalID, UUID.Zero, toUserInfo.CurrentRegionURI, currency.Amount, "");
+                    m_connector.SendUpdateMoneyBalanceToClient(userAcct.PrincipalID, UUID.Zero, toUserInfo.CurrentRegionURI, currency.Amount, "");
             }
         }
 
 
         protected void GetMoney(IScene scene, string[] cmd)
         {
-            UserAccount account = GetUserAccount ();
-            if (account == null)
+            UserAccount userAcct = GetUserAccount ();
+            if (!userAcct.Valid)
                 return;
 
-            var currency = m_connector.GetUserCurrency(account.PrincipalID);
-            MainConsole.Instance.Info(account.Name + " has " + StrUserBalance((int)currency.Amount));
+            var currency = m_connector.GetUserCurrency(userAcct.PrincipalID);
+            MainConsole.Instance.Info(userAcct.Name + " has " + StrUserBalance((int)currency.Amount));
         }
 
 /*
@@ -642,8 +642,8 @@ namespace WhiteCore.Modules.Currency
 */
         protected void HandleShowTransactions(IScene scene, string [] cmd)
         {
-            UserAccount account = GetUserAccount ();
-            if (account == null)
+            UserAccount userAcct = GetUserAccount ();
+            if (!userAcct.Valid)
                 return;
 
             int period;
@@ -664,7 +664,7 @@ namespace WhiteCore.Modules.Currency
             MainConsole.Instance.CleanInfo(
                 "-------------------------------------------------------------------------------------------------------------------------");
 
-            List<AgentTransfer> transactions =  GetTransactionHistory(account.PrincipalID, period, "day");
+            List<AgentTransfer> transactions =  GetTransactionHistory(userAcct.PrincipalID, period, "day");
             if (transactions != null) {
                 foreach (AgentTransfer transfer in transactions) {
                     transInfo = string.Format ("{0, -24}", transfer.TransferDate.ToLocalTime ());
@@ -682,8 +682,8 @@ namespace WhiteCore.Modules.Currency
 
         protected void HandleShowPurchases(IScene scene, string [] cmd)
         {
-            UserAccount account = GetUserAccount ();
-            if (account == null)
+            UserAccount userAcct = GetUserAccount ();
+            if (!userAcct.Valid)
                 return;
 
             int period;
@@ -702,7 +702,7 @@ namespace WhiteCore.Modules.Currency
             MainConsole.Instance.CleanInfo (
                 "--------------------------------------------------------------------------------------------");
 
-            List<AgentPurchase> purchases = GetPurchaseHistory (account.PrincipalID, period, "day");
+            List<AgentPurchase> purchases = GetPurchaseHistory (userAcct.PrincipalID, period, "day");
             if (purchases != null) {
                 foreach (AgentPurchase purchase in purchases) {
                     transInfo = string.Format ("{0, -24}", purchase.PurchaseDate.ToLocalTime ());

@@ -365,6 +365,12 @@ namespace WhiteCore.Simulation.Base
 
                         bool setIp = false;
 
+                        IConfig conf = whitecore_ini.AddConfig ("Architecture");
+                        if (isStandalone)
+                            conf.Set ("Include-Standalone", "Sim/Standalone/StandaloneCommon.ini");
+                        else
+                            conf.Set ("Include-Grid", "Sim/GridRegion/GridCommon.ini");
+
                         foreach (IConfig config in whitecore_ini_example.Configs) {
                             IConfig newConfig = whitecore_ini.AddConfig (config.Name);
                             foreach (string key in config.GetKeys ()) {
@@ -383,11 +389,14 @@ namespace WhiteCore.Simulation.Base
                             }
                         }
 
+                        conf.Set ("Include-Includes", "Sim/Includes.ini");
+
                         whitecore_ini.Save ();
                         Console.ForegroundColor = ConsoleColor.Green;
                         Console.WriteLine ("Your WhiteCore.ini has been successfully configured");
                         Console.ResetColor ();
 
+                        /* 20190722 -greythane- this config merged into the main whitecore.ini
                         MakeSureExists (cfgFolder + "Sim/Main.ini");
                         var main_ini = new IniConfigSource (
                             cfgFolder + "Sim/Main.ini",
@@ -397,13 +406,14 @@ namespace WhiteCore.Simulation.Base
                         if (isStandalone)
                             conf.Set ("Include-Standalone", "Sim/Standalone/StandaloneCommon.ini");
                         else
-                            conf.Set ("Include-Grid", "Sim/Grid/GridCommon.ini");
+                            conf.Set ("Include-Grid", "Sim/GridRegio/GridCommon.ini");
                         conf.Set ("Include-Includes", "Sim/Includes.ini");
 
                         main_ini.Save ();
                         Console.ForegroundColor = ConsoleColor.Green;
                         Console.WriteLine ("Your Main.ini has been successfully configured");
                         Console.ResetColor ();
+                        */
 
                         if (isStandalone) {
                             MakeSureExists (cfgFolder + "Sim/Standalone/StandaloneCommon.ini");
@@ -438,13 +448,13 @@ namespace WhiteCore.Simulation.Base
                             Console.WriteLine ("Your StandaloneCommon.ini has been successfully configured");
                             Console.ResetColor ();
                         } else {
-                            MakeSureExists (cfgFolder + "Sim/Grid/GridCommon.ini");
+                            MakeSureExists (cfgFolder + "Sim/GridRegion/GridCommon.ini");
                             var grid_ini = new IniConfigSource (
-                                cfgFolder + "Sim/Grid/GridCommon.ini",
+                                cfgFolder + "Sim/GridRegion/GridCommon.ini",
                                 Nini.Ini.IniFileType.AuroraStyle);
 
                             conf = grid_ini.AddConfig ("Includes");
-                            conf.Set ("Include-Grid", "Sim/Grid/Grid.ini");
+                            conf.Set ("Include-Grid", "Sim/GridRegion/Grid.ini");
                             conf = grid_ini.AddConfig ("Configuration");
                             conf.Set ("GridServerURI", "http://" + gridIPAddress + ":8012/grid/");
                             //Lets tell the Configurator to create the missing .ini entrys from the .example file

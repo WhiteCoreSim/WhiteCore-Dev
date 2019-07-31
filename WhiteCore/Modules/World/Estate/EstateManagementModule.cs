@@ -830,19 +830,19 @@ namespace WhiteCore.Modules.Estate
                                 TaskName = prt.Name,
                                 TimeModified = sog.RootChild.Rezzed
                             };
-                            UserAccount account =
+                            UserAccount ownerAcct =
                                 m_scene.UserAccountService.GetUserAccount (m_scene.RegionInfo.AllScopeIDs, sog.OwnerID);
-                            lsri.OwnerName = account != null ? account.Name : "Unknown";
+                            lsri.OwnerName = ownerAcct.Name;
 
                             if (filter.Length != 0)
                             {
-                                //Its in the filter, don't check it
-                                if (requestFlags == 2) //Owner name
+                                // Its in the filter, don't check it
+                                if (requestFlags == 2) // Owner name
                                 {
                                     if (!lsri.OwnerName.Contains (filter))
                                         continue;
                                 }
-                                if (requestFlags == 4) //Object name
+                                if (requestFlags == 4) // Object name
                                 {
                                     if (!lsri.TaskName.Contains (filter))
                                         continue;

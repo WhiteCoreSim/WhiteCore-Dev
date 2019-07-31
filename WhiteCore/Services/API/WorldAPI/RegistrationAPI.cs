@@ -48,12 +48,12 @@ namespace WhiteCore.Services.API
         OSDMap CheckIfUserExists (OSDMap map)
         {
             IUserAccountService accountService = m_registry.RequestModuleInterface<IUserAccountService> ();
-            UserAccount user = accountService.GetUserAccount (null, map ["Name"].AsString ());
+            UserAccount userAcct = accountService.GetUserAccount (null, map ["Name"].AsString ());
 
-            bool Verified = user != null;
+            bool Verified = userAcct.Valid;
             OSDMap resp = new OSDMap ();
             resp ["Verified"] = OSD.FromBoolean (Verified);
-            resp ["UUID"] = OSD.FromUUID (Verified ? user.PrincipalID : UUID.Zero);
+            resp ["UUID"] = OSD.FromUUID (Verified ? userAcct.PrincipalID : UUID.Zero);
             return resp;
         }
 
@@ -99,32 +99,35 @@ namespace WhiteCore.Services.API
             if (accountService == null)
                 return null;
 
-            if (!Password.StartsWith ("$1$", System.StringComparison.Ordinal))
+            if (!Password.StartsWith ("$1$", StringComparison.Ordinal))
                 Password = "$1$" + Util.Md5Hash (Password);
-            Password = Password.Remove (0, 3); //remove $1$
+            Password = Password.Remove (0, 3); // remove $1$
 
             accountService.CreateUser (Name, Password, Email);
-            UserAccount user = accountService.GetUserAccount (null, Name);
+            UserAccount userAcct = accountService.GetUserAccount (null, Name);
             IAgentInfoService agentInfoService = m_registry.RequestModuleInterface<IAgentInfoService> ();
             IGridService gridService = m_registry.RequestModuleInterface<IGridService> ();
             if (agentInfoService != null && gridService != null) {
                 GridRegion r = gridService.GetRegionByName (null, HomeRegion);
                 if (r != null) {
-                    agentInfoService.SetHomePosition (user.PrincipalID.ToString (), r.RegionID, new Vector3 (r.RegionSizeX / 2, r.RegionSizeY / 2, 20), Vector3.Zero);
+                    agentInfoService.SetHomePosition (userAcct.PrincipalID.ToString (),
+                                                      r.RegionID,
+                                                      new Vector3 (r.RegionSizeX / 2, r.RegionSizeY / 2, 20),
+                                                      Vector3.Zero);
                 } else {
                     MainConsole.Instance.DebugFormat ("[API]: Could not set home position for user {0}, region \"{1}\" did not produce a result from the grid service", Name, HomeRegion);
                 }
             }
 
-            Verified = user != null;
+            Verified = userAcct.Valid;
             UUID userID = UUID.Zero;
 
             OSDMap resp = new OSDMap ();
             resp ["Verified"] = OSD.FromBoolean (Verified);
 
             if (Verified) {
-                userID = user.PrincipalID;
-                user.UserLevel = userLevel;
+                userID = userAcct.PrincipalID;
+                userAcct.UserLevel = userLevel;
 
                 // could not find a way to save this data here.
                 DateTime RLDOB = map ["RLDOB"].AsDate ();
@@ -161,13 +164,13 @@ namespace WhiteCore.Services.API
                 }
                 con.UpdateAgent (agent);
 
-                accountService.StoreUserAccount (user);
+                accountService.StoreUserAccount (userAcct);
 
                 IProfileConnector profileData = DataPlugins.RequestPlugin<IProfileConnector> ();
-                IUserProfileInfo profile = profileData.GetUserProfile (user.PrincipalID);
+                IUserProfileInfo profile = profileData.GetUserProfile (userAcct.PrincipalID);
                 if (profile == null) {
-                    profileData.CreateNewProfile (user.PrincipalID);
-                    profile = profileData.GetUserProfile (user.PrincipalID);
+                    profileData.CreateNewProfile (userAcct.PrincipalID);
+                    profile = profileData.GetUserProfile (userAcct.PrincipalID);
                 }
                 if (AvatarArchive.Length > 0) {
                     profile.AArchiveName = AvatarArchive;
@@ -190,17 +193,17 @@ namespace WhiteCore.Services.API
         OSDMap Authenticated (OSDMap map)
         {
             IUserAccountService accountService = m_registry.RequestModuleInterface<IUserAccountService> ();
-            UserAccount user = accountService.GetUserAccount (null, map ["UUID"].AsUUID ());
+            UserAccount userAcct = accountService.GetUserAccount (null, map ["UUID"].AsUUID ());
 
-            bool Verified = user != null;
+            bool Verified = userAcct.Valid;
             OSDMap resp = new OSDMap ();
             resp ["Verified"] = OSD.FromBoolean (Verified);
 
             if (Verified) {
-                user.UserLevel = 0;
-                accountService.StoreUserAccount (user);
+                userAcct.UserLevel = 0;
+                accountService.StoreUserAccount (userAcct);
                 IAgentConnector con = DataPlugins.RequestPlugin<IAgentConnector> ();
-                IAgentInfo agent = con.GetAgent (user.PrincipalID);
+                IAgentInfo agent = con.GetAgent (userAcct.PrincipalID);
                 if (agent != null && agent.OtherAgentInformation.ContainsKey ("WebUIActivationToken")) {
                     agent.OtherAgentInformation.Remove ("WebUIActivationToken");
                     con.UpdateAgent (agent);
@@ -217,24 +220,24 @@ namespace WhiteCore.Services.API
 
             if (map.ContainsKey ("UserName") && map.ContainsKey ("PasswordHash") && map.ContainsKey ("ActivationToken")) {
                 IUserAccountService accountService = m_registry.RequestModuleInterface<IUserAccountService> ();
-                UserAccount user = accountService.GetUserAccount (null, map ["UserName"].ToString ());
-                if (user != null) {
+                UserAccount userAcct = accountService.GetUserAccount (null, map ["UserName"].ToString ());
+                if (userAcct.Valid) {
                     IAgentConnector con = DataPlugins.RequestPlugin<IAgentConnector> ();
-                    IAgentInfo agent = con.GetAgent (user.PrincipalID);
+                    IAgentInfo agent = con.GetAgent (userAcct.PrincipalID);
                     if (agent != null && agent.OtherAgentInformation.ContainsKey ("WebUIActivationToken")) {
                         UUID activationToken = map ["ActivationToken"];
                         string WebUIActivationToken = agent.OtherAgentInformation ["WebUIActivationToken"];
                         string PasswordHash = map ["PasswordHash"];
-                        if (!PasswordHash.StartsWith ("$1$")) {
+                        if (!PasswordHash.StartsWith ("$1$", StringComparison.Ordinal)) {
                             PasswordHash = "$1$" + Util.Md5Hash (PasswordHash);
                         }
                         PasswordHash = PasswordHash.Remove (0, 3); //remove $1$
 
-                        bool verified = Utils.MD5String (activationToken.ToString () + ":" + PasswordHash) == WebUIActivationToken;
-                        resp ["Verified"] = verified;
-                        if (verified) {
-                            user.UserLevel = 0;
-                            accountService.StoreUserAccount (user);
+                        bool usr_verified = Utils.MD5String (activationToken.ToString () + ":" + PasswordHash) == WebUIActivationToken;
+                        resp ["Verified"] = usr_verified;
+                        if (usr_verified) {
+                            userAcct.UserLevel = 0;
+                            accountService.StoreUserAccount (userAcct);
                             agent.OtherAgentInformation.Remove ("WebUIActivationToken");
                             con.UpdateAgent (agent);
                         }

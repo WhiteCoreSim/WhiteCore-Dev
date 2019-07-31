@@ -178,27 +178,27 @@ namespace WhiteCore.Services
 
             if (ids != null) {
                 foreach (string id in ids) {
-                    UserAccount account = m_userService.GetUserAccount (m_service.ClientCaps.AccountInfo.AllScopeIDs,
+                    UserAccount userAcct = m_userService.GetUserAccount (m_service.ClientCaps.AccountInfo.AllScopeIDs,
                                                                        UUID.Parse (id));
-                    if (account != null) {
+                    if (userAcct.Valid) {
                         IUserProfileInfo info =
                             Framework.Utilities.DataManager.RequestPlugin<IProfileConnector> ()
-                                  .GetUserProfile (account.PrincipalID);
+                                  .GetUserProfile (userAcct.PrincipalID);
                         if (info != null)
-                            PackUserInfo (info, account, ref agents);
+                            PackUserInfo (info, userAcct, ref agents);
                         else
-                            PackUserInfo (new IUserProfileInfo (), account, ref agents);
+                            PackUserInfo (new IUserProfileInfo (), userAcct, ref agents);
                         //else //Technically is right, but needs to be packed no matter what for OS based grids
                         //    bad_ids.Add (id);
                     }
                 }
             } else if (username != null) {
-                UserAccount account = m_userService.GetUserAccount (m_service.ClientCaps.AccountInfo.AllScopeIDs,
+                UserAccount userAcct = m_userService.GetUserAccount (m_service.ClientCaps.AccountInfo.AllScopeIDs,
                                                                    username.Replace ('.', ' '));
-                if (account != null) {
-                    var info = Framework.Utilities.DataManager.RequestPlugin<IProfileConnector> ().GetUserProfile (account.PrincipalID);
+                if (userAcct.Valid) {
+                    var info = Framework.Utilities.DataManager.RequestPlugin<IProfileConnector> ().GetUserProfile (userAcct.PrincipalID);
                     if (info != null)
-                        PackUserInfo (info, account, ref agents);
+                        PackUserInfo (info, userAcct, ref agents);
                     else
                         bad_usernames.Add (username);
                 }

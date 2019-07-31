@@ -50,7 +50,6 @@ namespace WhiteCore.Services.API
 
             var loginService = m_registry.RequestModuleInterface<ILoginService> ();
             var accountService = m_registry.RequestModuleInterface<IUserAccountService> ();
-            UserAccount account = null;
             var resp = new OSDMap ();
 
             resp ["Verified"] = OSD.FromBoolean (false);
@@ -59,22 +58,22 @@ namespace WhiteCore.Services.API
                 return resp;
             }
 
-            account = accountService.GetUserAccount (null, Name);
-            if (account == null)
+            UserAccount userAcct = accountService.GetUserAccount (null, Name);
+            if (!userAcct.Valid)
                 return resp;            // something nasty here
         
 
-            if (loginService.VerifyClient (account.PrincipalID, Name, "UserAccount", Password)) {
+            if (loginService.VerifyClient (userAcct.PrincipalID, Name, "UserAccount", Password)) {
                 if (asAdmin) {
-                    IAgentInfo agent = DataPlugins.RequestPlugin<IAgentConnector> ().GetAgent (account.PrincipalID);
+                    IAgentInfo agent = DataPlugins.RequestPlugin<IAgentConnector> ().GetAgent (userAcct.PrincipalID);
                     if (agent.OtherAgentInformation ["WebUIEnabled"].AsBoolean () == false) {
                         return resp;
                     }
                 }
-                resp ["UUID"] = OSD.FromUUID (account.PrincipalID);
-                resp ["FirstName"] = OSD.FromString (account.FirstName);
-                resp ["LastName"] = OSD.FromString (account.LastName);
-                resp ["Email"] = OSD.FromString (account.Email);
+                resp ["UUID"] = OSD.FromUUID (userAcct.PrincipalID);
+                resp ["FirstName"] = OSD.FromString (userAcct.FirstName);
+                resp ["LastName"] = OSD.FromString (userAcct.LastName);
+                resp ["Email"] = OSD.FromString (userAcct.Email);
                 Verified = true;
             }
 
@@ -93,19 +92,18 @@ namespace WhiteCore.Services.API
 
             var loginService = m_registry.RequestModuleInterface<ILoginService> ();
             var accountService = m_registry.RequestModuleInterface<IUserAccountService> ();
-            UserAccount account = null;
 
             if (accountService == null || CheckIfUserExists (map) ["Verified"] != true) {
                 resp ["Error"] = OSD.FromString ("AccountNotFound");
                 return resp;
             }
 
-            account = accountService.GetUserAccount (null, Name);
-            if (account == null)
+            UserAccount userAcct = accountService.GetUserAccount (null, Name);
+            if (!userAcct.Valid)
                 return resp;            // something nasty here
                
-            if (loginService.VerifyClient (account.PrincipalID, Name, "UserAccount", Password)) {
-                UUID agentID = account.PrincipalID;
+            if (loginService.VerifyClient (userAcct.PrincipalID, Name, "UserAccount", Password)) {
+                UUID agentID = userAcct.PrincipalID;
 
                 var agentInfo = DataPlugins.RequestPlugin<IAgentConnector> ().GetAgent (agentID);
 
@@ -133,11 +131,11 @@ namespace WhiteCore.Services.API
 
                 resp ["GoodLogin"] = OSD.FromBoolean (true);
 
-                resp ["UserLevel"] = OSD.FromInteger (account.UserLevel);
+                resp ["UserLevel"] = OSD.FromInteger (userAcct.UserLevel);
                 resp ["UUID"] = OSD.FromUUID (agentID);
-                resp ["FirstName"] = OSD.FromString (account.FirstName);
-                resp ["LastName"] = OSD.FromString (account.LastName);
-                resp ["Email"] = OSD.FromString (account.Email);
+                resp ["FirstName"] = OSD.FromString (userAcct.FirstName);
+                resp ["LastName"] = OSD.FromString (userAcct.LastName);
+                resp ["Email"] = OSD.FromString (userAcct.Email);
 
                 return resp;
             }

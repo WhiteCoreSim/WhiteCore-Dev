@@ -199,9 +199,9 @@ namespace WhiteCore.Modules.Web
                     if (error == "")
                     {
                         // set the user account type
-                        UserAccount account = accountService.GetUserAccount (null, userID);
-                        account.UserFlags = UserFlags;
-                        accountService.StoreUserAccount (account);
+                        UserAccount userAcct = accountService.GetUserAccount (null, userID);
+                        userAcct.UserFlags = UserFlags;
+                        accountService.StoreUserAccount (userAcct);
 
                         // create and save agent info
                         IAgentConnector con = Framework.Utilities.DataManager.RequestPlugin<IAgentConnector> ();

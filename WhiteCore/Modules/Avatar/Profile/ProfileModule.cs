@@ -421,11 +421,8 @@ namespace WhiteCore.Modules.Profiles
                     UserAccount parcelOwner =
                         remoteClient.Scene.UserAccountService.GetUserAccount (remoteClient.AllScopeIDs,
                             targetlandObj.LandData.OwnerID);
-                    if (parcelOwner != null)
-                        user = parcelOwner.Name;
-
+                    user = parcelOwner.Name;
                     parceluuid = targetlandObj.LandData.GlobalID;
-
                     OrigionalName = targetlandObj.LandData.Name;
                 }
             }
@@ -529,9 +526,9 @@ namespace WhiteCore.Modules.Profiles
         public void RequestAvatarProperty (IClientAPI remoteClient, UUID target)
         {
             IUserProfileInfo UPI = ProfileFrontend.GetUserProfile (target);
-            UserAccount TargetAccount =
+            UserAccount targetAccount =
                 remoteClient.Scene.UserAccountService.GetUserAccount (remoteClient.AllScopeIDs, target);
-            if (UPI == null || TargetAccount == null) {
+            if (UPI == null || !targetAccount.Valid) {
                 remoteClient.SendAvatarProperties (target, "",
                     Util.ToDateTime (0).ToString ("M/d/yyyy", CultureInfo.InvariantCulture),
                     new byte [1], "", 0,
@@ -548,15 +545,15 @@ namespace WhiteCore.Modules.Profiles
                 agentOnline = 16;
 
             if (IsFriendOfUser (remoteClient.AgentId, target))
-                SendProfile (remoteClient, UPI, TargetAccount, agentOnline);
+                SendProfile (remoteClient, UPI, targetAccount, agentOnline);
             else {
                 //Not a friend, so send the first page only and if they are online
 
                 byte [] charterMember;
                 if (UPI.MembershipGroup == "") {
                     charterMember = new byte [1];
-                    if (TargetAccount != null)
-                        charterMember [0] = (byte)((TargetAccount.UserFlags & Constants.USER_FLAG_CHARTERMEMBER) >> 8);     // CharterMember == 0xf00
+                    if (targetAccount.Valid)
+                        charterMember [0] = (byte)((targetAccount.UserFlags & Constants.USER_FLAG_CHARTERMEMBER) >> 8);     // CharterMember == 0xf00
                 } else {
                     charterMember = Utils.StringToBytes (UPI.MembershipGroup);
                 }
@@ -564,7 +561,7 @@ namespace WhiteCore.Modules.Profiles
                     UPI.PrincipalID, UPI.AboutText,
                     Util.ToDateTime (UPI.Created).ToString ("M/d/yyyy", CultureInfo.InvariantCulture),
                     charterMember, UPI.FirstLifeAboutText,
-                    (uint)TargetAccount.UserFlags & agentOnline,
+                    (uint)targetAccount.UserFlags & agentOnline,
                     UPI.FirstLifeImage,
                     UPI.Image,
                     UPI.WebURL,
@@ -614,7 +611,7 @@ namespace WhiteCore.Modules.Profiles
             byte [] charterMember;
             if (Profile.MembershipGroup == "") {
                 charterMember = new byte [1];
-                if (account != null)
+                if (account.Valid)
                     charterMember [0] = (byte)((account.UserFlags & Constants.USER_FLAG_CHARTERMEMBER) >> 8);   // CharterMember == 0xf00
             } else
                 charterMember = Utils.StringToBytes (Profile.MembershipGroup);
@@ -635,7 +632,7 @@ namespace WhiteCore.Modules.Profiles
                 membershipGroupINT = 4;
 
             uint flags = Convert.ToUInt32 (Profile.AllowPublish) + Convert.ToUInt32 (Profile.MaturePublish) +
-                         membershipGroupINT + agentOnline + (uint)(account != null ? account.UserFlags : 0);
+                                membershipGroupINT + agentOnline + (uint)(account.Valid ? account.UserFlags : 0);
 
             remoteClient.SendAvatarInterestsReply (
                 Profile.PrincipalID,
@@ -669,10 +666,10 @@ namespace WhiteCore.Modules.Profiles
             IUserProfileInfo UPI = ProfileFrontend.GetUserProfile (remoteClient.AgentId);
             if (UPI == null)
                 return;
-            UserAccount account = remoteClient.Scene.UserAccountService.GetUserAccount (remoteClient.AllScopeIDs,
+            UserAccount userAcct = remoteClient.Scene.UserAccountService.GetUserAccount (remoteClient.AllScopeIDs,
                                       remoteClient.AgentId);
-            if (account != null)
-                remoteClient.SendUserInfoReply (UPI.IMViaEmail, UPI.Visible, account.Email);
+            if (userAcct.Valid)
+                remoteClient.SendUserInfoReply (UPI.IMViaEmail, UPI.Visible, userAcct.Email);
         }
 
         public void UpdateUserPreferences (bool imViaEmail, bool visible, IClientAPI remoteClient)

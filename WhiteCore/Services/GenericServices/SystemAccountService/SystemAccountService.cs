@@ -219,10 +219,10 @@ namespace WhiteCore.Services.GenericServices.SystemAccountService
         void VerifySystemUserInfo (string usrType, UUID usrUUID, string usrName, int usrLevel)
         {
 
-            var userAccount = m_accountService.GetUserAccount (null, usrUUID);
+            var userAcct = m_accountService.GetUserAccount (null, usrUUID);
             var userPassword = Utilities.RandomPassword.Generate (2, 3, 0);
 
-            if (userAccount == null) {
+            if (!userAcct.Valid) {
                 MainConsole.Instance.WarnFormat ("Creating the {0} user '{1}'", usrType, usrName);
 
                 var error = m_accountService.CreateUser (
@@ -242,10 +242,10 @@ namespace WhiteCore.Services.GenericServices.SystemAccountService
                 }
 
                 //set  "God" level
-                var account = m_accountService.GetUserAccount (null, usrUUID);
-                account.UserLevel = usrLevel;
-                account.UserFlags = Constants.USER_FLAG_CHARTERMEMBER;
-                bool success = m_accountService.StoreUserAccount (account);
+                var godAcct = m_accountService.GetUserAccount (null, usrUUID);
+                godAcct.UserLevel = usrLevel;
+                godAcct.UserFlags = Constants.USER_FLAG_CHARTERMEMBER;
+                bool success = m_accountService.StoreUserAccount (godAcct);
 
                 if (success)
                     MainConsole.Instance.InfoFormat (" The {0} user has been elevated to '{1}' level", usrType, m_accountService.UserGodLevel (usrLevel));
@@ -255,12 +255,12 @@ namespace WhiteCore.Services.GenericServices.SystemAccountService
             }
 
             // we already have the account.. verify details in case of a configuration change
-            if (userAccount.Name != usrName) {
+            if (userAcct.Name != usrName) {
                 IAuthenticationService authService = m_registry.RequestModuleInterface<IAuthenticationService> ();
 
-                userAccount.Name = usrName;
-                bool updatePass = authService.SetPassword (userAccount.PrincipalID, "UserAccount", userPassword);
-                bool updateAcct = m_accountService.StoreUserAccount (userAccount);
+                userAcct.Name = usrName;
+                bool updatePass = authService.SetPassword (userAcct.PrincipalID, "UserAccount", userPassword);
+                bool updateAcct = m_accountService.StoreUserAccount (userAcct);
 
                 if (updatePass && updateAcct) {
                     SaveSystemUserPassword (usrType, usrName, userPassword);
@@ -395,19 +395,19 @@ namespace WhiteCore.Services.GenericServices.SystemAccountService
             //MainConsole.Instance.InfoFormat("[User account service]: User '{0}' created", name);
 
             // check for success
-            UserAccount account = m_accountService.GetUserAccount (null, userName);
-            if (account != null) {
-                account.UserFlags = Constants.USER_FLAG_CHARTERMEMBER;
-                account.UserLevel = 250;
-                m_accountService.StoreUserAccount (account);
+            UserAccount userAcct = m_accountService.GetUserAccount (null, userName);
+            if (userAcct.Valid) {
+                userAcct.UserFlags = Constants.USER_FLAG_CHARTERMEMBER;
+                userAcct.UserLevel = 250;
+                m_accountService.StoreUserAccount (userAcct);
 
                 // update profile for the user as well
                 var profileConnector = Framework.Utilities.DataManager.RequestPlugin<IProfileConnector> ();
                 if (profileConnector != null) {
-                    var profile = profileConnector.GetUserProfile (account.PrincipalID);
+                    var profile = profileConnector.GetUserProfile (userAcct.PrincipalID);
                     if (profile == null) {
-                        profileConnector.CreateNewProfile (account.PrincipalID);          // create a profile for the user
-                        profile = profileConnector.GetUserProfile (account.PrincipalID);
+                        profileConnector.CreateNewProfile (userAcct.PrincipalID);          // create a profile for the user
+                        profile = profileConnector.GetUserProfile (userAcct.PrincipalID);
                     }
 
                     if (userAvatarArchive != "")
@@ -452,19 +452,19 @@ namespace WhiteCore.Services.GenericServices.SystemAccountService
             if (question.StartsWith ("y", StringComparison.Ordinal)) {
                 var newPassword = Utilities.RandomPassword.Generate (2, 3, 0);
 
-                UserAccount account = m_accountService.GetUserAccount (null, systemUserName);
+                UserAccount userAcct = m_accountService.GetUserAccount (null, systemUserName);
                 bool success = false;
 
-                if (account != null) {
+                if (userAcct.Valid) {
                     IAuthenticationService authService = m_registry.RequestModuleInterface<IAuthenticationService> ();
                     if (authService != null)
-                        success = authService.SetPassword (account.PrincipalID, "UserAccount", newPassword);
+                        success = authService.SetPassword (userAcct.PrincipalID, "UserAccount", newPassword);
 
                     if (!success)
                         MainConsole.Instance.ErrorFormat ("[System account service]: Unable to reset password for the " + userType);
                     else {
                         SaveSystemUserPassword (userType, systemUserName, newPassword);
-                        MainConsole.Instance.Info ("[System account service]: The new password for '" + account.Name + "' is : " + newPassword);
+                        MainConsole.Instance.Info ("[System account service]: The new password for '" + userAcct.Name + "' is : " + newPassword);
                     }
                 }
             }

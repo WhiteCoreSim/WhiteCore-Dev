@@ -172,56 +172,84 @@ namespace WhiteCore.Services
                 message = CombineParams (cmd, 3);
             else
                 message = MainConsole.Instance.Prompt ("Message to send?", "");
-            if (message == "")
+            
+            if (string.IsNullOrWhiteSpace(message))
                 return;
 
             SendAlert (message);
+            MainConsole.Instance.Info ("The alert has been sent.");
         }
 
         protected void SendGridMessage (IScene scene, string [] cmd)
         {
-            string user;
+            string username;
             string message;
 
-            if (cmd.Length >= 4)
-                user = CombineParams (cmd, 3, 5);
-            else
-                user = MainConsole.Instance.Prompt ("User name? (First Last)", "");
-            if (user == "")
+            if (cmd.Length >= 4) {
+                username = CombineParams (cmd, 3, 5);
+                if (username.EndsWith (" ", System.StringComparison.Ordinal))
+                    username = username.Remove (username.Length - 1);
+            } else
+                username = MainConsole.Instance.Prompt ("User name? (First Last)", "");
+
+            if (string.IsNullOrWhiteSpace (username)) {
+                MainConsole.Instance.Info ("Invalid user specified.");
                 return;
+            }
 
             if (cmd.Length > 5)
                 message = CombineParams (cmd, 5);
             else
                 message = MainConsole.Instance.Prompt ("Message to send?", "");
-            if (message == "")
-                return;
-
-
-            IUserAccountService userService = m_registry.RequestModuleInterface<IUserAccountService> ();
-            UserAccount account = userService.GetUserAccount (null, user.Split (' ') [0], user.Split (' ') [1]);
-            if (account == null) {
-                MainConsole.Instance.Info ("User does not exist.");
+            if (string.IsNullOrWhiteSpace (message)) {
+                MainConsole.Instance.Info ("Invalid message specified.");
                 return;
             }
-            MessageUser (account.PrincipalID, message);
+
+            IUserAccountService userService = m_registry.RequestModuleInterface<IUserAccountService> ();
+            UserAccount userAcct = userService.GetUserAccount (null, username);
+            if (userAcct.Valid) {
+                MessageUser (userAcct.PrincipalID, message);
+                 MainConsole.Instance.Info ("Message sent to " + username);
+            } else 
+                MainConsole.Instance.Info (username + " does not exist.");
         }
 
         protected void KickUserMessage (IScene scene, string [] cmd)
         {
             //Combine the parameters and figure out the message
-            string user = CombineParams (cmd, 3, 5);
-            if (user.EndsWith (" ", System.StringComparison.Ordinal))
-                user = user.Remove (user.Length - 1);
-            string message = CombineParams (cmd, 5);
-            IUserAccountService userService = m_registry.RequestModuleInterface<IUserAccountService> ();
-            UserAccount account = userService.GetUserAccount (null, user);
-            if (account == null) {
-                MainConsole.Instance.Info ("User does not exist.");
+            string username;
+            string message;
+
+            if (cmd.Length >= 4) {
+                username = CombineParams (cmd, 3, 5);
+                if (username.EndsWith (" ", System.StringComparison.Ordinal))
+                    username = username.Remove (username.Length - 1);
+            } else 
+                 username = MainConsole.Instance.Prompt ("User name? (First Last)", "");
+
+            if (string.IsNullOrWhiteSpace (username)) {
+                MainConsole.Instance.Info ("Invalid user specified.");
                 return;
             }
 
-            KickUser (account.PrincipalID, message);
+            IUserAccountService userService = m_registry.RequestModuleInterface<IUserAccountService> ();
+            UserAccount userAcct = userService.GetUserAccount (null, username);
+            if (!userAcct.Valid) {
+                MainConsole.Instance.Info (username + " does not exist.");
+                return;
+            }
+
+            if (cmd.Length > 5) 
+                message = CombineParams (cmd, 5);
+            else {
+                message = MainConsole.Instance.Prompt ("Message to send?", "");
+                if (string.IsNullOrWhiteSpace (message))
+                    message = "You have been ejected.";
+            }
+                
+            KickUser (userAcct.PrincipalID, message);
+            MainConsole.Instance.Info (username + " has been 'kicked'.");
         }
 
         string CombineParams (string [] commandParams, int pos)

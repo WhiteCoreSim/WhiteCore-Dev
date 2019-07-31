@@ -65,17 +65,17 @@ namespace WhiteCore.Modules.Web
                 string username = requestParameters ["username"].ToString ();
                 string UserEmail = requestParameters ["UserEmail"].ToString ();
 
-                UserAccount account =
+                UserAccount userAcct =
                     webInterface.Registry.RequestModuleInterface<IUserAccountService> ()
                         .GetUserAccount (null, username);
 
-                if (account == null) {
+                if (!userAcct.Valid) {
                     response = "<h3>Please enter a valid username</h3>";
                     return null;
                 }
 
                 // email user etc here...
-                if (account.Email == "") {
+                if (userAcct.Email == "") {
                     response = "<h3>Sorry! Your account has no email details. Please contact the administrator to correct</h3>" +
                         "<script language=\"javascript\">" +
                         "setTimeout(function() {window.location.href = \"index.html\";}, 5000);" +
@@ -84,7 +84,7 @@ namespace WhiteCore.Modules.Web
                     return null;
                 }
 
-                var emailAddress = account.Email;
+                var emailAddress = userAcct.Email;
                 if (UserEmail != emailAddress) {
                     response = "<h3>Sorry! Unable to authenticate your account. Please contact the administrator to correct</h3>" +
                         "<script language=\"javascript\">" +
@@ -102,7 +102,7 @@ namespace WhiteCore.Modules.Web
                     bool success = false; 
 
                     if (authService != null)
-                        success = authService.SetPassword (account.PrincipalID, "UserAccount", newPassword);
+                        success = authService.SetPassword (userAcct.PrincipalID, "UserAccount", newPassword);
 
                     if (success) {
                         Email.SendEmail (

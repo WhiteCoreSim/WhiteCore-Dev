@@ -141,8 +141,7 @@ namespace WhiteCore.Services
                 OSDMap map = new OSDMap ();
                 map ["agent_id"] = account.PrincipalID;
                 IUserProfileInfo profileInfo =
-                    Framework.Utilities.DataManager.RequestPlugin<IProfileConnector> ()
-                          .GetUserProfile (account.PrincipalID);
+                    Framework.Utilities.DataManager.RequestPlugin<IProfileConnector> ().GetUserProfile (account.PrincipalID);
                 map ["display_name"] = (profileInfo == null || profileInfo.DisplayName == "")
                                           ? account.Name
                                           : profileInfo.DisplayName;

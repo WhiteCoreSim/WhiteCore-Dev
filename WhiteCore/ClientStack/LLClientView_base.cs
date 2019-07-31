@@ -480,9 +480,8 @@ namespace WhiteCore.ClientStack
             m_secureSessionId = sessionInfo.SecureSessionID;
             m_circuitCode = circuitCode;
             m_userEndPoint = remoteEP;
-            UserAccount account = m_scene.UserAccountService.GetUserAccount (m_scene.RegionInfo.AllScopeIDs, m_agentId);
-            if (account != null)
-                m_Name = account.Name;
+            UserAccount userAcct = m_scene.UserAccountService.GetUserAccount (m_scene.RegionInfo.AllScopeIDs, m_agentId);
+            m_Name = userAcct.Name;
 
             StartPos = sessionInfo.StartingPosition;
 

@@ -372,12 +372,23 @@ namespace WhiteCore.Simulation.Base
         /// </summary>
         public virtual void SetUpHTTPServer()
         {
-             m_Port = m_config.Configs ["Network"].GetUInt ("http_listener_port", 8002);
-             var standalone = m_config.Configs ["GridInfoService"].GetUInt("GridInfoInHandlerPort", 0) == 0;
+            m_Port = m_config.Configs ["Network"].GetUInt ("http_listener_port", 8002);
+            var giport  = m_config.Configs ["GridInfoService"].GetUInt ("GridInfoInHandlerPort", 0);
+            var remotecalls = m_config.Configs ["WhiteCoreConnectors"].GetBoolean ("DoRemoteCalls", false);
+
+            var standalone = (giport == 0);
+
             if (standalone) {
+                if (remotecalls)
+                    MainConsole.Instance.Info ("[Configuration]: Running in grid region mode");
+                else    
+                    MainConsole.Instance.Info ("[Configuration]: Running in standalone mode");
+                
                 var noweb = m_config.Configs ["WebInterface"].GetString ("Module", "None") == "None";
                 if (noweb)
                     m_Port = m_config.Configs ["Network"].GetUInt ("region_base_port", 9000);
+            } else {
+                MainConsole.Instance.Info ("[Configuration]: Running in grid connected mode");
             }
 
             m_BaseHTTPServer = GetHttpServer(m_Port);
@@ -643,7 +654,7 @@ namespace WhiteCore.Simulation.Base
                 }
                 catch
                 {
-                    //It doesn't matter, just shut down
+                    ;//It doesn't matter, just shut down
                 }
                 try
                 {
@@ -652,7 +663,7 @@ namespace WhiteCore.Simulation.Base
                 }
                 catch
                 {
-                    //Just shut down already
+                    ; //Just shut down already
                 }
                 try
                 {
@@ -661,7 +672,7 @@ namespace WhiteCore.Simulation.Base
                 }
                 catch
                 {
-                    //Just shut down already
+                    ; //Just shut down already
                 }
                 try
                 {
@@ -673,7 +684,7 @@ namespace WhiteCore.Simulation.Base
                 }
                 catch
                 {
-                    //Again, just shut down
+                    ; //Again, just shut down
                 }
 
                 if (close)
@@ -689,6 +700,7 @@ namespace WhiteCore.Simulation.Base
             }
             catch
             {
+                ; // just ignore this
             }
         }
 
@@ -730,6 +742,7 @@ namespace WhiteCore.Simulation.Base
                 }
                 catch (Exception)
                 {
+                    ; // ignore
                 }
             }
         }

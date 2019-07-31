@@ -179,7 +179,7 @@ namespace WhiteCore.Modules.Estate
         int GetUserEstateID (IScene scene, IEstateConnector estateConnector)
         {
             while (true) {
-                UserAccount account;
+                UserAccount ownerAcct;
                 string estateOwner;
 
                 estateOwner = MainConsole.Instance.Prompt ("Estate owner name");
@@ -188,17 +188,17 @@ namespace WhiteCore.Modules.Estate
 
                 // we have a prospective estate owner...
                 List<EstateSettings> ownerEstates = null;
-                account = scene.UserAccountService.GetUserAccount (scene.RegionInfo.AllScopeIDs, estateOwner);
-                if (account != null) {
+                ownerAcct = scene.UserAccountService.GetUserAccount (scene.RegionInfo.AllScopeIDs, estateOwner);
+                if (ownerAcct.Valid) {
                     // we have a user account...
-                    ownerEstates = estateConnector.GetEstates (account.PrincipalID);
+                    ownerEstates = estateConnector.GetEstates (ownerAcct.PrincipalID);
                 }
 
                 if (ownerEstates == null || ownerEstates.Count == 0) {
-                    if (account == null)
+                    if (!ownerAcct.Valid)
                         MainConsole.Instance.Warn ("[Estate]: Unable to locate the user " + estateOwner);
                     else
-                        MainConsole.Instance.WarnFormat ("[Estate]: The user, {0}, has no estates currently.", account.Name);
+                        MainConsole.Instance.WarnFormat ("[Estate]: The user, {0}, has no estates currently.", ownerAcct.Name);
 
                     continue;   // try again
                 }
@@ -206,7 +206,7 @@ namespace WhiteCore.Modules.Estate
                 string LastEstateName;
                 if (ownerEstates.Count > 1) {
                     MainConsole.Instance.InfoFormat ("[Estate]: User {0} has {1} estates currently. {2}",
-                        account.Name, ownerEstates.Count, "These estates are the following:");
+                        ownerAcct.Name, ownerEstates.Count, "These estates are the following:");
                     foreach (EstateSettings t in ownerEstates)
                         MainConsole.Instance.CleanInfo ("         " + t.EstateName);
 
@@ -232,7 +232,7 @@ namespace WhiteCore.Modules.Estate
 
 
                 // we should have a user account and estate name by now
-                int estateID = estateConnector.GetEstate (account.PrincipalID, LastEstateName);
+                int estateID = estateConnector.GetEstate (ownerAcct.PrincipalID, LastEstateName);
                 if (estateID == 0) {
                     MainConsole.Instance.Warn ("[Estate]: The name you have entered matches no known estate. Please try again");
                     continue;
@@ -265,7 +265,7 @@ namespace WhiteCore.Modules.Estate
             string sysEstateOwnerName;
             var sysAccount = scene.UserAccountService.GetUserAccount (scene.RegionInfo.AllScopeIDs, sysAccounts.SystemEstateOwnerUUID);
 
-            if (sysAccount == null)
+            if (!sysAccount.Valid)
                 sysEstateOwnerName = sysAccounts.SystemEstateOwnerName;
             else
                 sysEstateOwnerName = sysAccount.Name;
@@ -276,26 +276,25 @@ namespace WhiteCore.Modules.Estate
             string LastEstateName;
 
             while (true) {
-                UserAccount account;
+                UserAccount ownerAcct;
                 string estateOwner;
 
                 estateOwner = MainConsole.Instance.Prompt ("Estate owner name (" + sysEstateOwnerName + "/User Name)", LastEstateOwner);
 
                 // we have a prospective estate owner...
                 List<EstateSettings> ownerEstates = null;
-                account = scene.UserAccountService.GetUserAccount (scene.RegionInfo.AllScopeIDs, estateOwner);
-                if (account != null) {
+                ownerAcct = scene.UserAccountService.GetUserAccount (scene.RegionInfo.AllScopeIDs, estateOwner);
+                if (ownerAcct.Valid) {
                     // we have a user account...
-                    LastEstateOwner = account.Name;
-
-                    ownerEstates = estateConnector.GetEstates (account.PrincipalID);
+                    LastEstateOwner = ownerAcct.Name;
+                    ownerEstates = estateConnector.GetEstates (ownerAcct.PrincipalID);
                 }
 
-                if (account == null || ownerEstates == null || ownerEstates.Count == 0) {
-                    if (account == null)
+                if (!ownerAcct.Valid || ownerEstates == null || ownerEstates.Count == 0) {
+                    if (!ownerAcct.Valid)
                         MainConsole.Instance.Warn ("[Estate]: Unable to locate the user " + estateOwner);
                     else
-                        MainConsole.Instance.WarnFormat ("[Estate]: The user, {0}, has no estates currently.", account.Name);
+                        MainConsole.Instance.WarnFormat ("[Estate]: The user, {0}, has no estates currently.", ownerAcct.Name);
 
                     string joinSystemland = MainConsole.Instance.Prompt (
                         "Do you want to 'park' the region with the system owner/estate? (yes/no)", "yes");
@@ -307,7 +306,7 @@ namespace WhiteCore.Modules.Estate
 
                 if (ownerEstates.Count > 1) {
                     MainConsole.Instance.InfoFormat ("[Estate]: User {0} has {1} estates currently. {2}",
-                        account.Name, ownerEstates.Count, "These estates are the following:");
+                        ownerAcct.Name, ownerEstates.Count, "These estates are the following:");
                     foreach (EstateSettings t in ownerEstates)
                         MainConsole.Instance.CleanInfo ("         " + t.EstateName);
 
@@ -333,7 +332,7 @@ namespace WhiteCore.Modules.Estate
 
 
                 // we should have a user account and estate name by now
-                int estateID = estateConnector.GetEstate (account.PrincipalID, LastEstateName);
+                int estateID = estateConnector.GetEstate (ownerAcct.PrincipalID, LastEstateName);
                 if (estateID == 0) {
                     MainConsole.Instance.Warn ("[Estate]: The name you have entered matches no known estate. Please try again");
                     continue;

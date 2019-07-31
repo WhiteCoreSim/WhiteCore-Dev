@@ -971,7 +971,7 @@ namespace WhiteCore.Services.SQLServices.GridService
                 int RegionPosX = r.RegionLocX / Constants.RegionSize;
                 int RegionPosY = r.RegionLocY / Constants.RegionSize;
 
-                UserAccount account = accountService.GetUserAccount (null, r.EstateOwner);
+                UserAccount userAcct = accountService.GetUserAccount (null, r.EstateOwner);
 
                 MainConsole.Instance.Info (
                     "-------------------------------------------------------------------------------");
@@ -983,7 +983,7 @@ namespace WhiteCore.Services.SQLServices.GridService
                 MainConsole.Instance.Info ("Region Size      : " + string.Format ("{0} x {1}", r.RegionSizeX, r.RegionSizeY));
                 MainConsole.Instance.Info ("Region URI       : " + r.RegionURI);	
                 MainConsole.Instance.Info ("Map tile UUID    : " + r.TerrainMapImage);
-                MainConsole.Instance.Info ("Region Owner     : " + account.Name + " [" + r.EstateOwner + "]");
+                MainConsole.Instance.Info ("Region Owner     : " + userAcct.Name + " [" + r.EstateOwner + "]");
                 MainConsole.Instance.Info ("Region Flags     : " + flags);
                 //MainConsole.Instance.Info ("Gridserver URI    : " + r.ServerURI);				
                 MainConsole.Instance.Info ("");

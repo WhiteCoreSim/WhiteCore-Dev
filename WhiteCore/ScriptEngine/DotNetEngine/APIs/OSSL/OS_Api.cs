@@ -2204,16 +2204,12 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.Low, "osAvatarName2Key", m_host, "OSSL", m_itemID))
                 return "";
 
-            UserAccount account = World.UserAccountService.GetUserAccount(World.RegionInfo.AllScopeIDs,
+            UserAccount userAcct = World.UserAccountService.GetUserAccount(World.RegionInfo.AllScopeIDs,
                                                                           firstname + " " + lastname);
-            if (null == account)
-            {
-                return UUID.Zero.ToString();
+            if (!userAcct.Valid) {
+                return UUID.Zero.ToString ();
             }
-            else
-            {
-                return account.PrincipalID.ToString();
-            }
+            return userAcct.PrincipalID.ToString ();
         }
 
         public string osKey2Name(string id)
@@ -2221,22 +2217,14 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.Low, "osKey2Name", m_host, "OSSL", m_itemID)) return "";
             UUID key = new UUID();
 
-            if (UUID.TryParse(id, out key))
-            {
-                UserAccount account = World.UserAccountService.GetUserAccount(World.RegionInfo.AllScopeIDs, key);
-                if (account != null)
-                {
-                    return account.Name;                    
+            if (UUID.TryParse (id, out key)) {
+                UserAccount keyAcct = World.UserAccountService.GetUserAccount (World.RegionInfo.AllScopeIDs, key);
+                if (keyAcct.Valid) {
+                    return keyAcct.Name;
                 }
-                else
-                {
-                    return "";
-                }
-            }
-            else
-            {
                 return "";
             }
+            return "";
         }
 
         /// Threat level is Moderate because intentional abuse, for instance

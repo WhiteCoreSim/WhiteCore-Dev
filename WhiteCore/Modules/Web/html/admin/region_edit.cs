@@ -256,7 +256,7 @@ namespace WhiteCore.Modules.Web
                 vars.Add ("RegionID", region.RegionID.ToString ());
                 vars.Add ("RegionName", region.RegionName);
 
-                UserAccount estateOwnerAccount = null;
+                UserAccount estateOwnerAcct = new UserAccount();
                 var estateOwner = UUID.Zero;
                 var estateId = -1;
 
@@ -269,12 +269,12 @@ namespace WhiteCore.Modules.Web
                     }
                     var accountService = webInterface.Registry.RequestModuleInterface<IUserAccountService> ();
                     if (accountService != null)
-                        estateOwnerAccount = accountService.GetUserAccount (null, estate.EstateOwner);
+                        estateOwnerAcct = accountService.GetUserAccount (null, estate.EstateOwner);
                 }
 
                 vars.Add ("EstateList", WebHelpers.EstateSelections (webInterface.Registry, null, estateId));
                 vars.Add ("OwnerUUID", region.EstateOwner);
-                vars.Add ("OwnerName", estateOwnerAccount != null ? estateOwnerAccount.Name : "No account found");
+                vars.Add ("OwnerName", estateOwnerAcct.Valid ? estateOwnerAcct.Name : "No account found");
 
                 vars.Add ("RegionLocX", region.RegionLocX / Constants.RegionSize);
                 vars.Add ("RegionLocY", region.RegionLocY / Constants.RegionSize);

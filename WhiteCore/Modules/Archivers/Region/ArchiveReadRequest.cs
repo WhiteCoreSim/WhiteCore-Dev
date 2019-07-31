@@ -530,10 +530,12 @@ namespace WhiteCore.Modules.Archivers
 
             UUID u;
             if (!m_validUserUuids.TryGetValue (uuid, out u)) {
-                UserAccount account = m_scene.UserAccountService.GetUserAccount (m_scene.RegionInfo.AllScopeIDs, uuid);
-                if (account != null) {
-                    m_validUserUuids.Add (uuid, uuid);
-                    return uuid;
+                UserAccount userAcct = m_scene.UserAccountService.GetUserAccount (m_scene.RegionInfo.AllScopeIDs, uuid);
+                if (userAcct.Valid) {
+                    if (userAcct.FirstName != "Unknown") {
+                        m_validUserUuids.Add (uuid, uuid);
+                        return uuid;
+                    }
                 }
                 UUID id = UUID.Zero;
                 if (m_checkOwnership || (m_useParcelOwnership && parcels == null))
@@ -542,9 +544,9 @@ namespace WhiteCore.Modules.Archivers
                 tryAgain:
                     string ownerName =
                         MainConsole.Instance.Prompt (string.Format ("User Name to use instead of UUID '{0}'", uuid), "");
-                    account = m_scene.UserAccountService.GetUserAccount (m_scene.RegionInfo.AllScopeIDs, ownerName);
-                    if (account != null)
-                        id = account.PrincipalID;
+                    userAcct = m_scene.UserAccountService.GetUserAccount (m_scene.RegionInfo.AllScopeIDs, ownerName);
+                    if (userAcct.Valid)
+                        id = userAcct.PrincipalID;
                     else if (ownerName != "")
                         if (
                             (ownerName =

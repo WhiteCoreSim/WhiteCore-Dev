@@ -78,13 +78,13 @@ namespace WhiteCore.Services.API
             uuid = map ["UUID"].AsString ();
 
             IUserAccountService accountService = m_registry.RequestModuleInterface<IUserAccountService> ();
-            UserAccount user = accountService.GetUserAccount (null, map ["UUID"].AsUUID ());
+            UserAccount userAcct = accountService.GetUserAccount (null, map ["UUID"].AsUUID ());
             IAgentInfoService agentService = m_registry.RequestModuleInterface<IAgentInfoService> ();
 
             UserInfo userinfo;
             OSDMap resp = new OSDMap ();
-            bool verified = user != null;
-            resp ["Verified"] = OSD.FromBoolean (verified);
+            bool usr_verified = userAcct.Valid;
+            resp ["Verified"] = OSD.FromBoolean (usr_verified);
             if (verified) {
                 userinfo = agentService.GetUserInfo (uuid);
                 IGridService gs = m_registry.RequestModuleInterface<IGridService> ();
@@ -93,14 +93,14 @@ namespace WhiteCore.Services.API
                     gr = gs.GetRegionByUUID (null, userinfo.HomeRegionID);
                 }
 
-                resp ["UUID"] = OSD.FromUUID (user.PrincipalID);
+                resp ["UUID"] = OSD.FromUUID (userAcct.PrincipalID);
                 resp ["HomeUUID"] = OSD.FromUUID ((userinfo == null) ? UUID.Zero : userinfo.HomeRegionID);
                 resp ["HomeName"] = OSD.FromString ((userinfo == null) ? "" : gr.RegionName);
                 resp ["Online"] = OSD.FromBoolean ((userinfo == null) ? false : userinfo.IsOnline);
-                resp ["Email"] = OSD.FromString (user.Email);
-                resp ["Name"] = OSD.FromString (user.Name);
-                resp ["FirstName"] = OSD.FromString (user.FirstName);
-                resp ["LastName"] = OSD.FromString (user.LastName);
+                resp ["Email"] = OSD.FromString (userAcct.Email);
+                resp ["Name"] = OSD.FromString (userAcct.Name);
+                resp ["FirstName"] = OSD.FromString (userAcct.FirstName);
+                resp ["LastName"] = OSD.FromString (userAcct.LastName);
             }
 
             return resp;
@@ -111,38 +111,41 @@ namespace WhiteCore.Services.API
             OSDMap resp = new OSDMap ();
             string Name = map ["Name"].AsString ();
             UUID userID = map ["UUID"].AsUUID ();
+            var acctService = m_registry.RequestModuleInterface<IUserAccountService> ();
+            if (acctService == null) {
+                return resp;
+            }
 
-            UserAccount account = Name != "" ?
-                m_registry.RequestModuleInterface<IUserAccountService> ().GetUserAccount (null, Name) :
-                 m_registry.RequestModuleInterface<IUserAccountService> ().GetUserAccount (null, userID);
-            if (account != null) {
+            UserAccount userAcct = Name != "" ? acctService.GetUserAccount (null, Name)
+                                              : acctService.GetUserAccount (null, userID);
+            if (userAcct.Valid) {
                 OSDMap accountMap = new OSDMap ();
 
-                accountMap ["Created"] = account.Created;
-                accountMap ["Name"] = account.Name;
-                accountMap ["PrincipalID"] = account.PrincipalID;
-                accountMap ["Email"] = account.Email;
+                accountMap ["Created"] = userAcct.Created;
+                accountMap ["Name"] = userAcct.Name;
+                accountMap ["PrincipalID"] = userAcct.PrincipalID;
+                accountMap ["Email"] = userAcct.Email;
 
-                TimeSpan diff = DateTime.Now - Util.ToDateTime (account.Created);
+                TimeSpan diff = DateTime.Now - Util.ToDateTime (userAcct.Created);
                 int years = (int)diff.TotalDays / 356;
                 int days = years > 0 ? (int)diff.TotalDays / years : (int)diff.TotalDays;
                 accountMap ["TimeSinceCreated"] = years + " years, " + days + " days"; // if we're sending account.Created do we really need to send this string ?
 
                 IProfileConnector profileConnector = DataPlugins.RequestPlugin<IProfileConnector> ();
-                IUserProfileInfo profile = profileConnector.GetUserProfile (account.PrincipalID);
+                IUserProfileInfo profile = profileConnector.GetUserProfile (userAcct.PrincipalID);
                 if (profile != null) {
-                    resp ["profile"] = profile.ToOSD (false);//not trusted, use false
+                    resp ["profile"] = profile.ToOSD (false);   // not trusted, use false
 
-                    if (account.UserFlags == 0)
-                        account.UserFlags = 2; //Set them to no info given
+                    if (userAcct.UserFlags == 0)
+                        userAcct.UserFlags = 2;     // Set them to no info given
 
-                    string flags = ((IUserProfileInfo.ProfileFlags)account.UserFlags).ToString ();
+                    string flags = ((IUserProfileInfo.ProfileFlags)userAcct.UserFlags).ToString ();
                     IUserProfileInfo.ProfileFlags.NoPaymentInfoOnFile.ToString ();
 
                     accountMap ["AccountInfo"] = (profile.CustomType != "" ? profile.CustomType :
-                        account.UserFlags == 0 ? "Resident" : "Admin") + "\n" + flags;
-                    UserAccount partnerAccount = m_registry.RequestModuleInterface<IUserAccountService> ().GetUserAccount (null, profile.Partner);
-                    if (partnerAccount != null) {
+                        userAcct.UserFlags == 0 ? "Resident" : "Admin") + "\n" + flags;
+                    UserAccount partnerAccount = acctService.GetUserAccount (null, profile.Partner);
+                    if (partnerAccount.Valid) {
                         accountMap ["Partner"] = partnerAccount.Name;
                         accountMap ["PartnerUUID"] = partnerAccount.PrincipalID;
                     } else {
@@ -152,7 +155,7 @@ namespace WhiteCore.Services.API
 
                 }
                 IAgentConnector agentConnector = DataPlugins.RequestPlugin<IAgentConnector> ();
-                IAgentInfo agent = agentConnector.GetAgent (account.PrincipalID);
+                IAgentInfo agent = agentConnector.GetAgent (userAcct.PrincipalID);
                 if (agent != null) {
                     OSDMap agentMap = new OSDMap ();
                     agentMap ["RLName"] = agent.OtherAgentInformation ["RLName"].AsString ();
@@ -216,10 +219,10 @@ namespace WhiteCore.Services.API
             List<FriendInfo> friendsList = new List<FriendInfo> (friendService.GetFriends (map ["UserID"].AsUUID ()));
             OSDArray friends = new OSDArray (friendsList.Count);
             foreach (FriendInfo friendInfo in friendsList) {
-                UserAccount account = m_registry.RequestModuleInterface<IUserAccountService> ().GetUserAccount (null, UUID.Parse (friendInfo.Friend));
+                UserAccount userAcct = m_registry.RequestModuleInterface<IUserAccountService> ().GetUserAccount (null, UUID.Parse (friendInfo.Friend));
                 OSDMap friend = new OSDMap (4);
                 friend ["PrincipalID"] = friendInfo.Friend;
-                friend ["Name"] = account.Name;
+                friend ["Name"] = userAcct.Name;
                 friend ["MyFlags"] = friendInfo.MyFlags;
                 friend ["TheirFlags"] = friendInfo.TheirFlags;
                 friends.Add (friend);
@@ -244,16 +247,16 @@ namespace WhiteCore.Services.API
         {
             string email = map ["Email"].AsString ();
 
-            IUserAccountService accountService = m_registry.RequestModuleInterface<IUserAccountService> ();
-            UserAccount user = accountService.GetUserAccount (null, map ["UUID"].AsUUID ());
+            IUserAccountService acctService = m_registry.RequestModuleInterface<IUserAccountService> ();
+            UserAccount userAcct = acctService.GetUserAccount (null, map ["UUID"].AsUUID ());
             OSDMap resp = new OSDMap ();
 
-            bool verified = user != null;
-            resp ["Verified"] = OSD.FromBoolean (verified);
-            if (verified) {
-                user.Email = email;
-                user.UserLevel = 0;
-                accountService.StoreUserAccount (user);
+            bool usr_verified = userAcct.Valid;
+            resp ["Verified"] = OSD.FromBoolean (usr_verified);
+            if (usr_verified) {
+                userAcct.Email = email;
+                userAcct.UserLevel = 0;
+                acctService.StoreUserAccount (userAcct);
             }
             return resp;
         }
@@ -264,16 +267,16 @@ namespace WhiteCore.Services.API
             string Email = map ["Email"].AsString ();
 
             OSDMap resp = new OSDMap ();
-            IUserAccountService accountService = m_registry.RequestModuleInterface<IUserAccountService> ();
-            UserAccount user = accountService.GetUserAccount (null, Name);
-            bool verified = user != null;
-            resp ["Verified"] = OSD.FromBoolean (verified);
+            IUserAccountService acctService = m_registry.RequestModuleInterface<IUserAccountService> ();
+            UserAccount userAcct = acctService.GetUserAccount (null, Name);
+            bool usr_verified = userAcct.Valid;
+            resp ["Verified"] = OSD.FromBoolean (usr_verified);
 
-            if (verified) {
-                resp ["UUID"] = OSD.FromUUID (user.PrincipalID);
-                if (user.UserLevel >= 0) {
-                    if (user.Email.ToLower () != Email.ToLower ()) {
-                        MainConsole.Instance.TraceFormat ("User email for account \"{0}\" is \"{1}\" but \"{2}\" was specified.", Name, user.Email.ToString (), Email);
+            if (usr_verified) {
+                resp ["UUID"] = OSD.FromUUID (userAcct.PrincipalID);
+                if (userAcct.UserLevel >= 0) {
+                    if (userAcct.Email.ToLower () != Email.ToLower ()) {
+                        MainConsole.Instance.TraceFormat ("User email for account \"{0}\" is \"{1}\" but \"{2}\" was specified.", Name, userAcct.Email.ToString (), Email);
                         resp ["Error"] = OSD.FromString ("Email does not match the user name.");
                         resp ["ErrorCode"] = OSD.FromInteger (3);
                     }
@@ -297,21 +300,21 @@ namespace WhiteCore.Services.API
         {
             string Password = map ["Password"].AsString ();
             string newPassword = map ["NewPassword"].AsString ();
-            UserAccount account;
+            UserAccount userAcct;
             OSDMap resp = new OSDMap ();
 
             ILoginService loginService = m_registry.RequestModuleInterface<ILoginService> ();
-            IUserAccountService accountService = m_registry.RequestModuleInterface<IUserAccountService> ();
+            IUserAccountService acctService = m_registry.RequestModuleInterface<IUserAccountService> ();
             UUID userID = map ["UUID"].AsUUID ();
-            if (accountService != null) {
-                account = accountService.GetUserAccount (null, userID);
-                bool cliVerified = loginService.VerifyClient (account.PrincipalID, account.Name, "UserAccount", Password);
+            if (acctService != null) {
+                userAcct = acctService.GetUserAccount (null, userID);
+                bool cliVerified = loginService.VerifyClient (userAcct.PrincipalID, userAcct.Name, "UserAccount", Password);
                 resp ["Verified"] = OSD.FromBoolean (cliVerified);
 
                 if (cliVerified) {
                     IAuthenticationService auths = m_registry.RequestModuleInterface<IAuthenticationService> ();
                     if (auths != null) {
-                        if ((auths.Authenticate (userID, "UserAccount", Util.Md5Hash (Password), 100) != string.Empty) && (cliVerified)) 
+                        if ((auths.Authenticate (userID, "UserAccount", Util.Md5Hash (Password), 100) != string.Empty) && (cliVerified))
                             auths.SetPassword (userID, "UserAccount", newPassword);
                     }
                     resp ["Verified"] = OSD.FromBoolean (false);
@@ -325,18 +328,18 @@ namespace WhiteCore.Services.API
             UUID UUDI = map ["UUID"].AsUUID ();
             string Password = map ["Password"].AsString ();
 
-            IUserAccountService accountService = m_registry.RequestModuleInterface<IUserAccountService> ();
-            UserAccount user = accountService.GetUserAccount (null, UUDI);
+            IUserAccountService acctService = m_registry.RequestModuleInterface<IUserAccountService> ();
+            UserAccount userAcct = acctService.GetUserAccount (null, UUDI);
 
             OSDMap resp = new OSDMap ();
-            bool verified = user != null;
-            resp ["Verified"] = OSD.FromBoolean (verified);
+            bool usr_verified = userAcct.Valid;
+            resp ["Verified"] = OSD.FromBoolean (usr_verified);
             resp ["UserLevel"] = OSD.FromInteger (0);
-            if (verified) {
-                resp ["UserLevel"] = OSD.FromInteger (user.UserLevel);
-                if (user.UserLevel >= 0) {
+            if (usr_verified) {
+                resp ["UserLevel"] = OSD.FromInteger (userAcct.UserLevel);
+                if (userAcct.UserLevel >= 0) {
                     IAuthenticationService auths = m_registry.RequestModuleInterface<IAuthenticationService> ();
-                    auths.SetPassword (user.PrincipalID, "UserAccount", Password);
+                    auths.SetPassword (userAcct.PrincipalID, "UserAccount", Password);
                 } else {
                     resp ["Verified"] = OSD.FromBoolean (false);
                 }
@@ -364,25 +367,25 @@ namespace WhiteCore.Services.API
             return resp;
         }
 
-        OSDMap SetUserLevel (OSDMap map) //just sets a user level
+        OSDMap SetUserLevel (OSDMap map)    // just sets a user level
         {
             OSDMap resp = new OSDMap ();
 
             UUID agentID = map ["UserID"].AsUUID ();
             int userLevel = map ["UserLevel"].AsInteger ();
 
-            IUserAccountService userService = m_registry.RequestModuleInterface<IUserAccountService> ();
-            UserAccount account = userService.GetUserAccount (null, agentID);
+            IUserAccountService acctService = m_registry.RequestModuleInterface<IUserAccountService> ();
+            UserAccount userAcct = acctService.GetUserAccount (null, agentID);
 
-            if (account != null) //found
+            if (userAcct.Valid)     // found
             {
-                account.UserLevel = userLevel;
+                userAcct.UserLevel = userLevel;
 
-                userService.StoreUserAccount (account);
+                acctService.StoreUserAccount (userAcct);
 
                 resp ["UserFound"] = OSD.FromBoolean (true);
                 resp ["Updated"] = OSD.FromBoolean (true);
-            } else //not found
+            } else  // not found
               {
                 resp ["UserFound"] = OSD.FromBoolean (false);
                 resp ["Updated"] = OSD.FromBoolean (false);
@@ -398,15 +401,15 @@ namespace WhiteCore.Services.API
         /// <returns>Verified</returns>
         OSDMap ChangeName (OSDMap map)
         {
-            IUserAccountService accountService = m_registry.RequestModuleInterface<IUserAccountService> ();
-            UserAccount user = accountService.GetUserAccount (null, map ["UUID"].AsUUID ());
+            IUserAccountService acctService = m_registry.RequestModuleInterface<IUserAccountService> ();
+            UserAccount userAcct = acctService.GetUserAccount (null, map ["UUID"].AsUUID ());
             OSDMap resp = new OSDMap ();
 
-            bool verified = user != null;
-            resp ["Verified"] = OSD.FromBoolean (verified);
-            if (verified) {
-                user.Name = map ["Name"].AsString ();
-                resp ["Stored"] = OSD.FromBoolean (accountService.StoreUserAccount (user));
+            bool usr_verified = userAcct.Valid;
+            resp ["Verified"] = OSD.FromBoolean (usr_verified);
+            if (usr_verified) {
+                userAcct.Name = map ["Name"].AsString ();
+                resp ["Stored"] = OSD.FromBoolean (acctService.StoreUserAccount (userAcct));
             }
 
             return resp;
@@ -419,19 +422,24 @@ namespace WhiteCore.Services.API
             resp ["agent"] = OSD.FromBoolean (!editRLInfo); // if we have no RLInfo, editing account is assumed to be successful.
             resp ["account"] = OSD.FromBoolean (false);
             UUID principalID = map ["UserID"].AsUUID ();
-            UserAccount account = m_registry.RequestModuleInterface<IUserAccountService> ().GetUserAccount (null, principalID);
-            if (account != null) {
-                account.Email = map ["Email"];
-                if (m_registry.RequestModuleInterface<IUserAccountService> ().GetUserAccount (null, map ["Name"].AsString ()) == null) {
-                    account.Name = map ["Name"];
+            var acctService = m_registry.RequestModuleInterface<IUserAccountService> ();
+            if (acctService == null) {
+                return resp;
+            }
+
+            UserAccount userAcct = acctService.GetUserAccount (null, principalID);
+            if (userAcct.Valid) {
+                userAcct.Email = map ["Email"];
+                if (acctService.GetUserAccount (null, map ["Name"].AsString ()) == null) {
+                    userAcct.Name = map ["Name"];
                 }
 
                 if (editRLInfo) {
                     IAgentConnector agentConnector = DataPlugins.RequestPlugin<IAgentConnector> ();
-                    IAgentInfo agent = agentConnector.GetAgent (account.PrincipalID);
+                    IAgentInfo agent = agentConnector.GetAgent (userAcct.PrincipalID);
                     if (agent == null) {
-                        agentConnector.CreateNewAgent (account.PrincipalID);
-                        agent = agentConnector.GetAgent (account.PrincipalID);
+                        agentConnector.CreateNewAgent (userAcct.PrincipalID);
+                        agent = agentConnector.GetAgent (userAcct.PrincipalID);
                     }
                     if (agent != null) {
                         agent.OtherAgentInformation ["RLName"] = map ["RLName"];
@@ -443,7 +451,7 @@ namespace WhiteCore.Services.API
                         resp ["agent"] = OSD.FromBoolean (true);
                     }
                 }
-                resp ["account"] = OSD.FromBoolean (m_registry.RequestModuleInterface<IUserAccountService> ().StoreUserAccount (account));
+                resp ["account"] = OSD.FromBoolean (acctService.StoreUserAccount (userAcct));
             }
             return resp;
         }

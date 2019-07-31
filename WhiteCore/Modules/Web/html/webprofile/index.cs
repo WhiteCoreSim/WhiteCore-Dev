@@ -71,12 +71,12 @@ namespace WhiteCore.Modules.Web
             var vars = new Dictionary<string, object>();
 
             string username = filename.Split('/').LastOrDefault();
-            UserAccount account = null;
+            UserAccount userAcct = new UserAccount ();
             if (httpRequest.Query.ContainsKey("userid"))
             {
                 string userid = httpRequest.Query["userid"].ToString();
 
-                account = webInterface.Registry.RequestModuleInterface<IUserAccountService>().
+                userAcct = webInterface.Registry.RequestModuleInterface<IUserAccountService>().
                                        GetUserAccount(null, UUID.Parse(userid));
             }
             else if (httpRequest.Query.ContainsKey("name"))
@@ -84,8 +84,7 @@ namespace WhiteCore.Modules.Web
                 string name = httpRequest.Query.ContainsKey("name") ? httpRequest.Query["name"].ToString() : username;
                 name = name.Replace('.', ' ');
                 name = name.Replace("%20", " ");
-                account = webInterface.Registry.RequestModuleInterface<IUserAccountService>().
-                                       GetUserAccount(null, name);
+                userAcct = webInterface.Registry.RequestModuleInterface<IUserAccountService>().GetUserAccount(null, name);
             }
             else
             {
@@ -94,7 +93,7 @@ namespace WhiteCore.Modules.Web
                 return vars;
             }
 
-            if (account == null)
+            if (!userAcct.Valid)
                 return vars;
 
 			/* Allow access to the system user info - needed for Estate owner Profiles of regions
@@ -102,15 +101,15 @@ namespace WhiteCore.Modules.Web
 				return vars;
             */
 
-            vars.Add("UserName", account.Name);
+            vars.Add("UserName", userAcct.Name);
             //  TODO: User Profile inworld shows this as the standard mm/dd/yyyy
             //  Do we want this to be localised into the users Localisation or keep it as standard ?
             //
             //  vars.Add("UserBorn", Culture.LocaleDate(Util.ToDateTime(account.Created)));
-            vars.Add("UserBorn", Util.ToDateTime(account.Created).ToShortDateString());
+            vars.Add("UserBorn", Util.ToDateTime(userAcct.Created).ToShortDateString());
 
             IUserProfileInfo profile = Framework.Utilities.DataManager.RequestPlugin<IProfileConnector>().
-                                              GetUserProfile(account.PrincipalID);
+                                              GetUserProfile(userAcct.PrincipalID);
             string picUrl = "../images/icons/no_avatar.jpg";
             if (profile != null)
             {
@@ -118,11 +117,11 @@ namespace WhiteCore.Modules.Web
 
                 if (profile.Partner != UUID.Zero)
                 {
-                    account = webInterface.Registry.RequestModuleInterface<IUserAccountService> ().
-                                           GetUserAccount (null, profile.Partner);
-                    vars.Add ("UserPartner", account.Name);
+                    var partnerAcct = webInterface.Registry.RequestModuleInterface<IUserAccountService> ().GetUserAccount (null, profile.Partner);
+                    vars.Add ("UserPartner", partnerAcct.Name);
                 } else
                     vars.Add ("UserPartner", "No partner");
+                
                 vars.Add ("UserAboutMe", profile.AboutText == "" ? "Nothing here" : profile.AboutText);
                 IWebHttpTextureService webhttpService =
                     webInterface.Registry.RequestModuleInterface<IWebHttpTextureService> ();
@@ -140,17 +139,17 @@ namespace WhiteCore.Modules.Web
 
             // TODO:  This is only showing online status if you are logged in ??
             UserAccount ourAccount = Authenticator.GetAuthentication(httpRequest);
-            if (ourAccount != null)
+            if (ourAccount.Valid)
             {
                 IFriendsService friendsService = webInterface.Registry.RequestModuleInterface<IFriendsService>();
-                var friends = friendsService.GetFriends(account.PrincipalID);
+                var friends = friendsService.GetFriends(userAcct.PrincipalID);
                 UUID friendID = UUID.Zero;
                 if (friends.Any(f => UUID.TryParse(f.Friend, out friendID) && friendID == ourAccount.PrincipalID))
                 {
                     IAgentInfoService agentInfoService =
                         webInterface.Registry.RequestModuleInterface<IAgentInfoService>();
                     IGridService gridService = webInterface.Registry.RequestModuleInterface<IGridService>();
-                    UserInfo ourInfo = agentInfoService.GetUserInfo(account.PrincipalID.ToString());
+                    UserInfo ourInfo = agentInfoService.GetUserInfo(userAcct.PrincipalID.ToString());
                     if (ourInfo != null && ourInfo.IsOnline)
                         vars.Add("OnlineLocation", gridService.GetRegionByUUID(null, ourInfo.CurrentRegionID).RegionName);
                     vars.Add("UserIsOnline", ourInfo != null && ourInfo.IsOnline);

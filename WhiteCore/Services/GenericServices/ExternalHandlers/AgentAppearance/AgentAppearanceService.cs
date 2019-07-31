@@ -123,7 +123,8 @@ namespace WhiteCore.Services
             httpResponse.StatusCode = (int)System.Net.HttpStatusCode.OK;
             try {
                 httpResponse.ContentType = texture.TypeString;
-            } catch {
+            } catch (Exception e) {
+                MainConsole.Instance.Debug ("[Agent appearance service]: Exception setting httpResponse.ContenType\n" + e);
             }
 
             byte [] tdata = new byte [texture.Data.Length];
@@ -318,9 +319,9 @@ namespace WhiteCore.Services
 
             IUserAccountService uas = m_registry.RequestModuleInterface<IUserAccountService> ();
             if (uas != null) {
-                UserAccount account = uas.GetUserAccount (null, name);
-                if (account != null)
-                    BakeAppearance (account.PrincipalID, 0);
+                UserAccount userAcct = uas.GetUserAccount (null, name);
+                if (userAcct.Valid)
+                    BakeAppearance (userAcct.PrincipalID, 0);
                 else
                     MainConsole.Instance.WarnFormat ("Sorry! No user account found for {0}", name);
             }

@@ -76,10 +76,10 @@ namespace WhiteCore.Modules.Web
                     EstateSettings estate = estateConnector.GetRegionEstateSettings (region.RegionID);
                     if (estate != null) {
                         ownerUUID = estate.EstateOwner;
-                        UserAccount estateOwnerAccount = null;
+                        UserAccount estateOwnerAcct = new UserAccount();
                         if (userService != null)
-                            estateOwnerAccount = userService.GetUserAccount (null, estate.EstateOwner);
-                        ownerName = estateOwnerAccount == null ? "No account found" : estateOwnerAccount.Name;
+                            estateOwnerAcct = userService.GetUserAccount (null, estate.EstateOwner);
+                        ownerName = estateOwnerAcct.Valid ? estateOwnerAcct.Name : "No account found";
                     }
                 }
                 vars.Add ("OwnerUUID", ownerUUID);
@@ -108,13 +108,13 @@ namespace WhiteCore.Modules.Web
                         List<Dictionary<string, object>> users = new List<Dictionary<string, object>> ();
                         foreach (var client in usersInRegion) {
                             if (userService != null) {
-                                UserAccount account = userService.GetUserAccount (null, client.UserID);
-                                if (account != null) {
+                                UserAccount userAcct = userService.GetUserAccount (null, client.UserID);
+                                if (userAcct.Valid) {
 
                                     Dictionary<string, object> user = new Dictionary<string, object> ();
                                     user.Add ("UserNameText", translator.GetTranslatedString ("UserNameText"));
                                     user.Add ("UserUUID", client.UserID);
-                                    user.Add ("UserName", account.Name);
+                                    user.Add ("UserName", userAcct.Name);
                                     users.Add (user);
                                 }
                             }
@@ -141,9 +141,9 @@ namespace WhiteCore.Modules.Web
                             parcel.Add ("ParcelName", p.Name);
                             parcel.Add ("ParcelOwnerUUID", p.OwnerID);
                             if (userService != null) {
-                                var account = userService.GetUserAccount (null, p.OwnerID);
-                                if (account != null)
-                                    parcel.Add ("ParcelOwnerName", account.Name);
+                                var parcelownerAcct = userService.GetUserAccount (null, p.OwnerID);
+                                if (parcelownerAcct.Valid)
+                                    parcel.Add ("ParcelOwnerName", parcelownerAcct.Name);
                                 else
                                     parcel.Add ("ParcelOwnerName", translator.GetTranslatedString ("NoAccountFound"));
                             }
