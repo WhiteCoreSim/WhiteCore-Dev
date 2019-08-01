@@ -43,16 +43,16 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
     {
         #region Declares
 
-        //Threat Level for scripts.
+        // Threat Level for scripts.
         ThreatLevel m_MaxThreatLevel = 0;
         bool m_allowFunctionLimiting;
         IConfig m_config;
         bool allowHTMLLinking = true;
 
-        //List of all enabled APIs for scripts
+        // List of all enabled APIs for scripts
         List<string> EnabledAPIs = new List<string>();
 
-        //Keeps track of whether the source has been compiled before
+        // Keeps track of whether the source has been compiled before
         public Dictionary<string, string> PreviouslyCompiled = new Dictionary<string, string>();
 
         public Dictionary<UUID, Dictionary<UUID, ScriptData>> Scripts =
@@ -83,7 +83,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
         {
             None,
             Drop,
-            Delay, //Not Implemented
+            Delay,      // Not Implemented
             TerminateScript,
             TerminateEvent
         }
@@ -229,44 +229,33 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
 
             #endregion
 
-            m_threatLevelNone = new ThreatLevelDefinition(ThreatLevel.None,
-                                                          UserSetHelpers.ParseUserSetConfigSetting(config, "NoneUserSet",
-                                                                                                   UserSet.None), this);
-            m_threatLevelNuisance = new ThreatLevelDefinition(ThreatLevel.Nuisance,
-                                                              UserSetHelpers.ParseUserSetConfigSetting(config,
-                                                                                                       "NuisanceUserSet",
-                                                                                                       UserSet.None),
-                                                              this);
-            m_threatLevelVeryLow = new ThreatLevelDefinition(ThreatLevel.VeryLow,
-                                                             UserSetHelpers.ParseUserSetConfigSetting(config,
-                                                                                                      "VeryLowUserSet",
-                                                                                                      UserSet.None),
-                                                             this);
-            m_threatLevelLow = new ThreatLevelDefinition(ThreatLevel.Low,
-                                                         UserSetHelpers.ParseUserSetConfigSetting(config, "LowUserSet",
-                                                                                                  UserSet.None), this);
-            m_threatLevelModerate = new ThreatLevelDefinition(ThreatLevel.Moderate,
-                                                              UserSetHelpers.ParseUserSetConfigSetting(config,
-                                                                                                       "ModerateUserSet",
-                                                                                                       UserSet.None),
-                                                              this);
-            m_threatLevelHigh = new ThreatLevelDefinition(ThreatLevel.High,
-                                                          UserSetHelpers.ParseUserSetConfigSetting(config, "HighUserSet",
-                                                                                                   UserSet.None), this);
-            m_threatLevelVeryHigh = new ThreatLevelDefinition(ThreatLevel.VeryHigh,
-                                                              UserSetHelpers.ParseUserSetConfigSetting(config,
-                                                                                                       "VeryHighUserSet",
-                                                                                                       UserSet.None),
-                                                              this);
-            m_threatLevelSevere = new ThreatLevelDefinition(ThreatLevel.Severe,
-                                                            UserSetHelpers.ParseUserSetConfigSetting(config,
-                                                                                                     "SevereUserSet",
-                                                                                                     UserSet.None), this);
-            m_threatLevelNoAccess = new ThreatLevelDefinition(ThreatLevel.NoAccess,
-                                                              UserSetHelpers.ParseUserSetConfigSetting(config,
-                                                                                                       "NoAccessUserSet",
-                                                                                                       UserSet.None),
-                                                              this);
+            m_threatLevelNone = 
+                new ThreatLevelDefinition(
+                    ThreatLevel.None, UserSetHelpers.ParseUserSetConfigSetting(config, "NoneUserSet", UserSet.None), this);
+            m_threatLevelNuisance = 
+                new ThreatLevelDefinition(
+                    ThreatLevel.Nuisance, UserSetHelpers.ParseUserSetConfigSetting(config, "NuisanceUserSet", UserSet.None), this);
+            m_threatLevelVeryLow = 
+                new ThreatLevelDefinition(
+                    ThreatLevel.VeryLow, UserSetHelpers.ParseUserSetConfigSetting(config, "VeryLowUserSet", UserSet.None), this);
+            m_threatLevelLow = 
+                new ThreatLevelDefinition(
+                    ThreatLevel.Low, UserSetHelpers.ParseUserSetConfigSetting(config, "LowUserSet", UserSet.None), this);
+            m_threatLevelModerate = 
+                new ThreatLevelDefinition(
+                    ThreatLevel.Moderate, UserSetHelpers.ParseUserSetConfigSetting(config, "ModerateUserSet", UserSet.None), this);
+            m_threatLevelHigh = 
+                new ThreatLevelDefinition(
+                    ThreatLevel.High, UserSetHelpers.ParseUserSetConfigSetting(config, "HighUserSet", UserSet.None), this);
+            m_threatLevelVeryHigh = 
+                new ThreatLevelDefinition(
+                    ThreatLevel.VeryHigh, UserSetHelpers.ParseUserSetConfigSetting(config, "VeryHighUserSet", UserSet.None), this);
+            m_threatLevelSevere = 
+                new ThreatLevelDefinition(
+                    ThreatLevel.Severe, UserSetHelpers.ParseUserSetConfigSetting(config, "SevereUserSet", UserSet.None), this);
+            m_threatLevelNoAccess = 
+                new ThreatLevelDefinition(
+                    ThreatLevel.NoAccess, UserSetHelpers.ParseUserSetConfigSetting(config, "NoAccessUserSet", UserSet.None), this);
         }
 
         #endregion
@@ -353,7 +342,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
 
         internal void Error(string surMessage, string msg)
         {
-            throw new Exception(surMessage + msg);
+            throw new Exception(surMessage + msg);          // this stops execution of the script
         }
 
         #region Limitation Functions
@@ -362,7 +351,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
         {
             LimitDef d = null;
             bool isAPI = m_functionsToLimit.TryGetValue(API, out d);
-            bool isFunction = m_functionsToLimit.TryGetValue(function, out d); //Function overrides API
+            bool isFunction = m_functionsToLimit.TryGetValue(function, out d);  // Function overrides API
             if (m_allowFunctionLimiting && (isAPI || isFunction))
             {
                 //Get the list for the given type
@@ -409,7 +398,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
 
                 if (d.MaxNumberOfTimes != 0)
                 {
-                    if (r.NumberOfTimesFired + 1 > d.MaxNumberOfTimes) //Too Many, kill it
+                    if (r.NumberOfTimesFired + 1 > d.MaxNumberOfTimes)      // Too Many, kill it
                     {
                         TriggerAlert(function, d,
                                      "You have exceeded the number of times this function (" + function +
@@ -433,11 +422,11 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
                     else
                     {
                         r.LastFired = Util.EnvironmentTickCount();
-                        r.FunctionsSinceLastFired = 0; //Clear it out again
+                        r.FunctionsSinceLastFired = 0;  // Clear it out again
                     }
                     r.FunctionsSinceLastFired++;
                 }
-                //Put it back where it came from
+                // Put it back where it came from
                 functions[isFunction ? function : API] = r;
                 if (doInsert)
                     if (d.Type == LimitType.Owner)
@@ -480,12 +469,12 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
             if (d.Action == LimitAction.Drop)
                 return false; //Drop it
             if (d.Action == LimitAction.TerminateEvent)
-                throw new Exception (""); //Blank messages kill events, but don't show anything on the console/inworld
+                throw new Exception ("");       // Blank messages kill events, but don't show anything on the console/inworld
             if (d.Action == LimitAction.TerminateScript) {
                 ScriptData script = GetScript (itemID);
                 if (script != null)
-                    script.IgnoreNew = true; //Blocks all new events, can be reversed by resetting or resaving the script
-                throw new Exception (""); //Blank messages kill events, but don't show anything on the console/inworld
+                    script.IgnoreNew = true;    // Blocks all new events, can be reversed by resetting or resaving the script
+                throw new Exception ("");       // Blank messages kill events, but don't show anything on the console/inworld
             }
             if (d.Action == LimitAction.Delay)
                 MainConsole.Instance.Warn ("Function delaying is not implemented");
@@ -527,10 +516,9 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
                     m_allowedUsers = ids.Select(id =>
                     {
                         UUID uuid;
-                        if (UUID.TryParse(id.Trim(), out uuid))
+                        if (UUID.TryParse (id.Trim (), out uuid))
                             return uuid;
-                        else
-                            return UUID.Zero;
+                        return UUID.Zero;
                     }).Where((id) => id != UUID.Zero).ToList();
                 } 
                 perm = m_scriptProtectionModule.m_config.GetString("Allow_All", "");
@@ -540,10 +528,9 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
                     m_allowedUsers = ids.Select(id =>
                     {
                         UUID uuid;
-                        if (UUID.TryParse(id.Trim(), out uuid))
+                        if (UUID.TryParse (id.Trim (), out uuid))
                             return uuid;
-                        else
-                            return UUID.Zero;
+                        return UUID.Zero;
                     }).Where((id) => id != UUID.Zero).ToList();
                 }
             }
@@ -558,7 +545,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
                     string perm = m_scriptProtectionModule.m_config.GetString("Allow_" + function, "");
                     if (perm == "")
                     {
-                        FunctionPerms = null; // a null value is default, which means check against the max threat level
+                        FunctionPerms = null;       // a null value is default, which means check against the max threat level
                     }
                     else
                     {
@@ -602,12 +589,13 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
                 if (FunctionPerms == null) // No list = true
                 {
                     if (m_threatLevel > m_scriptProtectionModule.GetThreatLevel().m_threatLevel)
-                        m_scriptProtectionModule.Error("Runtime Error: ",
-                                                       string.Format(
-                                                           "{0} permission denied.  Allowed threat level is {1} but function threat level is {2}.",
-                                                           function,
-                                                           m_scriptProtectionModule.GetThreatLevel().m_threatLevel,
-                                                           m_threatLevel));
+                        m_scriptProtectionModule.Error(
+                            "Runtime Error: ",
+                            string.Format(
+                                "{0} permission denied.\nAllowed threat level is {1} but function threat level is {2}.\n",
+                                function,
+                                m_scriptProtectionModule.GetThreatLevel().m_threatLevel,
+                                m_threatLevel));
                 }
                 else
                 {
@@ -618,19 +606,19 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
                             if (m_allowGroupPermissions)
                             {
                                 Dictionary<string, bool> cachedFunctions;
-                                //Check to see whether we have already evaluated this function for this user
-                                if (m_knownAllowedGroupFunctionsForAvatars.TryGetValue(m_host.OwnerID,
-                                                                                       out cachedFunctions))
+                                // Check to see whether we have already evaluated this function for this user
+                                if (m_knownAllowedGroupFunctionsForAvatars.TryGetValue(m_host.OwnerID, out cachedFunctions))
                                 {
                                     if (cachedFunctions.ContainsKey(function))
                                     {
                                         if (cachedFunctions[function])
                                             return;
                                         else
-                                            m_scriptProtectionModule.Error("Runtime Error: ",
-                                                                           string.Format(
-                                                                               "{0} permission denied.  Prim owner is not in the list of users allowed to execute this function.",
-                                                                               function));
+                                            m_scriptProtectionModule.Error(
+                                                "Runtime Error: ",
+                                                string.Format(
+                                                    "{0} permission denied.\nPrim owner is not in the list of users allowed to execute this function.\n",
+                                                    function));
                                     }
                                 }
                                 else
@@ -651,18 +639,18 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
                                     //Cache the success
                                     cachedFunctions[function] = success;
                                     if (!m_knownAllowedGroupFunctionsForAvatars.ContainsKey(m_host.OwnerID))
-                                        m_knownAllowedGroupFunctionsForAvatars.Add(m_host.OwnerID,
-                                                                                   new Dictionary<string, bool>());
+                                        m_knownAllowedGroupFunctionsForAvatars.Add(m_host.OwnerID, new Dictionary<string, bool>());
                                     m_knownAllowedGroupFunctionsForAvatars[m_host.OwnerID] = cachedFunctions;
 
                                     if (success)
                                         return; //All is good
                                 }
                             }
-                            m_scriptProtectionModule.Error("Runtime Error: ",
-                                                           string.Format(
-                                                               "{0} permission denied.  Prim owner is not in the list of users allowed to execute this function.",
-                                                               function));
+                            m_scriptProtectionModule.Error(
+                                "Runtime Error: ",
+                                string.Format(
+                                    "{0} permission denied.\nPrim owner is not in the list of users allowed to execute this function.\n",
+                                    function));
                         }
                     }
                 }
@@ -687,8 +675,8 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
                 else if ((m_userSet == UserSet.Administrators &&
                           host.ParentEntity.Scene.Permissions.IsGod(host.OwnerID)))
                 {
-                    m_allowedUsers.Add(host.OwnerID); //We don't need to lock as it blocks up above,
-                    //and we don't need to Contains() either as we already let all users in above
+                    m_allowedUsers.Add(host.OwnerID);   // We don't need to lock as it blocks up above,
+                                                        // and we don't need to Contains() either as we already let all users in above
                     return true;
                 }
                 return false;
@@ -735,7 +723,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
             {
                 if (!PreviouslyCompiled.ContainsKey(key))
                 {
-                    //PreviouslyCompiled.Add (source, ID.AssemblyName);
+                    // PreviouslyCompiled.Add (source, ID.AssemblyName);
                     PreviouslyCompiled.Add(key, ID.AssemblyName);
                 }
             }
@@ -745,7 +733,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
         {
             if (string.IsNullOrEmpty(source))
                 return;
-            //string key = source.Length.ToString() + source.GetHashCode().ToString();
+            // string key = source.Length.ToString() + source.GetHashCode().ToString();
             string key = Util.Md5Hash(source);
             lock (PreviouslyCompiled)
             {
@@ -759,13 +747,13 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
 
         public string TryGetPreviouslyCompiledScript(string source)
         {
-            //string key = source.Length.ToString() + source.GetHashCode().ToString();
+            // string key = source.Length.ToString() + source.GetHashCode().ToString();
             string key = source.Length + Util.Md5Hash(source);
             string assemblyName = "";
 
             lock(PreviouslyCompiled)
                 PreviouslyCompiled.TryGetValue(key, out assemblyName);
-            //PreviouslyCompiled.TryGetValue (source, out assemblyName);
+            // PreviouslyCompiled.TryGetValue (source, out assemblyName);
 
             return assemblyName;
         }
