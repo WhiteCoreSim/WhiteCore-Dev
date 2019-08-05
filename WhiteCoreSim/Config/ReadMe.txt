@@ -7,6 +7,7 @@ August 2019
 ===============================
 The default configuration of WhiteCore is setup to run in Standalone mode and
   to use an SQLite database, with no pre-configured users or regions.
+
 On initial startup, you will be asked to create your initial region, 
   together with your first user.
 
@@ -17,9 +18,9 @@ To do this, modify the commented out settings in 'MyWorld.ini' located in the
   'Config' folder.  This will allow you to set the name of your Sim, configure your default
    region and specify an IP address to use if you do not want to use your external IP.
 
-** Grid mode **
-===============
-If you wish to re-configure and use the Grid mode of operation, 
+** Grid connected region **
+===========================
+If you wish to re-configure and connect your region to a Grid, 
   change the selected include mode at the top of the 'WhiteCore.ini' file.
 
 Edit WhiteCore.ini file in the 'Config' directory
@@ -31,7 +32,7 @@ Uncomment the "Include-Grid =" line.
 
 **    Configuration files     **
 ================================
-This Folder contains the configuration files necessary to setup
+This folder (Config) contains the configuration files necessary to setup
   your WhiteCor-Sim system.
 The files and folders that are used for the various modes of operations
   are as follows...
@@ -61,7 +62,7 @@ These settings will be used when the WhiteCore sim uses a combined grid
 
  GridRegion Mode
 -------------------------------
-The folder 'GridRegion' contains the startup settings for When the WhiteCore sim 
+The folder 'GridRegion' contains the startup settings for when the WhiteCore sim 
   region will be connected to an external (or local) Grid.
 
  Grid settings
