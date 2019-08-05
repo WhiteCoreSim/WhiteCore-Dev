@@ -251,7 +251,7 @@ namespace WhiteCore.Simulation.Base
         /// </summary>
         public virtual void Startup()
         {
-            PrintFileToConsole (Path.Combine(m_defaultDataPath, "../Config/startuplogo.txt"));
+            PrintStartupLogo ();
 
             MainConsole.Instance.Info("====================================================================");
             MainConsole.Instance.Info(
@@ -464,6 +464,30 @@ namespace WhiteCore.Simulation.Base
             }
         }
 
+        void PrintStartupLogo ()
+        {
+            Console.ForegroundColor = ConsoleColor.White;
+
+            var startuplogo = "../Config/Templates/startuplogo.txt";
+            if (File.Exists (startuplogo)) {
+                PrintFileToConsole (Path.Combine (m_defaultDataPath, startuplogo));
+            } else {
+                // default logo
+                Console.ForegroundColor = ConsoleColor.White;
+                Console.WriteLine (@" __    __ _     _ _         ___");
+                Console.WriteLine (@"/ / /\ \ \ |__ (_) |_ ___  / __\___  _ __ ___");
+                Console.WriteLine (@"\ \/  \/ / '_ \| | __/ _ \/ /  / _ \| '__/ _ \");
+                Console.WriteLine (@" \  /\  /| | | | | ||  __/ /__| (_) | | |  __/");
+                Console.WriteLine (@"  \/  \/ |_| |_|_|\__\___\____/\___/|_|  \___|");
+                Console.WriteLine (@"                                              ");
+                Console.WriteLine (@"==============================================");
+                Console.WriteLine (@"                                              ");
+                Console.ResetColor ();
+            }
+            Console.ResetColor();
+        }
+
+
         /// <summary>
         ///     Timer to run a specific text file as console commands.
         ///     Configured in in the main .ini file
@@ -622,7 +646,7 @@ namespace WhiteCore.Simulation.Base
 
         public virtual void HandleShowInfo(IScene scene, string[] cmd)
         {
-            PrintFileToConsole (Path.Combine (m_defaultDataPath, "../Config/startuplogo.txt"));
+            PrintStartupLogo ();
 
             MainConsole.Instance.Info("Version: " + m_version);
             MainConsole.Instance.Info("Startup directory: " + Environment.CurrentDirectory);
