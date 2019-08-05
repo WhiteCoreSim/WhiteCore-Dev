@@ -1,0 +1,89 @@
+;;  This file is used as a template when the configurator is run for a grid setup
+;;  ##  You DO NOT need to change anything here  ##
+;;
+
+[LoginService]
+;; This sets the message when a user logs in.
+;; <USERNAME> adds the user's name into the message.
+
+WelcomeMessage = "Welcome to WhiteCore, <USERNAME>!"
+
+;; OPTIONAL
+;;This sets the message when a user logs in with a customizable welcome message. You need to add a welcome.txt file somewhere in the web and put the URL here if you want to use this
+;;CustomizedMessageURL = http://127.0.0.1/welcome.txt
+
+;; Allow the Login level to be set remotely
+AllowRemoteSetLoginLevel = "false"
+
+;; Should new users be shown the Terms of Service when they log in if they have not seen it before?
+;;  If this is enabled, the FileNameOfTOS will be used to set what the users see.
+UseTermsOfServiceOnFirstLogin = false
+
+;; File name or the location of the Terms of Service document
+;; The default is a text file. This should be in the 'Data/html' folder unless specified
+FileNameOfTOS = ToS.txt
+
+;; Alternatively, an html formatted version of the Terms of Service  may be specified. 
+;;  The 'ToS.html' file should also be located in the 'Data/html' folder
+;; Comment the previous setting and uncomment below
+;;    'ServersHostname' will be replaced with the local grid URL   
+; FileNameOfTOS = http://ServersHostname:8002/local/ToS.html
+
+;; Allow users to login anonymously and have a new account created automatically? 
+;; This will create a new account for any user logging in.
+;; This is also used to set the default availability of registrations using the WebUI.
+AllowAnonymousLogin = false
+
+;; Allow users to login multiple times, but the previous agent will not be able to access his inventory or teleport again
+AllowDuplicateLogin = false
+
+;; This allows for a default avatar to be created so the user does not login as Ruth. 
+;;  Save an Avatar Archive (in the console) then put the name of it here.
+;; To set this, create a user and set them up as you wish them to look.
+;;  Then save an Avatar Archive into the database by the command in the console 
+;;   "save avatar archive" (for interactive prompting) or 
+;;   "save avatar archive <First> <Last> <Filename> <FolderNameToSaveInto>"
+;;    "Saves appearance to an avatar archive archive (Note: put \"\" around the FolderName if you need more than one word)"
+;;   Where <First> <Last> is the user name, FileName (can end with .database to save into the database) which is used to identify which archive you wish to use, and the default folder name to create in the new user's inventory.
+;;  After saving this archive, put the name of the archive here to set the default avatar appearance.
+DefaultAvatarArchiveForNewUser = 
+
+;; Will hide the First Life setting of profile from all users if set to false
+AllowFirstLifeInProfile = true
+
+;; Allow the 'export' permission in the Imprudence viewer.
+;; This allows people to set whether they would like to allow others to export objects that are theirs.
+AllowUsageOfExportPermissions = true
+
+;; If a user does not have a home location set, what region should it be set to for them?
+DefaultHomeRegion = ""
+
+;; The position in the default region (set above) to put the user (in the format "X,Y" or "X,Y,Z")
+;; Default is "128, 128, 25"
+DefaultHomeRegionPosition = "128, 128, 25"
+
+;; Only if you are using the Vivox voice server options and need to modify
+;VoiceServerType = "vivox"
+
+;; The maximum number of groups an agent can belong to 
+;MaxAgentGroups = 100
+
+;; If you want to change the default texture UUIDs, change them here
+SunTexture = "cce0f112-878f-4586-a2e2-a8f104bba271"
+MoonTexture = "ec4b9f0b-d008-45c6-96a4-01dd947ac621"
+CloudTexture = "dc4b9f0b-d008-45c6-96a4-01dd947ac621"
+
+;; If you run this login server behind a proxy, set this to true
+;; HasProxy = true
+
+;; Force all users to wear (OBJECTS ONLY FOR NOW) objects in this folder. 
+;; Value should be a unique folder name for the owner
+;; make sure you have worn the objects at least once before you enable this
+;; Folder Owner Value should be the UUID of the user that owns the folder 
+forceUserToWearFolderName = ""
+forceUserToWearFolderOwner = ""
+
+;; Optionally you can provide a list to be used to create and suggest names for
+;; new users. Names need to separated by commas and a mixture of first and second
+;; Example: UserNameSeed = "Aaron,Bassett,Kellie,Bridgforth,Violeta,Anglin,Dora,Osborne,Noel,Tedja,Mark,Lampron,Lucas,Sumrall,Elnur,Murga,Samir,Vannorman,Adjin,Cozart,Lars,Christian"
+UserNameSeed = ""
