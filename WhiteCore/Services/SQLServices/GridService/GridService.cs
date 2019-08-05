@@ -454,9 +454,12 @@ namespace WhiteCore.Services.SQLServices.GridService
                 r.RegionLocY < regionInfos.RegionLocY + regionInfos.RegionSizeY) &&
                 r.RegionID != regionInfos.RegionID))
             {
+                var regx = regionInfos.RegionLocX / Constants.RegionSize;
+                var regy = regionInfos.RegionLocY / Constants.RegionSize;
                 MainConsole.Instance.WarnFormat (
-                    "[Grid service]: Region {0} tried to register in coordinates {1}, {2} which are already in use in scope {3}.",
-                    regionInfos.RegionID, regionInfos.RegionLocX, regionInfos.RegionLocY, regionInfos.ScopeID);
+                    "[Grid service]: Region {0} tried to register in coordinates {1}, {2} which overlaps another region.",
+                    regionInfos.RegionName, regx, regy);
+                MainConsole.Instance.WarnFormat ( "RegionInfo UUID {0} in scope {1}.", regionInfos.RegionID, regionInfos.ScopeID);
                 return new RegisterRegion { Error = "Region overlaps another region" };
             }
 
