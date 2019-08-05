@@ -7907,14 +7907,15 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
                 IXmlRpcRouter xmlRpcRouter = World.RequestModuleInterface<IXmlRpcRouter>();
                 if (xmlRpcRouter != null)
                 {
-                    string ExternalHostName = MainServer.Instance.HostName;
+                    string hostName = MainServer.Instance.HostName;
+                    string protocol = MainServer.Instance.Secure ? "https://" : "http://";
 
                     xmlRpcRouter.RegisterNewReceiver(
                         m_ScriptEngine.ScriptModule,
                         channelID,
                         m_host.UUID,
                         m_itemID, 
-                        string.Format("http://{0}:{1}/", ExternalHostName,xmlrpcMod.Port)
+                        string.Format("{0}{1}:{2}/", protocol, hostName, xmlrpcMod.Port)
                     );
                 }
                 object[] resobj = {

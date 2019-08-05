@@ -396,7 +396,10 @@ namespace WhiteCore.Framework.Services
         /// </summary>
         public string ServerURI
         {
-            get { return "http://" + ExternalHostName + ":" + HttpPort; }	// this returns the main server port- gridserver??
+            get {
+                var protocol = MainServer.Instance.Secure ? "https://" : "http://";
+                return protocol + ExternalHostName + ":" + HttpPort;
+            }	// this returns the main server port- gridserver??
         }
 
         /// <summary>
@@ -405,7 +408,9 @@ namespace WhiteCore.Framework.Services
         /// <value>The region URI.</value>
         public string RegionURI
         {
-            get { return "http://" + ExternalHostName + ":" + InternalPort; }	
+            get { 
+                var protocol = MainServer.Instance.Secure ? "https://" : "http://";
+                return protocol + ExternalHostName + ":" + InternalPort; }	
         }
 
         public GridRegion ()

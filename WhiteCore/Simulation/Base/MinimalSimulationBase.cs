@@ -323,9 +323,8 @@ namespace WhiteCore.Simulation.Base
                     hostName = "http" + (useHTTPS ? "s" : "") + "://" + Utilities.GetExternalIp ();
                 }
             
-                //Clean it up a bit
-                if (hostName.StartsWith ("http://", StringComparison.OrdinalIgnoreCase) || hostName.StartsWith ("https://", StringComparison.OrdinalIgnoreCase))
-                    hostName = hostName.Replace ("https://", "").Replace ("http://", "");
+                // Clean it up a bit
+                hostName = hostName.Replace ("https://", "").Replace ("http://", "");
                 if (hostName.EndsWith ("/", StringComparison.Ordinal))
                     hostName = hostName.Remove (hostName.Length - 1, 1);
                 
