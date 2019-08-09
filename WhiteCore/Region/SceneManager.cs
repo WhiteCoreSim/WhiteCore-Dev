@@ -675,11 +675,21 @@ namespace WhiteCore.Region
 
 			MainConsole.Instance.Commands.AddCommand (
 				"scale region objects",
-				"scale region objects <factor>",
-				"Scales all region objects by the specified amount (please back up your region before using)",
+				"scale region objects <factor> [centerX] [centerY]",
+				"Scales all region objects size and relative positions by the specified amount\n" +
+                "  optionally re-centers relative to the supplied positions (default center of region)\n" +
+                "  (Please back up your region before using)",
 				HandleScaleScene, true, true);
 
-			MainConsole.Instance.Commands.AddCommand (
+            MainConsole.Instance.Commands.AddCommand (
+                "rescale region objects",
+                "rescale region objects <factorX> <factorY> <factorZ> [centerX] [centerY]",
+                "Scales all region objects size by the specified <x,y,z> values\n" +
+                "  optionally re-centers (default center of region)\n" +
+                "  (Please back up your region before using)",
+                HandleReScaleScene, true, true);
+
+            MainConsole.Instance.Commands.AddCommand (
 				"reposition region objects",
 				"reposition region objects <xOffset> <yOffset> <zOffset>",
 				"Move region objects by the specified amounts (Have you backed up your region?)",
@@ -1611,7 +1621,7 @@ namespace WhiteCore.Region
 		/// <param name="cmdparams">Cmdparams.</param>
 		void HandleRotateScene (IScene scene, string [] cmdparams)
 		{
-			var usage = "Usage: rotate scene objects <angle in degrees> [centerX centerY]\n" +
+			var usage = "Usage: rotate scene objects <angle in degrees> [centerX] [centerY]\n" +
 				"(centerX and centerY are optional and default to the center of the region";
 
 			if (cmdparams.Length < 4) {
@@ -1652,13 +1662,13 @@ namespace WhiteCore.Region
 		}
 
 		/// <summary>
-		/// Handles scaling of a scene.
+		/// Handles scaling of all objects in a scene, both size and relative position to each other.
 		/// </summary>
 		/// <param name="scene">Scene.</param>
 		/// <param name="cmdparams">Cmdparams.</param>
 		void HandleScaleScene (IScene scene, string [] cmdparams)
 		{
-			string usage = "Usage: scale region objects <factor>";
+			string usage = "Usage: scale region objects <factor> [centerX] [centerY]";
 
 			if (cmdparams.Length < 4) {
 				MainConsole.Instance.Info (usage);
@@ -1686,7 +1696,7 @@ namespace WhiteCore.Region
 					// offset above/below the current land height
 					var offsetZ = ent.AbsolutePosition.Z - heightmap.GetNormalizedGroundHeight ((int)ent.AbsolutePosition.X, (int)ent.AbsolutePosition.Y);
 
-					offsetPos.Z = offsetZ;          // only scale the height offset 
+					offsetPos.Z = offsetZ;
 					offsetPos *= factor;
 
 					var entParts = ent.ChildrenEntities ();
@@ -1708,6 +1718,74 @@ namespace WhiteCore.Region
 
 		}
 
+
+        /// <summary>
+        /// Handles scaling of all objects in a scene withour changing their relative positions.
+        /// </summary>
+        /// <param name="scene">Scene.</param>
+        /// <param name="cmdparams">Cmdparams.</param>
+        void HandleReScaleScene (IScene scene, string [] cmdparams)
+        {
+        	string usage = "Usage: rescale region objects <factorX> <factorY> <factorZ> [centerX] [centerY]";
+
+        	if (cmdparams.Length < 4) {
+        		MainConsole.Instance.Info (usage);
+        		return;
+        	}
+
+            // assume overall scaling factor initially
+            var xScale = Convert.ToSingle (cmdparams [3]);
+            var yScale = 1.0f;
+            var zScale = 1.0f;
+
+            // individual axis scaling?
+            if (cmdparams.Length > 4)
+                yScale = Convert.ToSingle (cmdparams [4]);
+            if (cmdparams.Length > 5)
+                zScale = Convert.ToSingle (cmdparams [5]);
+
+            var newScale = new Vector3 (xScale, yScale, zScale);
+
+        	var centerX = scene.RegionInfo.RegionSizeX * 0.5f;
+        	var centerY = scene.RegionInfo.RegionSizeY * 0.5f;
+
+        	// center supplied?
+        	if (cmdparams.Length > 6)
+        		centerX = Convert.ToSingle (cmdparams [6]);
+        	if (cmdparams.Length > 7)
+        		centerY = Convert.ToSingle (cmdparams [7]);
+
+        	var center = new Vector3 (centerX, centerY, 0.0f);
+
+        	ITerrainChannel heightmap = scene.RequestModuleInterface<ITerrainChannel> ();
+        	ISceneEntity [] entitlList = scene.Entities.GetEntities ();
+
+        	// let' do some resizing
+        	foreach (ISceneEntity ent in entitlList) {
+        		if (!ent.IsAttachment) {
+        			Vector3 offsetPos = ent.AbsolutePosition - center;
+        			// offset above/below the current land height
+                    var offsetZ = ent.AbsolutePosition.Z - heightmap.GetNormalizedGroundHeight ((int)ent.AbsolutePosition.X, (int)ent.AbsolutePosition.Y);
+                    offsetPos.Z = offsetZ * zScale;          // scale the height offset  
+        			
+        			var entParts = ent.ChildrenEntities ();
+        			foreach (ISceneChildEntity enp in entParts) {
+        				enp.Resize (enp.Scale * newScale);
+
+        				var curOffset = enp.OffsetPosition;
+        				enp.OffsetPosition = (curOffset * newScale);
+
+        			}
+
+        			// account for terrain height and reposition
+        			var newPos = offsetPos + center;
+                    // add the ground height back in
+                    newPos.Z += heightmap.GetNormalizedGroundHeight ((int)newPos.X, (int)newPos.Y);        			ent.UpdateGroupPosition (newPos, true);
+        		}
+        	}
+        	MainConsole.Instance.Info ("    Rescaling of region objects completed");
+
+        }
 
 
 		/// <summary>
