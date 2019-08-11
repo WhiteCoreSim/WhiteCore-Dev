@@ -139,7 +139,7 @@ namespace WhiteCore.Services.SQLServices.GridService
             if (handlerConfig.GetString ("GridHandler", "") != Name)
                 return;
 
-            //MainConsole.Instance.DebugFormat("[Grid service]: Starting...");
+            // MainConsole.Instance.DebugFormat("[Grid service]: Starting...");
             Configure (config, registry);
         }
 
@@ -1159,7 +1159,7 @@ namespace WhiteCore.Services.SQLServices.GridService
                 r.Flags = flags;
                 RegionFlags f = (RegionFlags)flags;
 
-                MainConsole.Instance.Info (String.Format ("Set region {0} to {1}", r.RegionName, f));
+                MainConsole.Instance.Info (string.Format ("Set region {0} to {1}", r.RegionName, f));
                 m_Database.Store (r);
             }
         }
@@ -1261,9 +1261,9 @@ namespace WhiteCore.Services.SQLServices.GridService
                 return new List<mapItemReply> ();
 
             Dictionary<Vector3, int> Positions = new Dictionary<Vector3, int> ();
-            //Get a list of all the clients in the region and add them
+            // Get a list of all the clients in the region and add them
             List<UserInfo> userInfos = m_agentInfoService.GetUserInfos (region.RegionID);
-            if (userInfos != null)
+            if (userInfos.Count > 0)
             {
                 foreach (UserInfo userInfo in userInfos)
                 {
@@ -1279,7 +1279,7 @@ namespace WhiteCore.Services.SQLServices.GridService
                 }
             }
 
-            //Build the mapItemReply blocks
+            // Build the mapItemReply blocks
             mapItems = Positions.Select (position => new mapItemReply {
                 x = (uint) (region.RegionLocX + position.Key.X),
                 y = (uint) (region.RegionLocY + position.Key.Y),
@@ -1289,7 +1289,7 @@ namespace WhiteCore.Services.SQLServices.GridService
                 Extra2 = 0
             }).ToList ();
 
-            //If there are no agents, we send one blank one to the client
+            // If there are no agents, we send one blank one to the client
             if (mapItems.Count == 0)
             {
                 mapItemReply mapitem = new mapItemReply {
@@ -1312,7 +1312,7 @@ namespace WhiteCore.Services.SQLServices.GridService
                 NeighborLocation currentLoc = BuildNeighborLocation (r);
                 if (m_KnownNeighbors.ContainsKey (currentLoc))
                 {
-                    //Add/Remove them to/from the list
+                    // Add/Remove them to/from the list
                     if (down)
                         m_KnownNeighbors [currentLoc].Remove (regionInfos);
                     else if (m_KnownNeighbors [currentLoc].Find ( delegate(GridRegion rr)

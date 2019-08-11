@@ -104,7 +104,8 @@ namespace WhiteCore.Modules.Web
                 IUserAccountService userService = webInterface.Registry.RequestModuleInterface<IUserAccountService> ();
                 if (agentInfoService != null) {
                     List<UserInfo> usersInRegion = agentInfoService.GetUserInfos (region.RegionID);
-                    vars.Add ("NumberOfUsersInRegion", usersInRegion != null ? usersInRegion.Count : 0);
+                    vars.Add ("NumberOfUsersInRegion", usersInRegion.Count);
+
                     List<Dictionary<string, object>> users = new List<Dictionary<string, object>> ();
                     if (userService != null) {
                         foreach (var client in usersInRegion) {

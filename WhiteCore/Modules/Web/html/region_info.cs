@@ -100,7 +100,7 @@ namespace WhiteCore.Modules.Web
 
                 if (agentInfoService != null) {
                     List<UserInfo> usersInRegion = agentInfoService.GetUserInfos (region.RegionID);
-                    if (usersInRegion == null) {
+                    if (usersInRegion.Count == 0) {
                         vars.Add ("NumberOfUsersInRegion", 0);
                         vars.Add ("UsersInRegion", new List<Dictionary<string, object>> ());
                     } else {

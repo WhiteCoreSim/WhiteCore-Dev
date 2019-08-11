@@ -98,16 +98,16 @@ namespace WhiteCore.Modules.Chat
                 return;
 
             IClientAPI client = (IClientAPI)sender;
-            MainConsole.Instance.DebugFormat ("[PRESENCE MODULE]: OnlineNotification requested by {0}", client.Name);
+            MainConsole.Instance.DebugFormat ("[Presence module]: OnlineNotification requested by {0}", client.Name);
 
-            List<UserInfo> status = m_Scene.RequestModuleInterface<IAgentInfoService> ().GetUserInfos (args);
-            if (status == null)
+            List<UserInfo> usersStatus = m_Scene.RequestModuleInterface<IAgentInfoService> ().GetUserInfos (args);
+            if (usersStatus.Count == 0)
                 return;
 
             List<UUID> online = new List<UUID> ();
             List<UUID> offline = new List<UUID> ();
 
-            foreach (UserInfo pi in status) {
+            foreach (UserInfo pi in usersStatus) {
                 UUID uuid = new UUID (pi.UserID);
                 if (pi.IsOnline && !online.Contains (uuid))
                     online.Add (uuid);
