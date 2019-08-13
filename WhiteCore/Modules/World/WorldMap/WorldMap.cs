@@ -241,32 +241,33 @@ namespace WhiteCore.Modules.WorldMap
             while (true) {
                 MapItemRequester item;
                 if (!m_itemsToRequest.TryDequeue (out item))
-                    break; //Nothing in the queue
+                    break; // Nothing in the queue
 
-                List<mapItemReply> mapitems;
+                List<mapItemReply> mapitems = new List<mapItemReply>();
                 if (!m_mapItemCache.TryGetValue (item.regionhandle, out mapitems))
-                //try again, might have gotten picked up by this already
+                // try again, might have gotten picked up by this already
                 {
                     multipleMapItemReply allmapitems = m_scene.GridService.GetMapItems (item.remoteClient.AllScopeIDs,
-                                                                                       item.regionhandle,
-                                                                                       (GridItemType)item.itemtype);
+                                                                                        item.regionhandle,
+                                                                                        (GridItemType)item.itemtype);
 
-                    if (allmapitems == null)
+                    if (allmapitems.items.Count == 0)       // nothing to see here...
                         continue;
                     
-                    //Send out the update
+                    // Send out the update
                     if (allmapitems.items.ContainsKey (item.regionhandle)) {
                         mapitems = allmapitems.items [item.regionhandle];
 
-                        //Update the cache
+                        // Update the cache
                         foreach (KeyValuePair<ulong, List<mapItemReply>> kvp in allmapitems.items) {
-                            m_mapItemCache.AddOrUpdate (kvp.Key, kvp.Value, 3 * 60); //3 mins
+                            m_mapItemCache.AddOrUpdate (kvp.Key, kvp.Value, 3 * 60);    // 3 mins
                         }
                     }
                 }
 
-                if (mapitems != null)
+                if (mapitems.Count > 0)          //   .if (mapitems != null)
                     item.remoteClient.SendMapItemReply (mapitems.ToArray (), item.itemtype, item.flags);
+                
                 Thread.Sleep (5);
             }
             itemRequesterIsRunning = false;
@@ -524,7 +525,7 @@ namespace WhiteCore.Modules.WorldMap
             }
 
             List<GridRegion> allRegions = new List<GridRegion> ();
-            if (regionInfos != null) {
+            if (regionInfos.Count > 0) {
                 foreach (GridRegion region in regionInfos) {
                     //Add the found in search region first
                     if (!allRegions.Contains (region)) {
@@ -540,7 +541,7 @@ namespace WhiteCore.Modules.WorldMap
                         (region.RegionLocY + (4 * Constants.RegionSize))
                     );
 
-                    if (nearRegions != null) {
+                    if (nearRegions.Count > 0) {
                         foreach (GridRegion nRegion in nearRegions) {
                             if (!allRegions.Contains (nRegion)) {
                                 allRegions.Add (nRegion);

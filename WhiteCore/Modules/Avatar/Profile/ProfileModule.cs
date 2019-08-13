@@ -699,9 +699,9 @@ namespace WhiteCore.Modules.Profiles
                         if (GUI != null && GUI.IsOnline) {
                             GridRegion region = m_Scene.GridService.GetRegionByUUID (
                                                     client.AllScopeIDs, GUI.CurrentRegionID);
-
-                            client.SendScriptTeleportRequest (client.Name, region.RegionName,
-                                GUI.CurrentPosition, GUI.CurrentLookAt);
+                            if (region != null)     // just being cautious here
+                                client.SendScriptTeleportRequest (client.Name, region.RegionName,
+                                                                  GUI.CurrentPosition, GUI.CurrentLookAt);
                         }
                     }
                 }

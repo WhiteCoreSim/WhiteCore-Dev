@@ -514,57 +514,61 @@ namespace WhiteCore.Services
                 // Change Online status and get the home region
                 //
                 GridRegion home = null;
-                if (guinfo != null && (guinfo.HomeRegionID != UUID.Zero) && m_GridService != null)
+                if (guinfo != null && (guinfo.HomeRegionID != UUID.Zero) && m_GridService != null) {
                     home = m_GridService.GetRegionByUUID (userAcct.AllScopeIDs, guinfo.HomeRegionID);
+                    if (home == null)       // the specified home region is not available?
+                        guinfo = null;
+                }
 
-                if (guinfo == null || guinfo.HomeRegionID == UUID.Zero) //Give them a default home and last
+                if (guinfo == null || guinfo.HomeRegionID == UUID.Zero)     // Give them a default home and last
                 {
                     bool positionSet = false;
+                    string regionName = "none";
+
                     if (guinfo == null)
                         guinfo = new UserInfo { UserID = userAcct.PrincipalID.ToString () };
-                    GridRegion DefaultRegion = null, FallbackRegion = null, SafeRegion = null;
+
                     if (m_GridService != null) {
                         if (m_DefaultHomeRegion != "") {
-                            DefaultRegion = m_GridService.GetRegionByName (userAcct.AllScopeIDs, m_DefaultHomeRegion);
-                            if (DefaultRegion != null)
-                                guinfo.HomeRegionID = guinfo.CurrentRegionID = DefaultRegion.RegionID;
+                            GridRegion homeRegion = m_GridService.GetRegionByName (userAcct.AllScopeIDs, m_DefaultHomeRegion);
+                            if (homeRegion != null)
+                                guinfo.HomeRegionID = guinfo.CurrentRegionID = homeRegion.RegionID;
                             guinfo.HomePosition = guinfo.CurrentPosition = m_DefaultHomeRegionPos;
                             positionSet = true;
+                            regionName = homeRegion.RegionName;
                         }
+
+                        // if we have not found our home region...
                         if (guinfo.HomeRegionID == UUID.Zero) {
-                            List<GridRegion> DefaultRegions = m_GridService.GetDefaultRegions (userAcct.AllScopeIDs);
-                            DefaultRegion = DefaultRegions.Count == 0 ? null : DefaultRegions [0];
-
-                            if (DefaultRegion != null)
-                                guinfo.HomeRegionID = guinfo.CurrentRegionID = DefaultRegion.RegionID;
-
-                            if (guinfo.HomeRegionID == UUID.Zero) {
-                                List<GridRegion> Fallback = m_GridService.GetFallbackRegions (userAcct.AllScopeIDs, 0, 0);
-                                FallbackRegion = Fallback.Count == 0 ? null : Fallback [0];
-
-                                if (FallbackRegion != null)
-                                    guinfo.HomeRegionID = guinfo.CurrentRegionID = FallbackRegion.RegionID;
-
-                                if (guinfo.HomeRegionID == UUID.Zero) {
-                                    List<GridRegion> Safe = m_GridService.GetSafeRegions (userAcct.AllScopeIDs, 0, 0);
-                                    SafeRegion = Safe.Count == 0 ? null : Safe [0];
-
-                                    if (SafeRegion != null)
-                                        guinfo.HomeRegionID = guinfo.CurrentRegionID = SafeRegion.RegionID;
+                            List<GridRegion> defaultRegions = m_GridService.GetDefaultRegions (userAcct.AllScopeIDs);
+                            if (defaultRegions.Count > 0) {
+                                guinfo.HomeRegionID = guinfo.CurrentRegionID = defaultRegions [0].RegionID;
+                                regionName = defaultRegions [0].RegionName;
+                            } else {
+                                List<GridRegion> fallbackRegions = m_GridService.GetFallbackRegions (userAcct.AllScopeIDs, 0, 0);
+                                if (fallbackRegions.Count > 0) {
+                                    guinfo.HomeRegionID = guinfo.CurrentRegionID = fallbackRegions [0].RegionID;
+                                    regionName = fallbackRegions [0].RegionName;
+                                } else {
+                                    List<GridRegion> safeRegions = m_GridService.GetSafeRegions (userAcct.AllScopeIDs, 0, 0);
+                                    if (safeRegions.Count > 0) {
+                                        guinfo.HomeRegionID = guinfo.CurrentRegionID = safeRegions [0].RegionID;
+                                        regionName = safeRegions [0].RegionName;
+                                    }
                                 }
                             }
                         }
                     }
 
-                    if (!positionSet)
+                    if (!positionSet) {
                         guinfo.CurrentPosition = guinfo.HomePosition = new Vector3 (128, 128, 25);
-                    guinfo.HomeLookAt = guinfo.CurrentLookAt = new Vector3 (0, 0, 0);
-
-                    m_agentInfoService.SetHomePosition (guinfo.UserID, guinfo.HomeRegionID, guinfo.HomePosition,
-                                                       guinfo.HomeLookAt);
+                        guinfo.HomeLookAt = guinfo.CurrentLookAt = new Vector3 (0, 0, 0);
+                    }
+                    m_agentInfoService.SetHomePosition (guinfo.UserID, guinfo.HomeRegionID,
+                                                        guinfo.HomePosition, guinfo.HomeLookAt);
 
                     MainConsole.Instance.Info ("[LLLoginService]: User did not have a home, set to " +
-                                              (guinfo.HomeRegionID == UUID.Zero ? "(no region found)" : guinfo.HomeRegionID.ToString ()));
+                                              (guinfo.HomeRegionID == UUID.Zero ? "(no region found)" : regionName));
                 }
 
                 //
@@ -678,6 +682,7 @@ namespace WhiteCore.Services
                     // Revert their logged in status if we got that far
                     m_agentInfoService.SetLoggedIn (userAcct.PrincipalID.ToString (), false, UUID.Zero, "");
                 }
+
                 return LLFailedLoginResponse.InternalError;
             }
         }
@@ -791,28 +796,29 @@ namespace WhiteCore.Services
 
                 if (tryDefaults) {
                     tpFlags &= ~TeleportFlags.ViaLandmark;
-                    List<GridRegion> defaults = m_GridService.GetDefaultRegions (account.AllScopeIDs);
-                    if (defaults != null && defaults.Count > 0) {
-                        region = defaults [0];
+                    List<GridRegion> defaultRegions = m_GridService.GetDefaultRegions (account.AllScopeIDs);
+                    if (defaultRegions.Count > 0) {
+                        region = defaultRegions [0];
                         where = "safe";
                     } else {
-                        List<GridRegion> fallbacks = m_GridService.GetFallbackRegions (account.AllScopeIDs, 0, 0);
-                        if (fallbacks != null && fallbacks.Count > 0) {
-                            region = fallbacks [0];
+                        // Try fo a fallback region
+                        List<GridRegion> fallbackRegions = m_GridService.GetFallbackRegions (account.AllScopeIDs, 0, 0);
+                        if (fallbackRegions.Count > 0) {
+                            region = fallbackRegions [0];
                             where = "safe";
                         } else {
-                            //Try to find any safe region
+                            // Try to find any safe region
                             List<GridRegion> safeRegions = m_GridService.GetSafeRegions (account.AllScopeIDs, 0, 0);
-                            if (safeRegions != null && safeRegions.Count > 0) {
+                            if (safeRegions.Count > 0) {
                                 region = safeRegions [0];
                                 where = "safe";
                             } else {
                                 MainConsole.Instance.WarnFormat (
                                     "[LLogin service]: User {0} {1} does not have a valid home and this grid does not have default locations. Attempting to find random region",
                                     account.FirstName, account.LastName);
-                                defaults = m_GridService.GetRegionsByName (account.AllScopeIDs, "", 0, 1);
-                                if (defaults != null && defaults.Count > 0) {
-                                    region = defaults [0];
+                                List<GridRegion> allRegions = m_GridService.GetRegionsByName (account.AllScopeIDs, "", 0, 1);
+                                if (allRegions.Count > 0) {
+                                    region = allRegions [0];
                                     where = "safe";
                                 }
                             }
@@ -837,20 +843,22 @@ namespace WhiteCore.Services
 
                 if (pinfo.CurrentRegionID.Equals (UUID.Zero) ||
                     (region = m_GridService.GetRegionByUUID (account.AllScopeIDs, pinfo.CurrentRegionID)) == null) {
+                    // Current region appears to be invalid...
+
                     tpFlags &= ~TeleportFlags.ViaLandmark;
-                    List<GridRegion> defaults = m_GridService.GetDefaultRegions (account.AllScopeIDs);
-                    if (defaults != null && defaults.Count > 0) {
-                        region = defaults [0];
+                    List<GridRegion> fbRegions = m_GridService.GetDefaultRegions (account.AllScopeIDs);
+                    if (fbRegions.Count > 0) {
+                        region = fbRegions [0];
                         where = "safe";
                     } else {
-                        defaults = m_GridService.GetFallbackRegions (account.AllScopeIDs, 0, 0);
-                        if (defaults != null && defaults.Count > 0) {
-                            region = defaults [0];
+                        fbRegions = m_GridService.GetFallbackRegions (account.AllScopeIDs, 0, 0);
+                        if (fbRegions.Count > 0) {
+                            region = fbRegions [0];
                             where = "safe";
                         } else {
-                            defaults = m_GridService.GetSafeRegions (account.AllScopeIDs, 0, 0);
-                            if (defaults != null && defaults.Count > 0) {
-                                region = defaults [0];
+                            fbRegions = m_GridService.GetSafeRegions (account.AllScopeIDs, 0, 0);
+                            if (fbRegions.Count > 0) {
+                                region = fbRegions [0];
                                 where = "safe";
                             }
                         }
@@ -891,37 +899,44 @@ namespace WhiteCore.Services
                 string regionName = uriMatch.Groups ["region"].ToString ();
                 if (!regionName.Contains ("@")) {
                     List<GridRegion> regions = m_GridService.GetRegionsByName (account.AllScopeIDs, regionName, 0, 1);
-                    if ((regions == null) || (regions.Count == 0)) {
-                        MainConsole.Instance.InfoFormat (
-                            "[LLogin service]: Got Custom Login URI {0}, can't locate region {1}. Trying defaults.",
-                            startLocation, regionName);
-                        regions = m_GridService.GetDefaultRegions (account.AllScopeIDs);
-                        if (regions != null && regions.Count > 0) {
-                            where = "safe";
-                            GetRegionLandingPoint (regions [0], out position, out lookAt);
-                            return regions [0];
-                        }
-                        List<GridRegion> fallbacks = m_GridService.GetFallbackRegions (account.AllScopeIDs, 0, 0);
-                        if (fallbacks != null && fallbacks.Count > 0) {
-                            where = "safe";
-                            GetRegionLandingPoint (fallbacks [0], out position, out lookAt);
-                            return fallbacks [0];
-                        }
-                        //Try to find any safe region
-                        List<GridRegion> safeRegions = m_GridService.GetSafeRegions (account.AllScopeIDs, 0, 0);
-                        if (safeRegions != null && safeRegions.Count > 0) {
-                            where = "safe";
-                            GetRegionLandingPoint (safeRegions [0], out position, out lookAt);
-                            return safeRegions [0];
-                        }
-                        MainConsole.Instance.InfoFormat (
-                            "[LLogin service]: Got Custom Login URI {0}, Grid does not have any available regions.",
-                            startLocation);
-                        return null;
+                    if (regions.Count > 0) {
+                        // get landing point if set
+                        GetRegionLandingPoint (regions [0], out position, out lookAt);
+                        return regions [0];
                     }
-                    // get landing point if set
-                    GetRegionLandingPoint (regions [0], out position, out lookAt);
-                    return regions [0];
+                       
+                    // could not locate requested region
+                    MainConsole.Instance.InfoFormat (
+                        "[LLogin service]: Got Custom Login URI {0}, can't locate region {1}. Trying defaults.",
+                        startLocation, regionName);
+                    
+                    List<GridRegion> defaults = m_GridService.GetDefaultRegions (account.AllScopeIDs);
+                    if (defaults.Count > 0) {
+                        where = "safe";
+                        GetRegionLandingPoint (defaults [0], out position, out lookAt);
+
+                        return defaults [0];
+                    }
+
+                    List<GridRegion> fallbacks = m_GridService.GetFallbackRegions (account.AllScopeIDs, 0, 0);
+                    if (fallbacks.Count > 0) {
+                        where = "safe";
+                        GetRegionLandingPoint (fallbacks [0], out position, out lookAt);
+                        return fallbacks [0];
+                    }
+
+                    // Try to find any safe region
+                    List<GridRegion> safeRegions = m_GridService.GetSafeRegions (account.AllScopeIDs, 0, 0);
+                    if (safeRegions.Count > 0) {
+                        where = "safe";
+                        GetRegionLandingPoint (safeRegions [0], out position, out lookAt);
+                        return safeRegions [0];
+                    }
+                    MainConsole.Instance.InfoFormat (
+                        "[LLogin service]: Got Custom Login URI {0}, Grid does not have any available regions.",
+                        startLocation);
+                    return null;
+
 
                 }
 
@@ -936,7 +951,7 @@ namespace WhiteCore.Services
                 // Valid specification of a remote grid
 
                 regionName = parts [0];
-                //Try now that we removed the domain locator
+                // Try now that we removed the domain locator
                 GridRegion region = m_GridService.GetRegionByName (account.AllScopeIDs, regionName);
                 if (region != null && region.RegionName == regionName) {
                     // Make sure the region name is right too... it could just be a similar name
@@ -944,21 +959,21 @@ namespace WhiteCore.Services
                     return region;
                 }
 
-                List<GridRegion> defaults = m_GridService.GetDefaultRegions (account.AllScopeIDs);
-                if (defaults != null && defaults.Count > 0) {
+                List<GridRegion> defaultRegions = m_GridService.GetDefaultRegions (account.AllScopeIDs);
+                if (defaultRegions.Count > 0) {
                     where = "safe";
-                    GetRegionLandingPoint (defaults [0], out position, out lookAt);
-                    return defaults [0];
+                    GetRegionLandingPoint (defaultRegions [0], out position, out lookAt);
+                    return defaultRegions [0];
                 } else {
                     List<GridRegion> fallbacks = m_GridService.GetFallbackRegions (account.AllScopeIDs, 0, 0);
-                    if (fallbacks != null && fallbacks.Count > 0) {
+                    if (fallbacks.Count > 0) {
                         where = "safe";
                         GetRegionLandingPoint (fallbacks [0], out position, out lookAt);
                         return fallbacks [0];
                     } else {
-                        //Try to find any safe region
+                        // Try to find any safe region
                         List<GridRegion> safeRegions = m_GridService.GetSafeRegions (account.AllScopeIDs, 0, 0);
-                        if (safeRegions != null && safeRegions.Count > 0) {
+                        if (safeRegions.Count > 0) {
                             where = "safe";
                             GetRegionLandingPoint (safeRegions [0], out position, out lookAt);
                             return safeRegions [0];
@@ -1000,7 +1015,7 @@ namespace WhiteCore.Services
             bool success = args.Success;
             if (!success && m_GridService != null) {
                 MainConsole.Instance.DebugFormat ("[LoginService]: Failed to log {0} into {1} at {2}...", account.Name, destination.RegionName, destination.ServerURI);
-                //Remove the landmark flag (landmark is used for ignoring the landing points in the region)
+                // Remove the landmark flag (landmark is used for ignoring the landing points in the region)
                 aCircuit.TeleportFlags &= ~(uint)TeleportFlags.ViaLandmark;
                 m_GridService.SetRegionUnsafe (destination.RegionID);
 
@@ -1009,34 +1024,34 @@ namespace WhiteCore.Services
 
                 // Try the default regions
                 List<GridRegion> defaultRegions = m_GridService.GetDefaultRegions (account.AllScopeIDs);
-                if (defaultRegions != null) {
+                if (defaultRegions.Count > 0) {
                     success = TryFindGridRegionForAgentLogin (defaultRegions, account,
-                                                             session, secureSession, circuitCode, position,
-                                                             clientIP, aCircuit, friendsToInform,
-                                                             out seedCap, out reason, out dest);
+                                                              session, secureSession, circuitCode, position,
+                                                              clientIP, aCircuit, friendsToInform,
+                                                              out seedCap, out reason, out dest);
                 }
                 if (!success) {
                     // Try the fallback regions
                     List<GridRegion> fallbacks = m_GridService.GetFallbackRegions (account.AllScopeIDs,
-                                                                                  destination.RegionLocX,
-                                                                                  destination.RegionLocY);
-                    if (fallbacks != null) {
+                                                                                   destination.RegionLocX,
+                                                                                   destination.RegionLocY);
+                    if (fallbacks.Count > 0) {
                         success = TryFindGridRegionForAgentLogin (fallbacks, account,
-                                                                 session, secureSession, circuitCode,
-                                                                 position,
-                                                                 clientIP, aCircuit, friendsToInform,
-                                                                 out seedCap, out reason, out dest);
+                                                                  session, secureSession, circuitCode,
+                                                                  position,
+                                                                  clientIP, aCircuit, friendsToInform,
+                                                                  out seedCap, out reason, out dest);
                     }
                     if (!success) {
-                        //Try to find any safe region
+                        // Try to find any safe region
                         List<GridRegion> safeRegions = m_GridService.GetSafeRegions (account.AllScopeIDs,
-                                                                                    destination.RegionLocX,
-                                                                                    destination.RegionLocY);
-                        if (safeRegions != null) {
+                                                                                     destination.RegionLocX,
+                                                                                     destination.RegionLocY);
+                        if (safeRegions.Count > 0) {
                             success = TryFindGridRegionForAgentLogin (safeRegions, account,
-                                                                     session, secureSession, circuitCode,
-                                                                     position, clientIP, aCircuit, friendsToInform,
-                                                                     out seedCap, out reason, out dest);
+                                                                      session, secureSession, circuitCode,
+                                                                      position, clientIP, aCircuit, friendsToInform,
+                                                                      out seedCap, out reason, out dest);
                             if (!success)
                                 reason = "No Region Found";
                         }

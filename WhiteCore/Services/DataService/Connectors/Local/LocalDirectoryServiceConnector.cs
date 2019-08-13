@@ -1198,8 +1198,8 @@ namespace WhiteCore.Services.DataService
             IRegionData regiondata = Framework.Utilities.DataManager.RequestPlugin<IRegionData>();
             if (regiondata != null)
             {
-                List<GridRegion> regions = regiondata.Get(regionName, null, null, null);
-                if (regions != null && regions.Count >= 1)
+                List<GridRegion> regions = regiondata.GetList(regionName, null, null, null);
+                if (regions.Count > 0)
                 {
                     QueryFilter filter = new QueryFilter();
                     filter.andFilters["region"] = regions[0].RegionID.ToString();

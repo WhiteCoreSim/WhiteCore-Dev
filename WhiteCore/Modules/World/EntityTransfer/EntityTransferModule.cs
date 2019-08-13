@@ -195,12 +195,12 @@ namespace WhiteCore.Modules.EntityTransfer
             try {
                 string reason = "";
                 if (finalDestination.RegionHandle == sp.Scene.RegionInfo.RegionHandle) {
-                    //First check whether the user is allowed to move at all
+                    // First check whether the user is allowed to move at all
                     if (!sp.Scene.Permissions.AllowedOutgoingLocalTeleport (sp.UUID, out reason)) {
                         sp.ControllingClient.SendTeleportFailed (reason);
                         return;
                     }
-                    //Now respect things like parcel bans with this
+                    // Now respect things like parcel bans with this
                     if (
                         !sp.Scene.Permissions.AllowedIncomingTeleport (sp.UUID, position, teleportFlags, out position,
                                                                       out reason)) {
@@ -255,16 +255,19 @@ namespace WhiteCore.Modules.EntityTransfer
 
             AgentData agent = new AgentData ();
             sp.CopyTo (agent);
-            //Fix the position
+            // Fix the position
             agent.Position = position;
 
             ISyncMessagePosterService syncPoster = sp.Scene.RequestModuleInterface<ISyncMessagePosterService> ();
             if (syncPoster != null) {
-                //This does CreateAgent and sends the EnableSimulator/EstablishAgentCommunication/TeleportFinish
+                // This does CreateAgent and sends the EnableSimulator/EstablishAgentCommunication/TeleportFinish
                 //  messages if they need to be called and deals with the callback
                 syncPoster.PostToServer (SyncMessageHelper.TeleportAgent ((int)sp.DrawDistance,
-                                                                        agentCircuit, agent, teleportFlags,
-                                                                        finalDestination, sp.Scene.RegionInfo.RegionID));
+                                                                          agentCircuit,
+                                                                          agent,
+                                                                          teleportFlags,
+                                                                          finalDestination,
+                                                                          sp.Scene.RegionInfo.RegionID));
             }
         }
 
@@ -275,7 +278,7 @@ namespace WhiteCore.Modules.EntityTransfer
                 return;
 
             sp.IsChildAgent = false;
-            //Tell modules about it
+            // Tell modules about it
             sp.AgentFailedToLeave ();
             sp.ControllingClient.SendTeleportFailed (reason);
             if (isCrossing)
@@ -286,6 +289,7 @@ namespace WhiteCore.Modules.EntityTransfer
         {
             AgentCircuitData agentCircuit = sp.ControllingClient.RequestClientInfo ();
             agentCircuit.StartingPosition = position;
+
             return agentCircuit;
 
         }
@@ -297,14 +301,14 @@ namespace WhiteCore.Modules.EntityTransfer
 
             sp.SetAgentLeaving (finalDestination);
 
-            //Kill the groups here, otherwise they will become ghost attachments 
+            // Kill the groups here, otherwise they will become ghost attachments 
             //  and stay in the sim, they'll get re-added below into the new sim
-            //KillAttachments(sp);
+            // KillAttachments(sp);
 
             // Well, this is it. The agent is over there.
             KillEntity (sp.Scene, sp);
 
-            //Make it a child agent for now... the grid will kill us later if we need to close
+            // Make it a child agent for now... the grid will kill us later if we need to close
             sp.MakeChildAgent (finalDestination);
 
             if (isCrossing)
@@ -323,7 +327,7 @@ namespace WhiteCore.Modules.EntityTransfer
         {
             sp.Scene.ForEachClient (delegate (IClientAPI client) {
                 if (sp.UUID != client.AgentId)
-                    //Don't send kill requests to us, it'll just look jerky
+                    // Don't send kill requests to us, it'll just look jerky
                     client.SendKillObject (sp.Scene.RegionInfo.RegionHandle, grp);
             });
         }
@@ -448,7 +452,7 @@ namespace WhiteCore.Modules.EntityTransfer
 
         public virtual bool TeleportHome (UUID id, IClientAPI client)
         {
-            //MainConsole.Instance.DebugFormat[Entity transfer]r]: Request to teleport {0} {1} home", client.FirstName, client.LastName);
+            // MainConsole.Instance.DebugFormat[Entity transfer]r]: Request to teleport {0} {1} home", client.FirstName, client.LastName);
 
             UserInfo uinfo =
                 client.Scene.RequestModuleInterface<IAgentInfoService> ().GetUserInfo (client.AgentId.ToString ());
@@ -456,30 +460,30 @@ namespace WhiteCore.Modules.EntityTransfer
             if (uinfo != null) {
                 GridRegion regionInfo = client.Scene.GridService.GetRegionByUUID (client.AllScopeIDs, uinfo.HomeRegionID);
                 if (regionInfo == null) {
-                    //can't find the Home region: Tell viewer and abort
+                    // can't find the Home region: Tell viewer and abort
                     client.SendTeleportFailed ("Your home region could not be found.");
                     return false;
                 }
                 MainConsole.Instance.DebugFormat ("[Entity transfer]: User's home region is {0} {1} ({2}-{3})",
-                                                 regionInfo.RegionName, regionInfo.RegionID,
-                                                 regionInfo.RegionLocX / Constants.RegionSize,
-                                                 regionInfo.RegionLocY / Constants.RegionSize);
+                                                  regionInfo.RegionName, regionInfo.RegionID,
+                                                  regionInfo.RegionLocX / Constants.RegionSize,
+                                                  regionInfo.RegionLocY / Constants.RegionSize);
 
                 RequestTeleportLocation (
                     client, regionInfo, uinfo.HomePosition, uinfo.HomeLookAt,
                     (uint)(TeleportFlags.SetLastToTarget | TeleportFlags.ViaHome));
             } else {
-                //Default region time...
-                List<GridRegion> Regions = client.Scene.GridService.GetDefaultRegions (client.AllScopeIDs);
-                if (Regions.Count != 0) {
+                // Default region time...
+                List<GridRegion> defaultRegions = client.Scene.GridService.GetDefaultRegions (client.AllScopeIDs);
+                if (defaultRegions.Count > 0) {
                     MainConsole.Instance.DebugFormat ( "[Entity transfer]: User's home region was not found, using {0} {1} ({2}-{3})",
-                        Regions [0].RegionName,
-                        Regions [0].RegionID,
-                        Regions [0].RegionLocX / Constants.RegionSize,
-                        Regions [0].RegionLocY / Constants.RegionSize);
+                        defaultRegions [0].RegionName,
+                        defaultRegions [0].RegionID,
+                        defaultRegions [0].RegionLocX / Constants.RegionSize,
+                        defaultRegions [0].RegionLocY / Constants.RegionSize);
 
                     RequestTeleportLocation (
-                        client, Regions [0], new Vector3 (128, 128, 25), new Vector3 (128, 128, 128),
+                        client, defaultRegions [0], new Vector3 (128, 128, 25), new Vector3 (128, 128, 128),
                         (uint)(TeleportFlags.SetLastToTarget | TeleportFlags.ViaHome));
                 } else
                     return false;
@@ -498,7 +502,7 @@ namespace WhiteCore.Modules.EntityTransfer
             pos.X = (agent.Scene.RegionInfo.RegionLocX + pos.X) - crossingRegion.RegionLocX;
             pos.Y = (agent.Scene.RegionInfo.RegionLocY + pos.Y) - crossingRegion.RegionLocY;
 
-            //Make sure that they are within bounds (velocity can push it out of bounds)
+            // Make sure that they are within bounds (velocity can push it out of bounds)
             if (pos.X < 0)
                 pos.X = 1;
             if (pos.Y < 0)
@@ -529,14 +533,17 @@ namespace WhiteCore.Modules.EntityTransfer
                 AgentCircuitData agentCircuit = BuildCircuitDataForPresence (agent, attemptedPos);
                 agentCircuit.TeleportFlags = (uint)TeleportFlags.ViaRegionID;
 
-                //This does UpdateAgent and closing of child agents
+                // This does UpdateAgent and closing of child agents
                 //  messages if they need to be called
                 ISyncMessagePosterService syncPoster =
                     agent.Scene.RequestModuleInterface<ISyncMessagePosterService> ();
                 if (syncPoster != null) {
-                    syncPoster.PostToServer (SyncMessageHelper.CrossAgent (crossingRegion, attemptedPos,
-                                                                         agent.Velocity, agentCircuit, cAgent,
-                                                                         agent.Scene.RegionInfo.RegionID));
+                    syncPoster.PostToServer (SyncMessageHelper.CrossAgent (crossingRegion,
+                                                                           attemptedPos,
+                                                                           agent.Velocity,
+                                                                           agentCircuit,
+                                                                           cAgent,
+                                                                           agent.Scene.RegionInfo.RegionID));
                 }
             } catch (Exception ex) {
                 MainConsole.Instance.Warn ("[Entity transfer]: Exception in crossing: " + ex);
@@ -549,9 +556,9 @@ namespace WhiteCore.Modules.EntityTransfer
             if (attModule != null) {
                 ISceneEntity [] attachments = attModule.GetAttachmentsForAvatar (agent.UUID);
                 foreach (ISceneEntity grp in attachments) {
-                    //Kill in all clients as it will be re-added in the other region
+                    // Kill in all clients as it will be re-added in the other region
                     KillEntities (agent, grp.ChildrenEntities ().ToArray ());
-                    //Now remove it from the Scene so that it will not come back
+                    // Now remove it from the Scene so that it will not come back
                     agent.Scene.SceneGraph.DeleteEntity (grp);
                 }
             }
@@ -610,6 +617,7 @@ namespace WhiteCore.Modules.EntityTransfer
             if (destination != null && !CrossPrimGroupIntoNewRegion (destination, grp, attemptedPosition)) {
                 grp.OffsetForNewRegion (oldGroupPosition);
                 grp.ScheduleGroupUpdate (PrimUpdateFlags.ForcedFullUpdate);
+
                 return false;
             }
             return true;
@@ -711,12 +719,11 @@ namespace WhiteCore.Modules.EntityTransfer
                 return false;
             }
 
-            //if (!sceneObject.IsAttachmentCheckFull()) // Not Attachment
+            // if (!sceneObject.IsAttachmentCheckFull()) // Not Attachment
             {
                 if (!scene.Permissions.CanObjectEntry (sceneObject.UUID,
                                                       true, sceneObject.AbsolutePosition, sceneObject.OwnerID)) {
                     // Deny non attachments based on parcel settings
-                    //
                     MainConsole.Instance.Info ("[Entity transfer]: Denied prim crossing because of parcel settings");
 
                     IBackupModule backup = scene.RequestModuleInterface<IBackupModule> ();
@@ -726,11 +733,12 @@ namespace WhiteCore.Modules.EntityTransfer
                     return false;
                 }
 
-                sceneObject.IsInTransit = false; //Reset this now that it's entering here
+                sceneObject.IsInTransit = false;        // Reset this now that it's entering here
                 if (scene.SceneGraph.AddPrimToScene (sceneObject)) {
                     if (sceneObject.IsSelected)
                         sceneObject.RootChild.CreateSelected = true;
                     sceneObject.ScheduleGroupUpdate (PrimUpdateFlags.ForcedFullUpdate);
+
                     return true;
                 }
             }
@@ -741,11 +749,11 @@ namespace WhiteCore.Modules.EntityTransfer
 
         #region Misc
 
-        public void CancelTeleport (UUID AgentID, UUID RegionID)
+        public void CancelTeleport (UUID agentID, UUID regionID)
         {
             ISyncMessagePosterService syncPoster = m_scene.RequestModuleInterface<ISyncMessagePosterService> ();
             if (syncPoster != null)
-                syncPoster.PostToServer (SyncMessageHelper.CancelTeleport (AgentID, RegionID));
+                syncPoster.PostToServer (SyncMessageHelper.CancelTeleport (agentID, regionID));
         }
 
         #endregion
@@ -796,9 +804,9 @@ namespace WhiteCore.Modules.EntityTransfer
                 // Kill it.
                 MainConsole.Instance.InfoFormat ("[Scene]: Zombie scene presence detected for {0} in {1}",
                                                  agent.AgentID, scene.RegionInfo.RegionName);
-                //Tell everyone about it
+                // Tell everyone about it
                 scene.WhiteCoreEventManager.FireGenericEventHandler ("AgentIsAZombie", sp.UUID);
-                //Send the killing message (DisableSimulator)
+                // Send the killing message (DisableSimulator)
                 scene.RemoveAgent (sp, true);
                 sp = null;
             }
@@ -808,7 +816,7 @@ namespace WhiteCore.Modules.EntityTransfer
 
             scene.WhiteCoreEventManager.FireGenericEventHandler ("NewUserConnection", agent);
 
-            //Add the circuit at the end
+            // Add the circuit at the end
             scene.AuthenticateHandler.AddNewCircuit (agent.CircuitCode, agent);
 
             MainConsole.Instance.InfoFormat (
@@ -891,7 +899,7 @@ namespace WhiteCore.Modules.EntityTransfer
                     if (!m_incomingChildAgentData.ContainsKey (scene))
                         m_incomingChildAgentData.Add (scene, new Dictionary<UUID, AgentData> ());
                     m_incomingChildAgentData [scene] [cAgentData.AgentID] = cAgentData;
-                    return false; //The agent doesn't exist
+                    return false;       // The agent doesn't exist
                 }
 
             return true;
@@ -906,7 +914,7 @@ namespace WhiteCore.Modules.EntityTransfer
         /// <returns>true if we handled it.</returns>
         public virtual bool IncomingChildAgentDataUpdate (IScene scene, AgentPosition cAgentData)
         {
-            //MainConsole.Instance.Debug(" XXX Scene IncomingChildAgentDataUpdate POSITION in " + RegionInfo.RegionName);
+            // MainConsole.Instance.Debug(" XXX Scene IncomingChildAgentDataUpdate POSITION in " + RegionInfo.RegionName);
             IScenePresence presence = scene.GetScenePresence (cAgentData.AgentID);
             if (presence != null) {
                 // I can't imagine *yet* why we would get an update if the agent is a root agent..
@@ -940,7 +948,7 @@ namespace WhiteCore.Modules.EntityTransfer
                 sp.CopyTo (data);
                 agent = data;
                 circuitData = BuildCircuitDataForPresence (sp, sp.AbsolutePosition);
-                //if (agentIsLeaving)
+                // if (agentIsLeaving)
                 //    sp.SetAgentLeaving(null);//We aren't sure where they are going
                 return true;
             }
@@ -955,7 +963,7 @@ namespace WhiteCore.Modules.EntityTransfer
         /// <param name="agentID"></param>
         public bool IncomingCloseAgent (IScene scene, UUID agentID)
         {
-            //MainConsole.Instance.DebugFormat("[SCENE]: Processing incoming close agent for {0}", agentID);
+            // MainConsole.Instance.DebugFormat("[SCENE]: Processing incoming close agent for {0}", agentID);
 
             IScenePresence presence = scene.GetScenePresence (agentID);
             if (presence != null)

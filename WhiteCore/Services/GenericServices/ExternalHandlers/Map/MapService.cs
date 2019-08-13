@@ -245,8 +245,11 @@ namespace WhiteCore.Services
                 }
                 using (MemoryStream imgstream = new MemoryStream ()) {
                     GridRegion region = m_gridService.GetRegionByName (null, uri.Remove (4));
-                    if (region == null)
+                    if (region == null) {
                         region = m_gridService.GetRegionByUUID (null, OpenMetaverse.UUID.Parse (uri.Remove (uri.Length - 4)));
+                        if (region == null)         // unable to resoleve region details
+                            return new byte [0];
+                    }
 
                     // non-async because we know we have the asset immediately.
                     byte [] mapasset = null;

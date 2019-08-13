@@ -712,7 +712,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
 
             List<GridRegion> regions = World.GridService.GetRegionsByName(World.RegionInfo.AllScopeIDs, regionName, 0, 1);
             // Try to link the region
-            if (regions != null && regions.Count > 0)
+            if (regions.Count > 0)
             {
                 GridRegion regInfo = regions[0];
 
@@ -762,7 +762,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
                 List<GridRegion> regions = World.GridService.GetRegionsByName(World.RegionInfo.AllScopeIDs, regionName,
                                                                               0, 1);
                 // Try to link the region
-                if (regions != null && regions.Count > 0)
+                if (regions.Count > 0)
                 {
                     GridRegion regInfo = regions[0];
 

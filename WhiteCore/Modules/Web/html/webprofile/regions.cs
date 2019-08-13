@@ -85,7 +85,7 @@ namespace WhiteCore.Modules.Web
 
                 var regions = gridService.GetRegionsByName(scopeUUID, "", null, null);
                 // TODO: Searching using the user UUID scope does not appear to work  -greythane- 20141020
-                if (regions != null)
+                if (regions.Count > 0)
                 {
                     noDetails = "";
 

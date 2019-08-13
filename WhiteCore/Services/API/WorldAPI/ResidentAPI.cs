@@ -88,19 +88,19 @@ namespace WhiteCore.Services.API
             if (verified) {
                 userinfo = agentService.GetUserInfo (uuid);
                 IGridService gs = m_registry.RequestModuleInterface<IGridService> ();
-                GridRegion gr = null;
-                if (userinfo != null) {
-                    gr = gs.GetRegionByUUID (null, userinfo.HomeRegionID);
+                if (gs != null && userinfo != null) {
+                    GridRegion gr = gs.GetRegionByUUID (null, userinfo.HomeRegionID);
+                    if (gr != null) {
+                        resp ["UUID"] = OSD.FromUUID (userAcct.PrincipalID);
+                        resp ["HomeUUID"] = OSD.FromUUID ((userinfo == null) ? UUID.Zero : userinfo.HomeRegionID);
+                        resp ["HomeName"] = OSD.FromString ((userinfo == null) ? "" : gr.RegionName);
+                        resp ["Online"] = OSD.FromBoolean ((userinfo == null) ? false : userinfo.IsOnline);
+                        resp ["Email"] = OSD.FromString (userAcct.Email);
+                        resp ["Name"] = OSD.FromString (userAcct.Name);
+                        resp ["FirstName"] = OSD.FromString (userAcct.FirstName);
+                        resp ["LastName"] = OSD.FromString (userAcct.LastName);
+                    }
                 }
-
-                resp ["UUID"] = OSD.FromUUID (userAcct.PrincipalID);
-                resp ["HomeUUID"] = OSD.FromUUID ((userinfo == null) ? UUID.Zero : userinfo.HomeRegionID);
-                resp ["HomeName"] = OSD.FromString ((userinfo == null) ? "" : gr.RegionName);
-                resp ["Online"] = OSD.FromBoolean ((userinfo == null) ? false : userinfo.IsOnline);
-                resp ["Email"] = OSD.FromString (userAcct.Email);
-                resp ["Name"] = OSD.FromString (userAcct.Name);
-                resp ["FirstName"] = OSD.FromString (userAcct.FirstName);
-                resp ["LastName"] = OSD.FromString (userAcct.LastName);
             }
 
             return resp;
