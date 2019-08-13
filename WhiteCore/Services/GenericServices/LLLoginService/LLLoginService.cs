@@ -428,12 +428,12 @@ namespace WhiteCore.Services
                     return LLFailedLoginResponse.InventoryProblem;
                 }
                 List<InventoryFolderBase> inventorySkel = m_InventoryService.GetInventorySkeleton (userAcct.PrincipalID);
-                if (m_RequireInventory && ((inventorySkel == null) || (inventorySkel.Count == 0))) {
+                if (m_RequireInventory && inventorySkel.Count == 0) {
                     List<InventoryItemBase> defaultItems;
                     m_InventoryService.CreateUserInventory (userAcct.PrincipalID, m_DefaultUserAvatarArchive == "",
-                                                           out defaultItems);
+                                                            out defaultItems);
                     inventorySkel = m_InventoryService.GetInventorySkeleton (userAcct.PrincipalID);
-                    if (m_RequireInventory && ((inventorySkel == null) || (inventorySkel.Count == 0))) {
+                    if (m_RequireInventory && inventorySkel.Count == 0) {
                         MainConsole.Instance.InfoFormat (
                             "[LLogin service]: Login failed for user {0}, reason: unable to retrieve user inventory",
                             userAcct.Name);

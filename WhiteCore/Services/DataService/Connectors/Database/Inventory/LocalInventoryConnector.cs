@@ -137,7 +137,7 @@ namespace WhiteCore.Services.DataService
                     GD.CloseDatabase(reader);
                 }
             }
-            return null;
+            return new List<InventoryItemBase>() ;
         }
 
         public virtual List<UUID> GetItemAssetIDs(UUID avatarID, string[] fields, string[] vals)
@@ -148,7 +148,12 @@ namespace WhiteCore.Services.DataService
 
             List<string> data = GD.Query(new string[] {"assetID"}, m_itemsrealm, filter, null, null, null);
 
-            return data != null ? data.ConvertAll<UUID> (s => UUID.Parse (s)) : null;
+            if (data.Count > 0)
+                return data.ConvertAll (UUID.Parse);
+            
+            return new List<UUID>();        // nothing to see here
+            
+            // was // return data != null ? data.ConvertAll<UUID> (s => UUID.Parse (s)) : null;
         }
 
         public virtual OSDArray GetLLSDItems(string[] fields, string[] vals)
@@ -180,7 +185,8 @@ namespace WhiteCore.Services.DataService
 
             List<string> q = GD.Query(new[] {"*"}, m_itemsrealm, filter, null, null, null);
 
-            return !(q != null && q.Count > 0);
+            return (q.Count == 0);      // ?? return false if is asset found??   does not appears to be used anyway - greythane- 20190813
+            // was // return !(q != null && q.Count > 0);
         }
 
         public virtual string GetItemNameByAsset(UUID assetID)
@@ -190,21 +196,21 @@ namespace WhiteCore.Services.DataService
 
             List<string> q = GD.Query(new[] {"inventoryName"}, m_itemsrealm, filter, null, null, null);
 
-
-            return (q != null && q.Count > 0) ? q[0] : "";
+            return (q.Count > 0) ? q [0] : "";
+            // was   // return (q != null && q.Count > 0) ? q[0] : "";
         }
 
         public virtual byte[] FetchInventoryReply(OSDArray fetchRequest, UUID agentID, UUID forceOwnerID,
                                                   UUID libraryOwnerID)
         {
             LLSDSerializationDictionary contents = new LLSDSerializationDictionary();
-            contents.WriteStartMap("llsd"); //Start llsd
+            contents.WriteStartMap("llsd");                     // Start llsd
 
-            contents.WriteKey("folders"); //Start array items
-            contents.WriteStartArray("folders"); //Start array folders
+            contents.WriteKey("folders");                       // Start array items
+            contents.WriteStartArray("folders");                // Start array folders
 
             foreach (OSD m in fetchRequest) {
-                contents.WriteStartMap("internalContents"); //Start internalContents kvp
+                contents.WriteStartMap("internalContents");     // Start internalContents kvp
                 OSDMap invFetch = (OSDMap) m;
 
                 //UUID agent_id = invFetch["agent_id"].AsUUID();
@@ -212,9 +218,9 @@ namespace WhiteCore.Services.DataService
                 UUID folder_id = invFetch["folder_id"].AsUUID();
                 bool fetch_folders = invFetch["fetch_folders"].AsBoolean();
                 bool fetch_items = invFetch["fetch_items"].AsBoolean();
-                //int sort_order = invFetch["sort_order"].AsInteger();
+                // int sort_order = invFetch["sort_order"].AsInteger();
 
-                //Set the normal stuff
+                // Set the normal stuff
                 contents["agent_id"] = agentID;
                 contents["owner_id"] = owner_id;
                 contents["folder_id"] = folder_id;
@@ -223,7 +229,7 @@ namespace WhiteCore.Services.DataService
                 string query = "";
 
                 if (fetch_items) {
-                    contents.WriteKey("items"); //Start array items
+                    contents.WriteKey("items"); // Start array items
                     contents.WriteStartArray("items");
                     List<UUID> moreLinkedItems = new List<UUID>();
                     bool addToCount = true;
@@ -235,14 +241,14 @@ namespace WhiteCore.Services.DataService
                         {
                             while (retVal.DataReader.Read())
                             {
-                                contents.WriteStartMap("item"); //Start item kvp
+                                contents.WriteStartMap("item");         // Start item kvp
                                 UUID assetID = UUID.Parse(retVal.DataReader["assetID"].ToString());
                                 contents["asset_id"] = assetID;
                                 contents["name"] = retVal.DataReader["inventoryName"].ToString();
                                 contents["desc"] = retVal.DataReader["inventoryDescription"].ToString();
 
 
-                                contents.WriteKey("permissions"); //Start permissions kvp
+                                contents.WriteKey("permissions");       // Start permissions kvp
                                 contents.WriteStartMap("permissions");
                                 contents["group_id"] = UUID.Parse(retVal.DataReader["groupID"].ToString());
                                 contents["is_owner_group"] = int.Parse(retVal.DataReader["groupOwned"].ToString()) == 1;
@@ -267,8 +273,8 @@ namespace WhiteCore.Services.DataService
                                     uint.Parse(retVal.DataReader["inventoryEveryOnePermissions"].ToString());
                                 contents.WriteEndMap( /*Permissions*/);
 
-                                contents.WriteKey("sale_info"); //Start permissions kvp
-                                contents.WriteStartMap("sale_info"); //Start sale_info kvp
+                                contents.WriteKey("sale_info");         // Start permissions kvp
+                                contents.WriteStartMap("sale_info");    // Start sale_info kvp
                                 contents["sale_price"] = int.Parse(retVal.DataReader["salePrice"].ToString());
                                 switch (byte.Parse(retVal.DataReader["saleType"].ToString()))
                                 {
@@ -310,21 +316,18 @@ namespace WhiteCore.Services.DataService
                                 contents["inv_type"] = Utils.InventoryTypeToString(invType);
 
                                 if ((int) invType == -1) {
-                                    //Asset problem, fix it, it's supposed to be 0
-                                    List<InventoryItemBase> itms = GetItems(agentID,
-                                                                            new string[] {"inventoryID", "avatarID"},
-                                                                            new string[]
-                                                                                {
-                                                                                    inventoryID.ToString(),
-                                                                                    avatarID.ToString()
-                                                                                });
+                                    // Asset problem, fix it, it's supposed to be 0
+                                    List<InventoryItemBase> itms = GetItems(
+                                        agentID,
+                                        new string[] {"inventoryID", "avatarID"},
+                                        new string[] {inventoryID.ToString(), avatarID.ToString()});
                                     itms[0].InvType = 0;
                                     StoreItem(itms[0]);
                                 }
 
                                 if (addToCount)
                                     count++;
-                                contents.WriteEndMap( /*"item"*/); //end array items
+                                contents.WriteEndMap( /*"item"*/);      // end array items
                             }
                         } catch {
                         } finally {
@@ -345,18 +348,14 @@ namespace WhiteCore.Services.DataService
                         moreLinkedItems.Clear();
                         goto redoQuery;
                     }
-                    contents.WriteEndArray( /*"items"*/); //end array items
+                    contents.WriteEndArray( /*"items"*/);       // end array items
                 }
 
-                contents.WriteStartArray("categories"); //We don't send any folders
+                contents.WriteStartArray("categories");         // We don't send any folders
                 int version = 0;
                 QueryFilter filter = new QueryFilter();
                 filter.andFilters["folderID"] = folder_id;
-                List<string> versionRetVal = GD.Query(new[]
-                                                          {
-                                                              "version",
-                                                              "type"
-                                                          }, m_foldersrealm, filter, null, null, null);
+                List<string> versionRetVal = GD.Query(new[]{"version","type"}, m_foldersrealm, filter, null, null, null);
 
                 if (versionRetVal.Count > 0) {
                     version = int.Parse(versionRetVal[0]);
@@ -366,14 +365,14 @@ namespace WhiteCore.Services.DataService
                             int.Parse(versionRetVal[1]) == (int) FolderType.CurrentOutfit ||
                             int.Parse(versionRetVal[1]) == (int) AssetType.LinkFolder)
                         {
-                            //If it is the trash folder, we need to send its descendents, because the viewer wants it
+                            // If it is the trash folder, we need to send its descendents, because the viewer wants it
                             query = string.Format("where {0} = '{1}' and {2} = '{3}'", "parentFolderID", folder_id,
                                                   "agentID", agentID);
                             using (DataReaderConnection retVal = GD.QueryData(query, m_foldersrealm, "*"))
                             {
                                 try {
                                     while (retVal.DataReader.Read()) {
-                                        contents.WriteStartMap("folder"); //Start item kvp
+                                        contents.WriteStartMap("folder");       // Start item kvp
                                         contents["folder_id"] = UUID.Parse(retVal.DataReader["folderID"].ToString());
                                         contents["parent_id"] =
                                             UUID.Parse(retVal.DataReader["parentFolderID"].ToString());
@@ -383,7 +382,7 @@ namespace WhiteCore.Services.DataService
                                         contents["preferred_type"] = type;
 
                                         count++;
-                                        contents.WriteEndMap( /*"folder"*/); //end array items
+                                        contents.WriteEndMap( /*"folder"*/);    // end array items
                                     }
                                 } catch {
                                 } finally {
@@ -398,12 +397,12 @@ namespace WhiteCore.Services.DataService
                 contents["descendents"] = count;
                 contents["version"] = version;
 
-                //Now add it to the folder array
-                contents.WriteEndMap(); //end array internalContents
+                // Now add it to the folder array
+                contents.WriteEndMap();         // end array internalContents
             }
 
-            contents.WriteEndArray(); //end array folders
-            contents.WriteEndMap( /*"llsd"*/); //end llsd
+            contents.WriteEndArray();           // end array folders
+            contents.WriteEndMap( /*"llsd"*/);  // end llsd
 
             try {
                 return contents.GetSerializer();
@@ -600,7 +599,7 @@ namespace WhiteCore.Services.DataService
 
                 array.Add(item);
             }
-            //retVal.Close();
+            // retVal.Close();
 
             return array;
         }
@@ -654,7 +653,7 @@ namespace WhiteCore.Services.DataService
                 };
 
                 if (item.InvType == -1) {
-                    //Fix the bad invType
+                    // Fix the bad invType
                     item.InvType = 0;
                     StoreItem(item);
                 }
@@ -745,7 +744,7 @@ namespace WhiteCore.Services.DataService
                         writer.WriteStartAttribute(string.Empty, "encoding", string.Empty);
                         writer.WriteString("base64");
                         writer.WriteEndAttribute();
-                        writer.WriteValue(Convert.ToBase64String((byte[]) value)); //Has to be base64
+                        writer.WriteValue(Convert.ToBase64String((byte[]) value));      // Has to be base64
                         writer.WriteEndElement();
                     }
                 }
@@ -841,7 +840,7 @@ namespace WhiteCore.Services.DataService
                     writer.WriteStartAttribute(string.Empty, "encoding", string.Empty);
                     writer.WriteString("base64");
                     writer.WriteEndAttribute();
-                    writer.WriteValue(Convert.ToBase64String((byte[]) value)); //Has to be base64
+                    writer.WriteValue(Convert.ToBase64String((byte[]) value));      // Has to be base64
                     writer.WriteEndElement();
                 }
             }
@@ -852,11 +851,13 @@ namespace WhiteCore.Services.DataService
                 writer.Close();
 
                 byte[] array = sw.ToArray();
-                /*byte[] newarr = new byte[array.Length - 3];
+                /*
+                byte[] newarr = new byte[array.Length - 3];
                 Array.Copy(array, 3, newarr, 0, newarr.Length);
                 writer = null;
                 sw = null;
-                array = null;*/
+                array = null;
+                */
 
                 return array;
             }
