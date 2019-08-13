@@ -369,7 +369,7 @@ namespace WhiteCore.Modules.Friends
 
 
             var friendRequests = FriendsService.GetFriendsRequest (agentID);
-            if (friendRequests == null)
+            if (friendRequests.Count == 0)
                 return;
 
             FriendInfo [] friends = friendRequests.ToArray ();
@@ -466,7 +466,7 @@ namespace WhiteCore.Modules.Friends
         {
             UUID agentID = client.AgentId;
             var friendRequests = FriendsService.GetFriendsRequest (agentID);
-            if (friendRequests == null)
+            if (friendRequests.Count == 0)
                 return;
 
             FriendInfo [] friends = friendRequests.ToArray ();
