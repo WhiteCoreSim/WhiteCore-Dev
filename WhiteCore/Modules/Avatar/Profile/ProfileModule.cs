@@ -702,6 +702,7 @@ namespace WhiteCore.Modules.Profiles
                             if (region != null)     // just being cautious here
                                 client.SendScriptTeleportRequest (client.Name, region.RegionName,
                                                                   GUI.CurrentPosition, GUI.CurrentLookAt);
+                            region = null;  // clean up
                         }
                     }
                 }

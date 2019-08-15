@@ -107,9 +107,10 @@ namespace WhiteCore.Modules.Currency
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
         public BaseCurrencyConfig GetConfig()
         {
-            object remoteValue = DoRemoteByURL("CurrencyServerURI");
-            if (remoteValue != null || m_doRemoteOnly)
-                return (BaseCurrencyConfig) remoteValue;
+            if (m_doRemoteOnly) {
+                object remoteValue = DoRemoteByURL ("CurrencyServerURI");
+                return (remoteValue != null) ? (BaseCurrencyConfig)remoteValue : new BaseCurrencyConfig ();
+            }
 
             return m_config;
         }
@@ -119,9 +120,10 @@ namespace WhiteCore.Modules.Currency
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
         public GroupBalance GetGroupBalance(UUID groupID)
         {
-            object remoteValue = DoRemoteByURL("CurrencyServerURI", groupID);
-            if (remoteValue != null || m_doRemoteOnly)
-                return (GroupBalance) remoteValue;
+            if (m_doRemoteOnly) {
+                object remoteValue = DoRemoteByURL ("CurrencyServerURI", groupID);
+                return (remoteValue != null) ? (GroupBalance)remoteValue : new GroupBalance ();
+            }
 
             GroupBalance gb = new GroupBalance {
                 GroupFee = 0,
@@ -153,9 +155,10 @@ namespace WhiteCore.Modules.Currency
             int currentInterval, int intervalDays)
         {
             //return new List<GroupAccountHistory>();
-            object remoteValue = DoRemoteByURL("CurrencyServerURI", groupID, fromAgentID, currentInterval, intervalDays);
-            if (remoteValue != null || m_doRemoteOnly)
-                return (List<GroupAccountHistory>) remoteValue;
+            if (m_doRemoteOnly) {
+                object remoteValue = DoRemoteByURL ("CurrencyServerURI", groupID, fromAgentID, currentInterval, intervalDays);
+                return (remoteValue != null) ? (List<GroupAccountHistory>)remoteValue : new List<GroupAccountHistory> ();
+            }
 
             QueryFilter filter = new QueryFilter();
 
@@ -279,13 +282,15 @@ namespace WhiteCore.Modules.Currency
                         (groupInfo == null ? "" : groupName + " ") + InWorldCurrency + amount + paidDesc;
                 }
 
-                if (payUser) {
-                    if (agentInfo != null && agentInfo.IsOnline) {
-                        SendUpdateMoneyBalanceToClient (userId, transactionID, agentInfo.CurrentRegionURI, userBalance, paidToMsg);
-                    }
-                } else {
-                    if (fromObjectID != UUID.Zero) {
-                        SendUpdateMoneyBalanceToClient (fromObjectID, transactionID, agentInfo.CurrentRegionURI, (uint) amount, paidFromMsg);
+                if (agentInfo != null) {
+                    if (payUser) {
+                        if (agentInfo.IsOnline) {
+                            SendUpdateMoneyBalanceToClient (userId, transactionID, agentInfo.CurrentRegionURI, userBalance, paidToMsg);
+                        }
+                    } else {
+                        if (fromObjectID != UUID.Zero) {
+                            SendUpdateMoneyBalanceToClient (fromObjectID, transactionID, agentInfo.CurrentRegionURI, (uint)amount, paidFromMsg);
+                        }
                     }
                 }
             }

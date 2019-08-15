@@ -826,18 +826,20 @@ namespace WhiteCore.Modules.Estate
                 return true;
             }
 
-            //Check whether they fit any ban criteria
+            // Check whether they fit any ban criteria
             if (Sp != null) {
                 foreach (string banstr in banCriteria) {
                     if (Sp.Name.Contains (banstr)) {
                         reason = "You have been banned from this region.";
                         return false;
-                    } else if (((IPEndPoint)Sp.ControllingClient.GetClientEP ()).Address.ToString ().Contains (banstr)) {
+                    }
+                    var ep = (IPEndPoint)Sp.ControllingClient.GetClientEP ();
+                    if (ep != null && ep.Address.ToString ().Contains (banstr)) {
                         reason = "You have been banned from this region.";
                         return false;
                     }
                 }
-                //Make sure they exist in the grid right now
+                // Make sure they exist in the grid right now
                 IAgentInfoService presence = scene.RequestModuleInterface<IAgentInfoService> ();
                 if (presence == null) {
                     reason = string.Format (
@@ -872,9 +874,12 @@ namespace WhiteCore.Modules.Estate
             foreach (EstateBan ban in EstateBans) {
                 if (ban.BannedUserID == agent.AgentID) {
                     if (Sp != null) {
-                        string banIP = ((IPEndPoint)Sp.ControllingClient.GetClientEP ()).Address.ToString ();
+                        var bIP = (IPEndPoint)Sp.ControllingClient.GetClientEP ();
+                        string banIP = "0.0.0.0";
+                        if (bIP != null)
+                            banIP = bIP.Address.ToString ();
 
-                        if (ban.BannedHostIPMask != banIP) //If it changed, ban them again
+                        if (ban.BannedHostIPMask != banIP) // If it changed, ban them again
                         {
                             //Add the ban with the new hostname
                             ES.AddBan (new EstateBan {
@@ -884,7 +889,7 @@ namespace WhiteCore.Modules.Estate
                                 BannedHostAddress = ban.BannedHostAddress,
                                 BannedHostNameMask = ban.BannedHostNameMask
                             });
-                            //Update the database
+                            // Update the database
                             Framework.Utilities.DataManager.RequestPlugin<IEstateConnector> ().SaveEstateSettings (ES);
                         }
                     }

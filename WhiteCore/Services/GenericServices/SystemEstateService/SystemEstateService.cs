@@ -212,7 +212,6 @@ namespace WhiteCore.Services.GenericServices.SystemEstateService
                         sysAccounts.GetSystemEstateOwnerName (estateID));
                 }
 
-
                 // in case of configuration changes
                 if (ES.EstateName != estateName) {
                     ES.EstateName = estateName;
@@ -220,23 +219,27 @@ namespace WhiteCore.Services.GenericServices.SystemEstateService
                     MainConsole.Instance.Info ("[EstateService]: The system Estate name has been updated to " + estateName);
                 }
 
+                // coverity flagged a resource leak here previously
+                ES = null;
                 return;
             }
 
             // Create a new estate
+            // coverity should flag a leak here for ES if ES.EstateID == 0
+            // ES = null;
 
-            ES = new EstateSettings ();
-            ES.EstateName = estateName;
-            ES.EstateOwner = ownerUUID;
+            var newES = new EstateSettings ();
+            newES.EstateName = estateName;
+            newES.EstateOwner = ownerUUID;
 
-            ES.EstateID = (uint)m_estateConnector.CreateNewEstate (ES);
-            if (ES.EstateID == 0) {
-                MainConsole.Instance.Warn ("There was an error in creating the system estate: " + ES.EstateName);
+            newES.EstateID = (uint)m_estateConnector.CreateNewEstate (ES);
+            if (newES.EstateID == 0) {
+                MainConsole.Instance.Warn ("There was an error in creating the system estate: " + newES.EstateName);
                 //EstateName holds the error. See LocalEstateConnector for more info.
 
             } else {
                 MainConsole.Instance.InfoFormat ("[EstateService]: The estate '{0}' owned by '{1}' has been created.",
-                    ES.EstateName, sysAccounts.GetSystemEstateOwnerName (estateID));
+                    newES.EstateName, sysAccounts.GetSystemEstateOwnerName (estateID));
             }
         }
 
@@ -335,7 +338,7 @@ namespace WhiteCore.Services.GenericServices.SystemEstateService
             IEstateConnector estateConnector = Framework.Utilities.DataManager.RequestPlugin<IEstateConnector> ();
 
             var regions = gridService.GetRegionsByName (null, "", null, null);
-            if (regions == null || regions.Count < 1)
+            if (regions.Count == 0)
                 return;
 
             int updated = 0;
@@ -793,6 +796,9 @@ namespace WhiteCore.Services.GenericServices.SystemEstateService
                         regionName, sysEstateInfo.SystemEstateName);
                     UpdateConsoleRegionEstate (regionName, ES);
                 }
+
+            // coverity flagged a resource leak here previously
+            ES = null;
 
         }
 

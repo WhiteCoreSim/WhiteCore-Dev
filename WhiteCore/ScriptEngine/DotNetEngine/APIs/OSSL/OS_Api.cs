@@ -2669,6 +2669,11 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
 
             //It takes care of permission checks in the module
             m_groupData.AddAgentToGroup(m_host.OwnerID, UUID.Parse(AgentID.m_string), groupRecord.GroupID, roleID);
+
+            // clean up
+            groupRecord = null;
+            roles = null;
+
             return 1;
         }
 
@@ -2734,18 +2739,30 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             UUID agent = new UUID((string) agentId);
             // groups module is required
             IGroupsModule groupsModule = World.RequestModuleInterface<IGroupsModule>();
-            if (groupsModule == null) return ScriptBaseClass.FALSE;
+            if (groupsModule == null) 
+                return ScriptBaseClass.FALSE;
+            
             // object has to be set to a group, but not group owned
-            if (m_host.GroupID == UUID.Zero || m_host.GroupID == m_host.OwnerID) return ScriptBaseClass.FALSE;
+            if (m_host.GroupID == UUID.Zero || m_host.GroupID == m_host.OwnerID)
+                return ScriptBaseClass.FALSE;
+
             // object owner has to be in that group and required permissions
             GroupMembershipData member = groupsModule.GetMembershipData(m_host.GroupID, m_host.OwnerID);
-            if (member == null || (member.GroupPowers & (ulong) GroupPowers.Invite) == 0) return ScriptBaseClass.FALSE;
+            if (member == null || (member.GroupPowers & (ulong) GroupPowers.Invite) == 0) 
+                return ScriptBaseClass.FALSE;
             // check if agent is in that group already
             //member = groupsModule.GetMembershipData(agent, m_host.GroupID, agent);
             //if (member != null) return ScriptBaseClass.FALSE;
             // invited agent has to be present in this scene
-            if (World.GetScenePresence(agent) == null) return ScriptBaseClass.FALSE;
+
+            member = null;
+            groupsModule = null;
+
+            if (World.GetScenePresence(agent) == null) 
+                return ScriptBaseClass.FALSE;
+            
             groupsModule.InviteGroup(null, m_host.OwnerID, m_host.GroupID, agent, UUID.Zero);
+
             return ScriptBaseClass.TRUE;
         }
 
@@ -2762,17 +2779,28 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             UUID agent = new UUID((string) agentId);
             // groups module is required
             IGroupsModule groupsModule = World.RequestModuleInterface<IGroupsModule>();
-            if (groupsModule == null) return ScriptBaseClass.FALSE;
+            if (groupsModule == null) 
+                return ScriptBaseClass.FALSE;
+
             // object has to be set to a group, but not group owned
-            if (m_host.GroupID == UUID.Zero || m_host.GroupID == m_host.OwnerID) return ScriptBaseClass.FALSE;
+            if (m_host.GroupID == UUID.Zero || m_host.GroupID == m_host.OwnerID) 
+                return ScriptBaseClass.FALSE;
+
             // object owner has to be in that group and required permissions
             GroupMembershipData member = groupsModule.GetMembershipData(m_host.GroupID, m_host.OwnerID);
-            if (member == null || (member.GroupPowers & (ulong) GroupPowers.Eject) == 0) return ScriptBaseClass.FALSE;
+            if (member == null || (member.GroupPowers & (ulong) GroupPowers.Eject) == 0) 
+                return ScriptBaseClass.FALSE;
+
             // agent has to be in that group
             //member = groupsModule.GetMembershipData(agent, m_host.GroupID, agent);
             //if (member == null) return ScriptBaseClass.FALSE;
             // ejectee can be offline
             groupsModule.EjectGroupMember(null, m_host.OwnerID, m_host.GroupID, agent);
+
+            // clean up
+            member = null;
+            groupsModule = null;
+
             return ScriptBaseClass.TRUE;
         }
 

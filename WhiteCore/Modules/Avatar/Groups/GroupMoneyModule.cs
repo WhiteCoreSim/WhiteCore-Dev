@@ -126,6 +126,7 @@ namespace WhiteCore.Modules.Avatar.Groups
                         intervalDays,
                         Util.BuildYMDDateString (groupBalance.StartingDate.AddDays (-currentInterval * intervalDays)),
                         history.ToArray ());
+                    groupBalance = null;
                 } else
                     client.SendGroupAccountingDetails (client, groupID, transactionID, sessionID, 0, currentInterval,
                         intervalDays,

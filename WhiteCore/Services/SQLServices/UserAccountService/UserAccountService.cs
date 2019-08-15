@@ -1629,6 +1629,7 @@ namespace WhiteCore.Services.SQLServices.UserAccountService
                         streamWriter.Close ();
                 }
             }
+            accounts = null;
         }
 
         // Developer testing only

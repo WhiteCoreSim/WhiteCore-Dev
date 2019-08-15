@@ -597,7 +597,11 @@ namespace WhiteCore.Modules.Groups
                 }
             }
 
-            GroupRecord groupInfo = m_groupData.GetGroupRecord (GetRequestingAgentID (remoteClient), groupID, null);
+            GroupRecord groupInfo = null;
+            if ( remoteClient != null)
+                groupInfo = m_groupData.GetGroupRecord (GetRequestingAgentID (remoteClient), groupID, null);
+            else
+                groupInfo = m_groupData.GetGroupRecord (agentID, groupID, null);
 
             UserAccount ejectAcct = m_scene.UserAccountService.GetUserAccount (regionInfo.AllScopeIDs, ejecteeID);
 

@@ -476,7 +476,7 @@ namespace WhiteCore.Modules.EntityTransfer
                 // Default region time...
                 List<GridRegion> defaultRegions = client.Scene.GridService.GetDefaultRegions (client.AllScopeIDs);
                 if (defaultRegions.Count > 0) {
-                    MainConsole.Instance.DebugFormat ( "[Entity transfer]: User's home region was not found, using {0} {1} ({2}-{3})",
+                    MainConsole.Instance.DebugFormat ("[Entity transfer]: User's home region was not found, using {0} {1} ({2}-{3})",
                         defaultRegions [0].RegionName,
                         defaultRegions [0].RegionID,
                         defaultRegions [0].RegionLocX / Constants.RegionSize,
@@ -486,6 +486,7 @@ namespace WhiteCore.Modules.EntityTransfer
                         client, defaultRegions [0], new Vector3 (128, 128, 25), new Vector3 (128, 128, 128),
                         (uint)(TeleportFlags.SetLastToTarget | TeleportFlags.ViaHome));
                 } else
+                    defaultRegions = null;
                     return false;
             }
 

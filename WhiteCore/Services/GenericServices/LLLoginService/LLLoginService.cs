@@ -531,11 +531,12 @@ namespace WhiteCore.Services
                     if (m_GridService != null) {
                         if (m_DefaultHomeRegion != "") {
                             GridRegion homeRegion = m_GridService.GetRegionByName (userAcct.AllScopeIDs, m_DefaultHomeRegion);
-                            if (homeRegion != null)
+                            if (homeRegion != null) {
                                 guinfo.HomeRegionID = guinfo.CurrentRegionID = homeRegion.RegionID;
+                                regionName = homeRegion.RegionName;
+                            }
                             guinfo.HomePosition = guinfo.CurrentPosition = m_DefaultHomeRegionPos;
                             positionSet = true;
-                            regionName = homeRegion.RegionName;
                         }
 
                         // if we have not found our home region...

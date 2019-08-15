@@ -13717,7 +13717,10 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             {
                 OSD o = OSDParser.DeserializeJson(json);
                 OSD specVal = JsonGetSpecific(o, specifiers, 0);
-                return specVal.AsString();
+                if (specVal != null)
+                    return specVal.AsString();
+                else
+                    return ScriptBaseClass.JSON_INVALID;
             }
             catch (Exception)
             {
