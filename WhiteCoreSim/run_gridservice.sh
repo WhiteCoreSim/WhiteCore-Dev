@@ -1,15 +1,15 @@
 #!/bin/bash
 # Startup script for WhiteCore-Sim grid server service
-# Versions 0.9.2+
+# Versions 0.9.5+
 #
-# July 2017
+# August 2019 - Always run config at startup - will pass through after initial setup
 # greythane @ gmail.com
 #
 
 cd ./bin
 wait
 echo Starting WhiteCore GridServer...
-screen -S Grid -d -m mono WhiteCore.Server.exe -skipconfig
+screen -S Grid -d -m mono WhiteCore.Server.exe
 sleep 3
 screen -list
 echo "To view the Grid server console, use the command : screen -r Grid"

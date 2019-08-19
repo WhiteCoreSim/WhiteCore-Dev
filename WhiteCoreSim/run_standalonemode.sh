@@ -1,15 +1,15 @@
 #!/bin/bash
 # startup script for WhiteCore-Sim standalone
-# Versions 0.9.2+
+# Versions 0.9.5+
 #
-# May 2014
+# August 2019 - Always run config at startup - will pass through after initial setup
 # greythane @ gmail.com
 #
 
 cd ./bin
 wait
 echo Starting Standalone Region Simulator...
-screen -S Sim -d -m mono WhiteCore.exe -skipconfig
+screen -S Sim -d -m mono WhiteCore.exe
 sleep 3
 screen -list
 echo "To view the Sim console, use the command : screen -r Sims"

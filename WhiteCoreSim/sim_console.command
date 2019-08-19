@@ -1,8 +1,8 @@
 #!/bin/bash
 # Start the WhiteCore-Sim Standalone server
-# Version 0.9.2+
+# Version 0.9.5+
 #
-# May 2014
+# August 2019 - Always run config at startup
 # greythane @ gmail.com
 
 WOASDIR="${0%/*}"
@@ -11,7 +11,7 @@ echo $WOASDIR
 
 cd ./bin
 echo Starting WhiteCore Standalone Simulator...
-mono WhiteCore.exe -skipconfig
+mono WhiteCore.exe
 wait
 
 exit
