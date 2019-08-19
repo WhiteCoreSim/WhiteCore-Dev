@@ -36,6 +36,7 @@ using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.SceneInfo;
 using WhiteCore.Framework.Services;
 using WhiteCore.Framework.Utilities;
+using WhiteCore.Services.GenericServices.SystemEstateService;
 
 namespace WhiteCore.Services.GenericServices.SystemAccountService
 {
@@ -143,25 +144,29 @@ namespace WhiteCore.Services.GenericServices.SystemAccountService
 
         public void Start (IConfigSource config, IRegistryCore registry)
         {
+        }
+
+        public void FinishedStartup ()
+        {
             m_accountService = m_registry.RequestModuleInterface<IUserAccountService> ();
 
             // these are only valid if we are local
             if (m_accountService.IsLocalConnector) {
-				// check and/or create default RealEstate user
-				CheckSystemUserInfo ();
+                var sysEstateSvc = m_registry.RequestModuleInterface<ISystemEstateService> ();
 
-                // if this is the initial run, create the grid system user
+                // if this is the initial run, create the grid owner user and estate
                 var users = m_accountService.NumberOfUserAccounts (null, "");
-                if (users == 0)
+                if (users == 0) {
+                    MainConsole.Instance.Info ("Creating grid owner");
+                    CreateGridOwnerUser ();
+                    sysEstateSvc.CheckGridOwnerEstate ();
+                }
 
-					CreateGridOwnerUser ();
-            }
-}
+                // check and/or create default system users
+                MainConsole.Instance.Info ("Verifying system users");
+                CheckSystemUserInfo ();
+                sysEstateSvc.CheckSystemEstates ();
 
-        public void FinishedStartup ()
-        {
-            // these are only valid if we are local
-            if (m_accountService.IsLocalConnector) {
                 AddCommands ();
             }
 
@@ -206,8 +211,10 @@ namespace WhiteCore.Services.GenericServices.SystemAccountService
         /// </summary>
         void CheckSystemUserInfo ()
         {
-            if (m_accountService == null)
+            if (m_accountService == null) {
+                MainConsole.Instance.Info ("No user account service available");
                 return;
+            }
 
             VerifySystemUserInfo ("Governor", GovernorUUID, GovernorName, Constants.USER_GOD_MAINTENANCE);
             VerifySystemUserInfo ("RealEstate", SystemEstateOwnerUUID, SystemEstateOwnerName, Constants.USER_GOD_LIASON);
@@ -218,7 +225,8 @@ namespace WhiteCore.Services.GenericServices.SystemAccountService
 
         void VerifySystemUserInfo (string usrType, UUID usrUUID, string usrName, int usrLevel)
         {
-
+            MainConsole.Instance.Info ("Checking system account for " + usrType);
+                
             var userAcct = m_accountService.GetUserAccount (null, usrUUID);
             var userPassword = Utilities.RandomPassword.Generate (2, 3, 0);
 
@@ -248,11 +256,13 @@ namespace WhiteCore.Services.GenericServices.SystemAccountService
                 bool success = m_accountService.StoreUserAccount (godAcct);
 
                 if (success)
-                    MainConsole.Instance.InfoFormat (" The {0} user has been elevated to '{1}' level", usrType, m_accountService.UserGodLevel (usrLevel));
+                    MainConsole.Instance.InfoFormat (" The {0} user has been set to '{1}' level", usrType, m_accountService.UserGodLevel (usrLevel));
 
                 return;
 
             }
+
+            MainConsole.Instance.Info ("Found system account for " + usrType);
 
             // we already have the account.. verify details in case of a configuration change
             if (userAcct.Name != usrName) {
@@ -318,6 +328,9 @@ namespace WhiteCore.Services.GenericServices.SystemAccountService
             string enteredName = firstName + " " + lastName;
             if (userName != "")
                 enteredName = userName;
+
+            MainConsole.Instance.CleanInfo ("");
+            MainConsole.Instance.Warn ("Please enter the user name of the grid owner");
 
             do {
                 userName = MainConsole.Instance.Prompt ("Grid owner user name (? for suggestion)", enteredName);
