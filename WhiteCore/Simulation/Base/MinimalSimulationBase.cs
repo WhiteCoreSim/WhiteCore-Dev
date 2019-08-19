@@ -323,6 +323,13 @@ namespace WhiteCore.Simulation.Base
             {
                 hostName = m_config.Configs ["Network"].GetString ("HostName", "0.0.0.0");
 
+                // special case for 'localhost'.. try for an external network address then
+                if ((hostName.ToLower() == "localip"))
+                {
+                    MainConsole.Instance.Info ("[Network]: Retrieving the local system IP address");
+                    hostName = Utilities.GetLocalIp ();
+                }
+
                 if ((hostName == "") || (hostName == "0.0.0.0"))
                 {
                     MainConsole.Instance.Info ("[Network]: Retrieving the external IP address");
