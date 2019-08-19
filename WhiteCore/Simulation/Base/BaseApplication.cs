@@ -68,19 +68,16 @@ namespace WhiteCore.Simulation.Base
         public static void BaseMain (string [] args, string defaultIniFile, ISimulationBase simBase)
         {
             // First line, hook the appdomain to the crash reporter
-            AppDomain.CurrentDomain.UnhandledException +=
-                CurrentDomain_UnhandledException;
+            AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
 
             // Add the arguments supplied when running the application to the configuration
             ArgvConfigSource configSource = new ArgvConfigSource (args);
 
-            // check configuration unless specifically requested not to
-            if (!args.Contains ("-skipconfig"))
-                Configure (false);
-
             // provide a startup configuration generation override option
             if (args.Contains ("-config"))
                 Configure (true);
+            else if (!args.Contains ("-skipconfig"))        // check configuration unless specifically requested not to
+                Configure (false);
 
             // Increase the number of IOCP threads available. Mono defaults to a tragically low number
             int workerThreads, iocpThreads;
@@ -157,9 +154,7 @@ namespace WhiteCore.Simulation.Base
             if (!requested) {
                 string configrun = CheckConfigStamp (isWhiteCoreExe);
                 if (configrun != "") {
-                    Console.ForegroundColor = ConsoleColor.Yellow;
                     if (existingConfig) {
-                        Console.WriteLine ("Using the existing configuration of " + configrun);
                         return;
                     }
 
@@ -239,7 +234,7 @@ namespace WhiteCore.Simulation.Base
                 Console.ResetColor ();
                 Console.WriteLine ("");
                 string resp = "no";
-                resp = ReadLine ("Do you want to configure WhiteCore-Sim now?  (yes/no)", resp);
+                resp = ReadLine ("Re-configure WhiteCore now. Are you sure?  (yes/no)", resp);
 
                 if (resp != "yes") {
                     Console.WriteLine ("No configuration changes will take place!");
@@ -312,7 +307,7 @@ namespace WhiteCore.Simulation.Base
 
                         dbSource = ReadLine ("MySQL database IP", dbSource);
                         dbPort = ReadLine ("MySQL database port (if not default)", dbPort);
-                        dbSchema = ReadLine ("MySQL database name for your region", dbSchema);
+                        dbSchema = ReadLine ("MySQL database name for your grid/region", dbSchema);
                         dbUser = ReadLine ("MySQL database user account", dbUser);
 
                         Console.WriteLine ("MySQL database password for that account");
@@ -323,7 +318,7 @@ namespace WhiteCore.Simulation.Base
                 }
 
                 if (isStandalone) {
-                    gridName = ReadLine ("Name of your WhiteCore-Sim server", gridName);
+                    gridName = ReadLine ("Name of your WhiteCore grid", gridName);
 
                     welcomeMessage = "Welcome to " + gridName + ", <USERNAME>!";
                     Console.ForegroundColor = ConsoleColor.White;
@@ -348,7 +343,7 @@ namespace WhiteCore.Simulation.Base
                     gridIPAddress = ReadLine ("Grid server address", gridIPAddress);
                 }
             
-                //Data.ini setup
+                // Data.ini setup
                 if (isStandalone) {
                     string cfgDataFolder = isWhiteCoreExe ? "Standalone/" : "Grid/";
 
@@ -543,6 +538,7 @@ namespace WhiteCore.Simulation.Base
                     	cfgFolder + "Templates/WhiteCore.Server.ini.example",
                     	Nini.Ini.IniFileType.AuroraStyle);
 
+                    Console.WriteLine (" You may enter 'localip' if the Grid server is running on this system\n");
                     gridIPAddress =
                         ReadLine ("\nThe domain name or IP address of the grid server", gridIPAddress);
                     bool ipSet = false;
@@ -664,7 +660,7 @@ namespace WhiteCore.Simulation.Base
             File.Create (file).Close ();
         }
 
-        static string CheckConfigStamp (bool region)
+        public static string CheckConfigStamp (bool region)
         {
             // check if a config info file exists in the current (bin) directory
             string cfile;
