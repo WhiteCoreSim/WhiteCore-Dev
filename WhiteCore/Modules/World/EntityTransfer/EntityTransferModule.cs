@@ -785,9 +785,12 @@ namespace WhiteCore.Modules.EntityTransfer
             IScenePresence sp = scene.GetScenePresence (agent.AgentID);
 
             // Don't disable this log message - it's too helpful
+            var agentAcct = m_scene.UserAccountService.GetUserAccount (null, agent.AgentID);
+            var agentName = (agentAcct != null) ? agentAcct.Name : agent.AgentID.ToString();
+
             MainConsole.Instance.TraceFormat (
                 "[Connection begin]: Region {0} told of incoming {1} agent {2} (circuit code {3}, teleportflags {4})",
-                scene.RegionInfo.RegionName, agent.IsChildAgent ? "child" : "root", agent.AgentID,
+                scene.RegionInfo.RegionName, agent.IsChildAgent ? "child" : "root", agentName,
                 agent.CircuitCode, teleportFlags);
 
             CacheUserInfo (scene, agent.CachedUserInfo);
@@ -804,7 +807,7 @@ namespace WhiteCore.Modules.EntityTransfer
                 // Or the same user is trying to be root twice here, won't work.
                 // Kill it.
                 MainConsole.Instance.InfoFormat ("[Scene]: Zombie scene presence detected for {0} in {1}",
-                                                 agent.AgentID, scene.RegionInfo.RegionName);
+                                                 agentName, scene.RegionInfo.RegionName);
                 // Tell everyone about it
                 scene.WhiteCoreEventManager.FireGenericEventHandler ("AgentIsAZombie", sp.UUID);
                 // Send the killing message (DisableSimulator)
@@ -822,7 +825,7 @@ namespace WhiteCore.Modules.EntityTransfer
 
             MainConsole.Instance.InfoFormat (
                 "[Connection begin]: Region {0} authenticated and authorized incoming {1} agent {2} (circuit code {3})",
-                scene.RegionInfo.RegionName, agent.IsChildAgent ? "child" : "root", agent.AgentID,
+                scene.RegionInfo.RegionName, agent.IsChildAgent ? "child" : "root", agentName,
                 agent.CircuitCode);
 
             response.Success = true;
@@ -858,9 +861,12 @@ namespace WhiteCore.Modules.EntityTransfer
             if (AuthorizationService != null) {
                 GridRegion ourRegion = new GridRegion (scene.RegionInfo);
                 if (!AuthorizationService.IsAuthorizedForRegion (ourRegion, agent, !agent.IsChildAgent, out reason)) {
+                    var agentAcct = m_scene.UserAccountService.GetUserAccount (null, agent.AgentID);
+                    var agentName = (agentAcct != null) ? agentAcct.Name : agent.AgentID.ToString();
+
                     MainConsole.Instance.WarnFormat (
                         "[Connection begin]: Denied access to {0} at {1} because the user does not have access to the region, reason: {2}",
-                        agent.AgentID, scene.RegionInfo.RegionName, reason);
+                        agentName, scene.RegionInfo.RegionName, reason);
                     reason = string.Format ("You do not have access to the region {0}, reason: {1}",
                                            scene.RegionInfo.RegionName, reason);
                     return false;
@@ -885,10 +891,13 @@ namespace WhiteCore.Modules.EntityTransfer
             //No null updates!
             if (cAgentData == null)
                 return false;
+            if (MainConsole.Instance.Threshold <= Level.Debug) {
+                var agentAcct = m_scene.UserAccountService.GetUserAccount (null, cAgentData.AgentID);
+                var agentName = (agentAcct != null) ? agentAcct.Name : cAgentData.AgentID.ToString ();
 
-            MainConsole.Instance.DebugFormat (
-                "[Scene]: Incoming child agent update for {0} in {1}", cAgentData.AgentID, scene.RegionInfo.RegionName);
-
+                MainConsole.Instance.DebugFormat (
+                    "[Scene]: Incoming child agent update for {0} in {1}", cAgentData.AgentID, scene.RegionInfo.RegionName);
+            }
             // We have to wait until the viewer contacts this region after receiving EAC.
             // That calls AddNewClient, which finally creates the ScenePresence and then this gets set up
             // So if the client isn't here yet, save the update for them when they get into the region fully
