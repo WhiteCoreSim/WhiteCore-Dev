@@ -95,6 +95,7 @@ namespace WhiteCore.Services.DataService
             QueryFilter filter = new QueryFilter ();
             filter.andFilters ["UserID"] = info.UserID;
             GD.Delete (m_userInfoTable, filter);
+
             return GD.Insert (m_userInfoTable, values);
         }
 
@@ -192,7 +193,7 @@ namespace WhiteCore.Services.DataService
             }
             UserInfo user = ParseQuery (query) [0];
 
-            //Check LastSeen
+            // Check LastSeen
             DateTime timeLastSeen = Util.ToDateTime (int.Parse (query [2]));
             DateTime timeNow = DateTime.Now.ToUniversalTime ();
             if (checkOnlineStatus && m_checkLastSeen && user.IsOnline && (timeLastSeen.AddHours (1) < timeNow)) {
@@ -236,11 +237,10 @@ namespace WhiteCore.Services.DataService
                 filter.orGreaterThanEqFilters ["LastSeen"] = now;
                 // filter.andGreaterThanFilters["LastLogout"] = now;
             }
-
             filter.andFilters ["IsOnline"] = "1";
 
-
             List<string> userCount = GD.Query (new string [1] { "COUNT(UserID)" }, m_userInfoTable, filter, null, null, null);
+
             return uint.Parse (userCount [0]);
         }
 
@@ -277,7 +277,6 @@ namespace WhiteCore.Services.DataService
 
             // online only please...
             filter.andFilters ["IsOnline"] = "1";
-
 
             List<string> query = GD.Query (new string [] { "*" }, m_userInfoTable, filter, sort, null, null);
 
