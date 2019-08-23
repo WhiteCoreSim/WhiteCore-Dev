@@ -51,223 +51,230 @@ namespace WhiteCore.Services.DataService
         ///     Gets a list of generic T's from the database
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="OwnerID"></param>
-        /// <param name="Type"></param>
-        /// <param name="GD"></param>
+        /// <param name="ownerID"></param>
+        /// <param name="type"></param>
+        /// <param name="genData"></param>
         /// <returns></returns>
-        public static List<T> GetGenerics<T>(UUID OwnerID, string Type, IGenericData GD) where T : IDataTransferable
+        public static List<T> GetGenerics<T> (UUID ownerID, string type, IGenericData genData) where T : IDataTransferable
         {
-            List<OSDMap> retVal = GetGenerics(OwnerID, Type, GD);
+            List<OSDMap> retVal = GetGenerics (ownerID, type, genData);
 
-            List<T> Values = new List<T>();
-            foreach (OSDMap map in retVal)
-            {
-                T data = (T) System.Activator.CreateInstance(typeof (T));
-                data.FromOSD(map);
-                Values.Add(data);
+            List<T> values = new List<T> ();
+            foreach (OSDMap map in retVal) {
+                T data = (T)System.Activator.CreateInstance (typeof (T));
+                data.FromOSD (map);
+                values.Add (data);
             }
 
-            return Values;
+            return values;
         }
 
         /// <summary>
         ///     Gets a list of OSDMaps from the database
         /// </summary>
-        /// <param name="OwnerID"></param>
-        /// <param name="Type"></param>
-        /// <param name="GD"></param>
+        /// <param name="ownerID"></param>
+        /// <param name="type"></param>
+        /// <param name="genData"></param>
         /// <returns></returns>
-        public static List<OSDMap> GetGenerics(UUID OwnerID, string Type, IGenericData GD)
+        public static List<OSDMap> GetGenerics (UUID ownerID, string type, IGenericData genData)
         {
-            QueryFilter filter = new QueryFilter();
-            filter.andFilters["OwnerID"] = OwnerID;
-            filter.andFilters["Type"] = Type;
-            List<string> retVal = GD.Query(new string[1] {"`value`"}, "generics", filter, null, null, null);
+            QueryFilter filter = new QueryFilter ();
+            filter.andFilters ["OwnerID"] = ownerID;
+            filter.andFilters ["Type"] = type;
+            List<string> retVal = genData.Query (new string [1] { "`value`" }, "generics", filter, null, null, null);
 
-            List<OSDMap> Values = new List<OSDMap>();
-            foreach (string ret in retVal)
-            {
-                OSDMap map = (OSDMap) OSDParser.DeserializeJson(ret);
+            List<OSDMap> values = new List<OSDMap> ();
+            foreach (string ret in retVal) {
+                OSDMap map = (OSDMap)OSDParser.DeserializeJson (ret);
                 if (map != null)
-                    Values.Add(map);
+                    values.Add (map);
             }
 
-            return Values;
+            return values;
         }
 
         /// <summary>
         ///     Gets a Generic type as set by T
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="OwnerID"></param>
-        /// <param name="Type"></param>
-        /// <param name="Key"></param>
-        /// <param name="GD"></param>
+        /// <param name="ownerID"></param>
+        /// <param name="type"></param>
+        /// <param name="key"></param>
+        /// <param name="genData"></param>
         /// <returns></returns>
-        public static T GetGeneric<T>(UUID OwnerID, string Type, string Key, IGenericData GD)
+        public static T GetGeneric<T> (UUID ownerID, string type, string key, IGenericData genData)
             where T : IDataTransferable
         {
-            OSDMap map = GetGeneric(OwnerID, Type, Key, GD);
-            if (map == null) return null;
-            T data = (T) System.Activator.CreateInstance(typeof (T));
-            data.FromOSD(map);
+            OSDMap map = GetGeneric (ownerID, type, key, genData);
+            if (map == null)
+                return null;
+
+            T data = (T)System.Activator.CreateInstance (typeof (T));
+            data.FromOSD (map);
+
             return data;
         }
 
         /// <summary>
         ///     Gets a Generic type as set by T
         /// </summary>
-        /// <param name="OwnerID"></param>
-        /// <param name="Type"></param>
-        /// <param name="Key"></param>
-        /// <param name="GD"></param>
+        /// <param name="ownerID"></param>
+        /// <param name="type"></param>
+        /// <param name="key"></param>
+        /// <param name="genData"></param>
         /// <returns></returns>
-        public static OSDMap GetGeneric(UUID OwnerID, string Type, string Key, IGenericData GD)
+        public static OSDMap GetGeneric (UUID ownerID, string type, string key, IGenericData genData)
         {
-            QueryFilter filter = new QueryFilter();
-            filter.andFilters["OwnerID"] = OwnerID;
-            filter.andFilters["Type"] = Type;
-            filter.andFilters["`Key`"] = Key;
-            List<string> retVal = GD.Query(new string[1] {"`value`"}, "generics", filter, null, null, null);
+            QueryFilter filter = new QueryFilter ();
+            filter.andFilters ["OwnerID"] = ownerID;
+            filter.andFilters ["Type"] = type;
+            filter.andFilters ["`Key`"] = key;
+            List<string> retVal = genData.Query (new string [1] { "`value`" }, "generics", filter, null, null, null);
 
             if (retVal.Count == 0)
                 return null;
 
-            return (OSDMap) OSDParser.DeserializeJson(retVal[0]);
+            return (OSDMap)OSDParser.DeserializeJson (retVal [0]);
         }
 
         /// <summary>
         ///     Gets the number of generic entries
         /// </summary>
-        /// <param name="OwnerID"></param>
-        /// <param name="Type"></param>
-        /// <param name="GD"></param>
+        /// <param name="ownerID"></param>
+        /// <param name="type"></param>
+        /// <param name="genData"></param>
         /// <returns></returns>
-        public static int GetGenericCount(UUID OwnerID, string Type, IGenericData GD)
+        public static int GetGenericCount (UUID ownerID, string type, IGenericData genData)
         {
-            QueryFilter filter = new QueryFilter();
-            filter.andFilters["OwnerID"] = OwnerID;
-            filter.andFilters["Type"] = Type;
-            List<string> retVal = GD.Query(new string[1] {"COUNT(*)"}, "generics", filter, null, null, null);
+            QueryFilter filter = new QueryFilter ();
+            filter.andFilters ["OwnerID"] = ownerID;
+            filter.andFilters ["Type"] = type;
+            List<string> retVal = genData.Query (new string [1] { "COUNT(*)" }, "generics", filter, null, null, null);
 
-            return (retVal == null || retVal.Count == 0) ? 0 : int.Parse(retVal[0]);
+            return (retVal == null || retVal.Count == 0) ? 0 : int.Parse (retVal [0]);
         }
 
         /// <summary>
         ///     Gets the number of generic entries
         /// </summary>
-        /// <param name="OwnerID"></param>
-        /// <param name="Type"></param>
-        /// <param name="Key"></param>
-        /// <param name="GD"></param>
+        /// <param name="ownerID"></param>
+        /// <param name="type"></param>
+        /// <param name="key"></param>
+        /// <param name="genData"></param>
         /// <returns></returns>
-        public static int GetGenericCount(UUID OwnerID, string Type, string Key, IGenericData GD)
+        public static int GetGenericCount (UUID ownerID, string type, string key, IGenericData genData)
         {
-            QueryFilter filter = new QueryFilter();
-            filter.andFilters["OwnerID"] = OwnerID;
-            filter.andFilters["Type"] = Type;
-            filter.andFilters["`Key`"] = Key;
-            List<string> retVal = GD.Query(new string[1] {"COUNT(*)"}, "generics", filter, null, null, null);
+            QueryFilter filter = new QueryFilter ();
+            filter.andFilters ["OwnerID"] = ownerID;
+            filter.andFilters ["Type"] = type;
+            filter.andFilters ["`Key`"] = key;
+            List<string> retVal = genData.Query (new string [1] { "COUNT(*)" }, "generics", filter, null, null, null);
 
-            return (retVal == null || retVal.Count == 0) ? 0 : int.Parse(retVal[0]);
+            return (retVal == null || retVal.Count == 0) ? 0 : int.Parse (retVal [0]);
         }
 
         /// <summary>
         ///     Gets the number of generic entries
         /// </summary>
-        /// <param name="OwnerID"></param>
-        /// <param name="GD"></param>
+        /// <param name="ownerID"></param>
+        /// <param name="genData"></param>
         /// <returns></returns>
-        public static int GetGenericCount(UUID OwnerID, IGenericData GD)
+        public static int GetGenericCount (UUID ownerID, IGenericData genData)
         {
-            QueryFilter filter = new QueryFilter();
-            filter.andFilters["OwnerID"] = OwnerID;
-            List<string> retVal = GD.Query(new string[1] {"COUNT(*)"}, "generics", filter, null, null, null);
+            QueryFilter filter = new QueryFilter ();
+            filter.andFilters ["OwnerID"] = ownerID;
+            List<string> retVal = genData.Query (new string [1] { "COUNT(*)" }, "generics", filter, null, null, null);
 
-            return (retVal == null || retVal.Count == 0) ? 0 : int.Parse(retVal[0]);
+            return (retVal == null || retVal.Count == 0) ? 0 : int.Parse (retVal [0]);
         }
 
         /// <summary>
         ///     Adds a generic into the database
         /// </summary>
-        /// <param name="OwnerID">ID of the entity that owns the generic data</param>
-        /// <param name="Type"></param>
-        /// <param name="Key"></param>
-        /// <param name="Value"></param>
-        /// <param name="GD"></param>
-        public static void AddGeneric(UUID OwnerID, string Type, string Key, OSDMap Value, IGenericData GD)
+        /// <param name="ownerID">ID of the entity that owns the generic data</param>
+        /// <param name="type"></param>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        /// <param name="genData"></param>
+        public static void AddGeneric (UUID ownerID, string type, string key, OSDMap value, IGenericData genData)
         {
-            Dictionary<string, object> row = new Dictionary<string, object>(4);
-            row["OwnerID"] = OwnerID;
-            row["Type"] = Type;
-            row["`Key`"] = Key;
-            row["`Value`"] = OSDParser.SerializeJsonString(Value);
-            GD.Replace("generics", row);
+            Dictionary<string, object> row = new Dictionary<string, object> (4);
+            row ["OwnerID"] = ownerID;
+            row ["Type"] = type;
+            row ["`Key`"] = key;
+            row ["`Value`"] = OSDParser.SerializeJsonString (value);
+
+            genData.Replace ("generics", row);
         }
 
         /// <summary>
         ///     Remove generic data for the specified owner by type and key
         /// </summary>
-        /// <param name="OwnerID">ID of the entity that owns the generic data</param>
-        /// <param name="Type"></param>
-        /// <param name="Key"></param>
-        /// <param name="GD"></param>
-        public static void RemoveGenericByKeyAndType(UUID OwnerID, string Type, string Key, IGenericData GD)
+        /// <param name="ownerID">ID of the entity that owns the generic data</param>
+        /// <param name="type"></param>
+        /// <param name="key"></param>
+        /// <param name="genData"></param>
+        public static void RemoveGenericByKeyAndType (UUID ownerID, string type, string key, IGenericData genData)
         {
-            QueryFilter filter = new QueryFilter();
-            filter.andFilters["OwnerID"] = OwnerID;
-            filter.andFilters["Type"] = Type;
-            filter.andFilters["`Key`"] = Key;
-            GD.Delete("generics", filter);
+            QueryFilter filter = new QueryFilter ();
+            filter.andFilters ["OwnerID"] = ownerID;
+            filter.andFilters ["Type"] = type;
+            filter.andFilters ["`Key`"] = key;
+
+            genData.Delete ("generics", filter);
         }
 
         /// <summary>
         ///     Removes a generic from the database
         /// </summary>
-        /// <param name="OwnerID">ID of the entity that owns the generic data</param>
-        /// <param name="Key"></param>
-        /// <param name="GD"></param>
-        public static void RemoveGenericByKey(UUID OwnerID, string Key, IGenericData GD)
+        /// <param name="ownerID">ID of the entity that owns the generic data</param>
+        /// <param name="key"></param>
+        /// <param name="genData"></param>
+        public static void RemoveGenericByKey (UUID ownerID, string key, IGenericData genData)
         {
-            QueryFilter filter = new QueryFilter();
-            filter.andFilters["OwnerID"] = OwnerID;
-            filter.andFilters["`Key`"] = Key;
-            GD.Delete("generics", filter);
+            QueryFilter filter = new QueryFilter ();
+            filter.andFilters ["OwnerID"] = ownerID;
+            filter.andFilters ["`Key`"] = key;
+
+            genData.Delete ("generics", filter);
         }
 
         /// <summary>
         ///     Removes a generic from the database
         /// </summary>
-        /// <param name="OwnerID">ID of the entity that owns the generic data</param>
-        /// <param name="Type"></param>
-        /// <param name="GD"></param>
-        public static void RemoveGenericByType(UUID OwnerID, string Type, IGenericData GD)
+        /// <param name="ownerID">ID of the entity that owns the generic data</param>
+        /// <param name="type"></param>
+        /// <param name="genData"></param>
+        public static void RemoveGenericByType (UUID ownerID, string type, IGenericData genData)
         {
-            QueryFilter filter = new QueryFilter();
-            filter.andFilters["OwnerID"] = OwnerID;
-            filter.andFilters["Type"] = Type;
-            GD.Delete("generics", filter);
+            QueryFilter filter = new QueryFilter ();
+            filter.andFilters ["OwnerID"] = ownerID;
+            filter.andFilters ["Type"] = type;
+
+            genData.Delete ("generics", filter);
         }
 
-        public static List<UUID> GetOwnersByGeneric(IGenericData GD, string Type, string Key)
+        public static List<UUID> GetOwnersByGeneric (string type, string key, IGenericData genData)
         {
-            QueryFilter filter = new QueryFilter();
-            filter.andFilters["Type"] = Type;
-            filter.andFilters["`Key`"] = Key;
+            QueryFilter filter = new QueryFilter ();
+            filter.andFilters ["Type"] = type;
+            filter.andFilters ["`Key`"] = key;
+
             return
-                GD.Query(new string[1] {"OwnerID"}, "generics", filter, null, null, null)
-                  .ConvertAll<UUID>(x => new UUID(x));
+                genData.Query (new string [1] { "OwnerID" }, "generics", filter, null, null, null)
+                  .ConvertAll<UUID> (x => new UUID (x));
         }
 
-        public static List<UUID> GetOwnersByGeneric(IGenericData GD, string Type, string Key, OSDMap Value)
+        public static List<UUID> GetOwnersByGeneric (string type, string key, OSDMap value, IGenericData genData)
         {
-            QueryFilter filter = new QueryFilter();
-            filter.andFilters["Type"] = Type;
-            filter.andFilters["`Key`"] = Key;
-            filter.andFilters["`Value`"] = OSDParser.SerializeJsonString(Value);
+            QueryFilter filter = new QueryFilter ();
+            filter.andFilters ["Type"] = type;
+            filter.andFilters ["`Key`"] = key;
+            filter.andFilters ["`Value`"] = OSDParser.SerializeJsonString (value);
+
             return
-                GD.Query(new string[1] {"OwnerID"}, "generics", filter, null, null, null)
-                  .ConvertAll<UUID>(x => new UUID(x));
+                genData.Query (new string [1] { "OwnerID" }, "generics", filter, null, null, null)
+                  .ConvertAll<UUID> (x => new UUID (x));
         }
     }
 }

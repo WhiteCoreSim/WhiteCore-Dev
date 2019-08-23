@@ -38,23 +38,21 @@ namespace WhiteCore.Services.DataService
 {
     public class LocalUserStatsDataConnector : IUserStatsDataConnector
     {
-        IGenericData GD;
+        IGenericData genData;
         const string m_realm = "statsdata";
 
-        public void Initialize(IGenericData GenericData, IConfigSource source, IRegistryCore simBase,
+        public void Initialize (IGenericData genericData, IConfigSource source, IRegistryCore simBase,
                                string defaultConnectionString)
         {
-            if (source.Configs["WhiteCoreConnectors"].GetString("WebStatsDataConnector", "LocalConnector") ==
-                "LocalConnector")
-            {
-                GD = GenericData;
+            if (source.Configs ["WhiteCoreConnectors"].GetString ("WebStatsDataConnector", "LocalConnector") ==
+                "LocalConnector") {
+                genData = genericData;
 
-                if (source.Configs[Name] != null)
-                    defaultConnectionString = source.Configs[Name].GetString("ConnectionString", defaultConnectionString);
+                if (source.Configs [Name] != null)
+                    defaultConnectionString = source.Configs [Name].GetString ("ConnectionString", defaultConnectionString);
 
-                if (GD != null)
-                {
-                    GD.ConnectToDatabase (defaultConnectionString, "Stats",
+                if (genData != null) {
+                    genData.ConnectToDatabase (defaultConnectionString, "Stats",
                         source.Configs ["WhiteCoreConnectors"].GetBoolean ("ValidateTables", true));
 
                     Framework.Utilities.DataManager.RegisterPlugin (Name, this);
@@ -62,12 +60,11 @@ namespace WhiteCore.Services.DataService
             }
         }
 
-        public string Name
-        {
+        public string Name {
             get { return "IUserStatsDataConnector"; }
         }
 
-        public void Dispose()
+        public void Dispose ()
         {
         }
 
@@ -77,128 +74,130 @@ namespace WhiteCore.Services.DataService
         /// <param name="uid"></param>
         /// <param name="agentID"></param>
         /// <param name="regionID"></param>
-        public void UpdateUserStats(ViewerStatsMessage uid, UUID agentID, UUID regionID)
+        public void UpdateUserStats (ViewerStatsMessage uid, UUID agentID, UUID regionID)
         {
-            Dictionary<string, object> rows = new Dictionary<string, object>();
+            Dictionary<string, object> rows = new Dictionary<string, object> ();
 
-            rows.Add("session_id", uid.SessionID);
-            rows.Add("agent_id", agentID);
-            rows.Add("region_id", regionID);
-            rows.Add("agents_in_view", uid.AgentsInView);
-            rows.Add("fps", uid.AgentFPS);
-            rows.Add("a_language", uid.AgentLanguage);
-            rows.Add("mem_use", uid.AgentMemoryUsed);
-            rows.Add("meters_traveled", uid.MetersTraveled);
-            rows.Add("ping", uid.AgentPing);
-            rows.Add("regions_visited", uid.RegionsVisited);
-            rows.Add("run_time", uid.AgentRuntime);
-            rows.Add("sim_fps", uid.SimulatorFPS);
-            rows.Add("start_time", Util.ToUnixTime(uid.AgentStartTime));
-            rows.Add("client_version", uid.AgentVersion);
-            rows.Add("s_cpu", uid.SystemCPU);
-            rows.Add("s_gpu", uid.SystemGPU);
-            rows.Add("s_gpuclass", uid.SystemGPUClass);
-            rows.Add("s_gpuvendor", uid.SystemGPUVendor);
-            rows.Add("s_gpuversion", uid.SystemGPUVersion);
-            rows.Add("s_os", uid.SystemOS);
-            rows.Add("s_ram", uid.SystemInstalledRam);
-            rows.Add("d_object_kb", uid.object_kbytes);
-            rows.Add("d_texture_kb", uid.texture_kbytes);
-            rows.Add("d_world_kb", uid.world_kbytes);
-            rows.Add("n_in_kb", uid.InKbytes);
-            rows.Add("n_in_pk", uid.InPackets);
-            rows.Add("n_out_kb", uid.OutKbytes);
-            rows.Add("n_out_pk", uid.OutPackets);
-            rows.Add("f_dropped", uid.StatsDropped);
-            rows.Add("f_failed_resends", uid.StatsFailedResends);
-            rows.Add("f_invalid", uid.FailuresInvalid);
-            rows.Add("f_off_circuit", uid.FailuresOffCircuit);
-            rows.Add("f_resent", uid.FailuresResent);
-            rows.Add("f_send_packet", uid.FailuresSendPacket);
+            rows.Add ("session_id", uid.SessionID);
+            rows.Add ("agent_id", agentID);
+            rows.Add ("region_id", regionID);
+            rows.Add ("agents_in_view", uid.AgentsInView);
+            rows.Add ("fps", uid.AgentFPS);
+            rows.Add ("a_language", uid.AgentLanguage);
+            rows.Add ("mem_use", uid.AgentMemoryUsed);
+            rows.Add ("meters_traveled", uid.MetersTraveled);
+            rows.Add ("ping", uid.AgentPing);
+            rows.Add ("regions_visited", uid.RegionsVisited);
+            rows.Add ("run_time", uid.AgentRuntime);
+            rows.Add ("sim_fps", uid.SimulatorFPS);
+            rows.Add ("start_time", Util.ToUnixTime (uid.AgentStartTime));
+            rows.Add ("client_version", uid.AgentVersion);
+            rows.Add ("s_cpu", uid.SystemCPU);
+            rows.Add ("s_gpu", uid.SystemGPU);
+            rows.Add ("s_gpuclass", uid.SystemGPUClass);
+            rows.Add ("s_gpuvendor", uid.SystemGPUVendor);
+            rows.Add ("s_gpuversion", uid.SystemGPUVersion);
+            rows.Add ("s_os", uid.SystemOS);
+            rows.Add ("s_ram", uid.SystemInstalledRam);
+            rows.Add ("d_object_kb", uid.object_kbytes);
+            rows.Add ("d_texture_kb", uid.texture_kbytes);
+            rows.Add ("d_world_kb", uid.world_kbytes);
+            rows.Add ("n_in_kb", uid.InKbytes);
+            rows.Add ("n_in_pk", uid.InPackets);
+            rows.Add ("n_out_kb", uid.OutKbytes);
+            rows.Add ("n_out_pk", uid.OutPackets);
+            rows.Add ("f_dropped", uid.StatsDropped);
+            rows.Add ("f_failed_resends", uid.StatsFailedResends);
+            rows.Add ("f_invalid", uid.FailuresInvalid);
+            rows.Add ("f_off_circuit", uid.FailuresOffCircuit);
+            rows.Add ("f_resent", uid.FailuresResent);
+            rows.Add ("f_send_packet", uid.FailuresSendPacket);
 
-            GD.Replace(m_realm, rows);
+            genData.Replace (m_realm, rows);
         }
 
-        public List<string> Get(string columnName)
+        public List<string> Get (string columnName)
         {
-            QueryFilter filter = new QueryFilter();
-            return GD.Query(new string[1] {columnName}, m_realm, filter, null, null, null);
+            QueryFilter filter = new QueryFilter ();
+
+            return genData.Query (new string [1] { columnName }, m_realm, filter, null, null, null);
         }
 
-        public int GetCount(string columnName, KeyValuePair<string, object> whereCheck)
+        public int GetCount (string columnName, KeyValuePair<string, object> whereCheck)
         {
-            QueryFilter filter = new QueryFilter();
-            filter.andFilters.Add(whereCheck.Key, whereCheck.Value);
-            return int.Parse(GD.Query(new string[1] {"count(" + columnName + ")"}, m_realm, filter, null, null, null)[0]);
+            QueryFilter filter = new QueryFilter ();
+            filter.andFilters.Add (whereCheck.Key, whereCheck.Value);
+
+            return int.Parse (genData.Query (new string [1] { "count(" + columnName + ")" }, m_realm, filter, null, null, null) [0]);
         }
 
-        public ViewerStatsMessage GetBySession(UUID sessionID)
+        public ViewerStatsMessage GetBySession (UUID sessionID)
         {
-            QueryFilter filter = new QueryFilter();
-            filter.andFilters.Add("session_id", sessionID);
-            List<string> results = GD.Query(new string[1] {"*"}, m_realm, filter, null, null, null);
-            return BuildSession(results, 0);
+            QueryFilter filter = new QueryFilter ();
+            filter.andFilters.Add ("session_id", sessionID);
+            List<string> results = genData.Query (new string [1] { "*" }, m_realm, filter, null, null, null);
+
+            return BuildSession (results, 0);
         }
 
-        public void RemoveAllSessions()
+        public void RemoveAllSessions ()
         {
-            GD.Delete(m_realm, null);
+            genData.Delete (m_realm, null);
         }
 
-        public Dictionary<string,int> ViewerUsage()
+        public Dictionary<string, int> ViewerUsage ()
         {
-            QueryFilter filter = new QueryFilter();
-            List<string> client_viewers = GD.Query(new string[1] {"client_version"}, m_realm, filter, null, null, null);
+            QueryFilter filter = new QueryFilter ();
+            List<string> client_viewers = genData.Query (new string [1] { "client_version" }, m_realm, filter, null, null, null);
             client_viewers.Sort ();
 
-            //List<string> client_viewers = Get ("client_version");
-            Dictionary<string, int> viewers = new Dictionary<string, int>();
-            foreach( var cli in client_viewers)
-                if (viewers.ContainsKey(cli))
-                    viewers[cli]++;
+            // List<string> client_viewers = Get ("client_version");
+            Dictionary<string, int> viewers = new Dictionary<string, int> ();
+            foreach (var cli in client_viewers)
+                if (viewers.ContainsKey (cli))
+                    viewers [cli]++;
                 else
                     viewers.Add (cli, 1);
 
             return viewers;
         }
 
-        ViewerStatsMessage BuildSession(List<string> results, int start)
+        ViewerStatsMessage BuildSession (List<string> results, int start)
         {
-            ViewerStatsMessage message = new ViewerStatsMessage();
-            for (int i = start; i < start + 33; i += 33)
-            {
-                message.SessionID = UUID.Parse(results[i + 0]);
-                message.AgentsInView = int.Parse(results[i + 3]);
-                message.AgentFPS = results[i + 4] == "" ? 0 : float.Parse(results[i + 4]);
-                message.AgentLanguage = results[i + 5];
-                message.AgentMemoryUsed = float.Parse(results[i + 6]);
-                message.MetersTraveled = float.Parse(results[i + 7]);
-                message.AgentPing = float.Parse(results[i + 8]);
-                message.RegionsVisited = int.Parse(results[i + 9]);
-                message.AgentRuntime = float.Parse(results[i + 10]);
-                message.SimulatorFPS = float.Parse(results[i + 11]);
-                message.AgentStartTime = Util.ToDateTime(int.Parse(results[i + 12]));
-                message.AgentVersion = results[i + 13];
-                message.SystemCPU = results[i + 14];
-                message.SystemGPU = results[i + 15];
-                message.SystemGPUClass = int.Parse(results[i + 16]);
-                message.SystemGPUVendor = results[i + 17];
-                message.SystemGPUVersion = results[i + 18];
-                message.SystemOS = results[i + 19];
-                message.SystemInstalledRam = int.Parse(results[i + 20]);
-                message.object_kbytes = float.Parse(results[i + 21]);
-                message.texture_kbytes = float.Parse(results[i + 22]);
-                message.world_kbytes = float.Parse(results[i + 23]);
-                message.InKbytes = float.Parse(results[i + 24]);
-                message.InPackets = float.Parse(results[i + 25]);
-                message.OutKbytes = float.Parse(results[i + 26]);
-                message.OutPackets = float.Parse(results[i + 27]);
-                message.StatsDropped = int.Parse(results[i + 28]);
-                message.StatsFailedResends = int.Parse(results[i + 29]);
-                message.FailuresInvalid = int.Parse(results[i + 30]);
-                message.FailuresOffCircuit = int.Parse(results[i + 31]);
-                message.FailuresResent = int.Parse(results[i + 32]);
-                message.FailuresSendPacket = int.Parse(results[i + 33]);
+            ViewerStatsMessage message = new ViewerStatsMessage ();
+            for (int i = start; i < start + 33; i += 33) {
+                message.SessionID = UUID.Parse (results [i + 0]);
+                message.AgentsInView = int.Parse (results [i + 3]);
+                message.AgentFPS = results [i + 4] == "" ? 0 : float.Parse (results [i + 4]);
+                message.AgentLanguage = results [i + 5];
+                message.AgentMemoryUsed = float.Parse (results [i + 6]);
+                message.MetersTraveled = float.Parse (results [i + 7]);
+                message.AgentPing = float.Parse (results [i + 8]);
+                message.RegionsVisited = int.Parse (results [i + 9]);
+                message.AgentRuntime = float.Parse (results [i + 10]);
+                message.SimulatorFPS = float.Parse (results [i + 11]);
+                message.AgentStartTime = Util.ToDateTime (int.Parse (results [i + 12]));
+                message.AgentVersion = results [i + 13];
+                message.SystemCPU = results [i + 14];
+                message.SystemGPU = results [i + 15];
+                message.SystemGPUClass = int.Parse (results [i + 16]);
+                message.SystemGPUVendor = results [i + 17];
+                message.SystemGPUVersion = results [i + 18];
+                message.SystemOS = results [i + 19];
+                message.SystemInstalledRam = int.Parse (results [i + 20]);
+                message.object_kbytes = float.Parse (results [i + 21]);
+                message.texture_kbytes = float.Parse (results [i + 22]);
+                message.world_kbytes = float.Parse (results [i + 23]);
+                message.InKbytes = float.Parse (results [i + 24]);
+                message.InPackets = float.Parse (results [i + 25]);
+                message.OutKbytes = float.Parse (results [i + 26]);
+                message.OutPackets = float.Parse (results [i + 27]);
+                message.StatsDropped = int.Parse (results [i + 28]);
+                message.StatsFailedResends = int.Parse (results [i + 29]);
+                message.FailuresInvalid = int.Parse (results [i + 30]);
+                message.FailuresOffCircuit = int.Parse (results [i + 31]);
+                message.FailuresResent = int.Parse (results [i + 32]);
+                message.FailuresSendPacket = int.Parse (results [i + 33]);
             }
             return message;
         }

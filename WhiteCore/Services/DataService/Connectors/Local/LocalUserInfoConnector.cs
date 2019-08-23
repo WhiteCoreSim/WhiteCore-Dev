@@ -39,18 +39,18 @@ namespace WhiteCore.Services.DataService
 {
     public class LocalUserInfoConnector : IAgentInfoConnector
     {
-        IGenericData GD;
+        IGenericData genData;
         protected bool m_allowDuplicatePresences = true;
         protected bool m_checkLastSeen = true;
         string m_userInfoTable = "user_info";
 
         #region IAgentInfoConnector Members
 
-        public void Initialize (IGenericData GenericData, IConfigSource source, IRegistryCore simBase,
+        public void Initialize (IGenericData genericData, IConfigSource source, IRegistryCore simBase,
                                string defaultConnectionString)
         {
             if (source.Configs ["WhiteCoreConnectors"].GetString ("UserInfoConnector", "LocalConnector") == "LocalConnector") {
-                GD = GenericData;
+                genData = genericData;
 
                 string connectionString = defaultConnectionString;
                 if (source.Configs [Name] != null) {
@@ -61,8 +61,8 @@ namespace WhiteCore.Services.DataService
                     m_checkLastSeen =
                         source.Configs [Name].GetBoolean ("CheckLastSeen", m_checkLastSeen);
                 }
-                if (GD != null)
-                    GD.ConnectToDatabase (connectionString, "UserInfo",
+                if (genData != null)
+                    genData.ConnectToDatabase (connectionString, "UserInfo",
                                          source.Configs ["WhiteCoreConnectors"].GetBoolean ("ValidateTables", true));
 
                 Framework.Utilities.DataManager.RegisterPlugin (this);
@@ -79,7 +79,7 @@ namespace WhiteCore.Services.DataService
             values [0] = info.UserID;
             values [1] = info.CurrentRegionID;
             values [2] = Util.ToUnixTime (DateTime.Now.ToUniversalTime ());
-            //Convert to binary so that it can be converted easily
+            // Convert to binary so that it can be converted easily
             values [3] = info.IsOnline ? 1 : 0;
             values [4] = Util.ToUnixTime (info.LastLogin);
             values [5] = Util.ToUnixTime (info.LastLogout);
@@ -94,9 +94,10 @@ namespace WhiteCore.Services.DataService
 
             QueryFilter filter = new QueryFilter ();
             filter.andFilters ["UserID"] = info.UserID;
-            GD.Delete (m_userInfoTable, filter);
 
-            return GD.Insert (m_userInfoTable, values);
+            genData.Delete (m_userInfoTable, filter);
+
+            return genData.Insert (m_userInfoTable, values);
         }
 
         public void Update (string userID, Dictionary<string, object> values)
@@ -104,7 +105,7 @@ namespace WhiteCore.Services.DataService
             QueryFilter filter = new QueryFilter ();
             filter.andFilters ["UserID"] = userID;
 
-            GD.Update (m_userInfoTable, values, null, filter, null, null);
+            genData.Update (m_userInfoTable, values, null, filter, null, null);
         }
 
         public void SetLastPosition (string userID, UUID regionID, string regionURI, Vector3 lastPosition,
@@ -172,7 +173,7 @@ namespace WhiteCore.Services.DataService
             QueryFilter filter = new QueryFilter ();
             filter.andFilters ["CurrentRegionID"] = regionID;
             filter.andFilters ["IsOnline"] = "1";
-            List<string> query = GD.Query (new string [1] { "*" }, m_userInfoTable, filter, null, null, null);
+            List<string> query = genData.Query (new string [1] { "*" }, m_userInfoTable, filter, null, null, null);
 
             if (query.Count == 0)
                 return new List<UserInfo> ();
@@ -186,7 +187,7 @@ namespace WhiteCore.Services.DataService
 
             QueryFilter filter = new QueryFilter ();
             filter.andFilters ["UserID"] = userID;
-            List<string> query = GD.Query (new string [1] { "*" }, m_userInfoTable, filter, null, null, null);
+            List<string> query = genData.Query (new string [1] { "*" }, m_userInfoTable, filter, null, null, null);
 
             if (query.Count == 0) {
                 return null;
@@ -206,6 +207,7 @@ namespace WhiteCore.Services.DataService
                 Set (user);
                 onlineStatusChanged = true;
             }
+
             return user;
         }
 
@@ -222,7 +224,8 @@ namespace WhiteCore.Services.DataService
                 filter.andFilters ["IsOnline"] = "1";
             }
 
-            List<string> userCount = GD.Query (new string [1] { "COUNT(UserID)" }, m_userInfoTable, filter, null, null, null);
+            List<string> userCount = genData.Query (new string [1] { "COUNT(UserID)" }, m_userInfoTable, filter, null, null, null);
+
             return uint.Parse (userCount [0]);
         }
 
@@ -239,7 +242,7 @@ namespace WhiteCore.Services.DataService
             }
             filter.andFilters ["IsOnline"] = "1";
 
-            List<string> userCount = GD.Query (new string [1] { "COUNT(UserID)" }, m_userInfoTable, filter, null, null, null);
+            List<string> userCount = genData.Query (new string [1] { "COUNT(UserID)" }, m_userInfoTable, filter, null, null, null);
 
             return uint.Parse (userCount [0]);
         }
@@ -257,7 +260,7 @@ namespace WhiteCore.Services.DataService
                 filter.andFilters ["IsOnline"] = "1";
             }
 
-            List<string> query = GD.Query (new string [] { "*" }, m_userInfoTable, filter, sort, null, null);
+            List<string> query = genData.Query (new string [] { "*" }, m_userInfoTable, filter, sort, null, null);
 
             return ParseQuery (query);
         }
@@ -278,7 +281,7 @@ namespace WhiteCore.Services.DataService
             // online only please...
             filter.andFilters ["IsOnline"] = "1";
 
-            List<string> query = GD.Query (new string [] { "*" }, m_userInfoTable, filter, sort, null, null);
+            List<string> query = genData.Query (new string [] { "*" }, m_userInfoTable, filter, sort, null, null);
 
             return ParseQuery (query);
         }
