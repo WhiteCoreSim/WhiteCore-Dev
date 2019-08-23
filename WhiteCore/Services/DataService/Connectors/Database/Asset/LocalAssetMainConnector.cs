@@ -298,7 +298,7 @@ namespace WhiteCore.Services.DataService.Connectors.Database.Asset
 
             if (UUID.TryParse (dr ["creatorID"].ToString (), out creator))
                 asset.CreatorID = creator;
-            
+
             try {
                 object d = dr ["data"];
                 if ((d != null) && (d.ToString () != "")) {

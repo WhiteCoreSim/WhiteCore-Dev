@@ -74,7 +74,7 @@ namespace WhiteCore.Services
         string login;
         Hashtable loginFlagsHash;
         string lookAt;
-        string COFVersion;
+        string cOFVersion;
 
         BuddyList m_buddyList;
         string seedCapability;
@@ -108,10 +108,10 @@ namespace WhiteCore.Services
                                IInventoryService invService, ILibraryService libService,
                                string where, string startlocation, Vector3 position, Vector3 lookAt,
                                List<InventoryItemBase> gestures,
-                               GridRegion home, IPEndPoint clientIP, string AdultMax, string AdultRating,
+                               GridRegion home, IPEndPoint clientIP, string adultMax, string adultRating,
                                ArrayList eventValues, ArrayList eventNotificationValues, ArrayList classifiedValues,
                                string seedCap, IConfigSource source,
-                               string DisplayName, string cofversion, IGridInfo info)
+                               string displayName, string cofversion, IGridInfo info)
             : this()
         {
             m_source = source;
@@ -125,21 +125,21 @@ namespace WhiteCore.Services
             CircuitCode = (int) aCircuit.CircuitCode;
             Lastname = account.LastName;
             Firstname = account.FirstName;
-            this.DisplayName = DisplayName;
+            this.DisplayName = displayName;
             AgentID = account.PrincipalID;
             SessionID = aCircuit.SessionID;
             SecureSessionID = aCircuit.SecureSessionID;
             BuddList = ConvertFriendListItem(friendsList);
             StartLocation = where;
-            AgentAccessMax = AdultMax;
-            AgentAccess = AdultRating;
+            AgentAccessMax = adultMax;
+            AgentAccess = adultRating;
             AgentRegionAccess = AgentRegionAccess;
             AOTransition = AOTransition;
             AgentFlag = AgentFlag;
             eventCategories = eventValues;
             eventNotifications = eventNotificationValues;
             classifiedCategories = classifiedValues;
-            COFVersion = cofversion;
+            cOFVersion = cofversion;
 
             FillOutHomeData(pinfo, home);
             LookAt = string.Format("[r{0},r{1},r{2}]", lookAt.X, lookAt.Y, lookAt.Z);
@@ -333,14 +333,14 @@ namespace WhiteCore.Services
                 responseData["inventory-lib-owner"] = InventoryLibraryOwner;
                 responseData["initial-outfit"] = initialOutfit;
 
-                Hashtable TutorialHash = new Hashtable();
-                TutorialHash["tutorial_url"] = TutorialURL;
+                Hashtable tutorialHash = new Hashtable();
+                tutorialHash["tutorial_url"] = TutorialURL;
 
                 if (TutorialURL != "")
-                    TutorialHash["use_tutorial"] = "Y";
+                    tutorialHash["use_tutorial"] = "Y";
                 else
-                    TutorialHash["use_tutorial"] = "";
-                tutorial.Add(TutorialHash);
+                    tutorialHash["use_tutorial"] = "";
+                tutorial.Add(tutorialHash);
 
                 responseData["tutorial_setting"] = tutorial;
                 responseData["start_location"] = startLocation;
@@ -351,7 +351,7 @@ namespace WhiteCore.Services
                 responseData["region_y"] = (int) (RegionY);
                 responseData["region_size_x"] = (RegionSizeX);
                 responseData["region_size_y"] = (RegionSizeY);
-                responseData["cof_version"] = COFVersion;
+                responseData["cof_version"] = cOFVersion;
                 
                 #region Global Textures
 
@@ -500,21 +500,21 @@ namespace WhiteCore.Services
                                                    List<InventoryFolderBase> folders)
         {
             UUID rootID = UUID.Zero;
-            ArrayList AgentInventoryArray = new ArrayList();
-            Hashtable TempHash;
+            ArrayList agentInventoryArray = new ArrayList();
+            Hashtable tempHash;
             foreach (InventoryFolderBase InvFolder in folders)
             {
                 if (InvFolder.ParentID == UUID.Zero && InvFolder.Name == InventoryFolderBase.ROOT_FOLDER_NAME)
                     rootID = InvFolder.ID;
-                TempHash = new Hashtable();
-                TempHash["name"] = InvFolder.Name;
-                TempHash["parent_id"] = InvFolder.ParentID.ToString();
-                TempHash["version"] = (int) InvFolder.Version;
-                TempHash["type_default"] = (int) InvFolder.Type;
-                TempHash["folder_id"] = InvFolder.ID.ToString();
-                AgentInventoryArray.Add(TempHash);
+                tempHash = new Hashtable();
+                tempHash["name"] = InvFolder.Name;
+                tempHash["parent_id"] = InvFolder.ParentID.ToString();
+                tempHash["version"] = (int) InvFolder.Version;
+                tempHash["type_default"] = (int) InvFolder.Type;
+                tempHash["folder_id"] = InvFolder.ID.ToString();
+                agentInventoryArray.Add(tempHash);
             }
-            return new InventoryData(AgentInventoryArray, rootID);
+            return new InventoryData(agentInventoryArray, rootID);
         }
 
         /// <summary>
@@ -523,15 +523,15 @@ namespace WhiteCore.Services
         /// <returns></returns>
         protected virtual ArrayList GetInventoryLibrary(ILibraryService library, IInventoryService inventoryService)
         {
-            ArrayList AgentInventoryArray = new ArrayList();
+            ArrayList agentInventoryArray = new ArrayList();
             List<InventoryFolderBase> rootFolders = inventoryService.GetRootFolders(library.LibraryOwnerUUID);
-            Hashtable RootHash = new Hashtable();
-            RootHash["name"] = library.LibraryName;
-            RootHash["parent_id"] = UUID.Zero.ToString();
-            RootHash["version"] = 1;
-            RootHash["type_default"] = 8;
-            RootHash["folder_id"] = library.LibraryRootFolderID.ToString();
-            AgentInventoryArray.Add(RootHash);
+            Hashtable rootHash = new Hashtable();
+            rootHash["name"] = library.LibraryName;
+            rootHash["parent_id"] = UUID.Zero.ToString();
+            rootHash["version"] = 1;
+            rootHash["type_default"] = 8;
+            rootHash["folder_id"] = library.LibraryRootFolderID.ToString();
+            agentInventoryArray.Add(rootHash);
 
             List<UUID> rootFolderUUIDs =
                 (from rootFolder in rootFolders 
@@ -543,10 +543,10 @@ namespace WhiteCore.Services
                 foreach (UUID rootfolderID in rootFolderUUIDs)
                 {
                     TraverseFolder(library.LibraryOwnerUUID, rootfolderID, inventoryService, library, true,
-                                   ref AgentInventoryArray);
+                                   ref agentInventoryArray);
                 }
             }
-            return AgentInventoryArray;
+            return agentInventoryArray;
         }
 
         void TraverseFolder(UUID agentIDreq, UUID folderID, IInventoryService invService, ILibraryService library,
@@ -555,16 +555,16 @@ namespace WhiteCore.Services
             List<InventoryFolderBase> folders = invService.GetFolderFolders(agentIDreq, folderID);
             foreach (InventoryFolderBase folder in folders)
             {
-                Hashtable TempHash = new Hashtable();
-                TempHash["name"] = folder.Name;
+                Hashtable tempHash = new Hashtable();
+                tempHash["name"] = folder.Name;
                 if (rootFolder)
-                    TempHash["parent_id"] = library.LibraryRootFolderID.ToString();
+                    tempHash["parent_id"] = library.LibraryRootFolderID.ToString();
                 else
-                    TempHash["parent_id"] = folder.ParentID.ToString();
-                TempHash["version"] = 1;
-                TempHash["type_default"] = 9;
-                TempHash["folder_id"] = folder.ID.ToString();
-                table.Add(TempHash);
+                    tempHash["parent_id"] = folder.ParentID.ToString();
+                tempHash["version"] = 1;
+                tempHash["type_default"] = 9;
+                tempHash["folder_id"] = folder.ID.ToString();
+                table.Add(tempHash);
                 TraverseFolder(agentIDreq, folder.ID, invService, library, false, ref table);
             }
         }
@@ -574,10 +574,10 @@ namespace WhiteCore.Services
         /// <returns></returns>
         protected virtual ArrayList GetLibraryOwner(ILibraryService libService)
         {
-            //for now create random inventory library owner
-            Hashtable TempHash = new Hashtable();
-            TempHash["agent_id"] = libService.LibraryOwnerUUID.ToString(); // libFolder.Owner
-            ArrayList inventoryLibOwner = new ArrayList {TempHash};
+            // for now create random inventory library owner
+            Hashtable tempHash = new Hashtable();
+            tempHash["agent_id"] = libService.LibraryOwnerUUID.ToString(); // libFolder.Owner
+            ArrayList inventoryLibOwner = new ArrayList {tempHash};
             return inventoryLibOwner;
         }
 
@@ -899,7 +899,9 @@ namespace WhiteCore.Services
         #endregion
 
         #region Nested type: UserInfo
-
+        // This UserInfo class is not used - greythane - 20190822
+        // the Framework.Services.UserInfo class has more details and used
+        /*
         public class UserInfo
         {
             public string firstname;
@@ -908,7 +910,7 @@ namespace WhiteCore.Services
             public ulong homeregionhandle;
             public string lastname;
         }
-
+        */
         #endregion
     }
 

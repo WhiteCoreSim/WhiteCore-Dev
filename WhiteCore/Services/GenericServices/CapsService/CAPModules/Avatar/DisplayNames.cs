@@ -110,7 +110,7 @@ namespace WhiteCore.Services
         /// <param name="httpResponse"></param>
         /// <returns></returns>
         byte [] ProcessSetDisplayName (string path, Stream request,
-                                     OSHttpRequest httpRequest, OSHttpResponse httpResponse)
+                                       OSHttpRequest httpRequest, OSHttpResponse httpResponse)
         {
             try {
                 OSDMap rm = (OSDMap)OSDParser.DeserializeLLSDXml (HttpServerHandlerHelpers.ReadFully (request));
@@ -118,7 +118,7 @@ namespace WhiteCore.Services
                 string oldDisplayName = display_name [0].AsString ();
                 string newDisplayName = display_name [1].AsString ();
 
-                //Check to see if their name contains a banned character
+                // Check to see if their name contains a banned character
                 if (bannedNames.Select (bannedUserName => bannedUserName.Replace (" ", ""))
                                .Any (BannedUserName => newDisplayName.ToLower ().Contains (BannedUserName.ToLower ()))) {
                     newDisplayName = m_service.ClientCaps.AccountInfo.Name;
@@ -126,25 +126,25 @@ namespace WhiteCore.Services
 
                 IUserProfileInfo info = m_profileConnector.GetUserProfile (m_service.AgentID);
                 if (info == null) {
-                    //m_avatar.ControllingClient.SendAlertMessage ("You cannot update your display name currently as your profile cannot be found.");
+                    // m_avatar.ControllingClient.SendAlertMessage ("You cannot update your display name currently as your profile cannot be found.");
                 } else {
-                    //Set the name
+                    // Set the name
                     info.DisplayName = newDisplayName;
                     info.DisplayNameUpdated = DateTime.UtcNow;
                     m_profileConnector.UpdateUserProfile (info);
 
                     var nextUpdate = info.DisplayNameUpdated.AddDays (m_update_days);
 
-                    //One for us
+                    // One for us
                     DisplayNameUpdate (newDisplayName, oldDisplayName, m_service.ClientCaps.AccountInfo, m_service.AgentID, nextUpdate);
 
                     foreach (
                         IRegionClientCapsService avatar in
                             m_service.RegionCaps.GetClients ().Where (avatar => avatar.AgentID != m_service.AgentID)) {
-                        //Update all others
+                        // Update all others
                         DisplayNameUpdate (newDisplayName, oldDisplayName, m_service.ClientCaps.AccountInfo, avatar.AgentID, nextUpdate);
                     }
-                    //The reply
+                    // The reply
                     SetDisplayNameReply (newDisplayName, oldDisplayName, m_service.ClientCaps.AccountInfo, nextUpdate);
 
                 }
@@ -164,9 +164,9 @@ namespace WhiteCore.Services
         /// <param name="httpResponse"></param>
         /// <returns></returns>
         byte [] ProcessGetDisplayName (string path, Stream request,
-                                     OSHttpRequest httpRequest, OSHttpResponse httpResponse)
+                                       OSHttpRequest httpRequest, OSHttpResponse httpResponse)
         {
-            //I've never seen this come in, so for now... do nothing
+            // I've never seen this come in, so for now... do nothing
             NameValueCollection query = HttpUtility.ParseQueryString (httpRequest.Url.Query);
             string [] ids = query.GetValues ("ids");
             string username = query.GetOne ("username");
@@ -188,13 +188,13 @@ namespace WhiteCore.Services
                             PackUserInfo (info, userAcct, ref agents);
                         else
                             PackUserInfo (new IUserProfileInfo (), userAcct, ref agents);
-                        //else //Technically is right, but needs to be packed no matter what for OS based grids
+                        // else //Technically is right, but needs to be packed no matter what for OS based grids
                         //    bad_ids.Add (id);
                     }
                 }
             } else if (username != null) {
                 UserAccount userAcct = m_userService.GetUserAccount (m_service.ClientCaps.AccountInfo.AllScopeIDs,
-                                                                   username.Replace ('.', ' '));
+                                                                     username.Replace ('.', ' '));
                 if (userAcct.Valid) {
                     var info = Framework.Utilities.DataManager.RequestPlugin<IProfileConnector> ().GetUserProfile (userAcct.PrincipalID);
                     if (info != null)
@@ -220,7 +220,7 @@ namespace WhiteCore.Services
             agentMap ["legacy_last_name"] = account.LastName;
             agentMap ["id"] = account.PrincipalID;
             agentMap ["is_display_name_default"] = isDefaultDisplayName (account.FirstName, account.LastName, account.Name,
-                                                                       info == null ? account.Name : info.DisplayName);
+                                                                         info == null ? account.Name : info.DisplayName);
             if (info != null) {
                 if (m_update_days > 0)
                     agentMap ["display_name_next_update"] = OSD.FromDate (info.DisplayNameUpdated.AddDays (m_update_days));
@@ -241,10 +241,10 @@ namespace WhiteCore.Services
         /// <param name="infoFromAv"></param>
         /// <param name="toAgentID"></param>
         void DisplayNameUpdate (string newDisplayName, string oldDisplayName, UserAccount infoFromAv,
-                               UUID toAgentID, DateTime nextUpdate)
+                                UUID toAgentID, DateTime nextUpdate)
         {
             if (m_eventQueue != null) {
-                //If the DisplayName is blank, the client refuses to do anything, so we send the name by default
+                // If the DisplayName is blank, the client refuses to do anything, so we send the name by default
                 if (newDisplayName == "")
                     newDisplayName = infoFromAv.Name;
 
@@ -263,6 +263,7 @@ namespace WhiteCore.Services
         {
             if (displayName == name)
                 return true;
+            
             return displayName == first + "." + last;
         }
 
@@ -353,7 +354,7 @@ namespace WhiteCore.Services
 
             body.Add ("content", content);
             body.Add ("agent", agentData);
-            //body.Add ("old_display_name", OSD.FromString (oldDisplayName));
+            // body.Add ("old_display_name", OSD.FromString (oldDisplayName));
             body.Add ("reason", OSD.FromString ("OK"));
             body.Add ("status", OSD.FromInteger (200));
 

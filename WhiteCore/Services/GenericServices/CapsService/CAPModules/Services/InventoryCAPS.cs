@@ -166,7 +166,7 @@ namespace WhiteCore.Services
         public byte [] HandleFetchLibDescendents (Stream request, UUID agentID)
         {
             try {
-                //MainConsole.Instance.DebugFormat("[InventoryCAPS]: Received FetchLibDescendents request for {0}", agentID);
+                // MainConsole.Instance.DebugFormat("[InventoryCAPS]: Received FetchLibDescendents request for {0}", agentID);
                 OSDMap map = (OSDMap)OSDParser.DeserializeLLSDXml (HttpServerHandlerHelpers.ReadFully (request));
                 if (map ["folders"].Type == OSDType.Unknown) {
                     MainConsole.Instance.Error ("[InventoryCAPS]: Call to 'FetchLibDescendants' with missing 'folders' parameter");
@@ -189,7 +189,7 @@ namespace WhiteCore.Services
         public byte [] HandleFetchInventory (Stream request, UUID agentID)
         {
             try {
-                //MainConsole.Instance.DebugFormat("[InventoryCAPS]: Received FetchInventory request for {0}", agentID);
+                // MainConsole.Instance.DebugFormat("[InventoryCAPS]: Received FetchInventory request for {0}", agentID);
                 OSDMap requestmap = (OSDMap)OSDParser.DeserializeLLSDXml (HttpServerHandlerHelpers.ReadFully (request));
                 if (requestmap ["items"].Type == OSDType.Unknown) {
                     MainConsole.Instance.Error ("[InventoryCAPS]: Call to 'FetchInventory' with missing 'items' parameter");
@@ -198,7 +198,7 @@ namespace WhiteCore.Services
 
                 OSDArray foldersrequested = (OSDArray)requestmap ["items"];
                 OSDMap map = new OSDMap { { "agent_id", OSD.FromUUID (agentID) } };
-                //We have to send the agent_id in the main map as well as all the items
+                // We have to send the agent_id in the main map as well as all the items
 
                 OSDArray items = new OSDArray ();
                 foreach (
@@ -227,7 +227,7 @@ namespace WhiteCore.Services
         public byte [] HandleFetchLib (Stream request, UUID agentID)
         {
             try {
-                //MainConsole.Instance.DebugFormat("[InventoryCAPS]: Received FetchLib request for {0}", agentID);
+                // MainConsole.Instance.DebugFormat("[InventoryCAPS]: Received FetchLib request for {0}", agentID);
                 OSDMap requestmap = (OSDMap)OSDParser.DeserializeLLSDXml (HttpServerHandlerHelpers.ReadFully (request));
                 if (requestmap ["items"].Type == OSDType.Unknown) {
                     MainConsole.Instance.Error ("[InventoryCAPS]: Call to 'FetchLib' with missing 'items' parameter");
@@ -302,7 +302,7 @@ namespace WhiteCore.Services
             OSDMap resp = InternalNewAgentInventoryRequest (map, httpRequest, httpResponse);
 
             resp ["resource_cost"] = resourceCost;
-            resp ["upload_price"] = charge; //Set me if you want to use variable cost stuff
+            resp ["upload_price"] = charge;     // Set me if you want to use variable cost stuff
 
             return OSDParser.SerializeLLSDXmlBytes (map);
         }
@@ -327,7 +327,7 @@ namespace WhiteCore.Services
                 } else if (assetType == "mesh" ||
                          assetType == "object") {
                     OSDMap meshMap = (OSDMap)map ["asset_resources"];
-                    //OSDArray instance_list = (OSDArray)meshMap["instance_list"];
+                    // OSDArray instance_list = (OSDArray)meshMap["instance_list"];
                     int mesh_list = meshMap.ContainsKey ("mesh_list") ? ((OSDArray)meshMap ["mesh_list"]).Count : 1;
                     int texture_list = meshMap.ContainsKey ("texture_list")
                                            ? ((OSDArray)meshMap ["texture_list"]).Count
@@ -351,8 +351,8 @@ namespace WhiteCore.Services
                                                  OSHttpResponse httpResponse)
         {
             string asset_type = map ["asset_type"].AsString ();
-            //MainConsole.Instance.Info("[CAPS]: NewAgentInventoryRequest Request is: " + map.ToString());
-            //MainConsole.Instance.Debug("asset upload request via CAPS" + llsdRequest.inventory_type + " , " + llsdRequest.asset_type);
+            // MainConsole.Instance.Info("[CAPS]: NewAgentInventoryRequest Request is: " + map.ToString());
+            // MainConsole.Instance.Debug("asset upload request via CAPS" + llsdRequest.inventory_type + " , " + llsdRequest.asset_type);
 
             string assetName = map ["name"].AsString ();
             string assetDes = map ["description"].AsString ();
@@ -388,9 +388,7 @@ namespace WhiteCore.Services
             int type = map ["type"].AsInteger ();
             string name = map ["name"].AsString ();
 
-            InventoryFolderBase newFolder
-                = new InventoryFolderBase (
-                      folder_id, name, m_agentID, (short)type, parent_id, 1);
+            InventoryFolderBase newFolder = new InventoryFolderBase (folder_id, name, m_agentID, (short)type, parent_id, 1);
             m_inventoryService.AddFolder (newFolder);
             OSDMap resp = new OSDMap ();
             resp ["folder_id"] = folder_id;
@@ -470,8 +468,7 @@ namespace WhiteCore.Services
                     for (int i = 0; i < mesh_list.Count; i++) {
                         PrimitiveBaseShape pbs = PrimitiveBaseShape.CreateBox ();
 
-                        Primitive.TextureEntry textureEntry =
-                            new Primitive.TextureEntry (Primitive.TextureEntry.WHITE_TEXTURE);
+                        Primitive.TextureEntry textureEntry = new Primitive.TextureEntry (Primitive.TextureEntry.WHITE_TEXTURE);
                         OSDMap inner_instance_list = (OSDMap)instance_list [i];
 
                         OSDArray face_list = (OSDArray)inner_instance_list ["face_list"];
@@ -490,15 +487,15 @@ namespace WhiteCore.Services
                             float scales = (float)faceMap ["scales"].AsReal ();
                             float scalet = (float)faceMap ["scalet"].AsReal ();
 
-                            if (imagerot != 0)
+                            if (!Util.ApproxZero(imagerot))
                                 f.Rotation = imagerot;
-                            if (offsets != 0)
+                            if (!Util.ApproxZero(offsets))
                                 f.OffsetU = offsets;
-                            if (offsett != 0)
+                            if (!Util.ApproxZero(offsett))
                                 f.OffsetV = offsett;
-                            if (scales != 0)
+                            if (!Util.ApproxZero(scales))
                                 f.RepeatU = scales;
-                            if (scalet != 0)
+                            if (!Util.ApproxZero(scalet))
                                 f.RepeatV = scalet;
                             f.TextureID = textures.Count > textureNum
                                                   ? textures [textureNum]
@@ -528,7 +525,7 @@ namespace WhiteCore.Services
                             GroupPermissions = groupMask,
                             NextPermissions = nextOwnerMask
                         };
-                        //Bad... but whatever
+                        // Bad... but whatever
                         m_inventoryService.AddItem (itemBase);
 
                         pbs.SculptEntry = true;
@@ -571,8 +568,8 @@ namespace WhiteCore.Services
                             grp.AddChild (prim, i + 1);
                         grp.RootPart.IsAttachment = false;
                     }
-                    if (grp != null) {              // unlikely not to have anything but itis possible
-                        if (grp.ChildrenList.Count > 1) //Fix first link #
+                    if (grp != null) {                      // unlikely not to have anything but itis possible
+                        if (grp.ChildrenList.Count > 1)     // Fix first link #
                             grp.RootPart.LinkNum++;
 
                         Vector3 rootPos = positions [0];
@@ -581,7 +578,7 @@ namespace WhiteCore.Services
                             Vector3 offset = positions [i] - rootPos;
                             grp.ChildrenList [i].SetOffsetPosition (offset);
                         }
-                        //grp.Rotation = rotations[0];
+                        // grp.Rotation = rotations[0];
                         for (int i = 0; i < rotations.Count; i++) {
                             if (i != 0)
                                 grp.ChildrenList [i].SetRotationOffset (false, rotations [i], false);

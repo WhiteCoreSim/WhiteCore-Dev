@@ -42,7 +42,7 @@ namespace WhiteCore.Services
 {
     public class GridInfoHandlers : IGridInfo
     {
-        readonly Hashtable _info = new Hashtable();
+        readonly Hashtable grid_info = new Hashtable();
 
         public string GridName { get; protected set; }
         public string GridNick { get; protected set; }
@@ -61,6 +61,7 @@ namespace WhiteCore.Services
         public string GridMarketplaceURI { get; protected set; }
         public string GridTutorialURI { get; protected set; }
         public string GridSnapshotConfigURI { get; protected set; }
+
         protected IConfigSource m_config;
         protected IRegistryCore m_registry;
 
@@ -87,7 +88,8 @@ namespace WhiteCore.Services
             IConfig gridCfg = m_config.Configs["GridInfoService"];
             if (gridCfg == null)
                 return;
-            _info["platform"] = "WhiteCore";
+            
+            grid_info["platform"] = "WhiteCore";
             try
             {
                 IConfig configCfg = m_config.Configs["Handlers"];
@@ -96,8 +98,8 @@ namespace WhiteCore.Services
                 IGridServerInfoService serverInfoService = m_registry.RequestModuleInterface<IGridServerInfoService>();
 
                 // grid details
-                _info["gridname"] = GridName = GetConfig(m_config, "gridname");
-                _info["gridnick"] = GridNick = GetConfig(m_config, "gridnick");
+                grid_info["gridname"] = GridName = GetConfig(m_config, "gridname");
+                grid_info["gridnick"] = GridNick = GetConfig(m_config, "gridnick");
 
                 // login
                 GridLoginURI = GetConfig(m_config, "login");
@@ -113,34 +115,34 @@ namespace WhiteCore.Services
                         GridLoginURI = MainServer.Instance.FullHostName + ":" + port + "/";
                     }
                 }
-                _info["login"] = GridLoginURI;
+                grid_info["login"] = GridLoginURI;
 
                 // welcome
                 GridWelcomeURI = GetConfig(m_config, "welcome");
                 if (GridWelcomeURI == "" && webInterface != null)
                     GridWelcomeURI = webInterface.LoginScreenURL;
-                _info["welcome"] = CheckServerHost(GridWelcomeURI);
+                grid_info["welcome"] = CheckServerHost(GridWelcomeURI);
 
                 // registration
                 GridRegisterURI = GetConfig(m_config, "register");
                 if (GridRegisterURI == "" && webInterface != null)
                     GridRegisterURI = webInterface.RegistrationScreenURL;
-                _info["register"] = CheckServerHost(GridRegisterURI);
+                grid_info["register"] = CheckServerHost(GridRegisterURI);
 
                 GridAboutURI = GetConfig(m_config, "about");
                 if (GridAboutURI == "" && webInterface != null)
                     GridAboutURI = webInterface.HomeScreenURL;
-                _info["about"] = CheckServerHost(GridAboutURI);
+                grid_info["about"] = CheckServerHost(GridAboutURI);
 
                 GridHelpURI = GetConfig(m_config, "help");
                 if (GridHelpURI == "" && webInterface != null)
                     GridHelpURI = webInterface.HelpScreenURL;
-                _info["help"] = CheckServerHost(GridHelpURI);
+                grid_info["help"] = CheckServerHost(GridHelpURI);
 
                 GridForgotPasswordURI = GetConfig(m_config, "forgottenpassword");
                 if (GridForgotPasswordURI == "" && webInterface != null)
                     GridForgotPasswordURI = webInterface.ForgotPasswordScreenURL;
-                 _info["password"] = CheckServerHost(GridForgotPasswordURI);
+                 grid_info["password"] = CheckServerHost(GridForgotPasswordURI);
 
                 // mapping
                 GridMapTileURI = GetConfig(m_config, "map");
@@ -173,24 +175,24 @@ namespace WhiteCore.Services
                         GridEconomyURI = MainServer.Instance.FullHostName + ":" + port + "/";
                     }
                 }
-                _info["economy"] = _info["helperuri"] = CheckServerHost(GridEconomyURI);
+                grid_info["economy"] = grid_info["helperuri"] = CheckServerHost(GridEconomyURI);
 
 
                 // misc.. these must be set to be used
                 GridSearchURI = GetConfig(m_config, "search");
-                _info["search"] = CheckServerHost(GridSearchURI);
+                grid_info["search"] = CheckServerHost(GridSearchURI);
 
                 GridDestinationURI = GetConfig(m_config, "destination");
-                _info["destination"] = CheckServerHost(GridDestinationURI);
+                grid_info["destination"] = CheckServerHost(GridDestinationURI);
 
                 GridMarketplaceURI = GetConfig(m_config, "marketplace");
-                _info["marketplace"] = CheckServerHost(GridMarketplaceURI);
+                grid_info["marketplace"] = CheckServerHost(GridMarketplaceURI);
 
                 GridTutorialURI = GetConfig(m_config, "tutorial");
-                _info["tutorial"] = CheckServerHost(GridTutorialURI);
+                grid_info["tutorial"] = CheckServerHost(GridTutorialURI);
 
                 GridSnapshotConfigURI = GetConfig(m_config, "snapshotconfig");
-                _info["snapshotconfig"] = CheckServerHost(GridSnapshotConfigURI);
+                grid_info["snapshotconfig"] = CheckServerHost(GridSnapshotConfigURI);
 
             }
             catch (Exception)
@@ -200,7 +202,7 @@ namespace WhiteCore.Services
             }
 
             MainConsole.Instance.DebugFormat("[Grid Info Service]: Grid info service initialized with {0} keys",
-                                             _info.Count);
+                                             grid_info.Count);
         }
 
         string CheckServerHost(string uri)
@@ -221,9 +223,9 @@ namespace WhiteCore.Services
             MainConsole.Instance.Warn(
                 "[Grid Info Service]: Trying to guess sensible defaults, you might want to provide better ones:");
 
-            foreach (string k in _info.Keys)
+            foreach (string key in grid_info.Keys)
             {
-                MainConsole.Instance.WarnFormat("[Grid Info Service]: {0}: {1}", k, _info[k]);
+                MainConsole.Instance.WarnFormat("[Grid Info Service]: {0}: {1}", key, grid_info[key]);
             }
         }
         
@@ -235,9 +237,9 @@ namespace WhiteCore.Services
             MainConsole.Instance.Debug("[Grid Info Service]: Request for grid info");
             UpdateGridInfo();
 
-            foreach (string k in _info.Keys)
+            foreach (string k in grid_info.Keys)
             {
-                responseData[k] = _info[k];
+                responseData[k] = grid_info[k];
             }
             response.Value = responseData;
 
@@ -251,9 +253,9 @@ namespace WhiteCore.Services
             UpdateGridInfo();
 
             sb.Append("<gridinfo>\n");
-            foreach (string k in _info.Keys)
+            foreach (string key in grid_info.Keys)
             {
-                sb.AppendFormat("<{0}>{1}</{0}>\n", k, _info[k]);
+                sb.AppendFormat("<{0}>{1}</{0}>\n", key, grid_info[key]);
             }
             sb.Append("</gridinfo>\n");
 
@@ -264,7 +266,7 @@ namespace WhiteCore.Services
         public Hashtable GetGridInfoHashtable ()
         {
             UpdateGridInfo ();
-            return new Hashtable (_info);
+            return new Hashtable (grid_info);
         }
 
     }

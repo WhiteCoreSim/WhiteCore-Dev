@@ -36,7 +36,7 @@ namespace WhiteCore.Services.DataService
 {
     public class LocalAuthConnector : IAuthenticationData
     {
-        IGenericData GD;
+        IGenericData m_GD;
         int m_LastExpire;
         string m_realm = "auth";
         string m_tokensrealm = "tokens";
@@ -49,14 +49,14 @@ namespace WhiteCore.Services.DataService
             if (source.Configs ["WhiteCoreConnectors"].GetString ("AuthConnector", "LocalConnector") != "LocalConnector")
                 return;
 
-            GD = genericData;
+            m_GD = genericData;
 
             string connectionString = defaultConnectionString;
             if (source.Configs [Name] != null)
                 connectionString = source.Configs [Name].GetString ("ConnectionString", defaultConnectionString);
 
-            if (GD != null)
-                GD.ConnectToDatabase (connectionString, "Auth",
+            if (m_GD != null)
+                m_GD.ConnectToDatabase (connectionString, "Auth",
                                      source.Configs ["WhiteCoreConnectors"].GetBoolean ("ValidateTables", true));
 
             Framework.Utilities.DataManager.RegisterPlugin (this);
@@ -71,7 +71,7 @@ namespace WhiteCore.Services.DataService
             QueryFilter filter = new QueryFilter ();
             filter.andFilters ["UUID"] = principalID;
             filter.andFilters ["accountType"] = authType;
-            List<string> query = GD.Query (new string [] { "*" }, m_realm, filter, null, null, null);
+            List<string> query = m_GD.Query (new string [] { "*" }, m_realm, filter, null, null, null);
             AuthData data = null;
             for (int i = 0; i < query.Count; i += 5) {
                 data = new AuthData {
@@ -90,14 +90,14 @@ namespace WhiteCore.Services.DataService
             QueryFilter filter = new QueryFilter ();
             filter.andFilters ["UUID"] = data.PrincipalID;
             filter.andFilters ["accountType"] = data.AccountType;
-            GD.Delete (m_realm, filter);
+            m_GD.Delete (m_realm, filter);
             Dictionary<string, object> row = new Dictionary<string, object> (4);
             row ["UUID"] = data.PrincipalID;
             row ["passwordHash"] = data.PasswordHash;
             row ["passwordSalt"] = data.PasswordSalt;
             row ["accountType"] = data.AccountType;
 
-            return GD.Insert (m_realm, row);
+            return m_GD.Insert (m_realm, row);
         }
 
         // I don't think this is used anywhere (don't know who wrote this comment ~ SignpostMarv)
@@ -109,7 +109,7 @@ namespace WhiteCore.Services.DataService
             QueryFilter filter = new QueryFilter ();
             filter.andFilters ["UUID"] = principalID;
 
-            return GD.Update (m_realm, values, null, filter, null, null);
+            return m_GD.Update (m_realm, values, null, filter, null, null);
         }
 
         public bool Delete (UUID principalID, string authType)
@@ -118,7 +118,7 @@ namespace WhiteCore.Services.DataService
             filter.andFilters ["UUID"] = principalID;
             filter.andFilters ["accountType"] = authType;
 
-            return GD.Delete (m_realm, filter);
+            return m_GD.Delete (m_realm, filter);
         }
 
         public bool SetToken (UUID principalID, string token, int lifetime)
@@ -132,7 +132,7 @@ namespace WhiteCore.Services.DataService
             row ["token"] = token;
             row ["validity"] = Utils.DateTimeToUnixTime (DateTime.Now) + (lifetime * 60);
 
-            return GD.Replace (m_tokensrealm, row);
+            return m_GD.Replace (m_tokensrealm, row);
         }
 
         public bool CheckToken (UUID principalID, string token, int lifetime)
@@ -150,7 +150,7 @@ namespace WhiteCore.Services.DataService
             filter.andFilters ["token"] = token;
             filter.andLessThanEqFilters ["validity"] = (int)now;
 
-            return GD.Update (m_tokensrealm, values, null, filter, null, null);
+            return m_GD.Update (m_tokensrealm, values, null, filter, null, null);
         }
 
         #endregion
@@ -161,7 +161,7 @@ namespace WhiteCore.Services.DataService
 
         void DoExpire ()
         {
-            GD.DeleteByTime (m_tokensrealm, "validity");
+            m_GD.DeleteByTime (m_tokensrealm, "validity");
 
             m_LastExpire = Environment.TickCount;
         }

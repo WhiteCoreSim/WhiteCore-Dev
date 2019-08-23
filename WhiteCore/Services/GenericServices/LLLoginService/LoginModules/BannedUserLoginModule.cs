@@ -86,7 +86,7 @@ namespace WhiteCore.Services
 
             if (request == null)
                 return null;
-            //If its null, its just a verification request, allow them to see things even if they are banned
+            // If its null, its just a verification request, allow them to see things even if they are banned
 
             bool tosExists = false;
             string tosAccepted = "";
@@ -95,7 +95,7 @@ namespace WhiteCore.Services
                 tosAccepted = request ["agree_to_tos"].ToString ();
             }
 
-            //MAC BANNING START
+            // MAC BANNING START
             var mac = (string)request ["mac"];
             if (mac == "") {
                 data = "Bad Viewer Connection";
@@ -109,29 +109,29 @@ namespace WhiteCore.Services
                 channel = request["channel"].ToString();
             */
 
-            bool AcceptedNewTOS = false;
-            //This gets if the viewer has accepted the new TOS
+            bool acceptedNewTOS = false;
+            // This gets if the viewer has accepted the new TOS
             if (!agentInfo.AcceptTOS && tosExists) {
                 if (tosAccepted == "0")
-                    AcceptedNewTOS = false;
+                    acceptedNewTOS = false;
                 else if (tosAccepted == "1")
-                    AcceptedNewTOS = true;
+                    acceptedNewTOS = true;
                 else
-                    AcceptedNewTOS = bool.Parse (tosAccepted);
+                    acceptedNewTOS = bool.Parse (tosAccepted);
 
-                if (agentInfo.AcceptTOS != AcceptedNewTOS) {
-                    agentInfo.AcceptTOS = AcceptedNewTOS;
+                if (agentInfo.AcceptTOS != acceptedNewTOS) {
+                    agentInfo.AcceptTOS = acceptedNewTOS;
                     agentData.UpdateAgent (agentInfo);
                 }
             }
-            if (!AcceptedNewTOS && !agentInfo.AcceptTOS && m_UseTOS) {
+            if (!acceptedNewTOS && !agentInfo.AcceptTOS && m_UseTOS) {
                 data = "TOS not accepted";
                 if (m_TOSLocation.ToLower ().StartsWith ("http://", StringComparison.Ordinal))
                     return new LLFailedLoginResponse (LoginResponseEnum.ToSNeedsSent, m_TOSLocation, false);
 
                 // text file
-                var ToSText = File.ReadAllText (Path.Combine (Environment.CurrentDirectory, m_TOSLocation));
-                return new LLFailedLoginResponse (LoginResponseEnum.ToSNeedsSent, ToSText, false);
+                var tosText = File.ReadAllText (Path.Combine (Environment.CurrentDirectory, m_TOSLocation));
+                return new LLFailedLoginResponse (LoginResponseEnum.ToSNeedsSent, tosText, false);
             }
             if ((agentInfo.Flags & IAgentFlags.PermBan) == IAgentFlags.PermBan) {
                 MainConsole.Instance.InfoFormat (
@@ -141,7 +141,7 @@ namespace WhiteCore.Services
             }
 
             if ((agentInfo.Flags & IAgentFlags.TempBan) == IAgentFlags.TempBan) {
-                bool IsBanned = true;
+                bool isBanned = true;
                 string until = "";
 
                 if (agentInfo.OtherAgentInformation.ContainsKey ("TemporaryBanInfo")) {
@@ -150,14 +150,14 @@ namespace WhiteCore.Services
                                            bannedTime.ToLocalTime ().ToShortDateString (),
                                            bannedTime.ToLocalTime ().ToLongTimeString ());
 
-                    //Check to make sure the time hasn't expired
+                    // Check to make sure the time hasn't expired
                     if (bannedTime.Ticks < DateTime.Now.ToUniversalTime ().Ticks) {
-                        //The banned time is less than now, let the user in.
-                        IsBanned = false;
+                        // The banned time is less than now, let the user in.
+                        isBanned = false;
                     }
                 }
 
-                if (IsBanned) {
+                if (isBanned) {
                     MainConsole.Instance.InfoFormat (
                         "[Login service]: Login failed for user {0}, reason: user is temporarily banned {1}.",
                         account.Name, until);
@@ -166,7 +166,7 @@ namespace WhiteCore.Services
                 }
             }
 
-            return null;
+            return null;        // not banned or otherwise in error
         }
     }
 }

@@ -58,7 +58,7 @@ namespace WhiteCore.Services
 
         public void FinishedStartup ()
         {
-            //Also look for incoming messages to display
+            // Also look for incoming messages to display
             m_registry.RequestModuleInterface<ISyncMessageRecievedService> ().OnMessageReceived += OnMessageReceived;
         }
 
@@ -73,15 +73,15 @@ namespace WhiteCore.Services
             var method = message ["Method"].AsString();
 
             ISyncMessagePosterService asyncPost = m_registry.RequestModuleInterface<ISyncMessagePosterService> ();
-            //We need to check and see if this is an AgentStatusChange
+            // We need to check and see if this is an AgentStatusChange
             if (method == "AgentStatusChange") {
                 OSDMap innerMessage = (OSDMap)message ["Message"];
-                //We got a message, now pass it on to the clients that need it
+                // We got a message, now pass it on to the clients that need it
                 UUID AgentID = innerMessage ["AgentID"].AsUUID ();
                 UUID FriendToInformID = innerMessage ["FriendToInformID"].AsUUID ();
                 bool NewStatus = innerMessage ["NewStatus"].AsBoolean ();
 
-                //Do this since IFriendsModule is a scene module, not a ISimulationBase module (not interchangeable)
+                // Do this since IFriendsModule is a scene module, not a ISimulationBase module (not interchangeable)
                 ISceneManager manager = m_registry.RequestModuleInterface<ISceneManager> ();
                 if (manager != null) {
                     foreach (IScene scene in manager.Scenes) {
@@ -89,7 +89,7 @@ namespace WhiteCore.Services
                             !scene.GetScenePresence (FriendToInformID).IsChildAgent) {
                             IFriendsModule friendsModule = scene.RequestModuleInterface<IFriendsModule> ();
                             if (friendsModule != null) {
-                                //Send the message
+                                // Send the message
                                 friendsModule.SendFriendsStatusMessage (FriendToInformID, new [] { AgentID }, NewStatus);
                             }
                         }
@@ -97,12 +97,12 @@ namespace WhiteCore.Services
                 }
             } else if (method == "AgentStatusChanges") {
                 OSDMap innerMessage = (OSDMap)message ["Message"];
-                //We got a message, now pass it on to the clients that need it
+                // We got a message, now pass it on to the clients that need it
                 List<UUID> AgentIDs = ((OSDArray)innerMessage ["AgentIDs"]).ConvertAll<UUID> ((o) => o);
                 UUID FriendToInformID = innerMessage ["FriendToInformID"].AsUUID ();
                 bool NewStatus = innerMessage ["NewStatus"].AsBoolean ();
 
-                //Do this since IFriendsModule is a scene module, not a ISimulationBase module (not interchangeable)
+                // Do this since IFriendsModule is a scene module, not a ISimulationBase module (not interchangeable)
                 ISceneManager manager = m_registry.RequestModuleInterface<ISceneManager> ();
                 if (manager != null) {
                     foreach (IScene scene in manager.Scenes) {
@@ -110,7 +110,7 @@ namespace WhiteCore.Services
                             !scene.GetScenePresence (FriendToInformID).IsChildAgent) {
                             IFriendsModule friendsModule = scene.RequestModuleInterface<IFriendsModule> ();
                             if (friendsModule != null) {
-                                //Send the message
+                                // Send the message
                                 friendsModule.SendFriendsStatusMessage (FriendToInformID, AgentIDs.ToArray (), NewStatus);
                             }
                         }
@@ -124,7 +124,7 @@ namespace WhiteCore.Services
                 if (agentInfoService != null && (info = agentInfoService.GetUserInfo (targetID.ToString ())) != null &&
                     info.IsOnline) {
 
-                    //Forward the message
+                    // Forward the message
                     asyncPost.Post (info.CurrentRegionURI, message);
                 }
             } else if (method == "FriendshipOffered") {
@@ -136,7 +136,7 @@ namespace WhiteCore.Services
                     (info = agentInfoService.GetUserInfo (targetID.ToString ())) != null &&
                     info.IsOnline) {
 
-                    //Forward the message
+                    // Forward the message
                     asyncPost.Post (info.CurrentRegionURI, message);
                 }
             } else if (method == "FriendTerminated") {
@@ -148,7 +148,7 @@ namespace WhiteCore.Services
                     (info = agentInfoService.GetUserInfo (targetID.ToString ())) != null &&
                     info.IsOnline) {
 
-                    //Forward the message
+                    // Forward the message
                     asyncPost.Post (info.CurrentRegionURI, message);
                 }
             } else if (method == "FriendshipDenied") {
@@ -160,7 +160,7 @@ namespace WhiteCore.Services
                     (info = agentInfoService.GetUserInfo (targetID.ToString ())) != null &&
                     info.IsOnline) {
 
-                    //Forward the message
+                    // Forward the message
                     asyncPost.Post (info.CurrentRegionURI, message);
                 }
             } else if (method == "FriendshipApproved") {
@@ -172,7 +172,7 @@ namespace WhiteCore.Services
                     (info = agentInfoService.GetUserInfo (targetID.ToString ())) != null &&
                     info.IsOnline) {
 
-                    //Forward the message
+                    // Forward the message
                     asyncPost.Post (info.CurrentRegionURI, message);
                 }
             }

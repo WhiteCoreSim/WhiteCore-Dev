@@ -55,15 +55,13 @@ namespace WhiteCore.Services
 
         #endregion
 
-        public virtual string Name
-        {
+        public virtual string Name {
             get { return GetType ().Name; }
         }
 
         #region IEventQueueService Members
 
-        public virtual IEventQueueService InnerService
-        {
+        public virtual IEventQueueService InnerService {
             get { return this; }
         }
 
@@ -74,18 +72,18 @@ namespace WhiteCore.Services
 
         public virtual bool Enqueue (string o, UUID agentID, UUID regionID)
         {
-            if (m_doRemoteCalls && m_doRemoteOnly)
-            {
+            if (m_doRemoteCalls && m_doRemoteOnly) {
                 Util.FireAndForget ((none) => {
                     EnqueueInternal (o, agentID, regionID);
                 });
                 return true;
             }
 
-            //Find the CapsService for the user and enqueue the event
+            // Find the CapsService for the user and enqueue the event
             IRegionClientCapsService service = GetRegionClientCapsService (agentID, regionID);
             if (service == null)
                 return false;
+
             RegionClientEventQueueService eventQueueService = service.GetServiceConnectors ()
                                                                      .OfType<RegionClientEventQueueService> ()
                                                                      .FirstOrDefault ();
@@ -135,7 +133,8 @@ namespace WhiteCore.Services
             IClientCapsService clientCaps = m_service.GetClientCapsService (agentID);
             if (clientCaps == null)
                 return null;
-            //If it doesn't exist, it will be null anyway, so we don't need to check anything else
+
+            // If it doesn't exist, it will be null anyway, so we don't need to check anything else
             return clientCaps.GetCapsService (regionHandle);
         }
 
@@ -147,22 +146,22 @@ namespace WhiteCore.Services
             Enqueue (item, avatarID, regionID);
         }
 
-        public virtual void EnableSimulator (ulong handle, byte[] iPAddress, int port,   
-                                             UUID avatarID, 
+        public virtual void EnableSimulator (ulong handle, byte [] iPAddress, int port,
+                                             UUID avatarID,
                                              int regionSizeX, int regionSizeY, UUID regionID)
         {
             OSD item = EventQueueHelper.EnableSimulator (handle, iPAddress, port, regionSizeX, regionSizeY);
             Enqueue (item, avatarID, regionID);
         }
 
-        public virtual void ObjectPhysicsProperties (ISceneChildEntity[] entities, UUID avatarID, UUID regionID)
+        public virtual void ObjectPhysicsProperties (ISceneChildEntity [] entities, UUID avatarID, UUID regionID)
         {
             OSD item = EventQueueHelper.ObjectPhysicsProperties (entities);
             Enqueue (item, avatarID, regionID);
         }
 
         public virtual void EstablishAgentCommunication (UUID avatarID, ulong regionHandle,
-                                                         byte[] iPAddress, int port,
+                                                         byte [] iPAddress, int port,
                                                          string capsUrl, int regionSizeX, int regionSizeY,
                                                          UUID regionID)
         {
@@ -178,7 +177,7 @@ namespace WhiteCore.Services
                                                  UUID avatarID, uint teleportFlags, int regionSizeX, int regionSizeY,
                                                  UUID regionID)
         {
-            //Blank (for the CapsUrl) as we do not know what the CapsURL is on the sim side, it will be fixed when it reaches the grid server
+            // Blank (for the CapsUrl) as we do not know what the CapsURL is on the sim side, it will be fixed when it reaches the grid server
             OSD item = EventQueueHelper.TeleportFinishEvent (regionHandle, simAccess, address, port,
                            locationID, capsURL, avatarID, teleportFlags, regionSizeX,
                            regionSizeY);
@@ -205,7 +204,7 @@ namespace WhiteCore.Services
                                                   UUID fromAgent, string message, UUID toAgent, string fromName,
                                                   byte dialog,
                                                   uint timeStamp, bool offline, int parentEstateID, Vector3 position,
-                                                  uint ttl, UUID transactionID, bool fromGroup, byte[] binaryBucket,
+                                                  uint ttl, UUID transactionID, bool fromGroup, byte [] binaryBucket,
                                                   UUID regionID)
         {
             OSD item = EventQueueHelper.ChatterboxInvitation (sessionID, sessionName, fromAgent, message, toAgent,
@@ -214,7 +213,7 @@ namespace WhiteCore.Services
                            transactionID,
                            fromGroup, binaryBucket);
             Enqueue (item, toAgent, regionID);
-            //MainConsole.Instance.InfoFormat("########### eq ChatterboxInvitation #############\n{0}", item);
+            // MainConsole.Instance.InfoFormat("########### eq ChatterboxInvitation #############\n{0}", item);
         }
 
         public virtual void ChatterBoxSessionAgentListUpdates (UUID sessionID, UUID fromAgent, UUID toAgent,
@@ -224,7 +223,7 @@ namespace WhiteCore.Services
             OSD item = EventQueueHelper.ChatterBoxSessionAgentListUpdates (sessionID, fromAgent, canVoiceChat,
                            isModerator, textMute);
             Enqueue (item, toAgent, regionID);
-            //MainConsole.Instance.InfoFormat("########### eq ChatterBoxSessionAgentListUpdates #############\n{0}", item);
+            // MainConsole.Instance.InfoFormat("########### eq ChatterBoxSessionAgentListUpdates #############\n{0}", item);
         }
 
         public virtual void ChatterBoxSessionAgentListUpdates (UUID sessionID,
@@ -234,7 +233,7 @@ namespace WhiteCore.Services
         {
             OSD item = EventQueueHelper.ChatterBoxSessionAgentListUpdates (sessionID, messages, transition);
             Enqueue (item, toAgent, regionID);
-            //MainConsole.Instance.InfoFormat("########### eq ChatterBoxSessionAgentListUpdates #############\n{0}", item);
+            // MainConsole.Instance.InfoFormat("########### eq ChatterBoxSessionAgentListUpdates #############\n{0}", item);
         }
 
         public virtual void ParcelProperties (ParcelPropertiesMessage parcelPropertiesPacket, UUID avatarID, UUID regionID)
@@ -261,7 +260,7 @@ namespace WhiteCore.Services
             Enqueue (item, avatarID, regionID);
         }
 
-        public virtual void QueryReply (PlacesReplyPacket groupUpdate, UUID avatarID, string[] info, UUID regionID)
+        public virtual void QueryReply (PlacesReplyPacket groupUpdate, UUID avatarID, string [] info, UUID regionID)
         {
             OSD item = EventQueueHelper.PlacesQuery (groupUpdate, info);
             Enqueue (item, avatarID, regionID);
@@ -294,8 +293,7 @@ namespace WhiteCore.Services
 
         public void DumpEventQueue ()
         {
-            lock (queue)
-            {
+            lock (queue) {
                 queue.Clear ();
             }
         }
@@ -307,16 +305,14 @@ namespace WhiteCore.Services
         /// <returns></returns>
         public bool Enqueue (OSD ev)
         {
-            try
-            {
+            try {
                 if (ev == null)
                     return false;
 
                 lock (queue)
                     queue.Enqueue (ev);
-            } catch (NullReferenceException e)
-            {
-                MainConsole.Instance.Error ("[EVENTQUEUE] Caught exception: " + e);
+            } catch (NullReferenceException e) {
+                MainConsole.Instance.Error ("[Event queue] Caught exception: " + e);
                 return false;
             }
 
@@ -329,25 +325,21 @@ namespace WhiteCore.Services
 
         public bool HasEvents (UUID requestID, UUID agentID)
         {
-            lock (queue)
-            {
+            lock (queue) {
                 return queue.Count > 0;
             }
         }
 
-        public byte[] GetEvents (UUID requestID, UUID pAgentId, string req, OSHttpResponse response)
+        public byte [] GetEvents (UUID requestID, UUID pAgentId, string req, OSHttpResponse response)
         {
             OSDMap events = new OSDMap ();
-            try
-            {
+            try {
                 OSDArray array = new OSDArray ();
-                lock (queue)
-                {
+                lock (queue) {
                     if (queue.Count == 0)
                         return NoEvents (requestID, pAgentId, response);
 
-                    while (queue.Count > 0)
-                    {
+                    while (queue.Count > 0) {
                         array.Add (queue.Dequeue ());
                         m_ids++;
                     }
@@ -356,21 +348,22 @@ namespace WhiteCore.Services
                 events.Add ("events", array);
 
                 events.Add ("id", new OSDInteger (m_ids));
-            } catch (Exception ex)
-            {
-                MainConsole.Instance.Warn ("[EQS]: Exception! " + ex);
+            } catch (Exception ex) {
+                MainConsole.Instance.Warn ("[Event queue]: Exception! " + ex);
             }
 
             response.StatusCode = 200;
             response.ContentType = "application/xml";
+
             return OSDParser.SerializeLLSDXmlBytes (events);
         }
 
-        public byte[] NoEvents (UUID requestID, UUID agentID, OSHttpResponse response)
+        public byte [] NoEvents (UUID requestID, UUID agentID, OSHttpResponse response)
         {
             response.KeepAlive = false;
             response.ContentType = "text/plain";
             response.StatusCode = 502;
+
             return Encoding.UTF8.GetBytes ("Upstream error: ");
         }
 
@@ -387,10 +380,9 @@ namespace WhiteCore.Services
             const string capsBase = "/CAPS/EQG/";
             m_capsPath = capsBase + UUID.Random () + "/";
 
-
             // Register this as a caps handler
-            m_service.AddStreamHandler ("EventQueueGet", 
-                new GenericStreamHandler ("POST", m_capsPath, ( path, request, httpRequest, httpResponse) => new byte[0]));
+            m_service.AddStreamHandler ("EventQueueGet",
+                new GenericStreamHandler ("POST", m_capsPath, (path, request, httpRequest, httpResponse) => new byte [0]));
 
             MainServer.Instance.AddPollServiceHTTPHandler (
                 m_capsPath, new PollServiceEventArgs (null, HasEvents, GetEvents, NoEvents, m_service.AgentID));

@@ -71,18 +71,17 @@ namespace WhiteCore.Services
             return llsdEvent;
         }
 
-        public static OSD EnableSimulator (ulong handle, byte[] IPAddress, int Port, int RegionSizeX, int RegionSizeY)
+        public static OSD EnableSimulator (ulong handle, byte[] ipAddress, int port, int regionSizeX, int regionSizeY)
         {
             OSDMap llsdSimInfo = new OSDMap (3) {
                 { "Handle", new OSDBinary (ulongToByteArray (handle)) },
-                { "IP", new OSDBinary (IPAddress) },
-                { "Port", new OSDInteger (Port) },
-                { "RegionSizeX", OSD.FromUInteger ((uint)RegionSizeX) },
-                { "RegionSizeY", OSD.FromUInteger ((uint)RegionSizeY) }
+                { "IP", new OSDBinary (ipAddress) },
+                { "Port", new OSDInteger (port) },
+                { "RegionSizeX", OSD.FromUInteger ((uint)regionSizeX) },
+                { "RegionSizeY", OSD.FromUInteger ((uint)regionSizeY) }
             };
 
             OSDArray arr = new OSDArray (1) { llsdSimInfo };
-
             OSDMap llsdBody = new OSDMap (1) { { "SimulatorInfo", arr } };
 
             return buildEvent ("EnableSimulator", llsdBody);
@@ -109,10 +108,11 @@ namespace WhiteCore.Services
                 i++;
             }
 
-            OSDMap m = new OSDMap { { "message", OSD.FromString ("ObjectPhysicsProperties") } };
+            OSDMap oMap = new OSDMap { { "message", OSD.FromString ("ObjectPhysicsProperties") } };
             OSD message_body = message.Serialize ();
-            m.Add ("body", message_body);
-            return m;
+            oMap.Add ("body", message_body);
+
+            return oMap;
         }
 
         public static OSD DisableSimulator (ulong handle)
@@ -123,7 +123,7 @@ namespace WhiteCore.Services
 
         public static OSD CrossRegion (ulong handle, Vector3 pos, Vector3 lookAt,
                                        IPAddress address, int port,
-                                       string capsURL, UUID agentID, UUID sessionID, int RegionSizeX, int RegionSizeY)
+                                       string capsURL, UUID agentID, UUID sessionID, int regionSizeX, int regionSizeY)
         {
             OSDArray lookAtArr = new OSDArray (3)
                                      { OSD.FromReal (lookAt.X), OSD.FromReal (lookAt.Y), OSD.FromReal (lookAt.Z) };
@@ -150,8 +150,8 @@ namespace WhiteCore.Services
                 { "SeedCapability", OSD.FromString (capsURL) },
                 { "SimIP", OSD.FromBinary (address.GetAddressBytes ()) },
                 { "SimPort", OSD.FromInteger (port) },
-                { "RegionSizeX", OSD.FromUInteger ((uint)RegionSizeX) },
-                { "RegionSizeY", OSD.FromUInteger ((uint)RegionSizeY) }
+                { "RegionSizeX", OSD.FromUInteger ((uint)regionSizeX) },
+                { "RegionSizeY", OSD.FromUInteger ((uint)regionSizeY) }
             };
 
             OSDArray regionDataArr = new OSDArray (1) { regionDataMap };
@@ -165,9 +165,9 @@ namespace WhiteCore.Services
             return buildEvent ("CrossedRegion", llsdBody);
         }
 
-        public static OSD TeleportFinishEvent (
-            ulong regionHandle, byte simAccess, IPAddress address, int port,
-            uint locationID, string capsURL, UUID agentID, uint teleportFlags, int RegionSizeX, int RegionSizeY)
+        public static OSD TeleportFinishEvent (ulong regionHandle, byte simAccess, IPAddress address, int port,
+                                               uint locationID, string capsURL, UUID agentID, uint teleportFlags,
+                                               int regionSizeX, int regionSizeY)
         {
             OSDMap info = new OSDMap {
                 { "AgentID", OSD.FromUUID (agentID) },
@@ -178,8 +178,8 @@ namespace WhiteCore.Services
                 { "SimIP", OSD.FromBinary (address.GetAddressBytes ()) },
                 { "SimPort", OSD.FromInteger (port) },
                 { "TeleportFlags", OSD.FromBinary (uintToByteArray (teleportFlags)) },
-                { "RegionSizeX", OSD.FromUInteger ((uint)RegionSizeX) },
-                { "RegionSizeY", OSD.FromUInteger ((uint)RegionSizeY) }
+                { "RegionSizeX", OSD.FromUInteger ((uint)regionSizeX) },
+                { "RegionSizeY", OSD.FromUInteger ((uint)regionSizeY) }
             };
 
             OSDArray infoArr = new OSDArray { info };
@@ -206,15 +206,15 @@ namespace WhiteCore.Services
         }
 
         public static OSD EstablishAgentCommunication (UUID agentID, ulong regionhandle, string simIpAndPort,
-                                                       string seedcap, int RegionSizeX, int RegionSizeY)
+                                                       string seedcap, int regionSizeX, int regionSizeY)
         {
             OSDMap body = new OSDMap (3) {
                 { "agent-id", new OSDUUID (agentID) },
                 { "sim-ip-and-port", new OSDString (simIpAndPort) },
                 { "seed-capability", new OSDString (seedcap) },
                 { "region-handle", OSD.FromULong (regionhandle) },
-                { "region-size-x", OSD.FromInteger (RegionSizeX) },
-                { "region-size-y", OSD.FromInteger (RegionSizeY) }
+                { "region-size-x", OSD.FromInteger (regionSizeX) },
+                { "region-size-y", OSD.FromInteger (regionSizeY) }
             };
 
             return buildEvent ("EstablishAgentCommunication", body);
@@ -334,9 +334,8 @@ namespace WhiteCore.Services
             return chatterboxInvitation;
         }
 
-        public static OSD ChatterBoxSessionAgentListUpdates (UUID sessionID,
-                                                            UUID agentID, bool canVoiceChat, bool isModerator,
-                                                            bool textMute)
+        public static OSD ChatterBoxSessionAgentListUpdates (UUID sessionID, UUID agentID, 
+                                                             bool canVoiceChat, bool isModerator, bool textMute)
         {
             OSDMap body = new OSDMap ();
             OSDMap agentUpdates = new OSDMap ();
@@ -361,8 +360,8 @@ namespace WhiteCore.Services
         }
 
         internal static OSD ChatterBoxSessionAgentListUpdates (UUID sessionID,
-                                                              ChatterBoxSessionAgentListUpdatesMessage.AgentUpdatesBlock
-                                                                  [] agentUpdatesBlock, string Transition)
+                                                               ChatterBoxSessionAgentListUpdatesMessage.AgentUpdatesBlock [] agentUpdatesBlock, 
+                                                               string transition)
         {
             OSDMap body = new OSDMap ();
             OSDMap agentUpdates = new OSDMap ();
@@ -378,8 +377,8 @@ namespace WhiteCore.Services
                 infoDetail.Add ("is_moderator", OSD.FromBoolean (block.IsModerator));
                 infoDetail.Add ("mutes", mutes);
                 OSDMap info = new OSDMap { { "info", infoDetail } };
-                if (Transition != string.Empty)
-                    info.Add ("transition", OSD.FromString (Transition));
+                if (transition != string.Empty)
+                    info.Add ("transition", OSD.FromString (transition));
                 agentUpdates.Add (block.AgentID.ToString (), info);
             }
             body.Add ("agent_updates", agentUpdates);
@@ -426,17 +425,17 @@ namespace WhiteCore.Services
             return groupUpdate;
         }
 
-        public static OSD PlacesQuery (PlacesReplyPacket PlacesReply, string[] regionType)
+        public static OSD PlacesQuery (PlacesReplyPacket placesReplyPkt, string[] regionType)
         {
             PlacesReplyMessage message = new PlacesReplyMessage ();
-            message.AgentID = PlacesReply.AgentData.AgentID;
-            message.QueryID = PlacesReply.AgentData.QueryID;
-            message.TransactionID = PlacesReply.TransactionData.TransactionID;
-            message.QueryDataBlocks = new PlacesReplyMessage.QueryData[PlacesReply.QueryData.Length];
+            message.AgentID = placesReplyPkt.AgentData.AgentID;
+            message.QueryID = placesReplyPkt.AgentData.QueryID;
+            message.TransactionID = placesReplyPkt.TransactionData.TransactionID;
+            message.QueryDataBlocks = new PlacesReplyMessage.QueryData[placesReplyPkt.QueryData.Length];
             OSDMap placesReply = new OSDMap { { "message", OSD.FromString ("PlacesReplyMessage") } };
 
             int i = 0;
-            foreach (PlacesReplyPacket.QueryDataBlock groupDataBlock in PlacesReply.QueryData)
+            foreach (PlacesReplyPacket.QueryDataBlock groupDataBlock in placesReplyPkt.QueryData)
             {
                 message.QueryDataBlocks [i] = new PlacesReplyMessage.QueryData ();
                 message.QueryDataBlocks [i].ActualArea = groupDataBlock.ActualArea;

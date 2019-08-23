@@ -66,11 +66,10 @@ namespace WhiteCore.Services
 
         #region Group Members
 
-        public byte[] GroupMemberData (string path, Stream request, OSHttpRequest httpRequest,
+        public byte [] GroupMemberData (string path, Stream request, OSHttpRequest httpRequest,
                                       OSHttpResponse httpResponse)
         {
-            try
-            {
+            try {
                 OSDMap rm = (OSDMap)OSDParser.DeserializeLLSDXml (HttpServerHandlerHelpers.ReadFully (request));
                 UUID groupID = rm ["group_id"].AsUUID ();
 
@@ -85,17 +84,14 @@ namespace WhiteCore.Services
                 List<string> titles = new List<string> ();
                 OSDMap members = new OSDMap ();
                 int count = 0;
-                foreach (GroupMembersData gmd in m_groupService.GetGroupMembers(m_service.AgentID, groupID))
-                {
+                foreach (GroupMembersData gmd in m_groupService.GetGroupMembers (m_service.AgentID, groupID)) {
                     OSDMap member = new OSDMap ();
                     member ["donated_square_meters"] = gmd.Contribution;
                     member ["owner"] = (gmd.IsOwner ? "Y" : "N");
                     member ["last_login"] = gmd.OnlineStatus;
-                    if (titles.Contains (gmd.Title))
-                    {
+                    if (titles.Contains (gmd.Title)) {
                         member ["title"] = titles.FindIndex ((s) => s == gmd.Title);
-                    } else
-                    {
+                    } else {
                         titles.Add (gmd.Title);
                         member ["title"] = titles.Count - 1;
                     }
@@ -111,8 +107,7 @@ namespace WhiteCore.Services
                 map ["titles"] = titles.ToOSDArray ();
                 map ["members"] = members;
                 return OSDParser.SerializeLLSDXmlBytes (map);
-            } catch (Exception e)
-            {
+            } catch (Exception e) {
                 MainConsole.Instance.Error ("[CAPS]: " + e);
             }
 

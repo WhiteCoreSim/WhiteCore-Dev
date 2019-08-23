@@ -94,7 +94,7 @@ namespace WhiteCore.Services
             // some additional features
             data ["god_names"] = GodNames (httpRequest);
 
-            //Send back data
+            // Send back data
             return OSDParser.SerializeLLSDXmlBytes (data);
         }
 

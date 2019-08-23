@@ -49,13 +49,13 @@ namespace WhiteCore.Services
 {
     public class AssetCAPS : IExternalCapsRequestHandler
     {
+        public const string DefaultFormat = "x-j2c";
 
         protected IAssetService m_assetService;
         protected IJ2KDecoder m_j2kDecoder;
         protected UUID m_AgentID;
-        public const string DefaultFormat = "x-j2c";
         // TODO: Change this to a config option
-        protected string REDIRECT_URL = null;
+        protected string redirect_URL = null;
         string m_getTextureURI;
         string m_getMeshURI;
         string m_bakedTextureURI;
@@ -91,9 +91,9 @@ namespace WhiteCore.Services
         #region Get Texture
 
         byte [] ProcessGetTexture (string path, Stream request, OSHttpRequest httpRequest,
-                                         OSHttpResponse httpResponse)
+                                   OSHttpResponse httpResponse)
         {
-            //MainConsole.Instance.DebugFormat("[GETTEXTURE]: called in {0}", m_scene.RegionInfo.RegionName);
+            // MainConsole.Instance.DebugFormat("[GETTEXTURE]: called in {0}", m_scene.RegionInfo.RegionName);
 
             // Try to parse the texture ID from the request URL
             NameValueCollection query = HttpUtility.ParseQueryString (httpRequest.Url.Query);
@@ -113,7 +113,7 @@ namespace WhiteCore.Services
                 else {
                     formats = WebUtils.GetPreferredImageTypes (httpRequest.Headers.Get ("Accept"));
                     if (formats.Length == 0)
-                        formats = new [] { DefaultFormat }; // default
+                        formats = new [] { DefaultFormat };     // default
                 }
 
                 // OK, we have an array with preferred formats, possibly with only one entry
@@ -142,14 +142,14 @@ namespace WhiteCore.Services
         bool FetchTexture (OSHttpRequest httpRequest, OSHttpResponse httpResponse, UUID textureID, string format,
                                   out byte [] response)
         {
-            //MainConsole.Instance.DebugFormat("[GETTEXTURE]: {0} with requested format {1}", textureID, format);
+            // MainConsole.Instance.DebugFormat("[GETTEXTURE]: {0} with requested format {1}", textureID, format);
             AssetBase texture;
 
             string fullID = textureID.ToString ();
             if (format != DefaultFormat)
                 fullID = fullID + "-" + format;
 
-            if (!string.IsNullOrEmpty (REDIRECT_URL)) {
+            if (!string.IsNullOrEmpty (redirect_URL)) {
                 // Only try to fetch locally cached textures. Misses are redirected
                 texture = m_assetService.GetCached (fullID);
 
@@ -164,13 +164,14 @@ namespace WhiteCore.Services
 
                     response = WriteTextureData (httpRequest, httpResponse, texture, format);
                     return true;
-                } else {
-                    string textureUrl = REDIRECT_URL + textureID;
-                    MainConsole.Instance.Debug ("[AssetCAPS]: Redirecting texture request to " + textureUrl);
-                    httpResponse.RedirectLocation = textureUrl;
-                    response = MainServer.BlankResponse;
-                    return true;
                 }
+
+                string textureUrl = redirect_URL + textureID;
+                MainConsole.Instance.Debug ("[AssetCAPS]: Redirecting texture request to " + textureUrl);
+                httpResponse.RedirectLocation = textureUrl;
+                response = MainServer.BlankResponse;
+
+                return true;
             }
 
             // no redirect
@@ -178,7 +179,7 @@ namespace WhiteCore.Services
             texture = m_assetService.GetCached (fullID);
 
             if (texture == null) {
-                //MainConsole.Instance.DebugFormat("[GETTEXTURE]: texture was not in the cache");
+                // MainConsole.Instance.DebugFormat("[Get texture]: texture was not in the cache");
 
                 // Fetch locally or remotely. Misses return a 404
                 texture = m_assetService.Get (textureID.ToString ());
@@ -203,15 +204,16 @@ namespace WhiteCore.Services
                         return true;
                     }
 
-                    AssetBase newTexture = new AssetBase (texture.ID + "-" + format, texture.Name, AssetType.Texture,
-                                                                     texture.CreatorID) { Data = ConvertTextureData (texture, format) };
+                    AssetBase newTexture = new AssetBase (texture.ID + "-" + format, texture.Name,
+                                                          AssetType.Texture,
+                                                          texture.CreatorID) { Data = ConvertTextureData (texture, format) };
 
                     if (newTexture.Data.Length == 0)            // unable to convert
                     {
                         response = MainServer.BlankResponse;
                         texture.Dispose ();
                         newTexture.Dispose ();
-                        return false; // !!! Caller try another codec, please!
+                        return false;           // !!! Caller try another codec, please!
                     }
 
                     newTexture.Flags = AssetFlags.Collectable | AssetFlags.Temporary;
@@ -262,7 +264,7 @@ namespace WhiteCore.Services
             }
 
             // the best result...
-            //MainConsole.Instance.DebugFormat("[GETTEXTURE]: texture was in the cache");
+            // MainConsole.Instance.DebugFormat("[GETTEXTURE]: texture was in the cache");
             response = WriteTextureData (httpRequest, httpResponse, texture, format);
             return true;
 
@@ -271,7 +273,7 @@ namespace WhiteCore.Services
         byte [] WriteTextureData (OSHttpRequest request, OSHttpResponse response, AssetBase texture, string format)
         {
             string range = request.Headers.GetOne ("Range");
-            //MainConsole.Instance.DebugFormat("[GETTEXTURE]: Range {0}", range);
+            // MainConsole.Instance.DebugFormat("[GETTEXTURE]: Range {0}", range);
             if (!string.IsNullOrEmpty (range)) // JP2's only
             {
                 // Range request
@@ -282,31 +284,32 @@ namespace WhiteCore.Services
                     if (start >= texture.Data.Length) {
                         response.StatusCode = (int)System.Net.HttpStatusCode.RequestedRangeNotSatisfiable;
                         return MainServer.BlankResponse;
-                    } else {
-                        // Handle the case where portions of the range are missing.
-                        if (start == -1)
-                            start = 0;
-                        if (end == -1)
-                            end = int.MaxValue;
+                    }       
 
-                        end = Utils.Clamp (end, 0, texture.Data.Length - 1);
-                        start = Utils.Clamp (start, 0, end);
-                        int len = end - start + 1;
+                    // Handle the case where portions of the range are missing.
+                    if (start == -1)
+                        start = 0;
+                    if (end == -1)
+                        end = int.MaxValue;
 
-                        //MainConsole.Instance.Debug("Serving " + start + " to " + end + " of " + texture.Data.Length + " bytes for texture " + texture.ID);
+                    end = Utils.Clamp (end, 0, texture.Data.Length - 1);
+                    start = Utils.Clamp (start, 0, end);
+                    int len = end - start + 1;
 
-                        if (len < texture.Data.Length)
-                            response.StatusCode = (int)System.Net.HttpStatusCode.PartialContent;
-                        else
-                            response.StatusCode = (int)System.Net.HttpStatusCode.OK;
+                    // MainConsole.Instance.Debug("Serving " + start + " to " + end + " of " + texture.Data.Length + " bytes for texture " + texture.ID);
 
-                        response.ContentType = texture.TypeString;
-                        response.AddHeader ("Content-Range",
-                                           string.Format ("bytes {0}-{1}/{2}", start, end, texture.Data.Length));
-                        byte [] array = new byte [len];
-                        Array.Copy (texture.Data, start, array, 0, len);
-                        return array;
-                    }
+                    if (len < texture.Data.Length)
+                        response.StatusCode = (int)System.Net.HttpStatusCode.PartialContent;
+                    else
+                        response.StatusCode = (int)System.Net.HttpStatusCode.OK;
+
+                    response.ContentType = texture.TypeString;
+                    response.AddHeader ("Content-Range",
+                                       string.Format ("bytes {0}-{1}/{2}", start, end, texture.Data.Length));
+                    byte [] array = new byte [len];
+                    Array.Copy (texture.Data, start, array, 0, len);
+
+                    return array;
                 }
 
                 MainConsole.Instance.Warn ("[AssetCAPS]: Malformed Range header: " + range);
@@ -376,6 +379,7 @@ namespace WhiteCore.Services
                 image = m_j2kDecoder.DecodeToImage (texture.Data);
                 if (image == null)
                     return data;
+                
                 // Save to bitmap
                 image = new Bitmap (image);
 
@@ -432,7 +436,7 @@ namespace WhiteCore.Services
                                          OSHttpResponse httpResponse)
         {
             try {
-                //MainConsole.Instance.Debug("[CAPS]: UploadBakedTexture Request in region: " +
+                // MainConsole.Instance.Debug("[CAPS]: UploadBakedTexture Request in region: " +
                 //        m_regionName);
 
                 string uploadpath = "/CAPS/Upload/" + UUID.Random () + "/";
@@ -476,7 +480,7 @@ namespace WhiteCore.Services
             /// <param name="httpResponse"></param>
             /// <returns></returns>
             public byte [] UploaderCaps (string path, Stream request,
-                                       OSHttpRequest httpRequest, OSHttpResponse httpResponse)
+                                         OSHttpRequest httpRequest, OSHttpResponse httpResponse)
             {
                 handlerUpLoad = OnUpLoad;
                 UUID newAssetID;
@@ -494,8 +498,11 @@ namespace WhiteCore.Services
 
         public void BakedTextureUploaded (byte [] data, out UUID newAssetID)
         {
-            //MainConsole.Instance.InfoFormat("[AssetCAPS]: Received baked texture {0}", assetID);
-            AssetBase asset = new AssetBase (UUID.Random (), "Baked Texture", AssetType.Texture, m_AgentID) { Data = data, Flags = AssetFlags.Deletable | AssetFlags.Temporary };
+            // MainConsole.Instance.InfoFormat("[AssetCAPS]: Received baked texture {0}", assetID);
+            AssetBase asset = new AssetBase (UUID.Random (), "Baked Texture", AssetType.Texture, m_AgentID);
+            asset.Data = data;
+            asset.Flags = AssetFlags.Deletable | AssetFlags.Temporary;
+
             newAssetID = asset.ID = m_assetService.Store (asset);
             MainConsole.Instance.DebugFormat ("[AssetCAPS]: Baked texture new id {0}", newAssetID);
         }

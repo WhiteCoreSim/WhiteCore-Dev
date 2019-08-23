@@ -37,7 +37,6 @@ using WhiteCore.Framework.Servers;
 using WhiteCore.Framework.Servers.HttpServer;
 using WhiteCore.Framework.Servers.HttpServer.Implementation;
 using WhiteCore.Framework.Services;
-using Encoder = System.Drawing.Imaging.Encoder;
 using GridRegion = WhiteCore.Framework.Services.GridRegion;
 
 namespace WhiteCore.Services
@@ -60,8 +59,8 @@ namespace WhiteCore.Services
             m_agentID = agentID;
 
             if (m_appearanceService == null)
-                return;//Can't bake!
-            
+                return;     // Can't bake!
+
             m_uri = "/CAPS/UpdateAvatarAppearance/" + UUID.Random () + "/";
             MainServer.Instance.AddStreamHandler (new GenericStreamHandler ("POST", m_uri, UpdateAvatarAppearance));
             capURLs ["UpdateAvatarAppearance"] = MainServer.Instance.ServerURI + m_uri;
@@ -74,11 +73,10 @@ namespace WhiteCore.Services
 
         #region Server Side Baked Textures
 
-        byte[] UpdateAvatarAppearance (string path, Stream request, OSHttpRequest httpRequest,
+        byte [] UpdateAvatarAppearance (string path, Stream request, OSHttpRequest httpRequest,
                                       OSHttpResponse httpResponse)
         {
-            try
-            {
+            try {
                 OSDMap rm = (OSDMap)OSDParser.DeserializeLLSDXml (HttpServerHandlerHelpers.ReadFully (request));
                 int cof_version = rm ["cof_version"].AsInteger ();
 
@@ -87,8 +85,7 @@ namespace WhiteCore.Services
                 AvatarAppearance appearance = m_appearanceService.BakeAppearance (m_agentID, cof_version);
 
                 OSDMap map = new OSDMap ();
-                if (appearance == null)
-                {
+                if (appearance == null) {
                     map ["success"] = false;
                     map ["error"] = "Wrong COF";
                     map ["agent_id"] = m_agentID;
@@ -113,8 +110,7 @@ namespace WhiteCore.Services
                 map["visual_params"] = visualParams;*/
                 return OSDParser.SerializeLLSDXmlBytes (map);
 
-            } catch (Exception e)
-            {
+            } catch (Exception e) {
                 MainConsole.Instance.Error ("[CAPS]: " + e);
             }
 

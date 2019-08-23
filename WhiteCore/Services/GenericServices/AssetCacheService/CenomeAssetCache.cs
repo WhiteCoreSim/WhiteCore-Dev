@@ -247,7 +247,7 @@ namespace WhiteCore.Services
             if (m_getCount == m_debugEpoch)
             {
                 MainConsole.Instance.DebugFormat(
-                    "[ASSET CACHE]: Cached = {0}, Get = {1}, Hits = {2}%, Size = {3} bytes, Avg. A. Size = {4} bytes",
+                    "[Asset cache]: Cached = {0}, Get = {1}, Hits = {2}%, Size = {3} bytes, Avg. A. Size = {4} bytes",
                     m_cachedCount,
                     m_getCount,
                     ((double) m_hitCount/m_getCount)*100.0,
@@ -277,7 +277,7 @@ namespace WhiteCore.Services
                 return;
 
             string name = moduleConfig.GetString("AssetCaching");
-            //MainConsole.Instance.DebugFormat("[XXX] name = {0} (this module's name: {1}", name, Name);
+            // MainConsole.Instance.DebugFormat("[XXX] name = {0} (this module's name: {1}", name, Name);
 
             if (name != Name)
                 return;
@@ -329,7 +329,7 @@ namespace WhiteCore.Services
         {
             if (maximalSize <= 0 || maximalCount <= 0)
             {
-                //MainConsole.Instance.Debug("[ASSET CACHE]: Cenome asset cache is not enabled.");
+                // MainConsole.Instance.Debug("[ASSET CACHE]: Cenome asset cache is not enabled.");
                 return;
             }
 
@@ -344,7 +344,7 @@ namespace WhiteCore.Services
                 CnmSynchronizedCache<string, AssetBase>.Synchronized(new CnmMemoryCache<string, AssetBase>(
                                                                          maximalSize, maximalCount, expirationTime));
             MainConsole.Instance.DebugFormat(
-                "[ASSET CACHE]: Cenome asset cache enabled (MaxSize = {0} bytes, MaxCount = {1}, ExpirationTime = {2})",
+                "[Asset cache]: Cenome asset cache enabled (MaxSize = {0} bytes, MaxCount = {1}, ExpirationTime = {2})",
                 maximalSize,
                 maximalCount,
                 expirationTime);

@@ -63,7 +63,7 @@ namespace WhiteCore.Services
 
         public void FinishedStartup ()
         {
-            //Also look for incoming messages to display
+            // Also look for incoming messages to display
             m_registry.RequestModuleInterface<ISyncMessageRecievedService> ().OnMessageReceived += OnMessageReceived;
         }
 
@@ -87,10 +87,10 @@ namespace WhiteCore.Services
                     List<UUID> regions = estateConnector.GetRegions ((int)es.EstateID);
                     if (regions != null) {
                         foreach (UUID region in regions) {
-                            //Send the message to update all regions that are in this estate, as a setting changed
-                            GridRegion r = gridService.GetRegionByUUID (null, region);
-                            if (r != null)
-                                asyncPoster.Post (r.ServerURI, SyncMessageHelper.UpdateEstateInfo (es.EstateID, region));
+                            // Send the message to update all regions that are in this estate, as a setting changed
+                            GridRegion gridR = gridService.GetRegionByUUID (null, region);
+                            if (gridR != null)
+                                asyncPoster.Post (gridR.ServerURI, SyncMessageHelper.UpdateEstateInfo (es.EstateID, region));
                         }
                     }
                 }
@@ -105,10 +105,10 @@ namespace WhiteCore.Services
         /// <returns></returns>
         protected OSDMap OnMessageReceived (OSDMap message)
         {
-            //We need to check and see if this is an AgentStatusChange
+            // We need to check and see if this is an AgentStatusChange
             if (message.ContainsKey ("Method") && message ["Method"] == "EstateUpdated") {
                 OSDMap innerMessage = (OSDMap)message ["Message"];
-                //We got a message, deal with it
+                // We got a message, deal with it
                 uint estateID = innerMessage ["EstateID"].AsUInteger ();
                 UUID regionID = innerMessage ["RegionID"].AsUUID ();
                 ISceneManager manager = m_registry.RequestModuleInterface<ISceneManager> ();

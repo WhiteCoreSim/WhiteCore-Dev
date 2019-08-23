@@ -89,7 +89,7 @@ namespace WhiteCore.Services
         protected Vector3 m_DefaultHomeRegionPos = new Vector3 ();
         protected ArrayList eventCategories = new ArrayList ();
         protected ArrayList classifiedCategories = new ArrayList ();
-        protected List<ILoginModule> LoginModules = new List<ILoginModule> ();
+        protected List<ILoginModule> loginModules = new List<ILoginModule> ();
         string m_forceUserToWearFolderName;
         string m_forceUserToWearFolderOwnerUUID;
 
@@ -194,8 +194,8 @@ namespace WhiteCore.Services
                 RegisterCommands ();
             }
 
-            LoginModules = WhiteCoreModuleLoader.PickupModules<ILoginModule> ();
-            foreach (ILoginModule module in LoginModules) {
+            loginModules = WhiteCoreModuleLoader.PickupModules<ILoginModule> ();
+            foreach (ILoginModule module in loginModules) {
                 module.Initialize (this, m_config, registry);
             }
 
@@ -323,7 +323,7 @@ namespace WhiteCore.Services
                 }
             }
 
-            foreach (ILoginModule module in LoginModules) {
+            foreach (ILoginModule module in loginModules) {
                 object data;
                 if (module.Login (null, userAcct, agent, authType, passwd, out data) != null) {
                     return false;
@@ -332,7 +332,7 @@ namespace WhiteCore.Services
             return true;
         }
 
-        public LoginResponse Login (UUID AgentID, string Name, string authType, string passwd, string startLocation,
+        public LoginResponse Login (UUID agentID, string Name, string authType, string passwd, string startLocation,
                                    string clientVersion, string channel, string mac, string id0, IPEndPoint clientIP,
                                    Hashtable requestData)
         {
@@ -357,8 +357,8 @@ namespace WhiteCore.Services
                 "[LLogin service]: Login request for {0} from {1} with user agent {2} starting in {3}",
                 Name, clientIP.Address, realViewer, startLocation);
 
-            UserAccount userAcct = AgentID != UUID.Zero
-                                      ? m_UserAccountService.GetUserAccount (null, AgentID)
+            UserAccount userAcct = agentID != UUID.Zero
+                                      ? m_UserAccountService.GetUserAccount (null, agentID)
                                       : m_UserAccountService.GetUserAccount (null, Name);
 
             // no user but allow anomymouse logins?
@@ -401,7 +401,7 @@ namespace WhiteCore.Services
             }
 
             requestData ["ip"] = clientIP.ToString ();
-            foreach (ILoginModule module in LoginModules) {
+            foreach (ILoginModule module in loginModules) {
                 object data;
                 if ((response = module.Login (requestData, userAcct, agent, authType, passwd, out data)) != null) {
                     MainConsole.Instance.InfoFormat (
@@ -414,7 +414,7 @@ namespace WhiteCore.Services
             }
 
             try {
-                string DisplayName = userAcct.Name;
+                string displayName = userAcct.Name;
                 AvatarAppearance avappearance = null;
                 IProfileConnector profileData = Framework.Utilities.DataManager.RequestPlugin<IProfileConnector> ();
 
@@ -458,41 +458,41 @@ namespace WhiteCore.Services
                 }
 
                 if (profileData != null) {
-                    IUserProfileInfo UPI = profileData.GetUserProfile (userAcct.PrincipalID);
-                    if (UPI == null) {
+                    IUserProfileInfo userPI = profileData.GetUserProfile (userAcct.PrincipalID);
+                    if (userPI == null) {
                         profileData.CreateNewProfile (userAcct.PrincipalID);
-                        UPI = profileData.GetUserProfile (userAcct.PrincipalID);
-                        UPI.AArchiveName = m_DefaultUserAvatarArchive;
-                        UPI.IsNewUser = true;
-                        //profileData.UpdateUserProfile(UPI); //It gets hit later by the next thing
+                        userPI = profileData.GetUserProfile (userAcct.PrincipalID);
+                        userPI.AArchiveName = m_DefaultUserAvatarArchive;
+                        userPI.IsNewUser = true;
+                        // profileData.UpdateUserProfile(UPI); //It gets hit later by the next thing
                     }
-                    //Find which is set, if any
-                    string archiveName = (UPI.AArchiveName != "" && UPI.AArchiveName != " ")
-                                             ? UPI.AArchiveName
+                    // Find which is set, if any
+                    string archiveName = (userPI.AArchiveName != "" && userPI.AArchiveName != " ")
+                                             ? userPI.AArchiveName
                                              : m_DefaultUserAvatarArchive;
-                    if (UPI.IsNewUser && archiveName != "") {
+                    if (userPI.IsNewUser && archiveName != "") {
                         AvatarArchive arch = m_ArchiveService.LoadAvatarArchive (archiveName, userAcct.PrincipalID);
-                        UPI.AArchiveName = "";
+                        userPI.AArchiveName = "";
                         if (arch != null) {
                             avappearance = arch.Appearance;
                             m_AvatarService.SetAppearance (userAcct.PrincipalID, avappearance);
-                            //Must reload this, as we created a new folder
+                            // Must reload this, as we created a new folder
                             inventorySkel = m_InventoryService.GetInventorySkeleton (userAcct.PrincipalID);
                         }
                     }
-                    if (UPI.IsNewUser) {
-                        UPI.IsNewUser = false;
-                        profileData.UpdateUserProfile (UPI);
+                    if (userPI.IsNewUser) {
+                        userPI.IsNewUser = false;
+                        profileData.UpdateUserProfile (userPI);
                     }
-                    if (UPI.DisplayName != "")
-                        DisplayName = UPI.DisplayName;
+                    if (userPI.DisplayName != "")
+                        displayName = userPI.DisplayName;
                 }
 
                 // Get active gestures
                 List<InventoryItemBase> gestures = m_InventoryService.GetActiveGestures (userAcct.PrincipalID);
-                //MainConsole.Instance.DebugFormat("[LLogin service]: {0} active gestures", gestures.Count);
+                // MainConsole.Instance.DebugFormat("[LLogin service]: {0} active gestures", gestures.Count);
 
-                //Now get the logged in status, then below make sure to kill the previous agent if we crashed before
+                // Now get the logged in status, then below make sure to kill the previous agent if we crashed before
                 UserInfo guinfo = m_agentInfoService.GetUserInfo (userAcct.PrincipalID.ToString ());
                 //
                 // Clear out any existing CAPS the user may have
@@ -608,7 +608,7 @@ namespace WhiteCore.Services
                     }
                 }
 
-                //Makes sure that all links are properly placed in the current outfit folder for v2 viewers
+                // Makes sure that all links are properly placed in the current outfit folder for v2 viewers
                 FixCurrentOutFitFolder (userAcct.PrincipalID, ref avappearance);
 
                 #endregion
@@ -647,13 +647,13 @@ namespace WhiteCore.Services
                 //
                 // Finally, fill out the response and return it
                 //
-                string MaturityRating = "A";
-                string MaxMaturity = "A";
+                string maturityRating = "A";
+                string maxMaturity = "A";
                 if (agent != null) {
-                    MaturityRating = agent.MaturityRating == 0
+                    maturityRating = agent.MaturityRating == 0
                                          ? "P"
                                          : agent.MaturityRating == 1 ? "M" : "A";
-                    MaxMaturity = agent.MaxMaturity == 0
+                    maxMaturity = agent.MaxMaturity == 0
                                       ? "P"
                                       : agent.MaxMaturity == 1 ? "M" : "A";
                 }
@@ -668,9 +668,9 @@ namespace WhiteCore.Services
                 response = new LLLoginResponse (userAcct, aCircuit, guinfo, destination, inventorySkel,
                                                friendsList.ToArray (), m_InventoryService, m_LibraryService,
                                                where, startLocation, position, lookAt, gestures, home, clientIP,
-                                               MaxMaturity, MaturityRating,
+                                               maxMaturity, maturityRating,
                                                eventCategories, eventNotifications, classifiedCategories, seedCap,
-                                               m_config, DisplayName, avappearance.Serial.ToString (), m_registry.RequestModuleInterface<IGridInfo> ());
+                                               m_config, displayName, avappearance.Serial.ToString (), m_registry.RequestModuleInterface<IGridInfo> ());
 
                 MainConsole.Instance.InfoFormat (
                     "[LLogin service]: All clear. Sending response to client for login to region " +
@@ -690,8 +690,7 @@ namespace WhiteCore.Services
 
         void BuildEventNotifications (UUID principalID, ref ArrayList eventNotifications)
         {
-            IDirectoryServiceConnector dirService =
-                Framework.Utilities.DataManager.RequestPlugin<IDirectoryServiceConnector> ();
+            IDirectoryServiceConnector dirService = Framework.Utilities.DataManager.RequestPlugin<IDirectoryServiceConnector> ();
             if (dirService == null)
                 return;
             List<EventData> events = dirService.GetEventNotifications (principalID);
@@ -730,25 +729,25 @@ namespace WhiteCore.Services
                     return;
 
                 }
-                int LastTelehubNum = 0;
-                if (!lastTelehub.TryGetValue (region.RegionID, out LastTelehubNum))
-                    LastTelehubNum = 0;
-                landingPoint = telehub.SpawnPos [LastTelehubNum] +
+                int lastTelehubNum = 0;
+                if (!lastTelehub.TryGetValue (region.RegionID, out lastTelehubNum))
+                    lastTelehubNum = 0;
+                landingPoint = telehub.SpawnPos [lastTelehubNum] +
                                         new Vector3 (telehub.TelehubLocX, telehub.TelehubLocY, telehub.TelehubLocZ);
-                lookAt = telehub.SpawnPos [LastTelehubNum] +
+                lookAt = telehub.SpawnPos [lastTelehubNum] +
                                         new Vector3 (telehub.TelehubRotX, telehub.TelehubRotY, telehub.TelehubRotZ);
-                LastTelehubNum++;
-                if (LastTelehubNum == telehub.SpawnPos.Count)
-                    LastTelehubNum = 0;
-                lastTelehub [region.RegionID] = LastTelehubNum;
+                lastTelehubNum++;
+                if (lastTelehubNum == telehub.SpawnPos.Count)
+                    lastTelehubNum = 0;
+                lastTelehub [region.RegionID] = lastTelehubNum;
 
                 return;
             }
 
             // no telehub, check for a set landing point near the 'standard' - might need to modify this for multiple parcels - greythane-
-            IDirectoryServiceConnector DSC = Framework.Utilities.DataManager.RequestPlugin<IDirectoryServiceConnector> ();
-            if (DSC != null) {
-                LandData landdata = DSC.GetParcelInfo (region.RegionID, (int)landingPoint.X, (int)landingPoint.Y);
+            IDirectoryServiceConnector dirSC = Framework.Utilities.DataManager.RequestPlugin<IDirectoryServiceConnector> ();
+            if (dirSC != null) {
+                LandData landdata = dirSC.GetParcelInfo (region.RegionID, (int)landingPoint.X, (int)landingPoint.Y);
                 if (landdata != null) {
                     if ((landdata.LandingType == (int)LandingType.LandingPoint) && (landdata.UserLocation != Vector3.Zero)) {
                         // we have a landing point specified, use it
@@ -1064,7 +1063,7 @@ namespace WhiteCore.Services
 
             if (success) {
                 MainConsole.Instance.DebugFormat ("[LoginService]: Successfully logged {0} into {1} at {2}...", account.Name, destination.RegionName, destination.ServerURI);
-                //Set the region to safe since we got there
+                // Set the region to safe since we got there
                 m_GridService.SetRegionSafe (destination.RegionID);
                 return aCircuit;
             }
@@ -1085,7 +1084,7 @@ namespace WhiteCore.Services
                 args = m_registry.RequestModuleInterface<IAgentProcessing> ().
                                   LoginAgent (r, aCircuit, friendsToInform);
                 if (args.Success) {
-                    //aCircuit = MakeAgent(r, account, session, secureSession, circuitCode, position, clientIP);
+                    // aCircuit = MakeAgent(r, account, session, secureSession, circuitCode, position, clientIP);
                     MakeAgent (r, account, session, secureSession, circuitCode, position, clientIP);
                     destination = r;
                     reason = args.Reason;
@@ -1174,9 +1173,9 @@ namespace WhiteCore.Services
 
         public AvatarAppearance WearFolder (AvatarAppearance avappearance, UUID user, UUID folderOwnerID)
         {
-            InventoryFolderBase Folder2Wear = m_InventoryService.GetFolderByOwnerAndName (folderOwnerID, m_forceUserToWearFolderName);
-            if (Folder2Wear != null) {
-                List<InventoryItemBase> itemsInFolder = m_InventoryService.GetFolderItems (UUID.Zero, Folder2Wear.ID);
+            InventoryFolderBase folder2Wear = m_InventoryService.GetFolderByOwnerAndName (folderOwnerID, m_forceUserToWearFolderName);
+            if (folder2Wear != null) {
+                List<InventoryItemBase> itemsInFolder = m_InventoryService.GetFolderItems (UUID.Zero, folder2Wear.ID);
 
                 InventoryFolderBase appearanceFolder = m_InventoryService.GetFolderForType (user, InventoryType.Wearable, FolderType.Clothing);
                 InventoryFolderBase folderForAppearance = new InventoryFolderBase (UUID.Random (), "GridWear", user, -1,
@@ -1280,12 +1279,13 @@ namespace WhiteCore.Services
 
         public void FixCurrentOutFitFolder (UUID user, ref AvatarAppearance avappearance)
         {
-            InventoryFolderBase CurrentOutFitFolder = m_InventoryService.GetFolderForType (user, 0, FolderType.CurrentOutfit);
-            if (CurrentOutFitFolder == null) return;
-            List<InventoryItemBase> ic = m_InventoryService.GetFolderItems (user, CurrentOutFitFolder.ID);
+            InventoryFolderBase currentOutFitFolder = m_InventoryService.GetFolderForType (user, 0, FolderType.CurrentOutfit);
+            if (currentOutFitFolder == null) return;
+            List<InventoryItemBase> folderItems = m_InventoryService.GetFolderItems (user, currentOutFitFolder.ID);
             List<UUID> brokenLinks = new List<UUID> ();
-            List<UUID> OtherStuff = new List<UUID> ();
-            foreach (var i in ic) {
+            List<UUID> otherStuff = new List<UUID> ();
+
+            foreach (var i in folderItems) {
                 InventoryItemBase linkedItem;
                 if ((linkedItem = m_InventoryService.GetItem (user, i.AssetID)) == null)
                     brokenLinks.Add (i.ID);
@@ -1296,14 +1296,14 @@ namespace WhiteCore.Services
                          linkedItem.ID == AvatarWearable.DEFAULT_SHIRT_ITEM ||
                          linkedItem.ID == AvatarWearable.DEFAULT_SKIN_ITEM)
                     brokenLinks.Add (i.ID); //Default item link, needs removed
-                else if (!OtherStuff.Contains (i.AssetID))
-                    OtherStuff.Add (i.AssetID);
+                else if (!otherStuff.Contains (i.AssetID))
+                    otherStuff.Add (i.AssetID);
             }
 
             for (int i = 0; i < avappearance.Wearables.Length; i++) {
                 AvatarWearable wearable = avappearance.Wearables [i];
                 for (int ii = 0; ii < wearable.Count; ii++) {
-                    if (!OtherStuff.Contains (wearable [ii].ItemID)) {
+                    if (!otherStuff.Contains (wearable [ii].ItemID)) {
                         InventoryItemBase linkedItem2;
                         if ((linkedItem2 = m_InventoryService.GetItem (user, wearable [ii].ItemID)) != null) {
                             InventoryItemBase linkedItem3 = (InventoryItemBase)linkedItem2.Clone ();
@@ -1312,7 +1312,7 @@ namespace WhiteCore.Services
                             linkedItem3.ID = UUID.Random ();
                             linkedItem3.CurrentPermissions = linkedItem2.NextPermissions;
                             linkedItem3.EveryOnePermissions = linkedItem2.NextPermissions;
-                            linkedItem3.Folder = CurrentOutFitFolder.ID;
+                            linkedItem3.Folder = currentOutFitFolder.ID;
                             m_InventoryService.AddItem (linkedItem3);
                         } else {
                             avappearance.Wearables [i] = AvatarWearable.DefaultWearables [i];
@@ -1324,7 +1324,7 @@ namespace WhiteCore.Services
             List<UUID> items2UnAttach = new List<UUID> ();
             foreach (KeyValuePair<int, List<AvatarAttachment>> attachmentSpot in avappearance.Attachments) {
                 foreach (AvatarAttachment attachment in attachmentSpot.Value) {
-                    if (!OtherStuff.Contains (attachment.ItemID)) {
+                    if (!otherStuff.Contains (attachment.ItemID)) {
                         InventoryItemBase linkedItem2;
                         if ((linkedItem2 = m_InventoryService.GetItem (user, attachment.ItemID)) != null) {
                             InventoryItemBase linkedItem3 = (InventoryItemBase)linkedItem2.Clone ();
@@ -1333,7 +1333,7 @@ namespace WhiteCore.Services
                             linkedItem3.ID = UUID.Random ();
                             linkedItem3.CurrentPermissions = linkedItem2.NextPermissions;
                             linkedItem3.EveryOnePermissions = linkedItem2.NextPermissions;
-                            linkedItem3.Folder = CurrentOutFitFolder.ID;
+                            linkedItem3.Folder = currentOutFitFolder.ID;
                             m_InventoryService.AddItem (linkedItem3);
                         } else
                             items2UnAttach.Add (attachment.ItemID);

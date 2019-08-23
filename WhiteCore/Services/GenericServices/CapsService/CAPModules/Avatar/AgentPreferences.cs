@@ -24,7 +24,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
- 
+
 using System.IO;
 using OpenMetaverse;
 using OpenMetaverse.StructuredData;
@@ -38,7 +38,7 @@ using WhiteCore.Framework.Utilities;
 
 namespace WhiteCore.Services
 {
-    public class AgentPreferencesCAPS: ICapsServiceConnector
+    public class AgentPreferencesCAPS : ICapsServiceConnector
     {
         IRegionClientCapsService m_service;
 
@@ -47,17 +47,17 @@ namespace WhiteCore.Services
         public void RegisterCaps (IRegionClientCapsService service)
         {
             m_service = service;
-            
-            HttpServerHandle method = delegate(string path, Stream request, OSHttpRequest httpRequest, OSHttpResponse httpResponse) {
+
+            HttpServerHandle method = delegate (string path, Stream request, OSHttpRequest httpRequest, OSHttpResponse httpResponse) {
                 return ProcessUpdateAgentPreferences (request, m_service.AgentID);
             };
 
             service.AddStreamHandler ("AgentPreferences",
                 new GenericStreamHandler ("POST", service.CreateCAPS ("AgentPreferences", ""), method));
-			
+
             service.AddStreamHandler ("UpdateAgentLanguage",
                 new GenericStreamHandler ("POST", service.CreateCAPS ("UpdateAgentLanguage", ""), method));
-			
+
             service.AddStreamHandler ("UpdateAgentInformation",
                 new GenericStreamHandler ("POST", service.CreateCAPS ("UpdateAgentInformation", ""), method));
         }
@@ -75,20 +75,20 @@ namespace WhiteCore.Services
 
         #endregion
 
-        byte[] ProcessUpdateAgentPreferences (Stream request, UUID agentID)
+        byte [] ProcessUpdateAgentPreferences (Stream request, UUID agentID)
         {
             OSDMap rm = OSDParser.DeserializeLLSDXml (HttpServerHandlerHelpers.ReadFully (request)) as OSDMap;
             if (rm == null)
                 return MainServer.BadRequest;
+
             IAgentConnector data = Framework.Utilities.DataManager.RequestPlugin<IAgentConnector> ();
-            if (data != null)
-            {
+            if (data != null) {
                 IAgentInfo agent = data.GetAgent (agentID);
                 if (agent == null)
                     return MainServer.BadRequest;
+
                 // Access preferences ?
-                if (rm.ContainsKey ("access_prefs"))
-                {
+                if (rm.ContainsKey ("access_prefs")) {
                     OSDMap accessPrefs = (OSDMap)rm ["access_prefs"];
                     string Level = accessPrefs ["max"].AsString ();
                     int maxLevel = 0;
@@ -101,44 +101,50 @@ namespace WhiteCore.Services
                     agent.MaturityRating = maxLevel;
                 }
                 // Next permissions
-                if (rm.ContainsKey ("default_object_perm_masks"))
-                {
+                if (rm.ContainsKey ("default_object_perm_masks")) {
                     OSDMap permsMap = (OSDMap)rm ["default_object_perm_masks"];
                     agent.PermEveryone = permsMap ["Everyone"].AsInteger ();
                     agent.PermGroup = permsMap ["Group"].AsInteger ();
                     agent.PermNextOwner = permsMap ["NextOwner"].AsInteger ();
                 }
                 // Hoverheight
-                if (rm.ContainsKey ("hover_height"))
-                {
+                if (rm.ContainsKey ("hover_height")) {
                     agent.HoverHeight = rm ["hover_height"].AsReal ();
                 }
                 // Language
-                if (rm.ContainsKey ("language"))
-                {
+                if (rm.ContainsKey ("language")) {
                     agent.Language = rm ["language"].AsString ();
                 }
                 // Show Language to others / objects
-                if (rm.ContainsKey ("language_is_public"))
-                {
+                if (rm.ContainsKey ("language_is_public")) {
                     agent.LanguageIsPublic = rm ["language_is_public"].AsBoolean ();
                 }
                 data.UpdateAgent (agent);
+
                 // Build a response that can be send back to the viewer
                 OSDMap resp = new OSDMap ();
                 OSDMap respAccessPrefs = new OSDMap ();
                 respAccessPrefs ["max"] = Utilities.GetMaxMaturity (agent.MaxMaturity);
                 resp ["access_prefs"] = respAccessPrefs;
+
                 OSDMap respDefaultPerms = new OSDMap ();
                 respDefaultPerms ["Everyone"] = agent.PermEveryone;
                 respDefaultPerms ["Group"] = agent.PermGroup;
                 respDefaultPerms ["NextOwner"] = agent.PermNextOwner;
                 resp ["default_object_perm_masks"] = respDefaultPerms;
-                resp ["god_level"] = 0; // *TODO: Add this
+
+                var acctsvc = m_service.Registry.RequestModuleInterface<IUserAccountService> ();
+                int usrLevel = 0;
+                if (acctsvc != null) {
+                    UserAccount usrAcct = acctsvc.GetUserAccount (null, agentID);
+                    usrLevel = usrAcct.UserLevel;
+                }
+                resp ["god_level"] = usrLevel;
+
                 resp ["hover_height"] = agent.HoverHeight;
                 resp ["language"] = agent.Language;
                 resp ["language_is_public"] = agent.LanguageIsPublic;
-            	
+
                 return OSDParser.SerializeLLSDXmlBytes (resp);
             }
             return MainServer.BlankResponse;

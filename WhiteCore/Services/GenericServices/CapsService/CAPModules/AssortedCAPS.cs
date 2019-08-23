@@ -99,20 +99,20 @@ namespace WhiteCore.Services
         byte[] HomeLocation (Stream request, UUID agentID)
         {
             OSDMap rm = (OSDMap)OSDParser.DeserializeLLSDXml (HttpServerHandlerHelpers.ReadFully (request));
-            OSDMap HomeLocation = rm ["HomeLocation"] as OSDMap;
-            if (HomeLocation != null)
+            OSDMap homeLocation = rm ["HomeLocation"] as OSDMap;
+            if (homeLocation != null)
             {
-                OSDMap pos = HomeLocation ["LocationPos"] as OSDMap;
+                OSDMap pos = homeLocation ["LocationPos"] as OSDMap;
                 Vector3 position = new Vector3 (
                                        (float)pos ["X"].AsReal (),
                                        (float)pos ["Y"].AsReal (),
                                        (float)pos ["Z"].AsReal ());
-                OSDMap lookat = HomeLocation ["LocationLookAt"] as OSDMap;
+                OSDMap lookat = homeLocation ["LocationLookAt"] as OSDMap;
                 Vector3 lookAt = new Vector3 (
                                      (float)lookat ["X"].AsReal (),
                                      (float)lookat ["Y"].AsReal (),
                                      (float)lookat ["Z"].AsReal ());
-                //int locationID = HomeLocation["LocationId"].AsInteger();
+                // int locationID = HomeLocation["LocationId"].AsInteger();
 
                 m_agentInfoService.SetHomePosition (agentID.ToString (), m_service.Region.RegionID, position, lookAt);
             }
@@ -179,7 +179,7 @@ namespace WhiteCore.Services
             Vector3 lookAt = new Vector3((float)lookat["X"].AsReal(),
                 (float)lookat["Y"].AsReal(),
                 (float)lookat["Z"].AsReal());*/
-            ulong RegionHandle = rm ["RegionHandle"].AsULong ();
+            ulong regionHandle = rm ["RegionHandle"].AsULong ();
             const uint tpFlags = 16;
 
             if (m_service.ClientCaps.GetRootCapsService ().RegionHandle != m_service.RegionHandle)
@@ -191,19 +191,19 @@ namespace WhiteCore.Services
 
             string reason = "";
             int x, y;
-            Util.UlongToInts (RegionHandle, out x, out y);
+            Util.UlongToInts (regionHandle, out x, out y);
             GridRegion destination = m_service.Registry.RequestModuleInterface<IGridService> ().GetRegionByPosition (
                                          m_service.ClientCaps.AccountInfo.AllScopeIDs, x, y);
             ISimulationService simService = m_service.Registry.RequestModuleInterface<ISimulationService> ();
-            AgentData ad = new AgentData ();
+            AgentData agentData = new AgentData ();
             AgentCircuitData circuitData = null;
             if (destination != null)
             {
-                simService.RetrieveAgent (m_service.Region, m_service.AgentID, true, out ad, out circuitData);
-                if (ad != null)
+                simService.RetrieveAgent (m_service.Region, m_service.AgentID, true, out agentData, out circuitData);
+                if (agentData != null)
                 {
-                    ad.Position = position;
-                    ad.Center = position;
+                    agentData.Position = position;
+                    agentData.Center = position;
                     circuitData.StartingPosition = position;
                 }
             }
@@ -215,20 +215,20 @@ namespace WhiteCore.Services
             }
             circuitData.IsChildAgent = false;
 
-            if (m_agentProcessing.TeleportAgent (ref destination, tpFlags, circuitData, ad,
+            if (m_agentProcessing.TeleportAgent (ref destination, tpFlags, circuitData, agentData,
                     m_service.AgentID, m_service.RegionID, out reason) || reason == "")
             {
                 retVal.Add ("success", OSD.FromBoolean (true));
             } else
             {
                 if (reason != "Already in a teleport")
-                    //If this error occurs... don't kick them out of their current region
+                    // If this error occurs... don't kick them out of their current region
                     simService.FailedToMoveAgentIntoNewRegion (m_service.AgentID, destination);
                 retVal.Add ("reason", reason);
                 retVal.Add ("success", OSD.FromBoolean (false));
             }
 
-            //Send back data
+            // Send back data
             _isInTeleportCurrently = false;
             return OSDParser.SerializeLLSDXmlBytes (retVal);
         }
