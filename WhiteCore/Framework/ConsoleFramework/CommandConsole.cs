@@ -169,14 +169,14 @@ namespace WhiteCore.Framework.ConsoleFramework
                 }
                 string [] commandPath = innerPath.Split (new string [] { " " }, StringSplitOptions.RemoveEmptyEntries);
                 if (commandPath.Length == 1 || !m_allowSubSets) {
-                    //Only one command after our path, its ours
+                    // Only one command after our path, its ours
 
-                    //Add commands together if there is more than one event hooked to one command
+                    // Add commands together if there is more than one event hooked to one command
                     if (!commands.ContainsKey (info.command)) {
                         commands [info.command] = info;
                     }
                 } else {
-                    //Its down the tree somewhere
+                    // Its down the tree somewhere
                     CommandSet downTheTree;
                     if (!commandsets.TryGetValue (commandPath [0], out downTheTree)) {
                         //Need to add it to the tree then
@@ -204,7 +204,7 @@ namespace WhiteCore.Framework.ConsoleFramework
                     }
                     commandOptions.Reverse ();
                     commandPath = commandPathList.ToArray ();
-                    //if (commandOptions.Count > 0)
+                    // if (commandOptions.Count > 0)
                     //    MainConsole.Instance.Info("Options: " + string.Join(", ", commandOptions.ToArray()));
                     List<string> cmdList;
                     if (commandPath.Length == 1 || !m_allowSubSets) {
@@ -212,7 +212,7 @@ namespace WhiteCore.Framework.ConsoleFramework
                             string [] comm = new string [i];
                             Array.Copy (commandPath, comm, i);
                             string com = string.Join (" ", comm);
-                            //Only one command after our path, its ours
+                            // Only one command after our path, its ours
                             if (commands.ContainsKey (com)) {
                                 MainConsole.Instance.HasProcessedCurrentCommand = false;
 
@@ -232,28 +232,29 @@ namespace WhiteCore.Framework.ConsoleFramework
                                     MainConsole.Instance.FormatNoTime (Level.Off, s);
                                 }
                                 return new string [0];
-                            } else {
-                                foreach (KeyValuePair<string, CommandInfo> cmd in commands) {
-                                    string [] cmdSplit = cmd.Key.Split (' ');
-                                    if (cmdSplit.Length == commandPath.Length) {
-                                        bool any = false;
-                                        for (int k = 0; k < commandPath.Length; k++)
-                                            if (!cmdSplit [k].StartsWith (commandPath [k], StringComparison.Ordinal)) {
-                                                any = true;
-                                                break;
-                                            }
-                                        bool same = !any;
-                                        if (same) {
-                                            foreach (CommandDelegate fn in cmd.Value.fn) {
-                                                cmdList = new List<string> (commandPath);
-                                                cmdList.AddRange (commandOptions);
-                                                if (fn != null) {
-                                                    foreach (IScene scene in GetScenes (cmd.Value))
-                                                        fn (scene, cmdList.ToArray ());
-                                                }
-                                            }
-                                            return new string [0];
+                            }
+
+                            // not 'help'
+                            foreach (KeyValuePair<string, CommandInfo> cmd in commands) {
+                                string [] cmdSplit = cmd.Key.Split (' ');
+                                if (cmdSplit.Length == commandPath.Length) {
+                                    bool any = false;
+                                    for (int k = 0; k < commandPath.Length; k++)
+                                        if (!cmdSplit [k].StartsWith (commandPath [k], StringComparison.Ordinal)) {
+                                            any = true;
+                                            break;
                                         }
+                                    bool same = !any;
+                                    if (same) {
+                                        foreach (CommandDelegate fn in cmd.Value.fn) {
+                                            cmdList = new List<string> (commandPath);
+                                            cmdList.AddRange (commandOptions);
+                                            if (fn != null) {
+                                                foreach (IScene scene in GetScenes (cmd.Value))
+                                                    fn (scene, cmdList.ToArray ());
+                                            }
+                                        }
+                                        return new string [0];
                                     }
                                 }
                             }
@@ -268,34 +269,33 @@ namespace WhiteCore.Framework.ConsoleFramework
                         if (!_ConsoleIsCaseSensitive) {
                             cmdToExecute = cmdToExecute.ToLower ();
                         }
-                        //Its down the tree somewhere
+                        // Its down the tree somewhere
                         CommandSet downTheTree;
                         if (commandsets.TryGetValue (cmdToExecute, out downTheTree)) {
                             cmdList = new List<string> (commandPath);
                             cmdList.AddRange (commandOptions);
                             return downTheTree.ExecuteCommand (cmdList.ToArray ());
-                        } else {
-                            //See if this is part of a word, and if it is part of a word, execute it
-                            foreach (
-                                KeyValuePair<string, CommandSet> cmd in
-                                    commandsets.Where (cmd => cmd.Key.StartsWith (commandPath [0], StringComparison.Ordinal))) {
+                        }
+
+                        // See if this is part of a word, and if it is part of a word, execute it
+                        foreach (
+                            KeyValuePair<string, CommandSet> cmd in
+                                commandsets.Where (cmd => cmd.Key.StartsWith (commandPath [0], StringComparison.Ordinal))) {
+                            cmdList = new List<string> (commandPath);
+                            cmdList.AddRange (commandOptions);
+                            return cmd.Value.ExecuteCommand (cmdList.ToArray ());
+                        }
+
+                        if (commands.ContainsKey (cmdToExecute)) {
+                            foreach (CommandDelegate fn in commands [cmdToExecute].fn.Where (fn => fn != null)) {
                                 cmdList = new List<string> (commandPath);
                                 cmdList.AddRange (commandOptions);
-                                return cmd.Value.ExecuteCommand (cmdList.ToArray ());
+                                foreach (IScene scene in GetScenes (commands [cmdToExecute]))
+                                    fn (scene, cmdList.ToArray ());
                             }
-
-                            if (commands.ContainsKey (cmdToExecute)) {
-                                foreach (CommandDelegate fn in commands [cmdToExecute].fn.Where (fn => fn != null)) {
-                                    cmdList = new List<string> (commandPath);
-                                    cmdList.AddRange (commandOptions);
-                                    foreach (IScene scene in GetScenes (commands [cmdToExecute]))
-                                        fn (scene, cmdList.ToArray ());
-                                }
-                                return new string [0];
-                            }
-                            MainConsole.Instance.Warn (" Sorry.. missed that...");
-
+                            return new string [0];
                         }
+                        MainConsole.Instance.Warn (" Sorry.. missed that...");
                     }
                 }
 
@@ -375,17 +375,17 @@ namespace WhiteCore.Framework.ConsoleFramework
                         if (!_ConsoleIsCaseSensitive) {
                             cmdToExecute = cmdToExecute.ToLower ();
                         }
-                        //Its down the tree somewhere
+                        // Its down the tree somewhere
                         CommandSet downTheTree;
                         if (commandsets.TryGetValue (cmdToExecute, out downTheTree)) {
                             return downTheTree.FindCommands (commandPath);
-                        } else {
-                            //See if this is part of a word, and if it is part of a word, execute it
-                            foreach (
-                                KeyValuePair<string, CommandSet> cmd in
-                                    commandsets.Where (cmd => cmd.Key.StartsWith (cmdToExecute, StringComparison.Ordinal))) {
-                                return cmd.Value.FindCommands (commandPath);
-                            }
+                        }
+
+                        // See if this is part of a word, and if it is part of a word, execute it
+                        foreach (
+                            KeyValuePair<string, CommandSet> cmd in
+                                commandsets.Where (cmd => cmd.Key.StartsWith (cmdToExecute, StringComparison.Ordinal))) {
+                            return cmd.Value.FindCommands (commandPath);
                         }
                     }
                 }
