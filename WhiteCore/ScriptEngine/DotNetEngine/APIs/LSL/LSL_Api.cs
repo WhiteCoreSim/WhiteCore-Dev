@@ -6758,28 +6758,22 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             UUID key = new UUID();
             if (UUID.TryParse(id, out key))
             {
-                try
-                {
-                    IScenePresence presence = World.GetScenePresence(key);
-                    IParcelManagementModule parcelManagement = World.RequestModuleInterface<IParcelManagementModule>();
-                    if (presence != null) // object is an avatar
-                    {
-                        if (parcelManagement != null)
-                        {
-                            if (m_host.OwnerID
-                                == parcelManagement.GetLandObject(
-                                presence.AbsolutePosition.X, presence.AbsolutePosition.Y).LandData.OwnerID)
+                try {
+                    IScenePresence presence = World.GetScenePresence (key);
+                    IParcelManagementModule parcelManagement = World.RequestModuleInterface<IParcelManagementModule> ();
+                    if (presence != null) {     // object is an avatar
+
+                        if (parcelManagement != null) {
+                            if (m_host.OwnerID == parcelManagement.GetLandObject (presence.AbsolutePosition.X,
+                                                                                  presence.AbsolutePosition.Y).LandData.OwnerID)
                                 return 1;
                         }
-                        else // object is not an avatar
-                        {
-                            ISceneChildEntity obj = World.GetSceneObjectPart(key);
-                            if (obj != null)
-                                if (parcelManagement != null)
-                                {
-                                    if (m_host.OwnerID == parcelManagement.GetLandObject(obj.AbsolutePosition.X, obj.AbsolutePosition.Y).LandData.OwnerID)
-                                        return 1;
-                                }
+                    } else {                    // object is not an avatar
+                        ISceneChildEntity obj = World.GetSceneObjectPart (key);
+                        if (obj != null && parcelManagement != null) {
+                            if (m_host.OwnerID == parcelManagement.GetLandObject (obj.AbsolutePosition.X,
+                                                                                  obj.AbsolutePosition.Y).LandData.OwnerID)
+                                return 1;
                         }
                     }
                 }

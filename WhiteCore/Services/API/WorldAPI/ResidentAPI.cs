@@ -84,21 +84,31 @@ namespace WhiteCore.Services.API
             UserInfo userinfo;
             OSDMap resp = new OSDMap ();
             bool usr_verified = userAcct.Valid;
+
             resp ["Verified"] = OSD.FromBoolean (usr_verified);
+            resp ["UUID"] = OSD.FromUUID (userAcct.PrincipalID);
+            resp ["Email"] = OSD.FromString (userAcct.Email);
+            resp ["Name"] = OSD.FromString (userAcct.Name);
+            resp ["FirstName"] = OSD.FromString (userAcct.FirstName);
+            resp ["LastName"] = OSD.FromString (userAcct.LastName);
+
+            // just some defaults
+            resp ["HomeUUID"] = OSD.FromUUID (UUID.Zero);
+            resp ["HomeName"] = OSD.FromString ("");
+            resp ["Online"] = OSD.FromBoolean (false);
+ 
+
             if (verified) {
                 userinfo = agentService.GetUserInfo (uuid);
+                if (userinfo != null) {
+                     resp ["HomeUUID"] = OSD.FromUUID (userinfo.HomeRegionID);
+                     resp ["Online"] = OSD.FromBoolean (userinfo.IsOnline);
+                }
                 IGridService gs = m_registry.RequestModuleInterface<IGridService> ();
-                if (gs != null && userinfo != null) {
+                if (gs != null) {
                     GridRegion gr = gs.GetRegionByUUID (null, userinfo.HomeRegionID);
                     if (gr != null) {
-                        resp ["UUID"] = OSD.FromUUID (userAcct.PrincipalID);
-                        resp ["HomeUUID"] = OSD.FromUUID ((userinfo == null) ? UUID.Zero : userinfo.HomeRegionID);
-                        resp ["HomeName"] = OSD.FromString ((userinfo == null) ? "" : gr.RegionName);
-                        resp ["Online"] = OSD.FromBoolean ((userinfo == null) ? false : userinfo.IsOnline);
-                        resp ["Email"] = OSD.FromString (userAcct.Email);
-                        resp ["Name"] = OSD.FromString (userAcct.Name);
-                        resp ["FirstName"] = OSD.FromString (userAcct.FirstName);
-                        resp ["LastName"] = OSD.FromString (userAcct.LastName);
+                        resp ["HomeName"] = OSD.FromString (gr.RegionName);
                     }
                 }
             }
@@ -191,6 +201,8 @@ namespace WhiteCore.Services.API
                 userInfo ["UserFlags"] = acc.UserFlags;
                 users.Add (userInfo);
             }
+            accounts.Clear ();
+
             resp ["Users"] = users;
 
             resp ["Start"] = OSD.FromInteger (start);
@@ -216,7 +228,7 @@ namespace WhiteCore.Services.API
                 return resp;
             }
 
-            List<FriendInfo> friendsList = new List<FriendInfo> (friendService.GetFriends (map ["UserID"].AsUUID ()));
+            List<FriendInfo> friendsList = friendService.GetFriends (map ["UserID"].AsUUID ());
             OSDArray friends = new OSDArray (friendsList.Count);
             foreach (FriendInfo friendInfo in friendsList) {
                 UserAccount userAcct = m_registry.RequestModuleInterface<IUserAccountService> ().GetUserAccount (null, UUID.Parse (friendInfo.Friend));
@@ -229,6 +241,7 @@ namespace WhiteCore.Services.API
             }
 
             resp ["Friends"] = friends;
+            friendsList.Clear ();
 
             return resp;
         }

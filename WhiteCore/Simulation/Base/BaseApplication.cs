@@ -196,11 +196,14 @@ namespace WhiteCore.Simulation.Base
                     requested = true;
 
                 }
+
+                // unless reset, exit
+                if (!requested) {
+                    return;
+                }
+
             }
 
-            if (!requested) {
-                return;
-            }
 
             // Start of configuration
             Console.ForegroundColor = ConsoleColor.Red;

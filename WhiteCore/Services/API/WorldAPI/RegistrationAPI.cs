@@ -108,15 +108,16 @@ namespace WhiteCore.Services.API
             IAgentInfoService agentInfoService = m_registry.RequestModuleInterface<IAgentInfoService> ();
             IGridService gridService = m_registry.RequestModuleInterface<IGridService> ();
             if (agentInfoService != null && gridService != null) {
-                GridRegion r = gridService.GetRegionByName (null, HomeRegion);
-                if (r != null) {
+                GridRegion rgn = gridService.GetRegionByName (null, HomeRegion);
+                if (rgn != null) {
                     agentInfoService.SetHomePosition (userAcct.PrincipalID.ToString (),
-                                                      r.RegionID,
-                                                      new Vector3 (r.RegionSizeX / 2, r.RegionSizeY / 2, 20),
+                                                      rgn.RegionID,
+                                                      new Vector3 (rgn.RegionSizeX / 2, rgn.RegionSizeY / 2, 20),
                                                       Vector3.Zero);
                 } else {
                     MainConsole.Instance.DebugFormat ("[API]: Could not set home position for user {0}, region \"{1}\" did not produce a result from the grid service", Name, HomeRegion);
                 }
+                rgn = null; // no longer needed
             }
 
             Verified = userAcct.Valid;

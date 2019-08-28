@@ -715,6 +715,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             if (regions.Count > 0)
             {
                 GridRegion regInfo = regions[0];
+                regions.Clear ();
 
                 ulong regionHandle = regInfo.RegionHandle;
                 return TeleportAgent(m_host.OwnerID, regionHandle,
@@ -2756,12 +2757,12 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             // invited agent has to be present in this scene
 
             member = null;
-            groupsModule = null;
 
             if (World.GetScenePresence(agent) == null) 
                 return ScriptBaseClass.FALSE;
             
             groupsModule.InviteGroup(null, m_host.OwnerID, m_host.GroupID, agent, UUID.Zero);
+            groupsModule = null;
 
             return ScriptBaseClass.TRUE;
         }
