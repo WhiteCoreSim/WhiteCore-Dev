@@ -38,26 +38,26 @@ namespace WhiteCore.Services.DataService
 {
     public class LocalAvatarConnector : IAvatarData
     {
-        IGenericData GD;
+        IGenericData m_GD;
         string m_realm = "user_appearance";
         readonly object m_lock = new object ();
 
         #region IAvatarData Members
 
-        public void Initialize (IGenericData GenericData, IConfigSource source, IRegistryCore simBase,
+        public void Initialize (IGenericData genericData, IConfigSource source, IRegistryCore simBase,
                                string defaultConnectionString)
         {
             if (source.Configs ["WhiteCoreConnectors"].GetString ("AvatarConnector", "LocalConnector") != "LocalConnector")
                 return;
 
-            GD = GenericData;
+            m_GD = genericData;
 
             string connectionString = defaultConnectionString;
             if (source.Configs [Name] != null)
                 connectionString = source.Configs [Name].GetString ("ConnectionString", defaultConnectionString);
 
-            if (GD != null)
-                GD.ConnectToDatabase (connectionString, "Avatars",
+            if (m_GD != null)
+                m_GD.ConnectToDatabase (connectionString, "Avatars",
                                      source.Configs ["WhiteCoreConnectors"].GetBoolean ("ValidateTables", true));
 
             Framework.Utilities.DataManager.RegisterPlugin (this);
@@ -73,43 +73,44 @@ namespace WhiteCore.Services.DataService
         {
         }
 
-        public AvatarAppearance Get (UUID PrincipalID)
+        public AvatarAppearance Get (UUID principalID)
         {
             QueryFilter filter = new QueryFilter ();
-            filter.andFilters ["PrincipalID"] = PrincipalID;
+            filter.andFilters ["PrincipalID"] = principalID;
             List<string> data;
             lock (m_lock) {
-                data = GD.Query (new string [] { "Appearance" }, m_realm, filter, null, null, null);
+                data = m_GD.Query (new string [] { "Appearance" }, m_realm, filter, null, null, null);
             }
             if (data.Count == 0)
                 return null;
-            
+
             AvatarAppearance appearance = new AvatarAppearance ();
             appearance.FromOSD ((OSDMap)OSDParser.DeserializeJson (data [0]));
 
             return appearance;
         }
 
-        public bool Store (UUID PrincipalID, AvatarAppearance data)
+        public bool Store (UUID principalID, AvatarAppearance data)
         {
             lock (m_lock) {
                 QueryFilter filter = new QueryFilter ();
-                filter.andFilters ["PrincipalID"] = PrincipalID;
+                filter.andFilters ["PrincipalID"] = principalID;
                 Dictionary<string, object> values = new Dictionary<string, object> ();
-                values.Add ("PrincipalID", PrincipalID);
+                values.Add ("PrincipalID", principalID);
                 values.Add ("Appearance", OSDParser.SerializeJsonString (data.ToOSD ()));
-                GD.Replace (m_realm, values);
+                m_GD.Replace (m_realm, values);
             }
+
             return true;
         }
 
-        public bool Delete (UUID PrincipalID)
+        public bool Delete (UUID principalID)
         {
             lock (m_lock) {
                 QueryFilter filter = new QueryFilter ();
-                filter.andFilters ["PrincipalID"] = PrincipalID;
+                filter.andFilters ["PrincipalID"] = principalID;
 
-                return GD.Delete (m_realm, filter);
+                return m_GD.Delete (m_realm, filter);
             }
         }
     }

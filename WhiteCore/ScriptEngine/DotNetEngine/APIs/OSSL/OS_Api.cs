@@ -712,9 +712,10 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
 
             List<GridRegion> regions = World.GridService.GetRegionsByName(World.RegionInfo.AllScopeIDs, regionName, 0, 1);
             // Try to link the region
-            if (regions != null && regions.Count > 0)
+            if (regions.Count > 0)
             {
                 GridRegion regInfo = regions[0];
+                regions.Clear ();
 
                 ulong regionHandle = regInfo.RegionHandle;
                 return TeleportAgent(m_host.OwnerID, regionHandle,
@@ -762,7 +763,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
                 List<GridRegion> regions = World.GridService.GetRegionsByName(World.RegionInfo.AllScopeIDs, regionName,
                                                                               0, 1);
                 // Try to link the region
-                if (regions != null && regions.Count > 0)
+                if (regions.Count > 0)
                 {
                     GridRegion regInfo = regions[0];
 
@@ -2204,16 +2205,12 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.Low, "osAvatarName2Key", m_host, "OSSL", m_itemID))
                 return "";
 
-            UserAccount account = World.UserAccountService.GetUserAccount(World.RegionInfo.AllScopeIDs,
+            UserAccount userAcct = World.UserAccountService.GetUserAccount(World.RegionInfo.AllScopeIDs,
                                                                           firstname + " " + lastname);
-            if (null == account)
-            {
-                return UUID.Zero.ToString();
+            if (!userAcct.Valid) {
+                return UUID.Zero.ToString ();
             }
-            else
-            {
-                return account.PrincipalID.ToString();
-            }
+            return userAcct.PrincipalID.ToString ();
         }
 
         public string osKey2Name(string id)
@@ -2221,22 +2218,14 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.Low, "osKey2Name", m_host, "OSSL", m_itemID)) return "";
             UUID key = new UUID();
 
-            if (UUID.TryParse(id, out key))
-            {
-                UserAccount account = World.UserAccountService.GetUserAccount(World.RegionInfo.AllScopeIDs, key);
-                if (account != null)
-                {
-                    return account.Name;                    
+            if (UUID.TryParse (id, out key)) {
+                UserAccount keyAcct = World.UserAccountService.GetUserAccount (World.RegionInfo.AllScopeIDs, key);
+                if (keyAcct.Valid) {
+                    return keyAcct.Name;
                 }
-                else
-                {
-                    return "";
-                }
-            }
-            else
-            {
                 return "";
             }
+            return "";
         }
 
         /// Threat level is Moderate because intentional abuse, for instance
@@ -2681,6 +2670,11 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
 
             //It takes care of permission checks in the module
             m_groupData.AddAgentToGroup(m_host.OwnerID, UUID.Parse(AgentID.m_string), groupRecord.GroupID, roleID);
+
+            // clean up
+            groupRecord = null;
+            roles = null;
+
             return 1;
         }
 
@@ -2746,18 +2740,30 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             UUID agent = new UUID((string) agentId);
             // groups module is required
             IGroupsModule groupsModule = World.RequestModuleInterface<IGroupsModule>();
-            if (groupsModule == null) return ScriptBaseClass.FALSE;
+            if (groupsModule == null) 
+                return ScriptBaseClass.FALSE;
+            
             // object has to be set to a group, but not group owned
-            if (m_host.GroupID == UUID.Zero || m_host.GroupID == m_host.OwnerID) return ScriptBaseClass.FALSE;
+            if (m_host.GroupID == UUID.Zero || m_host.GroupID == m_host.OwnerID)
+                return ScriptBaseClass.FALSE;
+
             // object owner has to be in that group and required permissions
             GroupMembershipData member = groupsModule.GetMembershipData(m_host.GroupID, m_host.OwnerID);
-            if (member == null || (member.GroupPowers & (ulong) GroupPowers.Invite) == 0) return ScriptBaseClass.FALSE;
+            if (member == null || (member.GroupPowers & (ulong) GroupPowers.Invite) == 0) 
+                return ScriptBaseClass.FALSE;
             // check if agent is in that group already
             //member = groupsModule.GetMembershipData(agent, m_host.GroupID, agent);
             //if (member != null) return ScriptBaseClass.FALSE;
             // invited agent has to be present in this scene
-            if (World.GetScenePresence(agent) == null) return ScriptBaseClass.FALSE;
+
+            member = null;
+
+            if (World.GetScenePresence(agent) == null) 
+                return ScriptBaseClass.FALSE;
+            
             groupsModule.InviteGroup(null, m_host.OwnerID, m_host.GroupID, agent, UUID.Zero);
+            groupsModule = null;
+
             return ScriptBaseClass.TRUE;
         }
 
@@ -2774,17 +2780,28 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             UUID agent = new UUID((string) agentId);
             // groups module is required
             IGroupsModule groupsModule = World.RequestModuleInterface<IGroupsModule>();
-            if (groupsModule == null) return ScriptBaseClass.FALSE;
+            if (groupsModule == null) 
+                return ScriptBaseClass.FALSE;
+
             // object has to be set to a group, but not group owned
-            if (m_host.GroupID == UUID.Zero || m_host.GroupID == m_host.OwnerID) return ScriptBaseClass.FALSE;
+            if (m_host.GroupID == UUID.Zero || m_host.GroupID == m_host.OwnerID) 
+                return ScriptBaseClass.FALSE;
+
             // object owner has to be in that group and required permissions
             GroupMembershipData member = groupsModule.GetMembershipData(m_host.GroupID, m_host.OwnerID);
-            if (member == null || (member.GroupPowers & (ulong) GroupPowers.Eject) == 0) return ScriptBaseClass.FALSE;
+            if (member == null || (member.GroupPowers & (ulong) GroupPowers.Eject) == 0) 
+                return ScriptBaseClass.FALSE;
+
             // agent has to be in that group
             //member = groupsModule.GetMembershipData(agent, m_host.GroupID, agent);
             //if (member == null) return ScriptBaseClass.FALSE;
             // ejectee can be offline
             groupsModule.EjectGroupMember(null, m_host.OwnerID, m_host.GroupID, agent);
+
+            // clean up
+            member = null;
+            groupsModule = null;
+
             return ScriptBaseClass.TRUE;
         }
 

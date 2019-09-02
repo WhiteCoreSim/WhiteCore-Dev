@@ -26,29 +26,28 @@
  */
 
 
+using Nini.Config;
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.PresenceInfo;
 using WhiteCore.Framework.SceneInfo;
 using WhiteCore.Framework.Services;
-using Nini.Config;
 
 namespace WhiteCore.Services
 {
     public class AuthorizationService : IAuthorizationService, IService
     {
-        private IRegistryCore m_registry;
+        IRegistryCore m_registry;
 
         #region IAuthorizationService Members
 
-        public bool IsAuthorizedForRegion(GridRegion region, AgentCircuitData agent, bool isRootAgent, out string reason)
+        public bool IsAuthorizedForRegion (GridRegion region, AgentCircuitData agent, bool isRootAgent, out string reason)
         {
-            ISceneManager manager = m_registry.RequestModuleInterface<ISceneManager>();
-            IScene scene = manager == null ? null : manager.Scenes.Find((s) => s.RegionInfo.RegionID == region.RegionID);
-            if (scene != null)
-            {
-                //Found the region, check permissions
-                return scene.Permissions.AllowedIncomingAgent(agent, isRootAgent, out reason);
+            ISceneManager manager = m_registry.RequestModuleInterface<ISceneManager> ();
+            IScene scene = manager == null ? null : manager.Scenes.Find ((s) => s.RegionInfo.RegionID == region.RegionID);
+            if (scene != null) {
+                // Found the region, check permissions
+                return scene.Permissions.AllowedIncomingAgent (agent, isRootAgent, out reason);
             }
             reason = "Not Authorized as region does not exist.";
             return false;
@@ -58,19 +57,19 @@ namespace WhiteCore.Services
 
         #region IService Members
 
-        public void Initialize(IConfigSource config, IRegistryCore registry)
+        public void Initialize (IConfigSource config, IRegistryCore registry)
         {
-            registry.RegisterModuleInterface<IAuthorizationService>(this);
+            registry.RegisterModuleInterface<IAuthorizationService> (this);
             m_registry = registry;
 
-            MainConsole.Instance.Debug("[AuthorizationService]: Local Authorization service enabled");
+            MainConsole.Instance.Debug ("[AuthorizationService]: Local Authorization service enabled");
         }
 
-        public void Start(IConfigSource config, IRegistryCore registry)
+        public void Start (IConfigSource config, IRegistryCore registry)
         {
         }
 
-        public void FinishedStartup()
+        public void FinishedStartup ()
         {
         }
 

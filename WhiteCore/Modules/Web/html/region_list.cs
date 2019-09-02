@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright (c) Contributors, http://whitecore-sim.org/
  * See CONTRIBUTORS.TXT for a full list of copyright holders.
  *
@@ -67,7 +67,7 @@ namespace WhiteCore.Modules.Web
 
 
             var regionData = Framework.Utilities.DataManager.RequestPlugin<IRegionData> ();
-            var regions = regionData.Get ((RegionFlags) 0,
+            var regions = regionData.GetList ((RegionFlags) 0,
                                           RegionFlags.Hyperlink | RegionFlags.Foreign | RegionFlags.Hidden,
                                           null, null, sortBy);
             foreach (var region in regions) {

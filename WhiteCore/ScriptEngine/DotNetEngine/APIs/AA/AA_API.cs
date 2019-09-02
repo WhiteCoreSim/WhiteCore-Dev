@@ -540,12 +540,12 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "aaAvatarFullName2Key", m_host, "AA", m_itemID))
                 return new LSL_String ();
 
-            UserAccount account = World.UserAccountService.GetUserAccount (World.RegionInfo.AllScopeIDs, fullname);
+            UserAccount userAcct = World.UserAccountService.GetUserAccount (World.RegionInfo.AllScopeIDs, fullname);
 
-            if (null == account)
+            if (!userAcct.Valid)
                 return UUID.Zero.ToString ();
 
-            return account.PrincipalID.ToString ();
+            return userAcct.PrincipalID.ToString ();
         }
 
         public void aaSetEnv (LSL_String name, LSL_List value)
@@ -637,9 +637,9 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
         public string resolveName (UUID objecUUID)
         {
             // try avatar username surname
-            UserAccount account = World.UserAccountService.GetUserAccount (World.RegionInfo.AllScopeIDs, objecUUID);
-            if (account != null)
-                return account.Name;
+            UserAccount userAcct = World.UserAccountService.GetUserAccount (World.RegionInfo.AllScopeIDs, objecUUID);
+            if (userAcct.Valid)
+                return userAcct.Name;
 
             // try an scene object
             ISceneChildEntity sceneObjP = World.GetSceneObjectPart (objecUUID);

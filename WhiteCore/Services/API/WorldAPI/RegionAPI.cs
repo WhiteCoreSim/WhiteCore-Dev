@@ -71,7 +71,7 @@ namespace WhiteCore.Services.API
                 }
             }
 
-            List<GridRegion> regions = regiondata.Get (type, sort);
+            List<GridRegion> regions = regiondata.GetList (type, sort);
             OSDArray Regions = new OSDArray ();
             if (start < regions.Count) {
                 int i = 0;
@@ -99,7 +99,9 @@ namespace WhiteCore.Services.API
                 if (regionID != UUID.Zero) {
                     region = regiondata.Get (regionID, null);
                 } else if (regionName != string.Empty) {
-                    region = regiondata.Get (regionName, null, null, null) [0];
+                    var regionList = regiondata.GetList (regionName, null, null, null);
+                    if (regionList.Count > 0)
+                        region = regionList [0];
                 }
                 if (region != null) {
                     resp ["Region"] = region.ToOSD ();

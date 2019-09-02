@@ -38,20 +38,20 @@ namespace WhiteCore.Services.DataService
 {
     public class LocalEmailMessagesConnector : ConnectorBase, IEmailConnector
     {
-        IGenericData GD;
+        IGenericData genData;
 
         #region IEmailConnector Members
 
-        public void Initialize (IGenericData GenericData, IConfigSource source, IRegistryCore simBase,
+        public void Initialize (IGenericData genericData, IConfigSource source, IRegistryCore simBase,
                                string defaultConnectionString)
         {
-            GD = GenericData;
+            genData = genericData;
 
             if (source.Configs [Name] != null)
                 defaultConnectionString = source.Configs [Name].GetString ("ConnectionString", defaultConnectionString);
 
-            if (GD != null)
-                GD.ConnectToDatabase (defaultConnectionString, "Generics",
+            if (genData != null)
+                genData.ConnectToDatabase (defaultConnectionString, "Generics",
                                      source.Configs ["WhiteCoreConnectors"].GetBoolean ("ValidateTables", true));
 
             Framework.Utilities.DataManager.RegisterPlugin (Name + "Local", this);
@@ -80,8 +80,8 @@ namespace WhiteCore.Services.DataService
             }
 
             //Get all the messages
-            List<Email> emails = GenericUtils.GetGenerics<Email> (objectID, "Emails", GD);
-            GenericUtils.RemoveGenericByType (objectID, "Emails", GD);
+            List<Email> emails = GenericUtils.GetGenerics<Email> (objectID, "Emails", genData);
+            GenericUtils.RemoveGenericByType (objectID, "Emails", genData);
             return emails;
         }
 
@@ -98,7 +98,7 @@ namespace WhiteCore.Services.DataService
             }
 
             GenericUtils.AddGeneric (email.toPrimID, "Emails", UUID.Random ().ToString (),
-                                    email.ToOSD (), GD);
+                                    email.ToOSD (), genData);
         }
 
         #endregion

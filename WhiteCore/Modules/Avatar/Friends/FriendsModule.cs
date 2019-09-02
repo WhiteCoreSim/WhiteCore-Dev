@@ -316,13 +316,13 @@ namespace WhiteCore.Modules.Friends
             im.SessionID = im.FromAgentID;
 
             // Try the local sim
-            UserAccount account = UserAccountService.GetUserAccount (m_scene.RegionInfo.AllScopeIDs, agentID);
-            im.FromAgentName = (account == null) ? "Unknown" : account.Name;
+            UserAccount userAcct = UserAccountService.GetUserAccount (m_scene.RegionInfo.AllScopeIDs, agentID);
+            im.FromAgentName = userAcct.Name;
 
             if (LocalFriendshipOffered (friendID, im))
                 return;
 
-            // The prospective friend is not here [as root]. Let's4 forward.
+            // The prospective friend is not here [as root]. Let's forward.
             SyncMessagePosterService.PostToServer (SyncMessageHelper.FriendshipOffered (agentID, friendID, im,
                 m_scene.RegionInfo.RegionID));
             // If the prospective friend is not online, they will get the message upon login.
@@ -349,11 +349,11 @@ namespace WhiteCore.Modules.Friends
             ICallingCardModule ccmodule = client.Scene.RequestModuleInterface<ICallingCardModule> ();
             if (ccmodule != null)
             {
-                UserAccount account = client.Scene.UserAccountService.GetUserAccount (client.AllScopeIDs, friendID);
+                UserAccount userAcct = client.Scene.UserAccountService.GetUserAccount (client.AllScopeIDs, friendID);
                 UUID folderID =
                     client.Scene.InventoryService.GetFolderForType (agentID, InventoryType.Unknown, FolderType.CallingCard).ID;
-                if (account != null)
-                    ccmodule.CreateCallingCard (client, friendID, folderID, account.Name);
+                if (userAcct.Valid)
+                    ccmodule.CreateCallingCard (client, friendID, folderID, userAcct.Name);
             }
 
             // Try Local
@@ -369,7 +369,7 @@ namespace WhiteCore.Modules.Friends
 
 
             var friendRequests = FriendsService.GetFriendsRequest (agentID);
-            if (friendRequests == null)
+            if (friendRequests.Count == 0)
                 return;
 
             FriendInfo [] friends = friendRequests.ToArray ();
@@ -466,7 +466,7 @@ namespace WhiteCore.Modules.Friends
         {
             UUID agentID = client.AgentId;
             var friendRequests = FriendsService.GetFriendsRequest (agentID);
-            if (friendRequests == null)
+            if (friendRequests.Count == 0)
                 return;
 
             FriendInfo [] friends = friendRequests.ToArray ();
@@ -485,11 +485,10 @@ namespace WhiteCore.Modules.Friends
                     if (!UUID.TryParse (fi.Friend, out fromAgentID))
                         continue;
 
-                    UserAccount account = m_scene.UserAccountService.GetUserAccount (
+                    UserAccount userAcct = m_scene.UserAccountService.GetUserAccount (
                                               client.Scene.RegionInfo.AllScopeIDs, fromAgentID);
                     im.FromAgentID = fromAgentID;
-                    if (account != null)
-                        im.FromAgentName = account.Name;
+                    im.FromAgentName = userAcct.Name;
                     im.Offline = 1;
                     im.SessionID = im.FromAgentID;
 
@@ -525,7 +524,7 @@ namespace WhiteCore.Modules.Friends
             IClientAPI friendClient = LocateClientObject (friendID);
             if (friendClient != null)
             {
-                //They are online, send the online message
+                // They are online, send the online message
                 if (us != null) {
                     us.SendAgentOnline (new [] { friendID });
 
@@ -551,11 +550,11 @@ namespace WhiteCore.Modules.Friends
                 ICallingCardModule ccmodule = friendClient.Scene.RequestModuleInterface<ICallingCardModule> ();
                 if (ccmodule != null)
                 {
-                    UserAccount account = friendClient.Scene.UserAccountService.GetUserAccount (friendClient.AllScopeIDs,
+                    UserAccount userAcct = friendClient.Scene.UserAccountService.GetUserAccount (friendClient.AllScopeIDs,
                                               userID);
                     UUID folderID =
                         friendClient.Scene.InventoryService.GetFolderForType (friendID, InventoryType.Unknown, FolderType.CallingCard).ID;
-                    ccmodule.CreateCallingCard (friendClient, userID, folderID, account.Name);
+                    ccmodule.CreateCallingCard (friendClient, userID, folderID, userAcct.Name);
                 }
                 // we're done
                 return true;

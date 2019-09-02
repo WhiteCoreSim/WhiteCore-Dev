@@ -37,26 +37,26 @@ namespace WhiteCore.Services.DataService
 {
     public class LocalFriendsConnector : IFriendsData
     {
-        IGenericData GD;
+        IGenericData m_GD;
         string m_realm = "friends";
 
         #region IFriendsData Members
 
-        public void Initialize (IGenericData GenericData, IConfigSource source, IRegistryCore simBase,
+        public void Initialize (IGenericData genericData, IConfigSource source, IRegistryCore simBase,
                                string defaultConnectionString)
         {
             if (source.Configs ["WhiteCoreConnectors"].GetString ("FriendsConnector", "LocalConnector") != "LocalConnector")
                 return;
 
 
-            GD = GenericData;
+            m_GD = genericData;
 
             string connectionString = defaultConnectionString;
             if (source.Configs [Name] != null)
                 connectionString = source.Configs [Name].GetString ("ConnectionString", defaultConnectionString);
 
-            if (GD != null)
-                GD.ConnectToDatabase (connectionString, "Friends",
+            if (m_GD != null)
+                m_GD.ConnectToDatabase (connectionString, "Friends",
                                      source.Configs ["WhiteCoreConnectors"].GetBoolean ("ValidateTables", true));
 
             Framework.Utilities.DataManager.RegisterPlugin (this);
@@ -66,19 +66,21 @@ namespace WhiteCore.Services.DataService
             get { return "IFriendsData"; }
         }
 
-        public bool Store (UUID PrincipalID, string Friend, int Flags, int Offered)
+        public bool Store (UUID principalID, string friend, int flags, int offered)
         {
             QueryFilter filter = new QueryFilter ();
-            filter.andFilters ["PrincipalID"] = PrincipalID;
-            filter.andFilters ["Friend"] = Friend;
-            GD.Delete (m_realm, filter);
-            Dictionary<string, object> row = new Dictionary<string, object> (4);
-            row ["PrincipalID"] = PrincipalID;
-            row ["Friend"] = Friend;
-            row ["Flags"] = Flags;
-            row ["Offered"] = Offered;
+            filter.andFilters ["PrincipalID"] = principalID;
+            filter.andFilters ["Friend"] = friend;
 
-            return GD.Insert (m_realm, row);
+            m_GD.Delete (m_realm, filter);
+
+            Dictionary<string, object> row = new Dictionary<string, object> (4);
+            row ["PrincipalID"] = principalID;
+            row ["Friend"] = friend;
+            row ["Flags"] = flags;
+            row ["Offered"] = offered;
+
+            return m_GD.Insert (m_realm, row);
         }
 
         public bool Delete (UUID ownerID, string friend)
@@ -87,7 +89,7 @@ namespace WhiteCore.Services.DataService
             filter.andFilters ["PrincipalID"] = ownerID;
             filter.andFilters ["Friend"] = friend;
 
-            return GD.Delete (m_realm, filter);
+            return m_GD.Delete (m_realm, filter);
         }
 
         public FriendInfo [] GetFriends (UUID principalID)
@@ -100,14 +102,14 @@ namespace WhiteCore.Services.DataService
                             new [,] { { "my.Friend", "his.PrincipalID" }, { "my.PrincipalID", "his.Friend" } });
             QueryFilter filter = new QueryFilter ();
             filter.andFilters ["my.PrincipalID"] = principalID;
-            List<string> query = GD.Query (new string []
+            List<string> query = m_GD.Query (new string []
                                               {
                                                   "my.Friend",
                                                   "my.Flags",
                                                   "his.Flags"
                                               }, tables, filter, null, null, null);
 
-            //These are used to get the other flags below
+            // These are used to get the other flags below
 
             for (int i = 0; i < query.Count; i += 3) {
                 FriendInfo info = new FriendInfo {
@@ -131,14 +133,13 @@ namespace WhiteCore.Services.DataService
             QueryFilter filter = new QueryFilter ();
             filter.andFilters ["my.PrincipalID"] = principalID;
             filter.andFilters ["my.Flags"] = 0;
-            List<string> query = GD.Query (new string []
+            List<string> query = m_GD.Query (new string []
                                               {
                                                   "my.Friend",
                                                   "my.Flags",
                                               }, tables, filter, null, null, null);
 
-            //These are used to get the other flags below
-
+            // These are used to get the other flags below
             for (int i = 0; i < query.Count; i += 2) {
                 FriendInfo info = new FriendInfo {
                     PrincipalID = principalID,

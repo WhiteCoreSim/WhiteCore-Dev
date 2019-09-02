@@ -279,14 +279,14 @@ namespace WhiteCore.Modules.Estate
         protected void UnBanUser (IScene scene, string [] cmdparams)
         {
             string userName = MainConsole.Instance.Prompt ("User name:", "");
-            UserAccount account = scene.UserAccountService.GetUserAccount (null, userName);
-            if (account == null) {
+            UserAccount userAcct = scene.UserAccountService.GetUserAccount (null, userName);
+            if (!userAcct.Valid) {
                 MainConsole.Instance.Warn ("Could not find user");
                 return;
             }
 
             EstateSettings ES = scene.RegionInfo.EstateSettings;
-            ES.RemoveBan (account.PrincipalID);
+            ES.RemoveBan (userAcct.PrincipalID);
             Framework.Utilities.DataManager.RequestPlugin<IEstateConnector> ().
                 SaveEstateSettings (ES);
         }
@@ -359,9 +359,9 @@ namespace WhiteCore.Modules.Estate
             }
 
 
-            var account = m_scene.UserAccountService.GetUserAccount (null, firstname, lastname);
-            if (account != null) {
-                var userID = account.PrincipalID;
+            var userAcct = m_scene.UserAccountService.GetUserAccount (null, firstname, lastname);
+            if (userAcct.Valid) {
+                var userID = userAcct.PrincipalID;
 
                 if (setcmd == "AddEstateBan".ToLower ()) {
                     EstateBan EB = new EstateBan { BannedUserID = userID };
@@ -519,10 +519,10 @@ namespace WhiteCore.Modules.Estate
                                        out Vector3 newPosition, out string reason)
         {
             newPosition = position;
-            UserAccount account = scene.UserAccountService.GetUserAccount (scene.RegionInfo.AllScopeIDs, userID);
+            UserAccount userAcct = scene.UserAccountService.GetUserAccount (scene.RegionInfo.AllScopeIDs, userID);
 
             IScenePresence Sp = scene.GetScenePresence (userID);
-            if (account == null) {
+            if (!userAcct.Valid) {
                 reason = "Failed authentication.";
                 return false; //NO!
             }
@@ -763,8 +763,8 @@ namespace WhiteCore.Modules.Estate
 
 
             if ((ILO.LandData.Flags & (int)ParcelFlags.DenyAnonymous) != 0) {
-                if (account != null &&
-                    (account.UserFlags & (int)IUserProfileInfo.ProfileFlags.NoPaymentInfoOnFile) ==
+                if (userAcct.Valid &&
+                    (userAcct.UserFlags & (int)IUserProfileInfo.ProfileFlags.NoPaymentInfoOnFile) ==
                     (int)IUserProfileInfo.ProfileFlags.NoPaymentInfoOnFile) {
                     reason = "You may not enter this region.";
                     return false;
@@ -796,8 +796,8 @@ namespace WhiteCore.Modules.Estate
         {
             #region Incoming Agent Checks
 
-            UserAccount account = scene.UserAccountService.GetUserAccount (scene.RegionInfo.AllScopeIDs, agent.AgentID);
-            if (account == null) {
+            UserAccount userAcct = scene.UserAccountService.GetUserAccount (scene.RegionInfo.AllScopeIDs, agent.AgentID);
+            if (!userAcct.Valid) {
                 reason = "No account exists";
                 return false;
             }
@@ -808,7 +808,7 @@ namespace WhiteCore.Modules.Estate
                 return false;
             }
 
-            //Check how long its been since the last TP
+            // Check how long its been since the last TP
             if (m_enabledBlockTeleportSeconds && Sp != null && !Sp.IsChildAgent) {
                 if (timeSinceLastTeleport.ContainsKey (Sp.Scene.RegionInfo.RegionID)) {
                     if (timeSinceLastTeleport [Sp.Scene.RegionInfo.RegionID] > Util.UnixTimeSinceEpoch ()) {
@@ -820,29 +820,31 @@ namespace WhiteCore.Modules.Estate
                 ((int)(secondsBeforeNextTeleport));
             }
 
-            //Gods tp freely
-            if ((Sp != null && Sp.GodLevel != 0) || (account != null && account.UserLevel != 0)) {
+            // Gods tp freely
+            if ((Sp != null && Sp.GodLevel != 0) || (userAcct.UserLevel > 0)) {
                 reason = "";
                 return true;
             }
 
-            //Check whether they fit any ban criteria
+            // Check whether they fit any ban criteria
             if (Sp != null) {
                 foreach (string banstr in banCriteria) {
                     if (Sp.Name.Contains (banstr)) {
                         reason = "You have been banned from this region.";
                         return false;
-                    } else if (((IPEndPoint)Sp.ControllingClient.GetClientEP ()).Address.ToString ().Contains (banstr)) {
+                    }
+                    var ep = (IPEndPoint)Sp.ControllingClient.GetClientEP ();
+                    if (ep != null && ep.Address.ToString ().Contains (banstr)) {
                         reason = "You have been banned from this region.";
                         return false;
                     }
                 }
-                //Make sure they exist in the grid right now
+                // Make sure they exist in the grid right now
                 IAgentInfoService presence = scene.RequestModuleInterface<IAgentInfoService> ();
                 if (presence == null) {
                     reason = string.Format (
                         "Failed to verify user presence in the grid for {0} in region {1}. Presence service does not exist.",
-                        account.Name, scene.RegionInfo.RegionName);
+                        userAcct.Name, scene.RegionInfo.RegionName);
                     return false;
                 }
 
@@ -851,7 +853,7 @@ namespace WhiteCore.Modules.Estate
                 if (pinfo == null || (!pinfo.IsOnline && ((agent.TeleportFlags & (uint)TeleportFlags.ViaLogin) == 0))) {
                     reason = string.Format (
                         "Failed to verify user presence in the grid for {0}, access denied to region {1}.",
-                        account.Name, scene.RegionInfo.RegionName);
+                        userAcct.Name, scene.RegionInfo.RegionName);
                     return false;
                 }
             }
@@ -872,9 +874,12 @@ namespace WhiteCore.Modules.Estate
             foreach (EstateBan ban in EstateBans) {
                 if (ban.BannedUserID == agent.AgentID) {
                     if (Sp != null) {
-                        string banIP = ((IPEndPoint)Sp.ControllingClient.GetClientEP ()).Address.ToString ();
+                        var bIP = (IPEndPoint)Sp.ControllingClient.GetClientEP ();
+                        string banIP = "0.0.0.0";
+                        if (bIP != null)
+                            banIP = bIP.Address.ToString ();
 
-                        if (ban.BannedHostIPMask != banIP) //If it changed, ban them again
+                        if (ban.BannedHostIPMask != banIP) // If it changed, ban them again
                         {
                             //Add the ban with the new hostname
                             ES.AddBan (new EstateBan {
@@ -884,7 +889,7 @@ namespace WhiteCore.Modules.Estate
                                 BannedHostAddress = ban.BannedHostAddress,
                                 BannedHostNameMask = ban.BannedHostNameMask
                             });
-                            //Update the database
+                            // Update the database
                             Framework.Utilities.DataManager.RequestPlugin<IEstateConnector> ().SaveEstateSettings (ES);
                         }
                     }
@@ -937,21 +942,21 @@ namespace WhiteCore.Modules.Estate
             }
 
             if (ES.DenyAnonymous &&
-                ((account.UserFlags & (int)IUserProfileInfo.ProfileFlags.NoPaymentInfoOnFile) ==
+                ((userAcct.UserFlags & (int)IUserProfileInfo.ProfileFlags.NoPaymentInfoOnFile) ==
                 (int)IUserProfileInfo.ProfileFlags.NoPaymentInfoOnFile)) {
                 reason = "You may not enter this region.";
                 return false;
             }
 
             if (ES.DenyIdentified &&
-                ((account.UserFlags & (int)IUserProfileInfo.ProfileFlags.PaymentInfoOnFile) ==
+                ((userAcct.UserFlags & (int)IUserProfileInfo.ProfileFlags.PaymentInfoOnFile) ==
                 (int)IUserProfileInfo.ProfileFlags.PaymentInfoOnFile)) {
                 reason = "You may not enter this region.";
                 return false;
             }
 
             if (ES.DenyTransacted &&
-                ((account.UserFlags & (int)IUserProfileInfo.ProfileFlags.PaymentInfoInUse) ==
+                ((userAcct.UserFlags & (int)IUserProfileInfo.ProfileFlags.PaymentInfoInUse) ==
                 (int)IUserProfileInfo.ProfileFlags.PaymentInfoInUse)) {
                 reason = "You may not enter this region.";
                 return false;
@@ -959,7 +964,7 @@ namespace WhiteCore.Modules.Estate
 
             const long m_Day = 24 * 60 * 60; //Find out day length in seconds
             if (scene.RegionInfo.RegionSettings.MinimumAge != 0 &&
-                (account.Created - Util.UnixTimeSinceEpoch ()) < (scene.RegionInfo.RegionSettings.MinimumAge * m_Day)) {
+                (userAcct.Created - Util.UnixTimeSinceEpoch ()) < (scene.RegionInfo.RegionSettings.MinimumAge * m_Day)) {
                 reason = "You may not enter this region.";
                 return false;
             }

@@ -87,9 +87,9 @@ namespace WhiteCore.Modules.Web
 
                         if (UserName.Split (' ').Length == 2) {
                             IUserAccountService accountService = webInterface.Registry.RequestModuleInterface<IUserAccountService> ();
-                            var userAccount = accountService.GetUserAccount (null, UserName);
-                            if (userAccount != null)
-                                UserID = userAccount.PrincipalID;
+                            var userAcct = accountService.GetUserAccount (null, UserName);
+                            if (userAcct.Valid)
+                                UserID = userAcct.PrincipalID;
                         }
                     }
 

@@ -85,7 +85,7 @@ namespace WhiteCore.Modules.Web
                 vars.Add("BackOne", start - 1 < 0 ? 0 : start - 1);
 
                 var regions = gridService.GetRegionsByName(null, regionname, (uint) start, amountPerQuery);
-                if (regions != null)
+                if (regions.Count > 0)
                 {
                     noDetails = "";
 

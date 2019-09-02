@@ -340,7 +340,7 @@ namespace WhiteCore.ClientStack
                     canUseCompressed = false;
                     canUseImproved = false;
                 } else if (updateFlags.HasFlag (PrimUpdateFlags.ForcedFullUpdate)) {
-                    //If a full update has been requested, DO THE FULL UPDATE.
+                    // If a full update has been requested, DO THE FULL UPDATE.
                     // Don't try to get out of this.... the monster called RepeatObjectUpdateCachedFromTheServer will occur and eat all your prims!
                     canUseCached = false;
                     canUseCompressed = false;
@@ -374,15 +374,16 @@ namespace WhiteCore.ClientStack
                     }
                 }
 
+                // Do NOT send cached updates for terse updates
+                // ONLY send full updates for attachments unless you want to figure out all the little screwy things with sending compressed updates and attachments
+                if (entity is ISceneChildEntity && ((ISceneChildEntity)entity).IsAttachment) {
+                    canUseCached = false;
+                    canUseImproved = false;
+                    canUseCompressed = false;
+                }
+
+                // let's do it... 
                 try {
-                    //Do NOT send cached updates for terse updates
-                    //ONLY send full updates for attachments unless you want to figure out all the little screwy things with sending compressed updates and attachments
-                    if (entity is ISceneChildEntity &&
-                        ((ISceneChildEntity)entity).IsAttachment) {
-                        canUseCached = false;
-                        canUseImproved = false;
-                        canUseCompressed = false;
-                    }
 
                     if (canUseCached && !isTerse) {
                         cachedUpdates.Add (update);

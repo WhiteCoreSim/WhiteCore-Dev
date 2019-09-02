@@ -81,7 +81,7 @@ namespace WhiteCore.Framework.Servers.HttpServer
         /// Gets or sets the listen IP address.
         /// </summary>
         /// <value>The listen IP address.</value>
-        private IPAddress ListenIPAddress {
+        IPAddress ListenIPAddress {
             get { return m_listenIPAddress; }
             set { m_listenIPAddress = value; }
         }

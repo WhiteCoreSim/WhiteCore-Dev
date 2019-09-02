@@ -44,25 +44,25 @@ namespace WhiteCore.Services.DataService
 {
     public class LocalGridConnector : IRegionData
     {
-        IGenericData GD;
+        IGenericData m_GD;
         string m_realm = "gridregions";
 
         #region IRegionData Members
 
-        public void Initialize (IGenericData GenericData, IConfigSource source, IRegistryCore simBase,
+        public void Initialize (IGenericData genericData, IConfigSource source, IRegistryCore simBase,
                                string defaultConnectionString)
         {
             if (source.Configs ["WhiteCoreConnectors"].GetString ("GridConnector", "LocalConnector") != "LocalConnector")
                 return;
 
-            GD = GenericData;
+            m_GD = genericData;
 
             string connectionString = (source.Configs [Name] != null)
                 ? source.Configs [Name].GetString ("ConnectionString", defaultConnectionString)
                         : defaultConnectionString;
 
-            if (GD != null) {
-                GD.ConnectToDatabase (connectionString, "GridRegions",
+            if (m_GD != null) {
+                m_GD.ConnectToDatabase (connectionString, "GridRegions",
                                       source.Configs ["WhiteCoreConnectors"].GetBoolean ("ValidateTables", true));
 
                 Framework.Utilities.DataManager.RegisterPlugin (this);
@@ -92,7 +92,7 @@ namespace WhiteCore.Services.DataService
             QueryFilter filter = new QueryFilter ();
             filter.andFilters ["OwnerUUID"] = UUID.Zero;
 
-            List<GridRegion> borked = ParseQuery (null, GD.Query (new string [] { "*" }, m_realm, filter, null, null, null));
+            List<GridRegion> borked = ParseQuery (null, m_GD.Query (new string [] { "*" }, m_realm, filter, null, null, null));
 
             if (borked.Count < 1) {
                 MainConsole.Instance.Info ("[LocalGridConnector] No regions found with missing owners.");
@@ -103,13 +103,13 @@ namespace WhiteCore.Services.DataService
 
             if (estatePlugin == null) {
                 MainConsole.Instance.Error ("[LocalGridConnector] " + borked.Count +
-                                           " regions found with missing owners, but could not get IEstateConnector plugin.");
+                                            " regions found with missing owners, but could not get IEstateConnector plugin.");
                 return;
             }
 
 
             MainConsole.Instance.Error ("[LocalGridConnector] " + borked.Count +
-                                           " regions found with missing owners, attempting fix.");
+                                        " regions found with missing owners, attempting fix.");
 
             Dictionary<int, List<GridRegion>> borkedByEstate = new Dictionary<int, List<GridRegion>> ();
             foreach (GridRegion region in borked) {
@@ -126,10 +126,10 @@ namespace WhiteCore.Services.DataService
                 EstateSettings es = estatePlugin.GetEstateIDSettings (estateID);
                 if ((es == null) || (es.EstateID == 0)) {
                     MainConsole.Instance.Error ("[LocalGridConnector] Cannot fix missing owner for regions in Estate " +
-                                               estateID + ", could not get estate settings.");
+                                                estateID + ", could not get estate settings.");
                 } else if (es.EstateOwner == UUID.Zero) {
                     MainConsole.Instance.Error ("[LocalGridConnector] Cannot fix missing owner for regions in Estate " +
-                                               estateID + ", Estate Owner is also missing.");
+                                                estateID + ", Estate Owner is also missing.");
                 }
                 if (es == null || es.EstateOwner == UUID.Zero) {
                     ++estateFail;
@@ -141,26 +141,27 @@ namespace WhiteCore.Services.DataService
             if (estateFail > 0) {
                 if (estateFail == borkedByEstate.Count) {
                     MainConsole.Instance.Error ("[LocalGridConnector] " + borked.Count +
-                                               " regions found with missing owners, could not locate any estate settings from IEstateConnector plugin.");
+                                                " regions found with missing owners, could not locate any estate settings from IEstateConnector plugin.");
                     return;
                 }
 
                 MainConsole.Instance.Error ("[LocalGridConnector] " + borked.Count +
-                                               " regions found with missing owners, could not locate estate settings for " +
-                                               estateFail + " estates.");
+                                            " regions found with missing owners, could not locate estate settings for " +
+                                            estateFail + " estates.");
 
             }
 
             uint storeSuccess = 0;
             uint storeFail = 0;
             int borkedCount = borked.Count;
+
             foreach (KeyValuePair<int, UUID> kvp in estateOwnerIDs) {
                 List<GridRegion> regions = borkedByEstate [kvp.Key];
                 foreach (GridRegion region in regions) {
                     region.EstateOwner = kvp.Value;
                     if (!Store (region)) {
                         MainConsole.Instance.Error ("[LocalGridConnector] Failed to fix missing region for " +
-                                                   region.RegionName + " (" + region.RegionID + ")");
+                                                    region.RegionName + " (" + region.RegionID + ")");
                         ++storeFail;
                     } else {
                         ++storeSuccess;
@@ -171,12 +172,12 @@ namespace WhiteCore.Services.DataService
 
             if (storeFail > 0) {
                 MainConsole.Instance.Error ("[LocalGridConnector] " + borkedCount +
-                                           " regions found with missing owners, fix failed on " + storeFail +
-                                           " regions, fix attempted on " + storeSuccess + " regions.");
+                                            " regions found with missing owners, fix failed on " + storeFail +
+                                            " regions, fix attempted on " + storeSuccess + " regions.");
             } else if (storeSuccess != borked.Count) {
                 MainConsole.Instance.Error ("[LocalGridConnector] " + borkedCount +
-                                           " regions found with missing owners, fix attempted on " + storeSuccess +
-                                           " regions.");
+                                            " regions found with missing owners, fix attempted on " + storeSuccess +
+                                            " regions.");
             } else {
                 MainConsole.Instance.Info (
                     "[LocalGridConnector] All regions found with missing owners should have their owners restored.");
@@ -187,8 +188,21 @@ namespace WhiteCore.Services.DataService
                     blurbs.Add (region.RegionName + " (" + region.RegionID + ")");
                 }
                 MainConsole.Instance.Info ("[LocalGridConnector] Failed to fix missing region owners for regions " +
-                                          string.Join (", ", blurbs.ToArray ()));
+                                           string.Join (", ", blurbs.ToArray ()));
             }
+        }
+
+        public uint Count (RegionFlags includeFlags, RegionFlags excludeFlags)
+        {
+            QueryFilter filter = new QueryFilter ();
+            if (includeFlags > 0) {
+                filter.andBitfieldAndFilters ["Flags"] = (uint)includeFlags;
+            }
+            if (excludeFlags > 0) {
+                filter.andBitfieldNandFilters ["Flags"] = (uint)excludeFlags;
+            }
+
+            return uint.Parse (m_GD.Query (new string [] { "COUNT(*)" }, m_realm, filter, null, null, null) [0]);
         }
 
         public uint GetCount (string regionName, List<UUID> scopeIDs)
@@ -196,24 +210,7 @@ namespace WhiteCore.Services.DataService
             QueryFilter filter = new QueryFilter ();
             filter.andLikeFilters ["RegionName"] = regionName;
 
-            return uint.Parse (GD.Query (new [] { "COUNT(*)" }, m_realm, filter, null, null, null) [0]);
-        }
-
-        public List<GridRegion> Get (string regionName, List<UUID> scopeIDs, uint? start, uint? count)
-        {
-            QueryFilter filter = new QueryFilter ();
-            filter.andLikeFilters ["RegionName"] = regionName;
-
-            List<string> query = GD.Query (new string [] { "*" }, m_realm, filter, null, start, count);
-
-            return (query.Count == 0) ? null : ParseQuery (scopeIDs, query);
-        }
-
-        public List<GridRegion> Get (RegionFlags flags)
-        {
-            QueryFilter filter = new QueryFilter ();
-            filter.andBitfieldAndFilters ["Flags"] = (uint)flags;
-            return ParseQuery (null, GD.Query (new string [] { "*" }, m_realm, filter, null, null, null));
+            return uint.Parse (m_GD.Query (new [] { "COUNT(*)" }, m_realm, filter, null, null, null) [0]);
         }
 
         public GridRegion GetZero (int posX, int posY, List<UUID> scopeIDs)
@@ -222,21 +219,9 @@ namespace WhiteCore.Services.DataService
             filter.andFilters ["LocX"] = posX;
             filter.andFilters ["LocY"] = posY;
 
-            List<string> query = GD.Query (new string [] { "*" }, m_realm, filter, null, null, null);
+            List<string> query = m_GD.Query (new string [] { "*" }, m_realm, filter, null, null, null);
 
             return (query.Count == 0) ? null : ParseQuery (scopeIDs, query) [0];
-        }
-
-        public List<GridRegion> Get (int posX, int posY, List<UUID> scopeIDs)
-        {
-            QueryFilter filter = new QueryFilter ();
-            filter.andFilters ["LocX"] = posX;
-            filter.andFilters ["LocY"] = posY;
-
-            Dictionary<string, bool> sort = new Dictionary<string, bool> (1);
-            sort ["LocZ"] = true;
-
-            return ParseQuery (scopeIDs, GD.Query (new string [] { "*" }, m_realm, filter, sort, null, null));
         }
 
         public GridRegion Get (UUID regionID, List<UUID> scopeIDs)
@@ -246,14 +231,44 @@ namespace WhiteCore.Services.DataService
 
             where ["RegionUUID"] = regionID;
 
-            query = GD.Query (new string [] { "*" }, m_realm, new QueryFilter {
+            query = m_GD.Query (new string [] { "*" }, m_realm, new QueryFilter {
                 andFilters = where
             }, null, null, null);
 
             return (query.Count == 0) ? null : ParseQuery (scopeIDs, query) [0];
         }
 
-        public List<GridRegion> Get (int startX, int startY, int endX, int endY, List<UUID> scopeIDs)
+        public List<GridRegion> GetList (string regionName, List<UUID> scopeIDs, uint? start, uint? count)
+        {
+            QueryFilter filter = new QueryFilter ();
+            filter.andLikeFilters ["RegionName"] = regionName;
+
+            List<string> query = m_GD.Query (new string [] { "*" }, m_realm, filter, null, start, count);
+
+            return (query.Count == 0) ? new List<GridRegion> () : ParseQuery (scopeIDs, query);
+        }
+
+        public List<GridRegion> GetList (RegionFlags flags)
+        {
+            QueryFilter filter = new QueryFilter ();
+            filter.andBitfieldAndFilters ["Flags"] = (uint)flags;
+
+            return ParseQuery (null, m_GD.Query (new string [] { "*" }, m_realm, filter, null, null, null));
+        }
+
+        public List<GridRegion> GetList (int posX, int posY, List<UUID> scopeIDs)
+        {
+            QueryFilter filter = new QueryFilter ();
+            filter.andFilters ["LocX"] = posX;
+            filter.andFilters ["LocY"] = posY;
+
+            Dictionary<string, bool> sort = new Dictionary<string, bool> (1);
+            sort ["LocZ"] = true;
+
+            return ParseQuery (scopeIDs, m_GD.Query (new string [] { "*" }, m_realm, filter, sort, null, null));
+        }
+
+        public List<GridRegion> GetList (int startX, int startY, int endX, int endY, List<UUID> scopeIDs)
         {
             int foo;
             if (startX > endX) {
@@ -272,16 +287,16 @@ namespace WhiteCore.Services.DataService
             filter.andGreaterThanEqFilters ["LocY"] = startY;
             filter.andLessThanEqFilters ["LocY"] = endY;
 
-            return ParseQuery (scopeIDs, GD.Query (new string [] { "*" }, m_realm, filter, null, null, null));
+            return ParseQuery (scopeIDs, m_GD.Query (new string [] { "*" }, m_realm, filter, null, null, null));
         }
 
-        public List<GridRegion> Get (RegionFlags flags, Dictionary<string, bool> sort)
+        public List<GridRegion> GetList (RegionFlags flags, Dictionary<string, bool> sort)
         {
-            return Get (flags, 0, null, null, sort);
+            return GetList (flags, 0, null, null, sort);
         }
 
-        public List<GridRegion> Get (uint start, uint count, uint estateID, RegionFlags flags,
-                                    Dictionary<string, bool> sort)
+        public List<GridRegion> GetList (uint start, uint count, uint estateID, RegionFlags flags,
+                                         Dictionary<string, bool> sort)
         {
             List<GridRegion> resp = new List<GridRegion> ();
             IEstateConnector estates = Framework.Utilities.DataManager.RequestPlugin<IEstateConnector> ();
@@ -297,8 +312,8 @@ namespace WhiteCore.Services.DataService
 
             while (resp.Count < count) {
                 uint limit = count - (uint)resp.Count;
-                List<GridRegion> query = 
-                    ParseQuery (null, GD.Query (new string [] { "*" }, m_realm, filter, sort, start, count));
+                List<GridRegion> query =
+                    ParseQuery (null, m_GD.Query (new string [] { "*" }, m_realm, filter, sort, start, count));
 
                 if (query.Count == 0) {
                     break;
@@ -317,8 +332,9 @@ namespace WhiteCore.Services.DataService
             return resp;
         }
 
-        public List<GridRegion> Get (RegionFlags includeFlags, RegionFlags excludeFlags, uint? start, uint? count,
-                                    Dictionary<string, bool> sort)
+        // used for web interface
+        public List<GridRegion> GetList (RegionFlags includeFlags, RegionFlags excludeFlags, uint? start, uint? count,
+                                         Dictionary<string, bool> sort)
         {
             QueryFilter filter = new QueryFilter ();
             if (includeFlags > 0) {
@@ -328,20 +344,7 @@ namespace WhiteCore.Services.DataService
                 filter.andBitfieldNandFilters ["Flags"] = (uint)excludeFlags;
             }
 
-            return ParseQuery (null, GD.Query (new string [] { "*" }, m_realm, filter, sort, start, count));
-        }
-
-        public uint Count (RegionFlags includeFlags, RegionFlags excludeFlags)
-        {
-            QueryFilter filter = new QueryFilter ();
-            if (includeFlags > 0) {
-                filter.andBitfieldAndFilters ["Flags"] = (uint)includeFlags;
-            }
-            if (excludeFlags > 0) {
-                filter.andBitfieldNandFilters ["Flags"] = (uint)excludeFlags;
-            }
-
-            return uint.Parse (GD.Query (new string [] { "COUNT(*)" }, m_realm, filter, null, null, null) [0]);
+            return ParseQuery (null, m_GD.Query (new string [] { "*" }, m_realm, filter, sort, start, count));
         }
 
         public List<GridRegion> GetNeighbours (UUID regionID, List<UUID> scopeIDs, uint squareRangeFromCenterInMeters)
@@ -353,14 +356,14 @@ namespace WhiteCore.Services.DataService
                 int centerX = region.RegionLocX + (region.RegionSizeX / 2); // calculate center of region
                 int centerY = region.RegionLocY + (region.RegionSizeY / 2); // calculate center of region
 
-                regions = Get (scopeIDs, region.RegionID, centerX, centerY, squareRangeFromCenterInMeters);
+                regions = GetList (scopeIDs, region.RegionID, centerX, centerY, squareRangeFromCenterInMeters);
             }
 
             return regions;
         }
 
-        public List<GridRegion> Get (List<UUID> scopeIDs, UUID excludeRegion, float centerX, float centerY,
-                                    uint squareRangeFromCenterInMeters)
+        public List<GridRegion> GetList (List<UUID> scopeIDs, UUID excludeRegion, float centerX, float centerY,
+                                         uint squareRangeFromCenterInMeters)
         {
             QueryFilter filter = new QueryFilter ();
 
@@ -378,7 +381,7 @@ namespace WhiteCore.Services.DataService
             sort ["LocX"] = true;
             sort ["LocY"] = true;
 
-            return ParseQuery (scopeIDs, GD.Query (new string [] { "*" }, m_realm, filter, sort, null, null));
+            return ParseQuery (scopeIDs, m_GD.Query (new string [] { "*" }, m_realm, filter, sort, null, null));
         }
 
         public uint Count (uint estateID, RegionFlags flags)
@@ -394,7 +397,7 @@ namespace WhiteCore.Services.DataService
             QueryFilter filter = new QueryFilter ();
             filter.andBitfieldAndFilters ["Flags"] = (uint)flags;
 
-            List<GridRegion> query = ParseQuery (null, GD.Query (new string [] { "*" }, m_realm, filter, null, null, null));
+            List<GridRegion> query = ParseQuery (null, m_GD.Query (new string [] { "*" }, m_realm, filter, null, null, null));
 
             uint count = 0;
             query.ForEach (delegate (GridRegion region) {
@@ -407,6 +410,40 @@ namespace WhiteCore.Services.DataService
             return count;
         }
 
+        public List<GridRegion> GetDefaultRegions (List<UUID> scopeIDs)
+        {
+            return GetList ((int)RegionFlags.DefaultRegion, scopeIDs);
+        }
+
+        public List<GridRegion> GetFallbackRegions (List<UUID> scopeIDs, int x, int y)
+        {
+            List<GridRegion> regions = GetList ((int)RegionFlags.FallbackRegion, scopeIDs);
+            RegionDataDistanceCompare distanceComparer = new RegionDataDistanceCompare (x, y);
+            regions.Sort (distanceComparer);
+
+            return regions;
+        }
+
+        public List<GridRegion> GetSafeRegions (List<UUID> scopeIDs, int x, int y)
+        {
+            List<GridRegion> regions = GetList ((int)RegionFlags.Safe, scopeIDs);
+            regions.AddRange (GetList ((int)RegionFlags.RegionOnline, scopeIDs));
+
+            RegionDataDistanceCompare distanceComparer = new RegionDataDistanceCompare (x, y);
+            regions.Sort (distanceComparer);
+
+            return regions;
+        }
+
+        public List<GridRegion> GetOwnerRegions (UUID ownerID)
+        {
+            QueryFilter filter = new QueryFilter ();
+            filter.andFilters ["OwnerUUID"] = ownerID.ToString ();
+
+            return ParseQuery (null, m_GD.Query (new string [] { "*" }, m_realm, filter, null, null, null));
+        }
+
+        #region database
         public bool Store (GridRegion region)
         {
             if (region.EstateOwner == UUID.Zero) {
@@ -440,14 +477,15 @@ namespace WhiteCore.Services.DataService
             row ["SessionID"] = region.SessionID;
             row ["Info"] = OSDParser.SerializeJsonString (region.ToOSD ());
 
-            return GD.Replace (m_realm, row);
+            return m_GD.Replace (m_realm, row);
         }
 
         public bool Delete (UUID regionID)
         {
             QueryFilter filter = new QueryFilter ();
             filter.andFilters ["RegionUUID"] = regionID;
-            return GD.Delete (m_realm, filter);
+
+            return m_GD.Delete (m_realm, filter);
         }
 
         public bool DeleteAll (string [] criteriaKey, object [] criteriaValue)
@@ -457,53 +495,20 @@ namespace WhiteCore.Services.DataService
             foreach (object value in criteriaValue) {
                 filter.andFilters [criteriaKey [i++]] = value;
             }
-            return GD.Delete (m_realm, filter);
+            return m_GD.Delete (m_realm, filter);
         }
 
-        public List<GridRegion> GetDefaultRegions (List<UUID> scopeIDs)
-        {
-            return Get ((int)RegionFlags.DefaultRegion, scopeIDs);
-        }
+        #endregion // database
 
-        public List<GridRegion> GetFallbackRegions (List<UUID> scopeIDs, int x, int y)
-        {
-            List<GridRegion> regions = Get ((int)RegionFlags.FallbackRegion, scopeIDs);
-            RegionDataDistanceCompare distanceComparer = new RegionDataDistanceCompare (x, y);
-            regions.Sort (distanceComparer);
-
-            return regions;
-        }
-
-        public List<GridRegion> GetSafeRegions (List<UUID> scopeIDs, int x, int y)
-        {
-            List<GridRegion> Regions = Get ((int)RegionFlags.Safe, scopeIDs);
-            Regions.AddRange (Get ((int)RegionFlags.RegionOnline, scopeIDs));
-
-            RegionDataDistanceCompare distanceComparer = new RegionDataDistanceCompare (x, y);
-            Regions.Sort (distanceComparer);
-
-            return Regions;
-        }
-
-        public List<GridRegion> GetOwnerRegions (UUID ownerID)
-        {
-            QueryFilter filter = new QueryFilter ();
-            filter.andFilters ["OwnerUUID"] = ownerID.ToString();
-
-            return ParseQuery (null, GD.Query (new string [] { "*" }, m_realm, filter, null, null, null));
-        }
         #endregion
 
-        public void Dispose ()
-        {
-        }
 
-        List<GridRegion> Get (int regionFlags, List<UUID> scopeIDs)
+        List<GridRegion> GetList (int regionFlags, List<UUID> scopeIDs)
         {
             QueryFilter filter = new QueryFilter ();
             filter.andBitfieldAndFilters ["Flags"] = (uint)regionFlags;
 
-            return ParseQuery (scopeIDs, GD.Query (new string [] { "*" }, m_realm, filter, null, null, null));
+            return ParseQuery (scopeIDs, m_GD.Query (new string [] { "*" }, m_realm, filter, null, null, null));
         }
 
         protected List<GridRegion> ParseQuery (List<UUID> scopeIDs, List<string> query)
@@ -528,6 +533,11 @@ namespace WhiteCore.Services.DataService
             }
 
             return AllScopeIDImpl.CheckScopeIDs (scopeIDs, regionData);
+        }
+
+
+        public void Dispose ()
+        {
         }
 
         #region Nested type: RegionDataDistanceCompare

@@ -40,8 +40,8 @@ namespace WhiteCore.Services.DataService
     public class LocalProfileConnector : ConnectorBase, IProfileConnector
     {
         //We can use a cache because we are the only place that profiles will be served from
-        readonly Dictionary<UUID, IUserProfileInfo> UserProfilesCache = new Dictionary<UUID, IUserProfileInfo>();
-        IGenericData GD;
+        readonly Dictionary<UUID, IUserProfileInfo> userProfilesCache = new Dictionary<UUID, IUserProfileInfo> ();
+        IGenericData genData;
         string m_userProfileTable = "user_profile";
         string m_userPicksTable = "user_picks";
         string m_userClassifiedsTable = "user_classifieds";
@@ -49,29 +49,28 @@ namespace WhiteCore.Services.DataService
 
         #region IProfileConnector Members
 
-        public void Initialize(IGenericData GenericData, IConfigSource source, IRegistryCore simBase,
+        public void Initialize (IGenericData genericData, IConfigSource source, IRegistryCore simBase,
                                string defaultConnectionString)
         {
-            GD = GenericData;
+            genData = genericData;
 
-            if (source.Configs[Name] != null)
-                defaultConnectionString = source.Configs[Name].GetString("ConnectionString", defaultConnectionString);
+            if (source.Configs [Name] != null)
+                defaultConnectionString = source.Configs [Name].GetString ("ConnectionString", defaultConnectionString);
 
-            if (GD != null)
-                GD.ConnectToDatabase(defaultConnectionString, "Agent",
-                                     source.Configs["WhiteCoreConnectors"].GetBoolean("ValidateTables", true));
+            if (genData != null)
+                genData.ConnectToDatabase (defaultConnectionString, "Agent",
+                                     source.Configs ["WhiteCoreConnectors"].GetBoolean ("ValidateTables", true));
 
-            Framework.Utilities.DataManager.RegisterPlugin(Name + "Local", this);
+            Framework.Utilities.DataManager.RegisterPlugin (Name + "Local", this);
 
-            if (source.Configs["WhiteCoreConnectors"].GetString("ProfileConnector", "LocalConnector") == "LocalConnector")
-            {
-                Framework.Utilities.DataManager.RegisterPlugin(this);
+            if (source.Configs ["WhiteCoreConnectors"].GetString ("ProfileConnector", "LocalConnector") == "LocalConnector") {
+                Framework.Utilities.DataManager.RegisterPlugin (this);
             }
-            Init(simBase, Name);
+
+            Init (simBase, Name);
         }
 
-        public string Name
-        {
+        public string Name {
             get { return "IProfileConnector"; }
         }
 
@@ -80,130 +79,136 @@ namespace WhiteCore.Services.DataService
         /// </summary>
         /// <param name="agentID"></param>
         /// <returns></returns>
-        [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
-        public IUserProfileInfo GetUserProfile(UUID agentID)
+        [CanBeReflected (ThreatLevel = ThreatLevel.Low)]
+        public IUserProfileInfo GetUserProfile (UUID agentID)
         {
-            IUserProfileInfo UserProfile = new IUserProfileInfo();
-            lock (UserProfilesCache)
-            {
+            IUserProfileInfo userProfile = new IUserProfileInfo ();
+            lock (userProfilesCache) {
                 //Try from the user profile first before getting from the DB
-                if (UserProfilesCache.TryGetValue(agentID, out UserProfile))
-                    return UserProfile;
+                if (userProfilesCache.TryGetValue (agentID, out userProfile))
+                    return userProfile;
             }
 
-            object remoteValue = DoRemote(agentID);
-            if (remoteValue != null || m_doRemoteOnly)
-            {
-                UserProfile = (IUserProfileInfo)remoteValue;
+            object remoteValue = DoRemote (agentID);
+            if (remoteValue != null || m_doRemoteOnly) {
+                userProfile = (IUserProfileInfo)remoteValue;
                 //Add to the cache
-                lock (UserProfilesCache)
-                    UserProfilesCache[agentID] = UserProfile;
-                return UserProfile;
+                lock (userProfilesCache)
+                    userProfilesCache [agentID] = userProfile;
+                return userProfile;
             }
 
-            QueryFilter filter = new QueryFilter();
-            filter.andFilters["ID"] = agentID;
-            filter.andFilters["`Key`"] = "LLProfile";
+            QueryFilter filter = new QueryFilter ();
+            filter.andFilters ["ID"] = agentID;
+            filter.andFilters ["`Key`"] = "LLProfile";
             List<string> query = null;
-            //Grab it from the almost generic interface
-            query = GD.Query(new[] { "Value" }, m_userProfileTable, filter, null, null, null);
+
+            // Grab it from the almost generic interface
+            query = genData.Query (new [] { "Value" }, m_userProfileTable, filter, null, null, null);
 
             if (query == null || query.Count == 0)
                 return null;
-            //Pull out the OSDmap
-            OSDMap profile = (OSDMap) OSDParser.DeserializeLLSDXml(query[0]);
 
-            UserProfile = new IUserProfileInfo();
-            UserProfile.FromOSD(profile);
+            // Pull out the OSDmap
+            OSDMap profile = (OSDMap)OSDParser.DeserializeLLSDXml (query [0]);
 
-            //Add to the cache
-            lock(UserProfilesCache)
-                UserProfilesCache[agentID] = UserProfile;
+            userProfile = new IUserProfileInfo ();
+            userProfile.FromOSD (profile);
 
-            return UserProfile;
+            // Add to the cache
+            lock (userProfilesCache)
+                userProfilesCache [agentID] = userProfile;
+
+            return userProfile;
         }
 
         /// <summary>
         ///     Update a user's profile (Note: this does not work if the user does not have a profile)
         /// </summary>
-        /// <param name="Profile"></param>
+        /// <param name="profile"></param>
         /// <returns></returns>
-        [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
-        public bool UpdateUserProfile(IUserProfileInfo Profile)
+        [CanBeReflected (ThreatLevel = ThreatLevel.Low)]
+        public bool UpdateUserProfile (IUserProfileInfo profile)
         {
             if (m_doRemoteOnly) {
-                object remoteValue = DoRemote (Profile);
+                object remoteValue = DoRemote (profile);
                 return remoteValue != null && (bool)remoteValue;
             }
 
-            IUserProfileInfo previousProfile = GetUserProfile(Profile.PrincipalID);
-            //Make sure the previous one exists
+            IUserProfileInfo previousProfile = GetUserProfile (profile.PrincipalID);
+
+            // Make sure the previous one exists
             if (previousProfile == null)
                 return false;
-            //Now fix values that the sim cannot change
-            Profile.Partner = previousProfile.Partner;
-            Profile.CustomType = previousProfile.CustomType;
-            Profile.MembershipGroup = previousProfile.MembershipGroup;
-            Profile.Created = previousProfile.Created;
 
-            Dictionary<string, object> values = new Dictionary<string, object>(1);
-            values["Value"] = OSDParser.SerializeLLSDXmlString(Profile.ToOSD());
+            // Now fix values that the sim cannot change
+            profile.Partner = previousProfile.Partner;
+            profile.CustomType = previousProfile.CustomType;
+            profile.MembershipGroup = previousProfile.MembershipGroup;
+            profile.Created = previousProfile.Created;
 
-            QueryFilter filter = new QueryFilter();
-            filter.andFilters["ID"] = Profile.PrincipalID.ToString();
-            filter.andFilters["`Key`"] = "LLProfile";
+            Dictionary<string, object> values = new Dictionary<string, object> (1);
+            values ["Value"] = OSDParser.SerializeLLSDXmlString (profile.ToOSD ());
 
-            //Update cache
-            lock(UserProfilesCache)
-                UserProfilesCache[Profile.PrincipalID] = Profile;
+            QueryFilter filter = new QueryFilter ();
+            filter.andFilters ["ID"] = profile.PrincipalID.ToString ();
+            filter.andFilters ["`Key`"] = "LLProfile";
 
-            return GD.Update(m_userProfileTable, values, null, filter, null, null);
+            // Update cache
+            lock (userProfilesCache)
+                userProfilesCache [profile.PrincipalID] = profile;
+
+            return genData.Update (m_userProfileTable, values, null, filter, null, null);
         }
 
-        public void ClearCache(UUID agentID)
+        public void ClearCache (UUID agentID)
         {
-            lock (UserProfilesCache)
-                UserProfilesCache.Remove(agentID);
+            lock (userProfilesCache)
+                userProfilesCache.Remove (agentID);
         }
 
         /// <summary>
         ///     Create a new profile for a user
         /// </summary>
-        /// <param name="AgentID"></param>
+        /// <param name="agentID"></param>
         //[CanBeReflected(ThreatLevel = ThreatLevel.Full)]
-        public void CreateNewProfile(UUID AgentID)
+        public void CreateNewProfile (UUID agentID)
         {
             /*object remoteValue = DoRemote(AgentID);
             if (remoteValue != null || m_doRemoteOnly)
                 return;*/
 
-            List<object> values = new List<object> {AgentID.ToString(), "LLProfile"};
+            List<object> values = new List<object> { agentID.ToString (), "LLProfile" };
 
-            //Create a new basic profile for them
-            IUserProfileInfo profile = new IUserProfileInfo {PrincipalID = AgentID};
+            // Create a new basic profile for them
+            IUserProfileInfo profile = new IUserProfileInfo { PrincipalID = agentID };
 
-            values.Add(OSDParser.SerializeLLSDXmlString(profile.ToOSD())); //Value which is a default Profile
+            values.Add (OSDParser.SerializeLLSDXmlString (profile.ToOSD ())); //Value which is a default Profile
 
-            GD.Insert(m_userProfileTable, values.ToArray());
+            genData.Insert (m_userProfileTable, values.ToArray ());
         }
 
-        [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
-        public bool AddClassified(Classified classified)
+        [CanBeReflected (ThreatLevel = ThreatLevel.Low)]
+        public bool AddClassified (Classified classified)
         {
             if (m_doRemoteOnly) {
                 object remoteValue = DoRemote (classified);
                 return remoteValue != null && (bool)remoteValue;
             }
 
-            if (GetUserProfile(classified.CreatorUUID) == null)
+            if (GetUserProfile (classified.CreatorUUID) == null)
                 return false;
+
             string keywords = classified.Description;
             if (keywords.Length > 512)
-                keywords = keywords.Substring(keywords.Length - 512, 512);
-            //It might be updating, delete the old
-            QueryFilter filter = new QueryFilter();
-            filter.andFilters["ClassifiedUUID"] = classified.ClassifiedUUID;
-            GD.Delete(m_userClassifiedsTable, filter);
+                keywords = keywords.Substring (keywords.Length - 512, 512);
+
+            // It might be updating, delete the old
+            QueryFilter filter = new QueryFilter ();
+            filter.andFilters ["ClassifiedUUID"] = classified.ClassifiedUUID;
+
+            genData.Delete (m_userClassifiedsTable, filter);
+
             List<object> values = new List<object>
                                       {
                                           classified.Name,
@@ -216,81 +221,86 @@ namespace WhiteCore.Services.DataService
                                           classified.PriceForListing,
                                           keywords
                                       };
-            return GD.Insert(m_userClassifiedsTable, values.ToArray());
+
+            return genData.Insert (m_userClassifiedsTable, values.ToArray ());
         }
 
-        [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
-        public List<Classified> GetClassifieds(UUID ownerID)
+        [CanBeReflected (ThreatLevel = ThreatLevel.Low)]
+        public List<Classified> GetClassifieds (UUID ownerID)
         {
             if (m_doRemoteOnly) {
                 object remoteValue = DoRemote (ownerID);
                 return remoteValue != null ? (List<Classified>)remoteValue : new List<Classified> ();
             }
 
-            QueryFilter filter = new QueryFilter();
-            filter.andFilters["OwnerUUID"] = ownerID;
+            QueryFilter filter = new QueryFilter ();
+            filter.andFilters ["OwnerUUID"] = ownerID;
 
-            List<string> query = GD.Query(new[] { "*" }, m_userClassifiedsTable, filter, null, null, null);
+            List<string> query = genData.Query (new [] { "*" }, m_userClassifiedsTable, filter, null, null, null);
 
-            List<Classified> classifieds = new List<Classified>();
-            for (int i = 0; i < query.Count; i += 9)
-            {
-                Classified classified = new Classified();
-                classified.FromOSD((OSDMap) OSDParser.DeserializeJson(query[i + 6]));
-                classifieds.Add(classified);
+            List<Classified> classifieds = new List<Classified> ();
+            for (int i = 0; i < query.Count; i += 9) {
+                Classified classified = new Classified ();
+                classified.FromOSD ((OSDMap)OSDParser.DeserializeJson (query [i + 6]));
+                classifieds.Add (classified);
             }
+
             return classifieds;
         }
 
-        [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
-        public Classified GetClassified(UUID queryClassifiedID)
+        [CanBeReflected (ThreatLevel = ThreatLevel.Low)]
+        public Classified GetClassified (UUID queryClassifiedID)
         {
             if (m_doRemoteOnly) {
                 object remoteValue = DoRemote (queryClassifiedID);
                 return remoteValue != null ? (Classified)remoteValue : null;
             }
 
-            QueryFilter filter = new QueryFilter();
-            filter.andFilters["ClassifiedUUID"] = queryClassifiedID;
+            QueryFilter filter = new QueryFilter ();
+            filter.andFilters ["ClassifiedUUID"] = queryClassifiedID;
 
-            List<string> query = GD.Query(new[] { "*" }, m_userClassifiedsTable, filter, null, null, null);
+            List<string> query = genData.Query (new [] { "*" }, m_userClassifiedsTable, filter, null, null, null);
 
             if (query.Count < 9)
                 return null;
-            
-            Classified classified = new Classified();
-            classified.FromOSD((OSDMap) OSDParser.DeserializeJson(query[6]));
+
+            Classified classified = new Classified ();
+            classified.FromOSD ((OSDMap)OSDParser.DeserializeJson (query [6]));
+
             return classified;
         }
 
-        [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
-        public void RemoveClassified(UUID queryClassifiedID)
+        [CanBeReflected (ThreatLevel = ThreatLevel.Low)]
+        public void RemoveClassified (UUID queryClassifiedID)
         {
             if (m_doRemoteOnly) {
                 DoRemote (queryClassifiedID);
                 return;
             }
 
-            QueryFilter filter = new QueryFilter();
-            filter.andFilters["ClassifiedUUID"] = queryClassifiedID;
-            GD.Delete(m_userClassifiedsTable, filter);
+            QueryFilter filter = new QueryFilter ();
+            filter.andFilters ["ClassifiedUUID"] = queryClassifiedID;
+
+            genData.Delete (m_userClassifiedsTable, filter);
         }
 
-        [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
-        public bool AddPick(ProfilePickInfo pick)
+        [CanBeReflected (ThreatLevel = ThreatLevel.Low)]
+        public bool AddPick (ProfilePickInfo pick)
         {
             if (m_doRemoteOnly) {
                 object remoteValue = DoRemote (pick);
                 return remoteValue != null && (bool)remoteValue;
             }
 
-            if (GetUserProfile(pick.CreatorUUID) == null)
+            if (GetUserProfile (pick.CreatorUUID) == null)
                 return false;
 
-            //It might be updating, delete the old
-            QueryFilter filter = new QueryFilter();
-            filter.andFilters["PickUUID"] = pick.PickUUID;
-            GD.Delete(m_userPicksTable, filter);
+            // It might be updating, delete the old
+            QueryFilter filter = new QueryFilter ();
+            filter.andFilters ["PickUUID"] = pick.PickUUID;
+
+            genData.Delete (m_userPicksTable, filter);
+
             List<object> values = new List<object>
                                       {
                                           pick.Name,
@@ -299,68 +309,72 @@ namespace WhiteCore.Services.DataService
                                           pick.PickUUID,
                                           OSDParser.SerializeJsonString(pick.ToOSD())
                                       };
-            return GD.Insert(m_userPicksTable, values.ToArray());
+
+            return genData.Insert (m_userPicksTable, values.ToArray ());
         }
 
-        [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
-        public ProfilePickInfo GetPick(UUID queryPickID)
+        [CanBeReflected (ThreatLevel = ThreatLevel.Low)]
+        public ProfilePickInfo GetPick (UUID queryPickID)
         {
             if (m_doRemoteOnly) {
                 object remoteValue = DoRemote (queryPickID);
                 return remoteValue != null ? (ProfilePickInfo)remoteValue : null;
             }
 
-            QueryFilter filter = new QueryFilter();
-            filter.andFilters["PickUUID"] = queryPickID;
+            QueryFilter filter = new QueryFilter ();
+            filter.andFilters ["PickUUID"] = queryPickID;
 
-            List<string> query = GD.Query(new[] { "*" }, m_userPicksTable, filter, null, null, null);
+            List<string> query = genData.Query (new [] { "*" }, m_userPicksTable, filter, null, null, null);
 
             if (query.Count < 5)
                 return null;
-            ProfilePickInfo pick = new ProfilePickInfo();
-            pick.FromOSD((OSDMap) OSDParser.DeserializeJson(query[4]));
+
+            ProfilePickInfo pick = new ProfilePickInfo ();
+            pick.FromOSD ((OSDMap)OSDParser.DeserializeJson (query [4]));
+
             return pick;
         }
 
-        [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
-        public List<ProfilePickInfo> GetPicks(UUID ownerID)
+        [CanBeReflected (ThreatLevel = ThreatLevel.Low)]
+        public List<ProfilePickInfo> GetPicks (UUID ownerID)
         {
             if (m_doRemoteOnly) {
                 object remoteValue = DoRemote (ownerID);
                 return remoteValue != null ? (List<ProfilePickInfo>)remoteValue : new List<ProfilePickInfo> ();
             }
 
-            QueryFilter filter = new QueryFilter();
-            filter.andFilters["OwnerUUID"] = ownerID;
+            QueryFilter filter = new QueryFilter ();
+            filter.andFilters ["OwnerUUID"] = ownerID;
 
-            List<string> query = GD.Query(new[] { "*" }, m_userPicksTable, filter, null, null, null);
+            List<string> query = genData.Query (new [] { "*" }, m_userPicksTable, filter, null, null, null);
 
-            List<ProfilePickInfo> picks = new List<ProfilePickInfo>();
-            for (int i = 0; i < query.Count; i += 5)
-            {
-                ProfilePickInfo pick = new ProfilePickInfo();
-                pick.FromOSD((OSDMap) OSDParser.DeserializeJson(query[i + 4]));
-                picks.Add(pick);
+            List<ProfilePickInfo> picks = new List<ProfilePickInfo> ();
+            for (int i = 0; i < query.Count; i += 5) {
+                ProfilePickInfo pick = new ProfilePickInfo ();
+                pick.FromOSD ((OSDMap)OSDParser.DeserializeJson (query [i + 4]));
+                picks.Add (pick);
             }
+
             return picks;
         }
 
-        [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
-        public void RemovePick(UUID queryPickID)
+        [CanBeReflected (ThreatLevel = ThreatLevel.Low)]
+        public void RemovePick (UUID queryPickID)
         {
             if (m_doRemoteOnly) {
                 DoRemote (queryPickID);
                 return;
             }
 
-            QueryFilter filter = new QueryFilter();
-            filter.andFilters["PickUUID"] = queryPickID;
-            GD.Delete(m_userPicksTable, filter);
+            QueryFilter filter = new QueryFilter ();
+            filter.andFilters ["PickUUID"] = queryPickID;
+
+            genData.Delete (m_userPicksTable, filter);
         }
 
         #endregion
 
-        public void Dispose()
+        public void Dispose ()
         {
         }
     }

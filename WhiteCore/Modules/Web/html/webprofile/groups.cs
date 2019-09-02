@@ -68,50 +68,51 @@ namespace WhiteCore.Modules.Web
             var vars = new Dictionary<string, object>();
 
             string username = filename.Split('/').LastOrDefault();
-            UserAccount account = null;
+            UserAccount userAcct = new UserAccount();
             if (httpRequest.Query.ContainsKey("userid"))
             {
                 string userid = httpRequest.Query["userid"].ToString();
 
-                account = webInterface.Registry.RequestModuleInterface<IUserAccountService>().
+                userAcct = webInterface.Registry.RequestModuleInterface<IUserAccountService>().
                                        GetUserAccount(null, UUID.Parse(userid));
             }
             else if (httpRequest.Query.ContainsKey("name") || username.Contains('.'))
             {
                 string name = httpRequest.Query.ContainsKey("name") ? httpRequest.Query["name"].ToString() : username;
                 name = name.Replace('.', ' ');
-                account = webInterface.Registry.RequestModuleInterface<IUserAccountService>().
+                userAcct = webInterface.Registry.RequestModuleInterface<IUserAccountService>().
                                        GetUserAccount(null, name);
             }
             else
             {
                 username = username.Replace("%20", " ");
-                account = webInterface.Registry.RequestModuleInterface<IUserAccountService>().
+                userAcct = webInterface.Registry.RequestModuleInterface<IUserAccountService>().
                                        GetUserAccount(null, username);
             }
 
-            if (account == null)
+            if (!userAcct.Valid)
                 return vars;
 
             // User found...
-            vars.Add("UserName", account.Name);
+            vars.Add("UserName", userAcct.Name);
 
             IUserProfileInfo profile = Framework.Utilities.DataManager.RequestPlugin<IProfileConnector>().
-                                              GetUserProfile(account.PrincipalID);
+                                              GetUserProfile(userAcct.PrincipalID);
             IWebHttpTextureService webhttpService =
                 webInterface.Registry.RequestModuleInterface<IWebHttpTextureService>();
 
             if (profile != null)
             {
                 vars.Add("UserType", profile.MembershipGroup == "" ? "Resident" : profile.MembershipGroup);
-                               if (profile.Partner != UUID.Zero)
+                if (profile.Partner != UUID.Zero)
                 {
-                    account = webInterface.Registry.RequestModuleInterface<IUserAccountService>().
+                    var partnerAcct = webInterface.Registry.RequestModuleInterface<IUserAccountService>().
                                            GetUserAccount(null, profile.Partner);
-                    vars.Add("UserPartner", account.Name);
+                    vars.Add("UserPartner", partnerAcct.Name);
                 }
                 else
                     vars.Add("UserPartner", "No partner");
+                
                 vars.Add("UserAboutMe", profile.AboutText == "" ? "Nothing here" : profile.AboutText);
                 string url = "../images/icons/no_avatar.jpg";
                 if (webhttpService != null && profile.Image != UUID.Zero)
@@ -135,9 +136,9 @@ namespace WhiteCore.Modules.Web
 
             if (groupsConnector != null)
             {
-                foreach (var grp in groupsConnector.GetAgentGroupMemberships(account.PrincipalID, account.PrincipalID))
+                foreach (var grp in groupsConnector.GetAgentGroupMemberships(userAcct.PrincipalID, userAcct.PrincipalID))
                 {
-                    var grpData = groupsConnector.GetGroupProfile (account.PrincipalID, grp.GroupID);
+                    var grpData = groupsConnector.GetGroupProfile (userAcct.PrincipalID, grp.GroupID);
                     string url = "../images/icons/no_groups.jpg";
                     if (webhttpService != null && grpData.InsigniaID != UUID.Zero)
                         url = webhttpService.GetTextureURL (grpData.InsigniaID);

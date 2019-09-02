@@ -1925,8 +1925,8 @@ namespace WhiteCore.ClientStack
                 ReportDataBlocks = new LandStatReplyMessage.ReportDataBlock [lsrpia.Length]
             };
 
-            for (int i = 0; i < lsrpia.Length; i++) {
-                lock (_lock) {
+            lock (_lock) {
+                for (int i = 0; i < lsrpia.Length; i++) {
                     var landItem = lsrpia [i];
                     var block = new LandStatReplyMessage.ReportDataBlock ();
 

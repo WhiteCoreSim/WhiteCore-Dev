@@ -85,7 +85,7 @@ namespace WhiteCore.Modules.Web
                     {
 
                         UserAccount ourAccount = Authenticator.GetAuthentication (httpRequest);
-                        if (ourAccount != null) {
+                        if (ourAccount.Valid) {
                             IFriendsService friendsService = webInterface.Registry.RequestModuleInterface<IFriendsService> ();
                             var friends = friendsService.GetFriends (ourAccount.PrincipalID);
                             foreach (var friend in friends) {

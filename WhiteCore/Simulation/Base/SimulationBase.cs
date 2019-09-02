@@ -251,7 +251,13 @@ namespace WhiteCore.Simulation.Base
         /// </summary>
         public virtual void Startup()
         {
-            PrintFileToConsole (Path.Combine(m_defaultDataPath, "../Config/startuplogo.txt"));
+            bool isWhiteCoreExe = AppDomain.CurrentDomain.FriendlyName == "WhiteCore.exe" ||
+                                      AppDomain.CurrentDomain.FriendlyName == "WhiteCore.vshost.exe";
+            string configrun = BaseApplication.CheckConfigStamp (isWhiteCoreExe);
+            if (configrun != "")
+                MainConsole.Instance.Info ("Using the configuration of " + configrun);
+
+            PrintStartupLogo ();
 
             MainConsole.Instance.Info("====================================================================");
             MainConsole.Instance.Info(
@@ -338,9 +344,8 @@ namespace WhiteCore.Simulation.Base
                     hostName = "http" + (useHTTPS ? "s" : "") + "://" + Utilities.GetExternalIp ();
                 }
 
-                //Clean it up a bit
-                if (hostName.StartsWith ("http://", StringComparison.OrdinalIgnoreCase) || hostName.StartsWith ("https://", StringComparison.OrdinalIgnoreCase))
-                    hostName = hostName.Replace ("https://", "").Replace ("http://", "");
+                // Clean it up a bit
+                hostName = hostName.Replace ("https://", "").Replace ("http://", "");
                 if (hostName.EndsWith ("/", StringComparison.Ordinal))
                     hostName = hostName.Remove (hostName.Length - 1, 1);
 
@@ -372,12 +377,23 @@ namespace WhiteCore.Simulation.Base
         /// </summary>
         public virtual void SetUpHTTPServer()
         {
-             m_Port = m_config.Configs ["Network"].GetUInt ("http_listener_port", 8002);
-             var standalone = m_config.Configs ["GridInfoService"].GetUInt("GridInfoInHandlerPort", 0) == 0;
+            m_Port = m_config.Configs ["Network"].GetUInt ("http_listener_port", 8002);
+            var giport  = m_config.Configs ["GridInfoService"].GetUInt ("GridInfoInHandlerPort", 0);
+            var remotecalls = m_config.Configs ["WhiteCoreConnectors"].GetBoolean ("DoRemoteCalls", false);
+
+            var standalone = (giport == 0);
+
             if (standalone) {
+                if (remotecalls)
+                    MainConsole.Instance.Info ("[Configuration]: Running in grid region mode");
+                else    
+                    MainConsole.Instance.Info ("[Configuration]: Running in standalone mode");
+                
                 var noweb = m_config.Configs ["WebInterface"].GetString ("Module", "None") == "None";
                 if (noweb)
                     m_Port = m_config.Configs ["Network"].GetUInt ("region_base_port", 9000);
+            } else {
+                MainConsole.Instance.Info ("[Configuration]: Running in grid connected mode");
             }
 
             m_BaseHTTPServer = GetHttpServer(m_Port);
@@ -453,6 +469,30 @@ namespace WhiteCore.Simulation.Base
                 }
             }
         }
+
+        void PrintStartupLogo ()
+        {
+            Console.ForegroundColor = ConsoleColor.White;
+
+            var startuplogo = "../Config/Templates/startuplogo.txt";
+            if (File.Exists (startuplogo)) {
+                PrintFileToConsole (Path.Combine (m_defaultDataPath, startuplogo));
+            } else {
+                // default logo
+                Console.ForegroundColor = ConsoleColor.White;
+                Console.WriteLine (@" __    __ _     _ _         ___");
+                Console.WriteLine (@"/ / /\ \ \ |__ (_) |_ ___  / __\___  _ __ ___");
+                Console.WriteLine (@"\ \/  \/ / '_ \| | __/ _ \/ /  / _ \| '__/ _ \");
+                Console.WriteLine (@" \  /\  /| | | | | ||  __/ /__| (_) | | |  __/");
+                Console.WriteLine (@"  \/  \/ |_| |_|_|\__\___\____/\___/|_|  \___|");
+                Console.WriteLine (@"                                              ");
+                Console.WriteLine (@"==============================================");
+                Console.WriteLine (@"                                              ");
+                Console.ResetColor ();
+            }
+            Console.ResetColor();
+        }
+
 
         /// <summary>
         ///     Timer to run a specific text file as console commands.
@@ -612,7 +652,7 @@ namespace WhiteCore.Simulation.Base
 
         public virtual void HandleShowInfo(IScene scene, string[] cmd)
         {
-            PrintFileToConsole (Path.Combine (m_defaultDataPath, "../Config/startuplogo.txt"));
+            PrintStartupLogo ();
 
             MainConsole.Instance.Info("Version: " + m_version);
             MainConsole.Instance.Info("Startup directory: " + Environment.CurrentDirectory);
@@ -643,7 +683,7 @@ namespace WhiteCore.Simulation.Base
                 }
                 catch
                 {
-                    //It doesn't matter, just shut down
+                    ;//It doesn't matter, just shut down
                 }
                 try
                 {
@@ -652,7 +692,7 @@ namespace WhiteCore.Simulation.Base
                 }
                 catch
                 {
-                    //Just shut down already
+                    ; //Just shut down already
                 }
                 try
                 {
@@ -661,7 +701,7 @@ namespace WhiteCore.Simulation.Base
                 }
                 catch
                 {
-                    //Just shut down already
+                    ; //Just shut down already
                 }
                 try
                 {
@@ -673,7 +713,7 @@ namespace WhiteCore.Simulation.Base
                 }
                 catch
                 {
-                    //Again, just shut down
+                    ; //Again, just shut down
                 }
 
                 if (close)
@@ -689,6 +729,7 @@ namespace WhiteCore.Simulation.Base
             }
             catch
             {
+                ; // just ignore this
             }
         }
 
@@ -730,6 +771,7 @@ namespace WhiteCore.Simulation.Base
                 }
                 catch (Exception)
                 {
+                    ; // ignore
                 }
             }
         }

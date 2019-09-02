@@ -183,20 +183,20 @@ namespace WhiteCore.Services.API
         void PromoteAPIUser (IScene scene, string [] cmd)
         {
             var userName = MainConsole.Instance.Prompt ("Name of user <First> <Last>");
-            var account = m_registry.RequestModuleInterface<IUserAccountService> ().GetUserAccount (null, userName);
+            var userAcct = m_registry.RequestModuleInterface<IUserAccountService> ().GetUserAccount (null, userName);
 
-            if (account == null) {
+            if (!userAcct.Valid) {
                 MainConsole.Instance.Error ("Sorry! Unable to locate this user.");
                 return;
             }
 
             var authKey = UUID.Random ().ToString ();
 
-            var apiItem = new APIAuthItem { Username = account.Name, KeyDate = DateTime.Now, APIKey = authKey };
+            var apiItem = new APIAuthItem { Username = userAcct.Name, KeyDate = DateTime.Now, APIKey = authKey };
             apiItem.KeyID = generics.GetGenericCount ((UUID)Constants.GovernorUUID, "APIKey") + 1;
             generics.AddGeneric ((UUID)Constants.GovernorUUID, "APIKey", authKey, apiItem.ToOSD ());
 
-            MainConsole.Instance.InfoFormat ("[API]: User {0} {1} - API key : {2}", account.FirstName, account.LastName, authKey);
+            MainConsole.Instance.InfoFormat ("[API]: User {0} {1} - API key : {2}", userAcct.FirstName, userAcct.LastName, authKey);
 
 
         }
@@ -209,8 +209,8 @@ namespace WhiteCore.Services.API
         void DemoteAPIUser (IScene scene, string [] cmd)
         {
             var userName = MainConsole.Instance.Prompt ("Name of user <First> <Last>");
-            var account = m_registry.RequestModuleInterface<IUserAccountService> ().GetUserAccount (null, userName);
-            if (account == null) {
+            var userAcct = m_registry.RequestModuleInterface<IUserAccountService> ().GetUserAccount (null, userName);
+            if (!userAcct.Valid) {
                 MainConsole.Instance.Error ("[API]: User does not exist!");
                 return;
             }
@@ -223,16 +223,16 @@ namespace WhiteCore.Services.API
 
             var apiKey = "";
             foreach (var apiItem in apiKeys) {
-                if (apiItem.UserID == account.PrincipalID) {
+                if (apiItem.UserID == userAcct.PrincipalID) {
                     apiKey = apiItem.APIKey;
                     generics.RemoveGeneric (UUID.Zero, "APIKey", apiKey);   // need something specific here to remove individual keys
-                    MainConsole.Instance.Info ("[API]: Removed API key for " + account.Name);
+                    MainConsole.Instance.Info ("[API]: Removed API key for " + userAcct.Name);
                     break;
                 }
             }
 
             if (apiKey == "")
-                MainConsole.Instance.Warn ("[API]: Unable to locate a key for " + account.Name);
+                MainConsole.Instance.Warn ("[API]: Unable to locate a key for " + userAcct.Name);
         }
 
         /// <summary>

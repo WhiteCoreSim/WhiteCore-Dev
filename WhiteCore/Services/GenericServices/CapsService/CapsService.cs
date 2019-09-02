@@ -109,7 +109,7 @@ namespace WhiteCore.Services
 
         protected void ShowUsers (IScene scene, string [] cmd)
         {
-            //Check for all or full to show child agents
+            // Check for all or full to show child agents
             bool showChildAgents = cmd.Length == 3 && (cmd [2] == "all" || (cmd [2] == "full"));
             int count =
                 m_RegionCapsServices.Values.SelectMany (regionCaps => regionCaps.GetClients ())
@@ -162,14 +162,14 @@ namespace WhiteCore.Services
         public string CreateCAPS (UUID agentID, string capsBase, UUID regionID, bool isRootAgent,
                                  AgentCircuitData circuitData, uint port)
         {
-            //Now make sure we didn't use an old one or something
+            // Now make sure we didn't use an old one or something
             IClientCapsService service = GetOrCreateClientCapsService (agentID);
             if (service != null) {
                 IRegionClientCapsService clientService = service.GetOrCreateCapsService (regionID, capsBase, circuitData,
                                                              port);
 
                 if (clientService != null) {
-                    //Fix the root agent status
+                    // Fix the root agent status
                     clientService.RootAgent = isRootAgent;
 
                     MainConsole.Instance.Debug ("[CapsService]: Adding Caps URL " + clientService.CapsUrl + " for agent " + agentID);
@@ -208,6 +208,7 @@ namespace WhiteCore.Services
         {
             if (!m_ClientCapsServices.ContainsKey (agentID))
                 return null;
+            
             bool disabled = true;
             foreach (IRegionClientCapsService regionClients in m_ClientCapsServices [agentID].GetCapsServices ()) {
                 if (!regionClients.Disabled) {
@@ -219,6 +220,7 @@ namespace WhiteCore.Services
                 RemoveCAPS (agentID);
                 return null;
             }
+
             return m_ClientCapsServices [agentID];
         }
 
@@ -241,6 +243,7 @@ namespace WhiteCore.Services
             if (m_RegionCapsServices.TryGetValue (regionID, out service)) {
                 return service;
             }
+
             return null;
         }
 

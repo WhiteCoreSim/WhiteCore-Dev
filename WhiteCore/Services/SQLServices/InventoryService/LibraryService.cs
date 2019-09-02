@@ -91,7 +91,7 @@ namespace WhiteCore.Services.SQLServices.InventoryService
                 libOwnerName = libConfig.GetString ("LibraryOwnerName", pLibOwnerName);
             }
 
-            //MainConsole.Instance.Debug("[LIBRARY]: Starting library service...");
+            // MainConsole.Instance.Debug("[LIBRARY]: Starting library service...");
 
             registry.RegisterModuleInterface<ILibraryService> (this);
             m_registry = registry;
@@ -160,7 +160,7 @@ namespace WhiteCore.Services.SQLServices.InventoryService
             // get root folders
             List<InventoryFolderBase> rootFolders = m_inventoryService.GetRootFolders (LibraryOwnerUUID);
 
-            //Delete the root folder's folders
+            // Delete the root folder's folders
             foreach (var rFF in rootFolders) {
                 List<InventoryFolderBase> rootFolderFolders = m_inventoryService.GetFolderFolders (LibraryOwnerUUID, rFF.ID);
 

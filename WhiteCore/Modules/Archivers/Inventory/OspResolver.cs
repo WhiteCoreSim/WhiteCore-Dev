@@ -26,10 +26,10 @@
  */
 
 
+using System.Text;
+using OpenMetaverse;
 using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.Services;
-using OpenMetaverse;
-using System.Text;
 
 namespace WhiteCore.Modules.Archivers
 {
@@ -44,7 +44,7 @@ namespace WhiteCore.Modules.Archivers
         public const string OSPA_NAME_VALUE_SEPARATOR = " ";
         public const string OSPA_TUPLE_SEPARATOR = "|";
         public const string OSPA_PAIR_SEPARATOR = "=";
-        public static readonly char[] OSPA_TUPLE_SEPARATOR_ARRAY = OSPA_TUPLE_SEPARATOR.ToCharArray();
+        public static readonly char [] OSPA_TUPLE_SEPARATOR_ARRAY = OSPA_TUPLE_SEPARATOR.ToCharArray ();
 
         /// <summary>
         ///     Make an OSPA given a user UUID
@@ -52,11 +52,11 @@ namespace WhiteCore.Modules.Archivers
         /// <param name="userId"></param>
         /// <param name="userService"></param>
         /// <returns>The OSPA.  Null if a user with the given UUID could not be found.</returns>
-        public static string MakeOspa(UUID userId, IUserAccountService userService)
+        public static string MakeOspa (UUID userId, IUserAccountService userService)
         {
-            UserAccount account = userService.GetUserAccount(null, userId);
-            if (account != null)
-                return MakeOspa(account.FirstName, account.LastName);
+            UserAccount userAcct = userService.GetUserAccount (null, userId);
+            if (userAcct.Valid)
+                return MakeOspa (userAcct.FirstName, userAcct.LastName);
 
             return null;
         }
@@ -67,7 +67,7 @@ namespace WhiteCore.Modules.Archivers
         /// <param name="firstName"></param>
         /// <param name="lastName"></param>
         /// <returns></returns>
-        public static string MakeOspa(string firstName, string lastName)
+        public static string MakeOspa (string firstName, string lastName)
         {
             return
                 OSPA_PREFIX + OSPA_NAME_KEY + OSPA_PAIR_SEPARATOR + firstName + OSPA_NAME_VALUE_SEPARATOR + lastName;
@@ -84,32 +84,30 @@ namespace WhiteCore.Modules.Archivers
         ///     A suitable UUID for use in Second Life client communication.  If the string was not a valid ospa, then UUID.Zero
         ///     is returned.
         /// </returns>
-        public static UUID ResolveOspa(string ospa, IUserAccountService userService)
+        public static UUID ResolveOspa (string ospa, IUserAccountService userService)
         {
-            if (!ospa.StartsWith(OSPA_PREFIX))
+            if (!ospa.StartsWith (OSPA_PREFIX, System.StringComparison.Ordinal))
                 return UUID.Zero;
 
-//            MainConsole.Instance.DebugFormat("[OSP RESOLVER]: Resolving {0}", ospa);
+            //            MainConsole.Instance.DebugFormat("[OSP RESOLVER]: Resolving {0}", ospa);
 
-            string ospaMeat = ospa.Substring(OSPA_PREFIX.Length);
-            string[] ospaTuples = ospaMeat.Split(OSPA_TUPLE_SEPARATOR_ARRAY);
+            string ospaMeat = ospa.Substring (OSPA_PREFIX.Length);
+            string [] ospaTuples = ospaMeat.Split (OSPA_TUPLE_SEPARATOR_ARRAY);
 
-            foreach (string tuple in ospaTuples)
-            {
-                int tupleSeparatorIndex = tuple.IndexOf(OSPA_PAIR_SEPARATOR);
+            foreach (string tuple in ospaTuples) {
+                int tupleSeparatorIndex = tuple.IndexOf (OSPA_PAIR_SEPARATOR, System.StringComparison.Ordinal);
 
-                if (tupleSeparatorIndex < 0)
-                {
-                    MainConsole.Instance.WarnFormat("[OSP RESOLVER]: Ignoring non-tuple component {0} in OSPA {1}",
+                if (tupleSeparatorIndex < 0) {
+                    MainConsole.Instance.WarnFormat ("[OSP RESOLVER]: Ignoring non-tuple component {0} in OSPA {1}",
                                                     tuple, ospa);
                     continue;
                 }
 
-                string key = tuple.Remove(tupleSeparatorIndex).Trim();
-                string value = tuple.Substring(tupleSeparatorIndex + 1).Trim();
+                string key = tuple.Remove (tupleSeparatorIndex).Trim ();
+                string value = tuple.Substring (tupleSeparatorIndex + 1).Trim ();
 
                 if (OSPA_NAME_KEY == key)
-                    return ResolveOspaName(value, userService);
+                    return ResolveOspaName (value, userService);
             }
 
             return UUID.Zero;
@@ -120,9 +118,9 @@ namespace WhiteCore.Modules.Archivers
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        public static UUID HashName(string name)
+        public static UUID HashName (string name)
         {
-            return new UUID(Utils.MD5(Encoding.Unicode.GetBytes(name)), 0);
+            return new UUID (Utils.MD5 (Encoding.Unicode.GetBytes (name)), 0);
         }
 
         /// <summary>
@@ -134,25 +132,24 @@ namespace WhiteCore.Modules.Archivers
         /// <returns>
         ///     An OpenSim internal identifier for the name given.  Returns null if the name was not valid
         /// </returns>
-        protected static UUID ResolveOspaName(string name, IUserAccountService userService)
+        protected static UUID ResolveOspaName (string name, IUserAccountService userService)
         {
             if (userService == null)
                 return UUID.Zero;
 
-            int nameSeparatorIndex = name.IndexOf(OSPA_NAME_VALUE_SEPARATOR);
+            int nameSeparatorIndex = name.IndexOf (OSPA_NAME_VALUE_SEPARATOR, System.StringComparison.Ordinal);
 
-            if (nameSeparatorIndex < 0)
-            {
-                MainConsole.Instance.WarnFormat("[OSP RESOLVER]: Ignoring un-separated name {0}", name);
+            if (nameSeparatorIndex < 0) {
+                MainConsole.Instance.WarnFormat ("[OSP RESOLVER]: Ignoring un-separated name {0}", name);
                 return UUID.Zero;
             }
 
-            string firstName = name.Remove(nameSeparatorIndex).TrimEnd();
-            string lastName = name.Substring(nameSeparatorIndex + 1).TrimStart();
+            string firstName = name.Remove (nameSeparatorIndex).TrimEnd ();
+            string lastName = name.Substring (nameSeparatorIndex + 1).TrimStart ();
 
-            UserAccount account = userService.GetUserAccount(null, firstName, lastName);
-            if (account != null)
-                return account.PrincipalID;
+            UserAccount userAcct = userService.GetUserAccount (null, firstName, lastName);
+            if (userAcct.Valid)
+                return userAcct.PrincipalID;
 
             // XXX: Disable temporary user profile creation for now as implementation is incomplete - justincc
             /*

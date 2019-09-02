@@ -59,11 +59,11 @@ namespace WhiteCore.Modules.Gods
         {
             IScenePresence sp = m_scene.GetScenePresence (agentID);
 
-            // NPC's are not allowed
-            if (sp.IsNpcAgent)
-                return;
-            
             if (sp != null) {
+                // NPC's are not allowed
+                if (sp.IsNpcAgent)
+                    return;
+            
                 if (godLike == false) {
                     //Unconditionally remove god levels
                     sp.GodLevel = Constants.USER_NORMAL;

@@ -82,7 +82,7 @@ namespace WhiteCore.Modules.Web
                     onlineText = translator.GetTranslatedString ("OnlineFriendsText");
 
                     var ourAccount = Authenticator.GetAuthentication (httpRequest);
-                    if (ourAccount != null) {
+                    if (ourAccount.Valid) {
                         var friendsService = webInterface.Registry.RequestModuleInterface<IFriendsService> ();
                         if (friendsService != null) {
                             var friends = friendsService.GetFriends (ourAccount.PrincipalID);
@@ -110,10 +110,10 @@ namespace WhiteCore.Modules.Web
 
                         var region = gridService.GetRegionByUUID (null, user.CurrentRegionID);
                         if (region != null) {
-                            var account = accountService.GetUserAccount (region.AllScopeIDs, UUID.Parse (user.UserID));
-                            if (account != null) {
+                            var userAcct = accountService.GetUserAccount (region.AllScopeIDs, UUID.Parse (user.UserID));
+                            if (userAcct.Valid) {
                                 usersList.Add (new Dictionary<string, object> {
-                                    { "UserName", account.Name },
+                                    { "UserName", userAcct.Name },
                                     { "UserRegion", region.RegionName },
                                     { "UserLocation",  user.CurrentPosition },
                                     { "UserID", user.UserID },

@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright (c) Contributors, http://whitecore-sim.org/, http://aurora-sim.org
  * See CONTRIBUTORS.TXT for a full list of copyright holders.
  *
@@ -72,7 +72,7 @@ namespace WhiteCore.Modules.Web
             var sortBy = new Dictionary<string, bool> ();
             sortBy.Add ("RegionName", true);
             var regionData = Framework.Utilities.DataManager.RequestPlugin<IRegionData> ();
-            var regions = regionData.Get (0, RegionFlags.Hyperlink | RegionFlags.Foreign | RegionFlags.Hidden,
+            var regions = regionData.GetList (0, RegionFlags.Hyperlink | RegionFlags.Foreign | RegionFlags.Hidden,
                                           null, 10, sortBy);
             foreach (var region in regions) {
                 string info;

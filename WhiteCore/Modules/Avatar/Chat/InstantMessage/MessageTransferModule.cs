@@ -73,11 +73,11 @@ namespace WhiteCore.Modules.Chat
 
         public event UndeliveredMessage OnUndeliveredMessage;
 
-        public virtual void SendInstantMessages (GridInstantMessage im, List<UUID> AgentsToSendTo)
+        public virtual void SendInstantMessages (GridInstantMessage im, List<UUID> agentsToSendTo)
         {
-            //Check for local users first
+            // Check for local users first
             List<UUID> RemoveUsers = new List<UUID> ();
-            foreach (UUID t in AgentsToSendTo) {
+            foreach (UUID t in agentsToSendTo) {
                 IScenePresence user;
                 foreach (IScene scene in m_scenes) {
                     if (!RemoveUsers.Contains (t) &&
@@ -88,19 +88,19 @@ namespace WhiteCore.Modules.Chat
                     }
                 }
             }
-            //Clear the local users out
+            // Clear the local users out
             foreach (UUID agentID in RemoveUsers) {
-                AgentsToSendTo.Remove (agentID);
+                agentsToSendTo.Remove (agentID);
             }
 
-            SendMultipleGridInstantMessageViaXMLRPC (im, AgentsToSendTo);
+            SendMultipleGridInstantMessageViaXMLRPC (im, agentsToSendTo);
         }
 
         public virtual void SendInstantMessage (GridInstantMessage im)
         {
             UUID toAgentID = im.ToAgentID;
 
-            //Look locally first
+            // Look locally first
             IScenePresence user;
             foreach (IScene scene in m_scenes) {
                 if (scene.TryGetScenePresence (toAgentID, out user)) {
@@ -116,7 +116,7 @@ namespace WhiteCore.Modules.Chat
                     return;
                 }
             }
-            //MainConsole.Instance.DebugFormat("[INSTANT MESSAGE]: Delivering IM to {0} via XMLRPC", im.toAgentID);
+            // MainConsole.Instance.DebugFormat("[INSTANT MESSAGE]: Delivering IM to {0} via XMLRPC", im.toAgentID);
             SendGridInstantMessageViaXMLRPC (im);
         }
 
@@ -138,7 +138,7 @@ namespace WhiteCore.Modules.Chat
             }
 
             if (!m_Enabled) {
-                MainConsole.Instance.Debug ("[MESSAGE TRANSFER]: Disabled by configuration");
+                MainConsole.Instance.Debug ("[Message transfer]: Disabled by configuration");
                 return;
             }
 
@@ -150,7 +150,7 @@ namespace WhiteCore.Modules.Chat
                 return;
 
             m_scenes.Add (scene);
-            //MainConsole.Instance.Debug("[MESSAGE TRANSFER]: Message transfer module active");
+            // MainConsole.Instance.Debug("[MESSAGE TRANSFER]: Message transfer module active");
             scene.RegisterModuleInterface<IMessageTransferModule> (this);
         }
 
@@ -193,7 +193,7 @@ namespace WhiteCore.Modules.Chat
                 return;
             }
 
-            //MainConsole.Instance.DebugFormat("[INSTANT MESSAGE]: Undeliverable");
+            // MainConsole.Instance.DebugFormat("[INSTANT MESSAGE]: Undeliverable");
         }
 
         protected virtual byte [] processGridInstantMessage (string path, Stream request, OSHttpRequest httpRequest, OSHttpResponse httpResponse)
@@ -221,16 +221,18 @@ namespace WhiteCore.Modules.Chat
 
         protected virtual void GridInstantMessageCompleted (IAsyncResult iar)
         {
-            GridInstantMessageDelegate icon =
-                (GridInstantMessageDelegate)iar.AsyncState;
-            icon.EndInvoke (iar);
+            GridInstantMessageDelegate icon = (GridInstantMessageDelegate)iar.AsyncState;
+            if (icon != null) {
+                icon.EndInvoke (iar);
+            }
         }
 
         protected virtual void SendGridInstantMessageViaXMLRPC (GridInstantMessage im)
         {
             GridInstantMessageDelegate d = SendGridInstantMessageViaXMLRPCAsync;
-
-            d.BeginInvoke (im, null, GridInstantMessageCompleted, d);
+            if (d != null) {
+                d.BeginInvoke (im, null, GridInstantMessageCompleted, d);
+            }
         }
 
         protected virtual void SendMultipleGridInstantMessageViaXMLRPC (GridInstantMessage im, List<UUID> users)
@@ -248,7 +250,7 @@ namespace WhiteCore.Modules.Chat
             }
             List<UUID> CompletedUsers = new List<UUID> ();
             foreach (KeyValuePair<UUID, string> kvp in HTTPPaths) {
-                //Fix the agentID
+                // Fix the agentID
                 im.ToAgentID = kvp.Key;
                 //We've tried to send an IM to them before, pull out their info
                 //Send the IM to their last location
@@ -259,44 +261,41 @@ namespace WhiteCore.Modules.Chat
                         IMUsersCache.Remove (kvp.Key);
                     }
                 } else {
-                    //Send the IM, and it made it to the user, return true
+                    // Send the IM, and it made it to the user, return true
                     CompletedUsers.Add (kvp.Key);
                 }
             }
 
-            //Remove the finished users
+            // Remove the finished users
             foreach (UUID agentID in CompletedUsers) {
                 users.Remove (agentID);
             }
             HTTPPaths.Clear ();
 
-            //Now query the grid server for the agents
+            // Now query the grid server for the agents
             List<string> Queries = users.Select (agentID => agentID.ToString ()).ToList ();
 
             if (Queries.Count == 0)
                 return; //All done
 
-            //Ask for the user new style first
-            List<string> AgentLocations = m_agentInfoService.GetAgentsLocations (im.FromAgentID.ToString (),
-                                                                                       Queries);
-            //If this is false, this doesn't exist on the presence server and we use the legacy way
-            if (AgentLocations != null && AgentLocations.Count != 0) {
+            // Ask for the user new style first
+            List<string> AgentLocations = m_agentInfoService.GetAgentsLocations (im.FromAgentID.ToString (), Queries);
+            // If this is false, this doesn't exist on the presence server and we use the legacy way
+            if (AgentLocations.Count > 0) {
                 for (int i = 0; i < users.Count; i++) {
-                    //No agents, so this user is offline
+                    // No agents, so this user is offline
                     if (AgentLocations [i] == "NotOnline") {
                         IMUsersCache.Remove (users [i]);
-                        MainConsole.Instance.Debug ("[GRID INSTANT MESSAGE]: Unable to deliver an instant message to " +
-                                                   users [i] +
-                                                   ", user was not online");
+                        MainConsole.Instance.Debug ("[Grid Instant Message]: Unable to deliver an instant message to " +
+                                                   users [i] + ", user was not online");
                         im.ToAgentID = users [i];
                         HandleUndeliveredMessage (im, "User is not online.");
                         continue;
                     }
                     if (AgentLocations [i] == "NonExistant") {
                         IMUsersCache.Remove (users [i]);
-                        MainConsole.Instance.Info ("[GRID INSTANT MESSAGE]: Unable to deliver an instant message to " +
-                                                  users [i] +
-                                                  ", user does not exist");
+                        MainConsole.Instance.Info ("[Grid Instant Message]: Unable to deliver an instant message to " +
+                                                  users [i] + ", user does not exist");
                         im.ToAgentID = users [i];
                         HandleUndeliveredMessage (im, "User does not exist.");
                         continue;
@@ -305,31 +304,31 @@ namespace WhiteCore.Modules.Chat
                 }
             } else {
                 MainConsole.Instance.Info (
-                    "[GRID INSTANT MESSAGE]: Unable to deliver an instant message, no users found.");
+                    "[Grid Instant Message]: Unable to deliver an instant message, no users found.");
                 return;
             }
 
-            //We found the agent's location, now ask them about the user
+            // We found the agent's location, now ask them about the user
             foreach (KeyValuePair<UUID, string> kvp in HTTPPaths) {
                 if (kvp.Value != "") {
                     im.ToAgentID = kvp.Key;
                     if (!doIMSending (kvp.Value, im)) {
-                        //It failed
+                        // It failed
                         lock (IMUsersCache) {
-                            //Remove them so we keep testing against the db
+                            // Remove them so we keep testing against the db
                             IMUsersCache.Remove (kvp.Key);
                         }
                         HandleUndeliveredMessage (im, "Failed to send IM to destination.");
                     } else {
-                        //Add to the cache
+                        // Add to the cache
                         if (!IMUsersCache.ContainsKey (kvp.Key))
                             IMUsersCache.Add (kvp.Key, kvp.Value);
-                        //Send the IM, and it made it to the user, return true
+                        // Send the IM, and it made it to the user, return true
                         continue;
                     }
                 } else {
                     lock (IMUsersCache) {
-                        //Remove them so we keep testing against the db
+                        // Remove them so we keep testing against the db
                         IMUsersCache.Remove (kvp.Key);
                     }
                     HandleUndeliveredMessage (im, "Agent Location was blank.");
@@ -362,74 +361,73 @@ namespace WhiteCore.Modules.Chat
             }
 
             if (HTTPPath != "") {
-                //We've tried to send an IM to them before, pull out their info
-                //Send the IM to their last location
+                // We've tried to send an IM to them before, pull out their info
+                // Send the IM to their last location
                 if (!doIMSending (HTTPPath, im)) {
-                    //If this fails, the user has either moved from their stored location or logged out
-                    //Since it failed, let it look them up again and rerun
+                    // If this fails, the user has either moved from their stored location or logged out
+                    // Since it failed, let it look them up again and rerun
                     lock (IMUsersCache) {
                         IMUsersCache.Remove (toAgentID);
                     }
-                    //Clear the path and let it continue trying again.
+                    // Clear the path and let it continue trying again.
                     HTTPPath = "";
                 } else {
-                    //Send the IM, and it made it to the user, return true
+                    // Send the IM, and it made it to the user, return true
                     return;
                 }
             }
 
-            //Now query the grid server for the agent
+            // Now query the grid server for the agent
             List<string> AgentLocations = m_agentInfoService.GetAgentsLocations (im.FromAgentID.ToString (),
                                                                  new List<string> (new [] { toAgentID.ToString () }));
-            if (AgentLocations != null && AgentLocations.Count > 0) {
-                //No agents, so this user is offline
+            if (AgentLocations.Count > 0) {
+                // No agents, so this user is offline
                 if (AgentLocations [0] == "NotOnline") {
                     lock (IMUsersCache) {
                         //Remove them so we keep testing against the db
                         IMUsersCache.Remove (toAgentID);
                     }
-                    MainConsole.Instance.Debug ("[GRID INSTANT MESSAGE]: Unable to deliver an instant message as user is not online");
+                    MainConsole.Instance.Debug ("[Grid Instant Message]: Unable to deliver an instant message as user is not online");
                     HandleUndeliveredMessage (im, "User is not online.");
                     return;
                 }
                 if (AgentLocations [0] == "NonExistant") {
                     IMUsersCache.Remove (toAgentID);
-                    MainConsole.Instance.Info ("[GRID INSTANT MESSAGE]: Unable to deliver an instant message to " +
-                                              toAgentID +
-                                              ", user does not exist");
+                    MainConsole.Instance.Info ("[Grid Instant Message]: Unable to deliver an instant message to " +
+                                              toAgentID + ", user does not exist");
                     HandleUndeliveredMessage (im, "User does not exist.");
                     return;
                 }
                 HTTPPath = AgentLocations [0];
             }
 
-            //We found the agent's location, now ask them about the user
+            // We found the agent's location, now ask them about the user
             if (HTTPPath != "") {
                 if (!doIMSending (HTTPPath, im)) {
-                    //It failed, stop now
+                    // It failed, stop now
                     lock (IMUsersCache) {
                         //Remove them so we keep testing against the db
                         IMUsersCache.Remove (toAgentID);
                     }
                     MainConsole.Instance.Info (
-                        "[GRID INSTANT MESSAGE]: Unable to deliver an instant message as the region could not be found");
+                        "[Grid Instant Message]: Unable to deliver an instant message as the region could not be found");
                     HandleUndeliveredMessage (im, "Failed to send IM to destination.");
                     return;
                 } else {
-                    //Add to the cache
+                    // Add to the cache
                     if (!IMUsersCache.ContainsKey (toAgentID))
                         IMUsersCache.Add (toAgentID, HTTPPath);
-                    //Send the IM, and it made it to the user, return true
+                    // Send the IM, and it made it to the user, return true
                     return;
                 }
             } else {
-                //Couldn't find them, stop for now
+                // Couldn't find them, stop for now
                 lock (IMUsersCache) {
                     //Remove them so we keep testing against the db
                     IMUsersCache.Remove (toAgentID);
                 }
                 MainConsole.Instance.Info (
-                    "[GRID INSTANT MESSAGE]: Unable to deliver an instant message as the region could not be found");
+                    "[Grid Instant Message]: Unable to deliver an instant message as the region could not be found");
                 HandleUndeliveredMessage (im, "Agent Location was blank.");
             }
         }
@@ -438,14 +436,14 @@ namespace WhiteCore.Modules.Chat
         ///     This actually does the XMLRPC Request
         /// </summary>
         /// <param name="httpInfo">RegionInfo we pull the data out of to send the request to</param>
-        /// <param name="xmlrpcdata">The Instant Message data Hashtable</param>
+        /// <param name="message">The Instant Message data Hashtable</param>
         /// <returns>Bool if the message was successfully delivered at the other side.</returns>
         protected virtual bool doIMSending (string httpInfo, GridInstantMessage message)
         {
             MemoryStream stream = new MemoryStream ();
             ProtoBuf.Serializer.Serialize (stream, message);
             byte [] data = WebUtils.PostToService (httpInfo + "/gridinstantmessages/", stream.ToArray ());
-            return data == null || data.Length == 0 || data [0] == 0 ? false : true;
+            return data != null && data.Length != 0 && data [0] != 0;     // true if we have data, false otherwise
         }
     }
 }

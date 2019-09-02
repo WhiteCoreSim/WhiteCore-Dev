@@ -421,13 +421,13 @@ namespace WhiteCore.Modules.Archivers
             foreach (UUID creatorId in m_userUuids.Keys)
             {
                 // Record the creator of this item
-                UserAccount creator = m_accountService.GetUserAccount(null, creatorId);
+                UserAccount creatorAcct = m_accountService.GetUserAccount(null, creatorId);
 
-                if (creator != null)
+                if (creatorAcct.Valid)
                 {
                     m_archiveWriter.WriteFile(
-                        ArchiveConstants.USERS_PATH + creator.FirstName + " " + creator.LastName + ".xml",
-                        UserProfileSerializer.Serialize(creator.PrincipalID, creator.FirstName, creator.LastName));
+                        ArchiveConstants.USERS_PATH + creatorAcct.Name + ".xml",
+                        UserProfileSerializer.Serialize(creatorAcct.PrincipalID, creatorAcct.FirstName, creatorAcct.LastName));
                 }
                 else
                 {

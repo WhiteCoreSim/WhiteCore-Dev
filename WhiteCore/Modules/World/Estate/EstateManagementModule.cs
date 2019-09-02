@@ -401,7 +401,7 @@ namespace WhiteCore.Modules.Estate
             // EstateAccessDelta handles Estate Managers, Sim Access, Sim Banlist, allowed Groups..  etc.
 
             if (user == m_scene.RegionInfo.EstateSettings.EstateOwner)
-                return; // never process EO
+                return; // never process Estate Owner
 
             IEstateConnector connector = Framework.Utilities.DataManager.RequestPlugin<IEstateConnector> ();
             List<EstateSettings> estates;
@@ -439,19 +439,24 @@ namespace WhiteCore.Modules.Estate
                         actions.Add ((userID) =>
                         {
                             IScenePresence SP = m_scene.GetScenePresence (user);
+
+                            var banhostEP = "0.0.0.0";
+                            if (SP != null) {
+                                var bIP = (System.Net.IPEndPoint)SP.ControllingClient.GetClientEP ();
+                                if (bIP != null)
+                                    banhostEP = bIP.Address.ToString ();
+                            }
+
                             EstateBan item = new EstateBan {
                                 BannedUserID = userID,
                                 EstateID = es.EstateID,
                                 BannedHostAddress = "0.0.0.0",
-                                BannedHostIPMask = (SP != null)
-                                                        ? ((System.Net.IPEndPoint)SP.ControllingClient.GetClientEP ()).Address.ToString ()
-                                                        : "0.0.0.0"
+                                BannedHostIPMask = banhostEP
                             };
 
                             es.AddBan (item);
 
-                            IEntityTransferModule transferModule =
-                                m_scene.RequestModuleInterface<IEntityTransferModule> ();
+                            IEntityTransferModule transferModule = m_scene.RequestModuleInterface<IEntityTransferModule> ();
                             if (SP != null && transferModule != null)
                             {
                                 if (!SP.IsChildAgent)
@@ -830,19 +835,19 @@ namespace WhiteCore.Modules.Estate
                                 TaskName = prt.Name,
                                 TimeModified = sog.RootChild.Rezzed
                             };
-                            UserAccount account =
+                            UserAccount ownerAcct =
                                 m_scene.UserAccountService.GetUserAccount (m_scene.RegionInfo.AllScopeIDs, sog.OwnerID);
-                            lsri.OwnerName = account != null ? account.Name : "Unknown";
+                            lsri.OwnerName = ownerAcct.Name;
 
                             if (filter.Length != 0)
                             {
-                                //Its in the filter, don't check it
-                                if (requestFlags == 2) //Owner name
+                                // Its in the filter, don't check it
+                                if (requestFlags == 2) // Owner name
                                 {
                                     if (!lsri.OwnerName.Contains (filter))
                                         continue;
                                 }
-                                if (requestFlags == 4) //Object name
+                                if (requestFlags == 4) // Object name
                                 {
                                     if (!lsri.TaskName.Contains (filter))
                                         continue;

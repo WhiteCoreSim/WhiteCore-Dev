@@ -54,11 +54,10 @@ namespace WhiteCore.Modules.Archivers
         /// <value>
         ///     Pending save completions initiated from the console
         /// </value>
-        protected List<Guid> m_pendingConsoleSaves = new List<Guid>();
+        protected List<Guid> m_pendingConsoleSaves = new List<Guid> ();
 
 
-        public string Name
-        {
+        public string Name {
             get { return "Inventory Archiver Module"; }
         }
 
@@ -66,59 +65,53 @@ namespace WhiteCore.Modules.Archivers
 
         public event InventoryArchiveSaved OnInventoryArchiveSaved;
 
-        public bool ArchiveInventory(
+        public bool ArchiveInventory (
             Guid id, string firstName, string lastName, string invPath, Stream saveStream)
         {
-            return ArchiveInventory(id, firstName, lastName, invPath, saveStream, new Dictionary<string, object>());
+            return ArchiveInventory (id, firstName, lastName, invPath, saveStream, new Dictionary<string, object> ());
         }
 
-        public bool ArchiveInventory(
+        public bool ArchiveInventory (
             Guid id, string firstName, string lastName, string invPath, Stream saveStream,
             Dictionary<string, object> options)
         {
-            UserAccount userInfo = m_registry.RequestModuleInterface<IUserAccountService>()
-                                             .GetUserAccount(null, firstName, lastName);
+            UserAccount userAcct = m_registry.RequestModuleInterface<IUserAccountService> ()
+                                             .GetUserAccount (null, firstName, lastName);
 
-            if (userInfo != null)
-            {
-                try
-                {
+            if (userAcct.Valid) {
+                try {
                     bool UseAssets = true;
-                    if (options.ContainsKey("assets"))
-                    {
+                    if (options.ContainsKey ("assets")) {
                         object Assets;
-                        options.TryGetValue("assets", out Assets);
-                        bool.TryParse(Assets.ToString(), out UseAssets);
+                        options.TryGetValue ("assets", out Assets);
+                        bool.TryParse (Assets.ToString (), out UseAssets);
                     }
 
                     string checkPermissions = "";
-                    if (options.ContainsKey("checkPermissions"))
-                    {
-                        Object temp;
-                        if (options.TryGetValue("checkPermissions", out temp))
-                            checkPermissions = temp.ToString().ToUpper();
+                    if (options.ContainsKey ("checkPermissions")) {
+                        object temp;
+                        if (options.TryGetValue ("checkPermissions", out temp))
+                            checkPermissions = temp.ToString ().ToUpper ();
                     }
 
-                    var saveArchive = new InventoryArchiveWriteRequest(
+                    var saveArchive = new InventoryArchiveWriteRequest (
                         id,
                         this,
                         m_registry,
-                        userInfo,
+                        userAcct,
                         invPath,
                         saveStream,
                         UseAssets,
                         null,
-                        new List<AssetBase>(),
+                        new List<AssetBase> (),
                         checkPermissions);
 
-                    saveArchive.Execute();
-                }
-                catch (EntryPointNotFoundException e)
-                {
-                    MainConsole.Instance.ErrorFormat(
+                    saveArchive.Execute ();
+                } catch (EntryPointNotFoundException e) {
+                    MainConsole.Instance.ErrorFormat (
                         "[Archiver]: Mismatch between Mono and zlib1g library version when trying to create compression stream."
                         + "If you've manually installed Mono, have you appropriately updated zlib1g as well?");
-                    MainConsole.Instance.Error(e);
+                    MainConsole.Instance.Error (e);
 
                     return false;
                 }
@@ -133,62 +126,60 @@ namespace WhiteCore.Modules.Archivers
 
         #region IService Members
 
-        public void Initialize(IConfigSource config, IRegistryCore registry)
+        public void Initialize (IConfigSource config, IRegistryCore registry)
         {
             m_registry = registry;
 
             // set default path to user archives
-            var defpath = m_registry.RequestModuleInterface<ISimulationBase>().DefaultDataPath;
+            var defpath = m_registry.RequestModuleInterface<ISimulationBase> ().DefaultDataPath;
             m_archiveDirectory = Path.Combine (defpath, Constants.DEFAULT_USERINVENTORY_DIR);
 
             // check if this is a local service
             IConfig connectorConfig = config.Configs ["WhiteCoreConnectors"];
             if ((connectorConfig != null) && connectorConfig.Contains ("DoRemoteCalls"))
-                isLocal = ! connectorConfig.GetBoolean ("DoRemoteCalls", false);
-            
+                isLocal = !connectorConfig.GetBoolean ("DoRemoteCalls", false);
+
         }
 
-        public void Start(IConfigSource config, IRegistryCore registry)
+        public void Start (IConfigSource config, IRegistryCore registry)
         {
         }
 
-        public void FinishedStartup()
+        public void FinishedStartup ()
         {
 
             // Lock out if remote 
-            if (isLocal)
-            {
-                m_registry.RegisterModuleInterface<IInventoryArchiverModule>(this);
+            if (isLocal) {
+                m_registry.RegisterModuleInterface<IInventoryArchiverModule> (this);
 
                 OnInventoryArchiveSaved += SaveIARConsoleCommandCompleted;
 
-                if (MainConsole.Instance != null)
-                {
-                    MainConsole.Instance.Commands.AddCommand(
+                if (MainConsole.Instance != null) {
+                    MainConsole.Instance.Commands.AddCommand (
                         "load iar",
                         "load iar <first> <last> [<IAR path> [<inventory path>]]",
-                        "Load user inventory archive (IAR).\n " +
-                        "--merge is an option which merges the loaded IAR with existing inventory folders where possible, rather than always creating new ones\n"
-                        + "<first> is user's first name." + Environment.NewLine
-                        + "<last> is user's last name." + Environment.NewLine
-                        + "<IAR path> is the filesystem path or URI from which to load the IAR." + Environment.NewLine
-                        + "           If this is not given then 'UserArchives' in the "+ m_archiveDirectory + " directory is used\n"
-                        + "<inventory path> is the path inside the user's inventory where the IAR should be loaded." 
+                        "Load user inventory archive (IAR).\n"
+                        + "--merge is an option which merges the loaded IAR with existing inventory folders where possible, rather than always creating new ones\n"
+                        + "<first> is user's first name.\n"
+                        + "<last> is user's last name.\n"
+                        + "<IAR path> is the filesystem path or URI from which to load the IAR.\n"
+                        + "           If this is not given then 'UserArchives' in the " + m_archiveDirectory + " directory is used\n"
+                        + "<inventory path> is the path inside the user's inventory where the IAR should be loaded.\n" 
                         + "                 (Default is '/iar_import')",
                         HandleLoadIARConsoleCommand, false, true);
 
-                    MainConsole.Instance.Commands.AddCommand(
+                    MainConsole.Instance.Commands.AddCommand (
                         "save iar",
                         "save iar <first> <last> [<IAR path> [<inventory path>]] [--noassets]",
-                        "Save user inventory archive (IAR). <first> is the user's first name." + Environment.NewLine
-                        + "<last> is the user's last name." + Environment.NewLine
-                        + "<IAR path> is the filesystem path at which to save the IAR." + Environment.NewLine
+                        "Save user inventory archive (IAR). <first> is the user's first name.\n"
+                        + "<last> is the user's last name.\n"
+                        + "<IAR path> is the filesystem path at which to save the IAR.\n"
                         + "           If this is not given then the IAR will be saved in " + m_archiveDirectory + "/UserArchives\n"
-                        + "<inventory path> is the path inside the user's inventory for the folder/item to be saved.\n"
-                        + "                 (Default is all folders)\n"
+                        + "<inventory path> is the path inside the user's inventory for the folder/item to be saved.\n" 
+                        + "                 (Default is all folders)\n" 
                         + " --noassets : if present, save withOUT assets.\n"
-                        +"               This version will NOT load on another grid/standalone other than the current grid/standalone!"
-                        + "--perm=<permissions> : If present, verify asset permissions before saving.\n"
+                        + "               This version will NOT load on another grid/standalone other than the current grid/standalone!\n"
+                        + "--perm=<permissions> : If present, verify asset permissions before saving.\n" 
                         + "   <permissions> can include 'C' (Copy), 'M' (Modify, 'T' (Transfer)",
                         HandleSaveIARConsoleCommand, false, true);
                 }
@@ -200,51 +191,45 @@ namespace WhiteCore.Modules.Archivers
         /// <summary>
         ///     Trigger the inventory archive saved event.
         /// </summary>
-        protected internal void TriggerInventoryArchiveSaved(
-            Guid id, bool succeeded, UserAccount userInfo, string invPath, Stream saveStream,
-            Exception reportedException)
+        protected internal void TriggerInventoryArchiveSaved (Guid id, bool succeeded, UserAccount userInfo,
+                                                              string invPath, Stream saveStream,
+                                                              Exception reportedException)
         {
             InventoryArchiveSaved handlerInventoryArchiveSaved = OnInventoryArchiveSaved;
             if (handlerInventoryArchiveSaved != null)
-                handlerInventoryArchiveSaved(id, succeeded, userInfo, invPath, saveStream, reportedException);
+                handlerInventoryArchiveSaved (id, succeeded, userInfo, invPath, saveStream, reportedException);
         }
 
-        public bool ArchiveInventory(
-            Guid id, string firstName, string lastName, string invPath, string savePath,
-            Dictionary<string, object> options)
+        public bool ArchiveInventory (Guid id, string firstName, string lastName,
+                                      string invPath, string savePath,
+                                      Dictionary<string, object> options)
         {
-            UserAccount userInfo = m_registry.RequestModuleInterface<IUserAccountService>()
-                                             .GetUserAccount(null, firstName, lastName);
+            UserAccount userAcct = m_registry.RequestModuleInterface<IUserAccountService> ()
+                                             .GetUserAccount (null, firstName, lastName);
 
-            if (userInfo != null)
-            {
-                try
-                {
+            if (userAcct.Valid) {
+                try {
                     bool UseAssets = true;
-                    if (options.ContainsKey("assets"))
-                    {
+                    if (options.ContainsKey ("assets")) {
                         object Assets;
-                        options.TryGetValue("assets", out Assets);
-                        bool.TryParse(Assets.ToString(), out UseAssets);
+                        options.TryGetValue ("assets", out Assets);
+                        bool.TryParse (Assets.ToString (), out UseAssets);
                     }
 
                     string checkPermissions = null;
-                    if (options.ContainsKey("checkPermissions"))
-                    {
-                        Object temp;
-                        if (options.TryGetValue("checkPermissions", out temp))
-                            checkPermissions = temp.ToString().ToUpper();
+                    if (options.ContainsKey ("checkPermissions")) {
+                        object temp;
+                        if (options.TryGetValue ("checkPermissions", out temp))
+                            checkPermissions = temp.ToString ().ToUpper ();
                     }
 
-                    new InventoryArchiveWriteRequest(id, this, m_registry, userInfo, invPath, savePath, UseAssets, checkPermissions).
-                        Execute();
-                }
-                catch (EntryPointNotFoundException e)
-                {
-                    MainConsole.Instance.ErrorFormat(
+                    new InventoryArchiveWriteRequest (id, this, m_registry, userAcct, invPath, savePath, UseAssets, checkPermissions).
+                        Execute ();
+                } catch (EntryPointNotFoundException e) {
+                    MainConsole.Instance.ErrorFormat (
                         "[Archiver]: Mismatch between Mono and zlib1g library version when trying to create compression stream.\n"
                         + "If you've manually installed Mono, have you appropriately updated zlib1g as well?");
-                    MainConsole.Instance.Error(e);
+                    MainConsole.Instance.Error (e);
 
                     return false;
                 }
@@ -255,33 +240,29 @@ namespace WhiteCore.Modules.Archivers
             return false;
         }
 
-        public bool DearchiveInventory(
-            string firstName, string lastName, string invPath, string loadPath,
-            Dictionary<string, object> options)
+        public bool DearchiveInventory (string firstName, string lastName, 
+                                        string invPath, string loadPath,
+                                        Dictionary<string, object> options)
         {
-            UserAccount userInfo = m_registry.RequestModuleInterface<IUserAccountService>()
-                                             .GetUserAccount(null, firstName, lastName);
+            UserAccount userAcct = m_registry.RequestModuleInterface<IUserAccountService> ()
+                                             .GetUserAccount (null, firstName, lastName);
 
-            if (userInfo != null)
-            {
+            if (userAcct.Valid) {
                 InventoryArchiveReadRequest request;
-                bool merge = (options.ContainsKey("merge") && (bool) options["merge"]);
+                bool merge = (options.ContainsKey ("merge") && (bool)options ["merge"]);
 
-                try
-                {
-                    request = new InventoryArchiveReadRequest(m_registry, userInfo, invPath, loadPath, merge, UUID.Zero);
-                }
-                catch (EntryPointNotFoundException e)
-                {
-                    MainConsole.Instance.ErrorFormat(
+                try {
+                    request = new InventoryArchiveReadRequest (m_registry, userAcct, invPath, loadPath, merge, UUID.Zero);
+                } catch (EntryPointNotFoundException e) {
+                    MainConsole.Instance.ErrorFormat (
                         "[Archiver]: Mismatch between Mono and zlib1g library version when trying to create compression stream.\n"
                         + "If you've manually installed Mono, have you appropriately updated zlib1g as well?");
-                    MainConsole.Instance.Error(e);
+                    MainConsole.Instance.Error (e);
 
                     return false;
                 }
 
-                var loadArchive = request.Execute(false);
+                var loadArchive = request.Execute (false);
                 if (loadArchive == null)                         // nothing loaded ??
                     return false;
 
@@ -291,12 +272,11 @@ namespace WhiteCore.Modules.Archivers
             return false;
         }
 
-        public List<string> GetIARFilenames()
+        public List<string> GetIARFilenames ()
         {
-            var retVals = new List<string>();
+            var retVals = new List<string> ();
 
-            if (Directory.Exists (m_archiveDirectory))
-            {
+            if (Directory.Exists (m_archiveDirectory)) {
                 var archives = new List<string> (Directory.GetFiles (m_archiveDirectory, "*.iar"));
                 archives.AddRange (new List<string> (Directory.GetFiles (m_archiveDirectory, "*.tgz")));
                 foreach (string file in archives)
@@ -311,121 +291,105 @@ namespace WhiteCore.Modules.Archivers
         /// </summary>
         /// <param name="scene"></param>
         /// <param name="cmdparams"></param>
-        protected void HandleLoadIARConsoleCommand(IScene scene, string[] cmdparams)
+        protected void HandleLoadIARConsoleCommand (IScene scene, string [] cmdparams)
         {
-            try
-            {
+            try {
                 string iarPath = "IAR Import";             // default path to load IAR
 
-                Dictionary<string, object> options = new Dictionary<string, object>();
-                List<string> newParams = new List<string>(cmdparams);
-                foreach (string param in cmdparams)
-                {
-                    if (param.StartsWith("--skip-assets", StringComparison.CurrentCultureIgnoreCase))
-                    {
-                        options["skip-assets"] = true;
-                        newParams.Remove(param);
-                    } 
+                Dictionary<string, object> options = new Dictionary<string, object> ();
+                List<string> newParams = new List<string> (cmdparams);
+                foreach (string param in cmdparams) {
+                    if (param.StartsWith ("--skip-assets", StringComparison.CurrentCultureIgnoreCase)) {
+                        options ["skip-assets"] = true;
+                        newParams.Remove (param);
+                    }
 
-                    if (param.StartsWith("--merge", StringComparison.CurrentCultureIgnoreCase))
-                    {
-                        options["merge"] = true;
+                    if (param.StartsWith ("--merge", StringComparison.CurrentCultureIgnoreCase)) {
+                        options ["merge"] = true;
                         iarPath = "/";
-                        newParams.Remove(param);
+                        newParams.Remove (param);
                     }
                 }
 
                 string firstName;
                 string lastName;
 
-                if (newParams.Count < 3)
-                {
-                    string[] names;
+                if (newParams.Count < 3) {
+                    string [] names;
                     string name = "";
 
-                    do
-                    {
-                        name = MainConsole.Instance.Prompt("User Name <first last>: ", name);
-                        names = name.Split(' ');
-                        if (name.ToLower() == "cancel")
+                    do {
+                        name = MainConsole.Instance.Prompt ("User Name <first last>: ", name);
+                        names = name.Split (' ');
+                        if (name.ToLower () == "cancel")
                             return;
                     } while (names.Length < 2);
-                    firstName = names[0];
-                    lastName = names[1];
-                } else
-                {
-                    firstName = newParams[2];
-                    lastName = newParams[3];
+                    firstName = names [0];
+                    lastName = names [1];
+                } else {
+                    firstName = newParams [2];
+                    lastName = newParams [3];
                 }
-                string archiveFileName = firstName+"_"+lastName+".iar";         // assume this is the IAR to load initially
+                string archiveFileName = firstName + "_" + lastName + ".iar";         // assume this is the IAR to load initially
 
                 // optional...
                 if (newParams.Count > 4)
-                    archiveFileName = newParams[4];
-                else
-                {
+                    archiveFileName = newParams [4];
+                else {
                     // confirm iar to load
-                    do
-                    {
-                        archiveFileName = MainConsole.Instance.Prompt("IAR file to load (? for list): ", archiveFileName);
+                    do {
+                        archiveFileName = MainConsole.Instance.Prompt ("IAR file to load (? for list): ", archiveFileName);
                         if (archiveFileName == "")
                             return;
 
-                        if (archiveFileName == "?")
-                        {
-                            var archives = GetIARFilenames();
-                            if (archives.Count > 0)
-                            {
+                        if (archiveFileName == "?") {
+                            var archives = GetIARFilenames ();
+                            if (archives.Count > 0) {
                                 MainConsole.Instance.CleanInfo (" Available archives are : ");
                                 foreach (string file in archives)
                                     MainConsole.Instance.CleanInfo ("   " + file);
                             } else
                                 MainConsole.Instance.CleanInfo ("Sorry, no archives are available.");
 
-                            archiveFileName = "";    
+                            archiveFileName = "";
                         }
                     } while (archiveFileName == "");
                 }
 
                 // sanity checks...
-                var loadPath = PathHelpers.VerifyReadFile(archiveFileName, new List<string>{".iar",".tgz"}, m_archiveDirectory);
-                if (loadPath == "")
-                {
-                    MainConsole.Instance.InfoFormat("   Sorry, IAR file '{0}' not found!", archiveFileName);
+                var loadPath = PathHelpers.VerifyReadFile (archiveFileName, new List<string> { ".iar", ".tgz" }, m_archiveDirectory);
+                if (loadPath == "") {
+                    MainConsole.Instance.InfoFormat ("   Sorry, IAR file '{0}' not found!", archiveFileName);
                     return;
                 }
 
                 // inventory path...
                 if (cmdparams.Length > 5)
-                    iarPath = newParams[5];
-                else
-                {
+                    iarPath = newParams [5];
+                else {
                     // not provided. Check for merge
-                    string mergeIar = MainConsole.Instance.Prompt(
+                    string mergeIar = MainConsole.Instance.Prompt (
                         "Do you want to 'merge' this archive or 'create' a new folder 'IAR Import'? (merge/create)", "create");
-                    if (mergeIar.ToLower().StartsWith("m"))
+                    if (mergeIar.ToLower ().StartsWith ("m", StringComparison.Ordinal))
                         iarPath = "/";
                 }
 
                 if (iarPath == "/")
-                    options["merge"] = true;                // always merge if using the root folder
+                    options ["merge"] = true;                // always merge if using the root folder
 
-                if (loadPath != "")
-                {
+                if (loadPath != "") {
 
-                    MainConsole.Instance.InfoFormat(
+                    MainConsole.Instance.InfoFormat (
                         "[Inventory Archiver]: Loading archive {0} to inventory path {1} for {2} {3}",
                         loadPath, iarPath, firstName, lastName);
 
-                    if (DearchiveInventory(firstName, lastName, iarPath, loadPath, options))
-                        MainConsole.Instance.InfoFormat(
+                    if (DearchiveInventory (firstName, lastName, iarPath, loadPath, options))
+                        MainConsole.Instance.InfoFormat (
                             "[Inventory Archiver]: Loaded archive {0} for {1} {2}",
                             loadPath, firstName, lastName);
                 }
-            }
-            catch (InventoryArchiverException e)
-            {
-                MainConsole.Instance.ErrorFormat("[Inventory Archiver]: {0}", e.Message);
+            } catch (InventoryArchiverException e) {
+                MainConsole.Instance.ErrorFormat ("[Inventory Archiver]: {0}", e.Message);
             }
         }
 
@@ -433,104 +397,90 @@ namespace WhiteCore.Modules.Archivers
         ///     Save inventory to a file archive
         /// </summary>
         /// <param name="cmdparams"></param>
-        protected void HandleSaveIARConsoleCommand(IScene scene, string[] cmdparams)
+        protected void HandleSaveIARConsoleCommand (IScene scene, string [] cmdparams)
         {
-            Dictionary<string, object> options = new Dictionary<string, object> {{"Assets", true}};
-            List<string> newParams = new List<string>(cmdparams);
-            foreach (string param in cmdparams)
-            {
-                if (param.StartsWith("--noassets", StringComparison.CurrentCultureIgnoreCase))
-                {
-                    options["Assets"] = false;
-                    newParams.Remove(param);
+            Dictionary<string, object> options = new Dictionary<string, object> { { "Assets", true } };
+            List<string> newParams = new List<string> (cmdparams);
+            foreach (string param in cmdparams) {
+                if (param.StartsWith ("--noassets", StringComparison.CurrentCultureIgnoreCase)) {
+                    options ["Assets"] = false;
+                    newParams.Remove (param);
                 }
-                if (param.StartsWith("--perm=", StringComparison.CurrentCultureIgnoreCase))
-                {
-                    options["CheckPermissions"] = param.Substring(7);
-                    newParams.Remove(param);
+                if (param.StartsWith ("--perm=", StringComparison.CurrentCultureIgnoreCase)) {
+                    options ["CheckPermissions"] = param.Substring (7);
+                    newParams.Remove (param);
                 }
 
             }
 
             string firstName;
             string lastName;
-            try
-            {
-                if (newParams.Count < 3)
-                {
-                    string[] names;
+            try {
+                if (newParams.Count < 3) {
+                    string [] names;
                     string name = "";
 
-                    do
-                    {
-                        name = MainConsole.Instance.Prompt("User Name <first last>: ", name);
-                        names = name.Split(' ');
-                        if (name.ToLower() == "cancel")
+                    do {
+                        name = MainConsole.Instance.Prompt ("User Name <first last>: ", name);
+                        names = name.Split (' ');
+                        if (name.ToLower () == "cancel")
                             return;
                     } while (names.Length < 2);
-                    firstName = names[0];
-                    lastName = names[1];
-                } else
-                {
-                    firstName = newParams[2];
-                    lastName = newParams[3];
+                    firstName = names [0];
+                    lastName = names [1];
+                } else {
+                    firstName = newParams [2];
+                    lastName = newParams [3];
                 }
 
                 // optional...
                 string iarPath = "/*";
                 if (newParams.Count > 5)
-                    iarPath = newParams[5];
+                    iarPath = newParams [5];
 
                 // archive name
                 string archiveFileName;
-                if (newParams.Count < 4)
-                {
-                    archiveFileName = firstName+"_"+lastName;
-                    archiveFileName = MainConsole.Instance.Prompt("IAR file to save: ", archiveFileName);
+                if (newParams.Count < 4) {
+                    archiveFileName = firstName + "_" + lastName;
+                    archiveFileName = MainConsole.Instance.Prompt ("IAR file to save: ", archiveFileName);
                 } else
-                    archiveFileName = newParams[4];
-                
+                    archiveFileName = newParams [4];
+
                 //some file sanity checks
                 string savePath;
                 savePath = PathHelpers.VerifyWriteFile (archiveFileName, ".iar", m_archiveDirectory, true);
 
-                MainConsole.Instance.InfoFormat(
+                MainConsole.Instance.InfoFormat (
                     "[Inventory Archiver]: Saving archive {0} using inventory path {1} for {2} {3}",
                     savePath, iarPath, firstName, lastName);
 
-                Guid id = Guid.NewGuid();
-                ArchiveInventory(id, firstName, lastName, iarPath, savePath, options);
+                Guid id = Guid.NewGuid ();
+                ArchiveInventory (id, firstName, lastName, iarPath, savePath, options);
 
                 lock (m_pendingConsoleSaves)
-                    m_pendingConsoleSaves.Add(id);
-            }
-            catch (InventoryArchiverException e)
-            {
-                MainConsole.Instance.ErrorFormat("[Inventory Archiver]: {0}", e.Message);
+                    m_pendingConsoleSaves.Add (id);
+            } catch (InventoryArchiverException e) {
+                MainConsole.Instance.ErrorFormat ("[Inventory Archiver]: {0}", e.Message);
             }
         }
 
-        void SaveIARConsoleCommandCompleted(
+        void SaveIARConsoleCommandCompleted (
             Guid id, bool succeeded, UserAccount userInfo, string invPath, Stream saveStream,
             Exception reportedException)
 
         {
-            lock (m_pendingConsoleSaves)
-            {
-                if (m_pendingConsoleSaves.Contains(id))
-                    m_pendingConsoleSaves.Remove(id);
+            lock (m_pendingConsoleSaves) {
+                if (m_pendingConsoleSaves.Contains (id))
+                    m_pendingConsoleSaves.Remove (id);
                 else
                     return;
             }
 
-            if (succeeded)
-            {
-                MainConsole.Instance.InfoFormat("[Inventory Archiver]: Saved archive for {0} {1}", userInfo.FirstName,
+            if (succeeded) {
+                MainConsole.Instance.InfoFormat ("[Inventory Archiver]: Saved archive for {0} {1}", userInfo.FirstName,
                                                 userInfo.LastName);
-            }
-            else
-            {
-                MainConsole.Instance.ErrorFormat(
+            } else {
+                MainConsole.Instance.ErrorFormat (
                     "[Inventory Archiver]: Archive save for {0} {1} failed - {2}",
                     userInfo.FirstName, userInfo.LastName, reportedException.Message);
             }

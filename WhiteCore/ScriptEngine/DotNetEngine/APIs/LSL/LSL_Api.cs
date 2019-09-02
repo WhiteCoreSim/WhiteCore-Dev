@@ -1160,12 +1160,12 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
 
         public string resolveName(UUID objecUUID)
         {
-            // try avatar username surname
-            UserAccount account = World.UserAccountService.GetUserAccount(World.RegionInfo.AllScopeIDs, objecUUID);
-            if (account != null)
-                return account.Name;
+            // try for avatar name
+            UserAccount userAcct = World.UserAccountService.GetUserAccount(World.RegionInfo.AllScopeIDs, objecUUID);
+            if (userAcct.Valid)
+                return userAcct.Name;
 
-            // try an scene object
+            // try for a scene object
             ISceneChildEntity SOP = World.GetSceneObjectPart(objecUUID);
             if (SOP != null)
                 return SOP.Name;
@@ -4952,19 +4952,19 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
 
             UUID uuid = (UUID)id;
             UserInfo pinfo = null;
-            UserAccount account;
+            UserAccount userAcct;
 
             UserInfoCacheEntry ce;
             if (!m_userInfoCache.TryGetValue(uuid, out ce))
             {
-                account = World.UserAccountService.GetUserAccount(World.RegionInfo.AllScopeIDs, uuid);
-                if (account == null)
+                userAcct = World.UserAccountService.GetUserAccount(World.RegionInfo.AllScopeIDs, uuid);
+                if (!userAcct.Valid)
                 {
                     m_userInfoCache[uuid] = null; // Cache negative
                     return UUID.Zero.ToString();
                 }
 
-                ce = new UserInfoCacheEntry { time = Util.EnvironmentTickCount(), account = account };
+                ce = new UserInfoCacheEntry { time = Util.EnvironmentTickCount(), account = userAcct };
                 pinfo = World.RequestModuleInterface<IAgentInfoService>().GetUserInfo(uuid.ToString());
                 ce.pinfo = pinfo;
                 m_userInfoCache[uuid] = ce;
@@ -4975,7 +4975,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
                 {
                     return UUID.Zero.ToString();
                 }
-                account = ce.account;
+                userAcct = ce.account;
                 pinfo = ce.pinfo;
             }
 
@@ -4997,21 +4997,21 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
                         reply = "0";
                     break;
                 case 2: // DATA_NAME (First Last)
-                    reply = account.Name;
+                    reply = userAcct.Name;
                     break;
                 case 3: // DATA_BORN (YYYY-MM-DD)
                     DateTime born = new DateTime(1970, 1, 1, 0, 0, 0, 0);
-                    born = born.AddSeconds(account.Created);
+                    born = born.AddSeconds(userAcct.Created);
                     reply = born.ToString("yyyy-MM-dd");
                     break;
                 case 4: // DATA_RATING (0,0,0,0,0,0)
                     reply = "0,0,0,0,0,0";
                     break;
                 case 8: // DATA_PAYINFO (0|1|2|3)
-                    if ((account.UserFlags & ScriptBaseClass.PAYMENT_INFO_ON_FILE) ==
+                    if ((userAcct.UserFlags & ScriptBaseClass.PAYMENT_INFO_ON_FILE) ==
                         ScriptBaseClass.PAYMENT_INFO_ON_FILE)
                         reply = ScriptBaseClass.PAYMENT_INFO_ON_FILE.ToString();
-                    if ((account.UserFlags & ScriptBaseClass.PAYMENT_INFO_USED) == ScriptBaseClass.PAYMENT_INFO_USED)
+                    if ((userAcct.UserFlags & ScriptBaseClass.PAYMENT_INFO_USED) == ScriptBaseClass.PAYMENT_INFO_USED)
                         reply = ScriptBaseClass.PAYMENT_INFO_USED.ToString();
                     reply = "0";
                     break;
@@ -6758,28 +6758,22 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             UUID key = new UUID();
             if (UUID.TryParse(id, out key))
             {
-                try
-                {
-                    IScenePresence presence = World.GetScenePresence(key);
-                    IParcelManagementModule parcelManagement = World.RequestModuleInterface<IParcelManagementModule>();
-                    if (presence != null) // object is an avatar
-                    {
-                        if (parcelManagement != null)
-                        {
-                            if (m_host.OwnerID
-                                == parcelManagement.GetLandObject(
-                                presence.AbsolutePosition.X, presence.AbsolutePosition.Y).LandData.OwnerID)
+                try {
+                    IScenePresence presence = World.GetScenePresence (key);
+                    IParcelManagementModule parcelManagement = World.RequestModuleInterface<IParcelManagementModule> ();
+                    if (presence != null) {     // object is an avatar
+
+                        if (parcelManagement != null) {
+                            if (m_host.OwnerID == parcelManagement.GetLandObject (presence.AbsolutePosition.X,
+                                                                                  presence.AbsolutePosition.Y).LandData.OwnerID)
                                 return 1;
                         }
-                        else // object is not an avatar
-                        {
-                            ISceneChildEntity obj = World.GetSceneObjectPart(key);
-                            if (obj != null)
-                                if (parcelManagement != null)
-                                {
-                                    if (m_host.OwnerID == parcelManagement.GetLandObject(obj.AbsolutePosition.X, obj.AbsolutePosition.Y).LandData.OwnerID)
-                                        return 1;
-                                }
+                    } else {                    // object is not an avatar
+                        ISceneChildEntity obj = World.GetSceneObjectPart (key);
+                        if (obj != null && parcelManagement != null) {
+                            if (m_host.OwnerID == parcelManagement.GetLandObject (obj.AbsolutePosition.X,
+                                                                                  obj.AbsolutePosition.Y).LandData.OwnerID)
+                                return 1;
                         }
                     }
                 }
@@ -7907,14 +7901,15 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
                 IXmlRpcRouter xmlRpcRouter = World.RequestModuleInterface<IXmlRpcRouter>();
                 if (xmlRpcRouter != null)
                 {
-                    string ExternalHostName = MainServer.Instance.HostName;
+                    string hostName = MainServer.Instance.HostName;
+                    string protocol = MainServer.Instance.Secure ? "https://" : "http://";
 
                     xmlRpcRouter.RegisterNewReceiver(
                         m_ScriptEngine.ScriptModule,
                         channelID,
                         m_host.UUID,
                         m_itemID, 
-                        string.Format("http://{0}:{1}/", ExternalHostName,xmlrpcMod.Port)
+                        string.Format("{0}{1}:{2}/", protocol, hostName, xmlrpcMod.Port)
                     );
                 }
                 object[] resobj = {
@@ -13139,10 +13134,9 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             Util.FireAndForget(delegate
                                    {
                                        string name = "";
-                                       UserAccount info =
+                                       UserAccount userAcct =
                                            World.UserAccountService.GetUserAccount(World.RegionInfo.AllScopeIDs, userID);
-                                       if (info != null)
-                                           name = info.Name;
+                                       name = userAcct.Name;
                                        dataserverPlugin.AddReply(uuid.ToString(), name, 100);
                                    });
 
@@ -13406,7 +13400,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
                 data = llList2CSV(new LSL_List("INVALID_AGENT"));
             else if (amt <= 0)
                 data = llList2CSV(new LSL_List("INVALID_AMOUNT"));
-            else if (World.UserAccountService.GetUserAccount(World.RegionInfo.AllScopeIDs, destID) == null)
+            else if (!World.UserAccountService.GetUserAccount(World.RegionInfo.AllScopeIDs, destID).Valid)
                 data = llList2CSV(new LSL_List ("LINDENDOLLAR_ENTITYDOESNOTEXIST"));
             else if (m_host.ParentEntity.OwnerID == m_host.ParentEntity.GroupID)
                 data = llList2CSV(new LSL_List ("GROUP_OWNED"));
@@ -13717,7 +13711,10 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             {
                 OSD o = OSDParser.DeserializeJson(json);
                 OSD specVal = JsonGetSpecific(o, specifiers, 0);
-                return specVal.AsString();
+                if (specVal != null)
+                    return specVal.AsString();
+                else
+                    return ScriptBaseClass.JSON_INVALID;
             }
             catch (Exception)
             {

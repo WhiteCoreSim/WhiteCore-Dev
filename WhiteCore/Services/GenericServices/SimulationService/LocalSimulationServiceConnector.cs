@@ -176,7 +176,7 @@ namespace WhiteCore.Services
             if (transferModule != null)
                 retVal = transferModule.IncomingChildAgentDataUpdate (Scene, agentData);
 
-            //            MainConsole.Instance.DebugFormat("[LOCAL COMMS]: Did not find region {0} for ChildAgentUpdate", regionHandle);
+            // MainConsole.Instance.DebugFormat("[LOCAL COMMS]: Did not find region {0} for ChildAgentUpdate", regionHandle);
             return retVal;
         }
 
@@ -186,7 +186,7 @@ namespace WhiteCore.Services
             if (Scene == null || destination == null)
                 return false;
 
-            //MainConsole.Instance.Debug("[LOCAL COMMS]: Found region to send ChildAgentUpdate");
+            // MainConsole.Instance.Debug("[LOCAL COMMS]: Found region to send ChildAgentUpdate");
             IEntityTransferModule transferModule = Scene.RequestModuleInterface<IEntityTransferModule> ();
             if (transferModule != null)
                 return transferModule.IncomingChildAgentDataUpdate (Scene, agentData);
@@ -194,19 +194,19 @@ namespace WhiteCore.Services
             return false;
         }
 
-        public bool FailedToMoveAgentIntoNewRegion (UUID AgentID, UUID RegionID)
+        public bool FailedToMoveAgentIntoNewRegion (UUID agentID, UUID regionID)
         {
-            IScene Scene = GetScene (RegionID);
+            IScene Scene = GetScene (regionID);
             if (Scene == null)
                 return false;
 
-            IScenePresence sp = Scene.GetScenePresence (AgentID);
+            IScenePresence sp = Scene.GetScenePresence (agentID);
             if (sp != null)
                 sp.AgentFailedToLeave ();
             return true;
         }
 
-        public bool MakeChildAgent (UUID AgentID, GridRegion oldRegion, GridRegion destination, bool isCrossing)
+        public bool MakeChildAgent (UUID agentID, GridRegion oldRegion, GridRegion destination, bool isCrossing)
         {
             IScene Scene = oldRegion == null ? null : GetScene (oldRegion.RegionID);
             if (Scene == null)
@@ -214,7 +214,7 @@ namespace WhiteCore.Services
 
             IEntityTransferModule transferModule = Scene.RequestModuleInterface<IEntityTransferModule> ();
             if (transferModule == null) return false;
-            transferModule.MakeChildAgent (Scene.GetScenePresence (AgentID), destination, isCrossing);
+            transferModule.MakeChildAgent (Scene.GetScenePresence (agentID), destination, isCrossing);
             return true;
         }
 
@@ -241,12 +241,12 @@ namespace WhiteCore.Services
             if (Scene == null || destination == null)
                 return false;
 
-            //MainConsole.Instance.Debug("[LOCAL COMMS]: Found region to send ChildAgentUpdate");
+            // MainConsole.Instance.Debug("[LOCAL COMMS]: Found region to send ChildAgentUpdate");
             IEntityTransferModule transferModule = Scene.RequestModuleInterface<IEntityTransferModule> ();
             if (transferModule != null)
                 return transferModule.IncomingRetrieveRootAgent (Scene, agentID, agentIsLeaving, out agentData, out circuitData);
             return false;
-            //MainConsole.Instance.Debug("[LOCAL COMMS]: region not found for ChildAgentUpdate");
+            // MainConsole.Instance.Debug("[LOCAL COMMS]: region not found for ChildAgentUpdate");
         }
 
         public bool CloseAgent (GridRegion destination, UUID agentID)

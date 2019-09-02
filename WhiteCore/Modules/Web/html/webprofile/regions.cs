@@ -65,7 +65,7 @@ namespace WhiteCore.Modules.Web
             response = null;
             var vars = new Dictionary<string, object>();
             var regionslist = new List<Dictionary<string, object>>();
-            UserAccount account = null;
+            UserAccount userAcct = new UserAccount();
 
             // future use // uint amountPerQuery = 10;
             string noDetails = translator.GetTranslatedString ("NoDetailsText");
@@ -77,7 +77,7 @@ namespace WhiteCore.Modules.Web
                 UUID userUUID = UUID.Parse (userid);
                 scopeUUID.Add (userUUID);
                   
-                account = webInterface.Registry.RequestModuleInterface<IUserAccountService>().
+                userAcct = webInterface.Registry.RequestModuleInterface<IUserAccountService>().
                     GetUserAccount(null, userUUID);
 
                 IGridService gridService = webInterface.Registry.RequestModuleInterface<IGridService>();
@@ -85,7 +85,7 @@ namespace WhiteCore.Modules.Web
 
                 var regions = gridService.GetRegionsByName(scopeUUID, "", null, null);
                 // TODO: Searching using the user UUID scope does not appear to work  -greythane- 20141020
-                if (regions != null)
+                if (regions.Count > 0)
                 {
                     noDetails = "";
 
@@ -131,11 +131,8 @@ namespace WhiteCore.Modules.Web
              }
 
             vars.Add("NoDetailsText", noDetails);
-            if (account != null)
-                vars.Add ("UserName", account.Name);
-            else
-                vars.Add ("UserName", "");
-            
+            vars.Add ("UserName", userAcct.Name);
+
             vars.Add ("RegionListText", translator.GetTranslatedString ("RegionListText"));
             vars.Add ("RegionList", regionslist);
             vars.Add ("RegionNameText", translator.GetTranslatedString ("RegionNameText"));

@@ -57,7 +57,7 @@ namespace WhiteCore.Services
 
         public void FinishedStartup ()
         {
-            //Also look for incoming messages to display
+            // Also look for incoming messages to display
             m_registry.RequestModuleInterface<ISyncMessageRecievedService> ().OnMessageReceived += OnMessageReceived;
         }
 
@@ -70,7 +70,7 @@ namespace WhiteCore.Services
         /// <returns></returns>
         protected OSDMap OnMessageReceived (OSDMap message)
         {
-            //We need to check and see if this is an AgentStatusChange
+            // We need to check and see if this is an AgentStatusChange
             if (message.ContainsKey ("Method") && message ["Method"] == "UpdateAvatarAppearance") {
                 var appearance = new AvatarAppearance (message ["AgentID"], (OSDMap)message ["Appearance"]);
                 ISceneManager manager = m_registry.RequestModuleInterface<ISceneManager> ();

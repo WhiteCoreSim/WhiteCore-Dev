@@ -68,12 +68,12 @@ namespace WhiteCore.Modules.Web
                 ILoginService loginService = webInterface.Registry.RequestModuleInterface<ILoginService> ();
                 if (loginService.VerifyClient (UUID.Zero, username, "UserAccount", password)) {
                     UUID sessionID = UUID.Random ();
-                    UserAccount account =
+                    UserAccount userAcct =
                         webInterface.Registry.RequestModuleInterface<IUserAccountService> ()
                             .GetUserAccount (null, username);
-                    Authenticator.AddAuthentication (sessionID, account);
-                    if (account.UserLevel > 0)
-                        Authenticator.AddAdminAuthentication (sessionID, account);
+                    Authenticator.AddAuthentication (sessionID, userAcct);
+                    if (userAcct.UserLevel > 0)
+                        Authenticator.AddAdminAuthentication (sessionID, userAcct);
                     httpResponse.AddCookie (new System.Web.HttpCookie ("SessionID", sessionID.ToString ()) {
                         Expires = DateTime.MinValue,
                         Path = ""

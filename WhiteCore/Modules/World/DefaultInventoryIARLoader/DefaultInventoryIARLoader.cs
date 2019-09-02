@@ -115,17 +115,26 @@ namespace WhiteCore.Modules.DefaultInventoryIARLoader
                 m_MockScene.AddModuleInterfaces (m_registry.GetInterfaces ());
             }
 
-            UserAccount uinfo = m_MockScene.UserAccountService.GetUserAccount (null, m_libService.LibraryOwnerUUID);
-            //Make the user account for the default IAR
-            if (uinfo == null) 
+            UserAccount libAcct = m_MockScene.UserAccountService.GetUserAccount (null, m_libService.LibraryOwnerUUID);
+            // Make the user account for the default IAR
+            if (!libAcct.Valid) 
             {
-                uinfo = m_MockScene.UserAccountService.GetUserAccount (null, m_libService.LibraryOwnerUUID);
-                m_MockScene.InventoryService.CreateUserInventory (uinfo.PrincipalID, false);
+                // this should not happen as the Library account should have been created with the system accounts
+                MainConsole.Instance.Error ("[Library Inventory]: Creating library user for load" + m_libService.LibraryOwnerName);
+                m_MockScene.UserAccountService.CreateUser (m_libService.LibraryOwnerUUID,
+                                                           UUID.Zero,
+                                                           m_libService.LibraryOwnerName,
+                                                           Util.Md5Hash ("library"),
+                                                           "");
+                libAcct = m_MockScene.UserAccountService.GetUserAccount (null, m_libService.LibraryOwnerUUID);
+                m_MockScene.InventoryService.CreateUserInventory (m_libService.LibraryOwnerUUID, false);
             }
-            if (m_MockScene.InventoryService.GetRootFolder (m_libService.LibraryOwnerUUID) == null)
-                m_MockScene.InventoryService.CreateUserInventory (uinfo.PrincipalID, false);
 
-            List<InventoryFolderBase> rootFolders = m_MockScene.InventoryService.GetFolderFolders (uinfo.PrincipalID, UUID.Zero);
+            if (m_MockScene.InventoryService.GetRootFolder (m_libService.LibraryOwnerUUID) == null)
+                // Try again...
+                m_MockScene.InventoryService.CreateUserInventory (m_libService.LibraryOwnerUUID, false);
+
+            List<InventoryFolderBase> rootFolders = m_MockScene.InventoryService.GetFolderFolders (m_libService.LibraryOwnerUUID, UUID.Zero);
             bool alreadyExists = rootFolders.Any (folder => folder.Name == iarFileName);
 
             if (alreadyExists) {
@@ -135,18 +144,18 @@ namespace WhiteCore.Modules.DefaultInventoryIARLoader
             }
 
             MainConsole.Instance.InfoFormat ("[Library Inventory]: Loading IAR file {0}", iarFileName);
-            InventoryFolderBase rootFolder = m_MockScene.InventoryService.GetRootFolder (uinfo.PrincipalID);
+            InventoryFolderBase rootFolder = m_MockScene.InventoryService.GetRootFolder (m_libService.LibraryOwnerUUID);
 
             if (rootFolder == null) {
-                //We need to create the root folder, otherwise the IAR freaks
-                m_MockScene.InventoryService.CreateUserInventory (uinfo.PrincipalID, false);
+                // We need to create the root folder, otherwise the IAR freaks
+                m_MockScene.InventoryService.CreateUserInventory (m_libService.LibraryOwnerUUID, false);
             }
 
-            var archread = new InventoryArchiveReadRequest (m_MockScene, uinfo, "/", iarFileName,
+            var archread = new InventoryArchiveReadRequest (m_MockScene, libAcct, "/", iarFileName,
                                                             false, m_libService.LibraryOwnerUUID);
 
             try {
-                archread.ReplaceAssets = true; //Replace any old assets
+                archread.ReplaceAssets = true;      // Replace any old assets
                 var nodes = new List<InventoryNodeBase> (archread.Execute (true));
                 if (nodes.Count == 0)
                     return;

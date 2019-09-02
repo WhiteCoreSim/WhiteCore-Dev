@@ -47,6 +47,8 @@ namespace WhiteCore.Services
 {
     public class MapService : IService, IMapService
     {
+        const int SIZE_OF_IMAGE = Constants.RegionSize;          // 256
+
         uint m_port = 8012;
         IHttpServer m_server;
         IRegistryCore m_registry;
@@ -99,6 +101,7 @@ namespace WhiteCore.Services
 
             m_blankRegionTile = new Bitmap (256, 256);
             m_blankRegionTile.Tag = "StaticBlank";
+
             using (Graphics g = Graphics.FromImage (m_blankRegionTile)) {
                 SolidBrush sea = new SolidBrush (Color.FromArgb (29, 71, 95));
                 g.FillRectangle (sea, 0, 0, 256, 256);
@@ -125,7 +128,9 @@ namespace WhiteCore.Services
 
         public void Start (IConfigSource config, IRegistryCore registry)
         {
-            if (!m_enabled) return;
+            if (!m_enabled) 
+                return;
+            
             m_assetService = m_registry.RequestModuleInterface<IAssetService> ();
             m_gridService = m_registry.RequestModuleInterface<IGridService> ();
             m_j2kDecoder = m_registry.RequestModuleInterface<IJ2KDecoder> ();
@@ -133,7 +138,9 @@ namespace WhiteCore.Services
 
         public void FinishedStartup ()
         {
-            if (!m_enabled) return;
+            if (!m_enabled) 
+                return;
+            
             IGridServerInfoService serverInfo = m_registry.RequestModuleInterface<IGridServerInfoService> ();
             if (serverInfo != null)
                 serverInfo.AddURI ("MapAPIService", MapServiceAPIURL);
@@ -245,8 +252,11 @@ namespace WhiteCore.Services
                 }
                 using (MemoryStream imgstream = new MemoryStream ()) {
                     GridRegion region = m_gridService.GetRegionByName (null, uri.Remove (4));
-                    if (region == null)
+                    if (region == null) {
                         region = m_gridService.GetRegionByUUID (null, OpenMetaverse.UUID.Parse (uri.Remove (uri.Length - 4)));
+                        if (region == null)         // unable to resoleve region details
+                            return new byte [0];
+                    }
 
                     // non-async because we know we have the asset immediately.
                     byte [] mapasset = null;
@@ -317,7 +327,6 @@ namespace WhiteCore.Services
             if (mapView == 1)
                 return BuildMapTile (regionX, regionY, regions.ToList ());
 
-            const int SizeOfImage = 256;
 
             List<Bitmap> generatedMapTiles = new List<Bitmap> ();
             int offset = (int)(Math.Pow (2, mapView - 1) / 2f);
@@ -337,10 +346,10 @@ namespace WhiteCore.Services
                 return m_blankRegionTile;
             }
 
-            mapTexture = new Bitmap (SizeOfImage, SizeOfImage);
+            mapTexture = new Bitmap (SIZE_OF_IMAGE, SIZE_OF_IMAGE);
             using (Graphics g = Graphics.FromImage (mapTexture)) {
                 SolidBrush sea = new SolidBrush (Color.FromArgb (29, 71, 95));
-                g.FillRectangle (sea, 0, 0, SizeOfImage, SizeOfImage);
+                g.FillRectangle (sea, 0, 0, SIZE_OF_IMAGE, SIZE_OF_IMAGE);
 
                 if (generatedMapTiles [0] != null) {
                     Bitmap texture = ResizeBitmap (generatedMapTiles [0], 128, 128);
@@ -382,6 +391,7 @@ namespace WhiteCore.Services
             bool isStatic = false;
             if ((bitmap != null) && (bitmap.Tag is string))
                 isStatic = ((string)bitmap.Tag == "StaticBlank");
+            
             return isStatic;
         }
 
@@ -392,6 +402,7 @@ namespace WhiteCore.Services
                 temp.DrawImage (b, 0, 0, nWidth, nHeight);
                 temp.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
             }
+
             DisposeTexture (b);
             return newsize;
         }
@@ -419,24 +430,25 @@ namespace WhiteCore.Services
             }
             foreach (GridRegion r in badRegions)
                 regions.Remove (r);
+            
             badRegions.Clear ();
             IJ2KDecoder decoder = m_registry.RequestModuleInterface<IJ2KDecoder> ();
-            foreach (GridRegion r in regions) {
+            foreach (GridRegion rgn in regions) {
                 byte [] texAsset = null;
-                if (m_assetService.GetExists (r.TerrainMapImage.ToString ()))
-                    texAsset = m_assetService.GetData (r.TerrainMapImage.ToString ());
+                if (m_assetService.GetExists (rgn.TerrainMapImage.ToString ()))
+                    texAsset = m_assetService.GetData (rgn.TerrainMapImage.ToString ());
 
                 if (texAsset != null) {
                     Image image = decoder.DecodeToImage (texAsset);
                     if (image != null)
                         bitImages.Add (image);
                     else
-                        badRegions.Add (r);
+                        badRegions.Add (rgn);
                 } else
-                    badRegions.Add (r);
+                    badRegions.Add (rgn);
             }
-            foreach (GridRegion r in badRegions)
-                regions.Remove (r);
+            foreach (GridRegion rgn in badRegions)
+                regions.Remove (rgn);
 
             if (regions.Count == 0) {
                 lock (m_blankTiles.BlankTiles)
@@ -444,25 +456,21 @@ namespace WhiteCore.Services
                 return m_blankRegionTile;
             }
 
-            const int SizeOfImage = Constants.RegionSize;           // 256
-
-            Bitmap mapTexture = new Bitmap (SizeOfImage, SizeOfImage);
+            Bitmap mapTexture = new Bitmap (SIZE_OF_IMAGE, SIZE_OF_IMAGE);
             using (Graphics g = Graphics.FromImage (mapTexture)) {
                 SolidBrush sea = new SolidBrush (Color.FromArgb (29, 71, 95));
-                g.FillRectangle (sea, 0, 0, SizeOfImage, SizeOfImage);
+                g.FillRectangle (sea, 0, 0, SIZE_OF_IMAGE, SIZE_OF_IMAGE);
 
                 for (int i = 0; i < regions.Count; i++) {
-                    //Find the offsets first
-                    float x = (regions [i].RegionLocX - (regionX * (float)Constants.RegionSize)) /
-                                Constants.RegionSize;
-                    float y = (regions [i].RegionLocY - (regionY * (float)Constants.RegionSize)) /
-                                Constants.RegionSize;
+                    // Find the offsets first
+                    float x = (regions [i].RegionLocX - (regionX * (float)Constants.RegionSize)) / Constants.RegionSize;
+                    float y = (regions [i].RegionLocY - (regionY * (float)Constants.RegionSize)) / Constants.RegionSize;
                     y += (regions [i].RegionSizeY - Constants.RegionSize) / Constants.RegionSize;
-                    float xx = (x * (SizeOfImage));
-                    float yy = SizeOfImage - (y * (SizeOfImage) + (SizeOfImage));
+                    float xx = (x * (SIZE_OF_IMAGE));
+                    float yy = SIZE_OF_IMAGE - (y * (SIZE_OF_IMAGE) + (SIZE_OF_IMAGE));
                     g.DrawImage (bitImages [i], xx, yy,
-                        (int)(SizeOfImage * ((float)regions [i].RegionSizeX / Constants.RegionSize)),
-                        (int)(SizeOfImage * (regions [i].RegionSizeY / (float)Constants.RegionSize))); // y origin is top
+                        (int)(SIZE_OF_IMAGE * ((float)regions [i].RegionSizeX / Constants.RegionSize)),
+                        (int)(SIZE_OF_IMAGE * (regions [i].RegionSizeY / (float)Constants.RegionSize)));    // y origin is top
                 }
             }
 
@@ -470,7 +478,7 @@ namespace WhiteCore.Services
                 bmp.Dispose ();
 
             CacheMapTexture (1, regionX, regionY, mapTexture);
-            //mapTexture = ResizeBitmap(mapTexture, 128, 128);
+            // mapTexture = ResizeBitmap(mapTexture, 128, 128);
             return mapTexture;
         }
 
@@ -494,7 +502,7 @@ namespace WhiteCore.Services
 
             string fullPath = Path.Combine (m_assetMapCacheDir, name);
             if (File.Exists (fullPath)) {
-                //Make sure the time is ok
+                // Make sure the time is ok
                 if (DateTime.Now < File.GetLastWriteTime (fullPath).AddHours (m_cacheExpires))
                     return File.ReadAllBytes (fullPath);
             }
@@ -519,7 +527,7 @@ namespace WhiteCore.Services
             string name = string.Format ("map-{0}-{1}-{2}-objects.jpg", maplayer, regionX, regionY);
             string fullPath = Path.Combine (m_assetMapCacheDir, name);
             if (File.Exists (fullPath)) {
-                //Make sure the time is ok
+                // Make sure the time is ok
                 if (DateTime.Now < File.GetLastWriteTime (fullPath).AddHours (m_cacheExpires)) {
                     using (MemoryStream imgstream = new MemoryStream (File.ReadAllBytes (fullPath))) {
                         return new Bitmap (imgstream);
@@ -561,7 +569,7 @@ namespace WhiteCore.Services
                 return;
 
             string name = string.Format ("map-{0}-{1}-{2}-objects.jpg", maplayer, regionX, regionY);
-            //string fullPath = Path.Combine(m_assetCacheDir, Path.Combine("mapzoomlevels", name));
+            // string fullPath = Path.Combine(m_assetCacheDir, Path.Combine("mapzoomlevels", name));
             string fullPath = Path.Combine (m_assetMapCacheDir, name);
             File.WriteAllBytes (fullPath, data);
         }

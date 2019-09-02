@@ -37,16 +37,16 @@ namespace WhiteCore.Framework.Services
     public interface IRegionData : IWhiteCoreDataPlugin
     {
         GridRegion Get(UUID regionID, List<UUID> scopeIDs);
-        List<GridRegion> Get(string regionName, List<UUID> scopeIDs, uint? start, uint? count);
-        uint GetCount(string regionName, List<UUID> scopeIDs);
-        GridRegion GetZero(int x, int y, List<UUID> scopeIDs);
-        List<GridRegion> Get(int x, int y, List<UUID> scopeIDs);
-        List<GridRegion> Get(RegionFlags regionFlags);
-        List<GridRegion> Get(int xStart, int yStart, int xEnd, int yEnd, List<UUID> scopeIDs);
-        List<GridRegion> Get(RegionFlags flags, Dictionary<string, bool> sort);
-        List<GridRegion> Get(uint start, uint count, uint EstateID, RegionFlags flags, Dictionary<string, bool> sort);
+        GridRegion GetZero (int x, int y, List<UUID> scopeIDs);
+        uint GetCount (string regionName, List<UUID> scopeIDs);
+        List<GridRegion> GetList(string regionName, List<UUID> scopeIDs, uint? start, uint? count);
+        List<GridRegion> GetList(int x, int y, List<UUID> scopeIDs);
+        List<GridRegion> GetList(RegionFlags regionFlags);
+        List<GridRegion> GetList(int xStart, int yStart, int xEnd, int yEnd, List<UUID> scopeIDs);
+        List<GridRegion> GetList(RegionFlags flags, Dictionary<string, bool> sort);
+        List<GridRegion> GetList(uint start, uint count, uint EstateID, RegionFlags flags, Dictionary<string, bool> sort);
 
-        List<GridRegion> Get(RegionFlags includeFlags, RegionFlags excludeFlags, uint? start, uint? count,
+        List<GridRegion> GetList(RegionFlags includeFlags, RegionFlags excludeFlags, uint? start, uint? count,
                              Dictionary<string, bool> sort);
 
         /// <summary>
@@ -75,7 +75,7 @@ namespace WhiteCore.Framework.Services
         /// <param name="centerY"></param>
         /// <param name="squareRangeFromCenterInMeters"></param>
         /// <returns></returns>
-        List<GridRegion> Get(List<UUID> scopeIDs, UUID excludeRegion, float centerX, float centerY,
+        List<GridRegion> GetList(List<UUID> scopeIDs, UUID excludeRegion, float centerX, float centerY,
                              uint squareRangeFromCenterInMeters);
 
         uint Count(uint estateID, RegionFlags flags);

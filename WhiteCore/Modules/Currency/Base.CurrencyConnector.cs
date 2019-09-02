@@ -107,9 +107,10 @@ namespace WhiteCore.Modules.Currency
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
         public BaseCurrencyConfig GetConfig()
         {
-            object remoteValue = DoRemoteByURL("CurrencyServerURI");
-            if (remoteValue != null || m_doRemoteOnly)
-                return (BaseCurrencyConfig) remoteValue;
+            if (m_doRemoteOnly) {
+                object remoteValue = DoRemoteByURL ("CurrencyServerURI");
+                return (remoteValue != null) ? (BaseCurrencyConfig)remoteValue : new BaseCurrencyConfig ();
+            }
 
             return m_config;
         }
@@ -119,9 +120,10 @@ namespace WhiteCore.Modules.Currency
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
         public GroupBalance GetGroupBalance(UUID groupID)
         {
-            object remoteValue = DoRemoteByURL("CurrencyServerURI", groupID);
-            if (remoteValue != null || m_doRemoteOnly)
-                return (GroupBalance) remoteValue;
+            if (m_doRemoteOnly) {
+                object remoteValue = DoRemoteByURL ("CurrencyServerURI", groupID);
+                return (remoteValue != null) ? (GroupBalance)remoteValue : new GroupBalance ();
+            }
 
             GroupBalance gb = new GroupBalance {
                 GroupFee = 0,
@@ -153,9 +155,10 @@ namespace WhiteCore.Modules.Currency
             int currentInterval, int intervalDays)
         {
             //return new List<GroupAccountHistory>();
-            object remoteValue = DoRemoteByURL("CurrencyServerURI", groupID, fromAgentID, currentInterval, intervalDays);
-            if (remoteValue != null || m_doRemoteOnly)
-                return (List<GroupAccountHistory>) remoteValue;
+            if (m_doRemoteOnly) {
+                object remoteValue = DoRemoteByURL ("CurrencyServerURI", groupID, fromAgentID, currentInterval, intervalDays);
+                return (remoteValue != null) ? (List<GroupAccountHistory>)remoteValue : new List<GroupAccountHistory> ();
+            }
 
             QueryFilter filter = new QueryFilter();
 
@@ -258,7 +261,7 @@ namespace WhiteCore.Modules.Currency
                         groupID,
                         groupName,
                         userId,
-                        (agentAccount == null ? "System" : agentAccount.Name),
+                        (agentAccount.Valid ? agentAccount.Name : "System"),
                         amount,
                         transType,
                         gb.TotalTierCredits,        // assume this it the 'total credit for the group but it may be land tier credit??
@@ -279,13 +282,15 @@ namespace WhiteCore.Modules.Currency
                         (groupInfo == null ? "" : groupName + " ") + InWorldCurrency + amount + paidDesc;
                 }
 
-                if (payUser) {
-                    if (agentInfo != null && agentInfo.IsOnline) {
-                        SendUpdateMoneyBalanceToClient (userId, transactionID, agentInfo.CurrentRegionURI, userBalance, paidToMsg);
-                    }
-                } else {
-                    if (fromObjectID != UUID.Zero) {
-                        SendUpdateMoneyBalanceToClient (fromObjectID, transactionID, agentInfo.CurrentRegionURI, (uint) amount, paidFromMsg);
+                if (agentInfo != null) {
+                    if (payUser) {
+                        if (agentInfo.IsOnline) {
+                            SendUpdateMoneyBalanceToClient (userId, transactionID, agentInfo.CurrentRegionURI, userBalance, paidToMsg);
+                        }
+                    } else {
+                        if (fromObjectID != UUID.Zero) {
+                            SendUpdateMoneyBalanceToClient (fromObjectID, transactionID, agentInfo.CurrentRegionURI, (uint)amount, paidFromMsg);
+                        }
                     }
                 }
             }
@@ -639,8 +644,8 @@ namespace WhiteCore.Modules.Currency
                         type,
                         toCurrency.Amount, 
                         (fromCurrency == null ? 0 : fromCurrency.Amount),
-                        (toAccount == null ? "System" : toAccount.Name), 
-                        (fromAccount == null ? "System" : fromAccount.Name),
+                        (toAccount.Valid ? toAccount.Name : "System"), 
+                        (fromAccount.Valid ? fromAccount.Name : "System"),
                         toObjectName,
                         fromObjectName,
                         (fromUserInfo == null ? UUID.Zero : fromUserInfo.CurrentRegionID)
@@ -652,10 +657,10 @@ namespace WhiteCore.Modules.Currency
 
                 if (amount > 0) {
                     paidFromMsg = 
-                        (fromAccount == null ? " received " : fromAccount.Name + " paid you ") +
+                        (fromAccount.Valid ? (fromAccount.Name + " paid you ") : " received ") +
                         InWorldCurrency + amount + paidDesc;
                     paidToMsg = "You paid " +
-                        (toAccount == null ? "" : toAccount.Name + " ") +
+                        (toAccount.Valid ? toAccount.Name + " " : "") +
                         InWorldCurrency + amount + paidDesc;
                 }
 
@@ -663,7 +668,7 @@ namespace WhiteCore.Modules.Currency
                 {
                     if (toUserInfo != null && toUserInfo.IsOnline)
                         SendUpdateMoneyBalanceToClient(toID, transactionID, toUserInfo.CurrentRegionURI, toCurrency.Amount, 
-                                                       toAccount == null ? "" : (toAccount.Name + " paid you ") +
+                                                       toAccount.Valid ? (toAccount.Name + " paid you ") : "" +
                                                        InWorldCurrency + amount + paidDesc);
                 } else
                 {
@@ -788,8 +793,8 @@ namespace WhiteCore.Modules.Currency
         void UserCurrencyCreate(UUID agentId)
         {
 			// Check if this agent has a user account, if not assume its a bot and exit
-			UserAccount account = m_registry.RequestModuleInterface<IUserAccountService>().GetUserAccount(new List<UUID> { UUID.Zero }, agentId);
-            if (account != null)
+            UserAccount userAcct = m_registry.RequestModuleInterface<IUserAccountService>().GetUserAccount(new List<UUID> { UUID.Zero }, agentId);
+            if (userAcct.Valid)
             {
                 GD.Insert(_REALM, new object[] {agentId.ToString(), 0, 0, 0, 0, 0});
             }

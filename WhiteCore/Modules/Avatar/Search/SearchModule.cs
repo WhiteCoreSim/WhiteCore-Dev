@@ -605,9 +605,9 @@ namespace WhiteCore.Modules.Search
         {
             IScene scene = client.Scene;
             List<UserAccount> accounts = scene.UserAccountService.GetUserAccounts (scene.RegionInfo.AllScopeIDs, query);
-
-            if (accounts == null)
-                accounts = new List<UserAccount> (0);
+            // GetUserAccount always returns a list - empty if nothing found
+            //if (accounts == null)
+            //    accounts = new List<UserAccount> (0);
 
             AvatarPickerReplyPacket replyPacket =
                 (AvatarPickerReplyPacket)PacketPool.Instance.GetPacket (PacketType.AvatarPickerReply);

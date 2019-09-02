@@ -289,7 +289,7 @@ namespace WhiteCore.Framework.ConsoleFramework
             if (text != "") {
                 int CurrentLine = 0;
                 string [] Lines = text.Split (new char [] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
-                //This exists so that we don't have issues with multiline stuff, since something is messed up with the Regex
+                // This exists so that we don't have issues with multiline stuff, since something is messed up with the Regex
                 foreach (string line in Lines) {
                     string [] split = line.Split (new string [] { "[", "]" }, StringSplitOptions.None);
                     int currentPos = 0;
@@ -323,7 +323,7 @@ namespace WhiteCore.Framework.ConsoleFramework
                                 WriteColorText (ConsoleColor.Yellow, s);
                             else
                                 WriteColorText (ConsoleColor.Gray, s);
-                        } else //We're in a box
+                        } else // We're in a box
                             WriteColorText (DeriveColor (s), s);
                         currentPos += s.Length; //Include the extra 1 for the [ or ]
                     }
@@ -349,9 +349,12 @@ namespace WhiteCore.Framework.ConsoleFramework
                 if (m_logFile != null) {
                     if (m_logDate != DateTime.Now.Date)
                         RotateLog ();
-
-                    m_logFile.WriteLine (fullText);
-                    m_logFile.Flush ();
+                    try {
+                        m_logFile.WriteLine (fullText);
+                        m_logFile.Flush ();
+                    } catch {
+                        // encountered an error writing... 
+                    }
                 }
                 lock (_cmdlock) {
                     if (y == -1) {
@@ -416,8 +419,8 @@ namespace WhiteCore.Framework.ConsoleFramework
             int historyLine = history.Count;
             bool allSelected = false;
 
-            SetCursorLeft (0); // Needed for mono
-            Console.Write (" "); // Needed for mono
+            SetCursorLeft (0);      // Needed for mono
+            Console.Write (" ");    // Needed for mono
 
             lock (_cmdlock) {
                 y = Console.CursorTop;
@@ -464,7 +467,7 @@ namespace WhiteCore.Framework.ConsoleFramework
                         SetCursorLeft (0);
                         y = SetCursorTop (y);
 
-                        if (echo) //This space makes the last line part disappear
+                        if (echo)   // This space makes the last line part disappear
                             Console.Write ("{0}{1}", prompt, cmdline + toReplace);
                         else
                             Console.Write ("{0}", prompt);
@@ -484,7 +487,7 @@ namespace WhiteCore.Framework.ConsoleFramework
                             }
                             cmdline.Remove (0, cmdline.Length);
                             cp = 0;
-                            allSelected = false; //All done
+                            allSelected = false;    // All done
                         } else {
                             cmdline.Remove (cp, 1);
                             cp--;
@@ -493,7 +496,7 @@ namespace WhiteCore.Framework.ConsoleFramework
                         SetCursorLeft (0);
                         y = SetCursorTop (y);
 
-                        if (echo) //This space makes the last line part disappear
+                        if (echo)   // This space makes the last line part disappear
                             Console.Write ("{0}{1}", prompt, cmdline + stringToReplace);
                         else
                             Console.Write ("{0}", prompt);

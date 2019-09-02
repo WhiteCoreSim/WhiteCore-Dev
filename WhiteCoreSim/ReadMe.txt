@@ -1,8 +1,7 @@
-WhiteCore-Dev 0.9.3+ (git)
+WhiteCore-Dev 0.9.5+ (git)
 Rowan Deppeler <greythane@gmail.com>
-June 2014
 Fly-Man-
-Jan 2015
+July 2019
 ===============================================
 
 ** Simplified startup scripts **
@@ -58,11 +57,12 @@ To do this, modify the commented out settings in 'MyWorld.ini' located in the
 ** Grid mode **
 ===============
 This configuration has been setup to run as a standalone simulator. If you wish to re-configure
-and use the Grid mode of operation, change the selected include mode in the 'Main.ini' file.
+and use the Grid mode of operation, change the selected include mode at the top of the
+'WhiteCore.ini' file.
 
-Edit Main.ini file in
-Config > Sim > Main.ini
+Edit WhiteCore.ini file in the 'Config' directory
 
+At the top of the file....
 Comment the "Include-Standalone =" line.
 Uncomment the "Include-Grid =" line.
 
@@ -75,16 +75,8 @@ Checkout the 'Build Your Own.txt' file in the 'WhiteCoreDocs' folder for details
  if you want to build from source.
 Re-compile and copy/paste the new 'WhiteCoreSim/bin' subdirectory from your build environment.
 
-Monthly 'Development' build snapshots are available at the following links:
-
-Windows
-https://drive.google.com/file/d/0B2u55gI751a8VXJBckZJWU5rZ1E/edit?usp=sharing
-
-Mono 32 bit  (Linux / Mac)
-https://drive.google.com/file/d/0B2u55gI751a8OEgtV0Q0Yk4wWEE/edit?usp=sharing
-
-Mono 64bit
-https://drive.google.com/file/d/0B2u55gI751a8ZmV1OEE4ZDE4Nm8/edit?usp=sharing
+Monthly 'Development' build snapshots will be available at the following link:
+https://drive.google.com/open?id=0BxMBE_reBR03QkZDSGI4NVVjcEk
 
 Download your desired update snapshot.
 Delete or backup the existing 'WhiteCoreSim/bin' subdirectory.
@@ -99,7 +91,7 @@ or check into the MeWe community for WhiteCore https://mewe.com/group/5cb284545d
 Rowan Deppeler
 <greythane @ gmail.com>
 
-April 2019
+July 2019
 =======================
 
 For licensing information, please see the relevant licenses.

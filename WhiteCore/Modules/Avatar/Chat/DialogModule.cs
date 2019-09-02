@@ -134,11 +134,11 @@ namespace WhiteCore.Modules.Chat
 		public void SendDialogToUser (UUID avatarID, string objectName, UUID objectID, UUID ownerID,
 		                              string message, UUID textureID, int ch, string [] buttonlabels)
 		{
-			UserAccount account = m_scene.UserAccountService.GetUserAccount (m_scene.RegionInfo.AllScopeIDs, ownerID);
+            UserAccount userAcct = m_scene.UserAccountService.GetUserAccount (m_scene.RegionInfo.AllScopeIDs, ownerID);
 			string ownerFirstName, ownerLastName;
-			if (account != null) {
-				ownerFirstName = account.FirstName;
-				ownerLastName = account.LastName;
+			if (userAcct.Valid) {
+				ownerFirstName = userAcct.FirstName;
+				ownerLastName = userAcct.LastName;
 			} else {
 				ownerFirstName = "(unknown";
 				ownerLastName = " owner)";
@@ -209,12 +209,12 @@ namespace WhiteCore.Modules.Chat
 			IScenePresence sp = m_scene.GetScenePresence (avatarID);
 
 			if (sp != null && !sp.IsChildAgent) {
-				UserAccount account = m_scene.UserAccountService.GetUserAccount (m_scene.RegionInfo.AllScopeIDs, ownerID);
+                UserAccount userAcct = m_scene.UserAccountService.GetUserAccount (m_scene.RegionInfo.AllScopeIDs, ownerID);
 				string ownerFirstName, ownerLastName;
 
-				if (account != null) {
-					ownerFirstName = account.FirstName;
-					ownerLastName = account.LastName;
+				if (userAcct.Valid) {
+					ownerFirstName = userAcct.FirstName;
+					ownerLastName = userAcct.LastName;
 				} else {
 					if (name != "") {
 						ownerFirstName = name;

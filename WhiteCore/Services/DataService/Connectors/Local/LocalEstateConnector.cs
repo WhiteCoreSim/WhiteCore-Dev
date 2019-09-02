@@ -39,7 +39,7 @@ namespace WhiteCore.Services.DataService
 {
     public class LocalEstateConnector : ConnectorBase, IEstateConnector
     {
-        IGenericData GD;
+        IGenericData genData;
         string m_estateSettingsTable = "estate_settings";
         string m_estateRegionsTable = "estate_regions";
 
@@ -49,17 +49,17 @@ namespace WhiteCore.Services.DataService
             return m_doRemoteCalls;
         }
 
-        public void Initialize (IGenericData GenericData, IConfigSource source, IRegistryCore registry,
+        public void Initialize (IGenericData genericData, IConfigSource source, IRegistryCore registry,
                                string defaultConnectionString)
         {
-            GD = GenericData;
+            genData = genericData;
             m_registry = registry;
 
             if (source.Configs [Name] != null)
                 defaultConnectionString = source.Configs [Name].GetString ("ConnectionString", defaultConnectionString);
 
-            if (GD != null)
-                GD.ConnectToDatabase (defaultConnectionString, "Estate",
+            if (genData != null)
+                genData.ConnectToDatabase (defaultConnectionString, "Estate",
                                      source.Configs ["WhiteCoreConnectors"].GetBoolean ("ValidateTables", true));
 
             Framework.Utilities.DataManager.RegisterPlugin (Name + "Local", this);
@@ -67,6 +67,7 @@ namespace WhiteCore.Services.DataService
             if (source.Configs ["WhiteCoreConnectors"].GetString ("EstateConnector", "LocalConnector") == "LocalConnector") {
                 Framework.Utilities.DataManager.RegisterPlugin (this);
             }
+
             Init (registry, Name);
         }
 
@@ -87,7 +88,9 @@ namespace WhiteCore.Services.DataService
             int estateID = GetRegionEstateID (regionUUID);
             if (estateID == 0)
                 return settings;
+            
             settings = GetEstate (estateID);
+
             return settings;
         }
 
@@ -100,6 +103,7 @@ namespace WhiteCore.Services.DataService
             }
 
             var es = GetEstate (estateID);
+
             return es;
         }
 
@@ -114,16 +118,16 @@ namespace WhiteCore.Services.DataService
             QueryFilter filter = new QueryFilter ();
             filter.andFilters ["EstateName"] = name;
             //            var EstateID = int.Parse (GD.Query (new string[1] { "EstateID" }, "estatesettings", filter, null, null, null) [0]);
-            List<string> estate = GD.Query (new string [] { "EstateID" }, m_estateSettingsTable, filter, null, null, null);
+            List<string> estate = genData.Query (new string [] { "EstateID" }, m_estateSettingsTable, filter, null, null, null);
 
             if (estate.Count == 0)              // not found!!
                 return null;
 
-            int EstateID;
-            if (!int.TryParse (estate [0], out EstateID))
+            int estateID;
+            if (!int.TryParse (estate [0], out estateID))
                 return null;
 
-            return GetEstate (EstateID);
+            return GetEstate (estateID);
         }
 
         [CanBeReflected (ThreatLevel = ThreatLevel.Low)]
@@ -155,23 +159,24 @@ namespace WhiteCore.Services.DataService
         }
 
         [CanBeReflected (ThreatLevel = ThreatLevel.Low)]
-        public int CreateNewEstate (EstateSettings es, UUID RegionID)
+        public int CreateNewEstate (EstateSettings es, UUID regionID)
         {
             if (m_doRemoteOnly) {
-                object remoteValue = DoRemote (es.ToOSD (), RegionID);
+                object remoteValue = DoRemote (es.ToOSD (), regionID);
                 return remoteValue != null ? (int)remoteValue : 0;
             }
 
 
             int estateID = GetEstate (es.EstateOwner, es.EstateName);
             if (estateID > 0) {
-                if (LinkRegion (RegionID, estateID))
+                if (LinkRegion (regionID, estateID))
                     return estateID;
                 return 0;
             }
             es.EstateID = GetNewEstateID ();
             SaveEstateSettings (es, true);
-            LinkRegion (RegionID, (int)es.EstateID);
+            LinkRegion (regionID, (int)es.EstateID);
+
             return (int)es.EstateID;
         }
 
@@ -198,7 +203,8 @@ namespace WhiteCore.Services.DataService
             Dictionary<string, object> row = new Dictionary<string, object> (2);
             row ["RegionID"] = regionID;
             row ["EstateID"] = estateID;
-            GD.Replace (m_estateRegionsTable, row);
+
+            genData.Replace (m_estateRegionsTable, row);
 
             return true;
         }
@@ -213,7 +219,8 @@ namespace WhiteCore.Services.DataService
 
             QueryFilter filter = new QueryFilter ();
             filter.andFilters ["RegionID"] = regionID;
-            GD.Delete (m_estateRegionsTable, filter);
+
+            genData.Delete (m_estateRegionsTable, filter);
 
             return true;
         }
@@ -228,8 +235,9 @@ namespace WhiteCore.Services.DataService
 
             QueryFilter filter = new QueryFilter ();
             filter.andFilters ["EstateID"] = estateID;
-            GD.Delete (m_estateRegionsTable, filter);
-            GD.Delete (m_estateSettingsTable, filter);
+
+            genData.Delete (m_estateRegionsTable, filter);
+            genData.Delete (m_estateSettingsTable, filter);
 
             return true;
         }
@@ -244,7 +252,7 @@ namespace WhiteCore.Services.DataService
 
             QueryFilter filter = new QueryFilter ();
             filter.andFilters ["EstateName"] = name;
-            List<string> retVal = GD.Query (new string [] { "EstateID" }, m_estateSettingsTable, filter, null, null, null);
+            List<string> retVal = genData.Query (new string [] { "EstateID" }, m_estateSettingsTable, filter, null, null, null);
 
             return retVal.Count > 0;
         }
@@ -279,10 +287,11 @@ namespace WhiteCore.Services.DataService
 
             QueryFilter filter = new QueryFilter ();
             filter.andFilters ["EstateName"] = name;
-            List<string> retVal = GD.Query (new string [] { "EstateID" }, m_estateSettingsTable, filter, null, null, null);
+            List<string> retVal = genData.Query (new string [] { "EstateID" }, m_estateSettingsTable, filter, null, null, null);
 
             if (retVal.Count > 0)
-                return int.Parse (retVal [0]);        // return the EstateID
+                return int.Parse (retVal [0]);        // return the estateID
+            
             return 0;
         }
 
@@ -298,10 +307,11 @@ namespace WhiteCore.Services.DataService
             filter.andFilters ["EstateName"] = name;
             filter.andFilters ["EstateOwner"] = ownerID;
 
-            List<string> retVal = GD.Query (new string [] { "EstateID" }, m_estateSettingsTable, filter, null, null, null);
+            List<string> retVal = genData.Query (new string [] { "EstateID" }, m_estateSettingsTable, filter, null, null, null);
 
             if (retVal.Count > 0)
                 return int.Parse (retVal [0]);
+            
             return 0;
         }
 
@@ -316,7 +326,7 @@ namespace WhiteCore.Services.DataService
             QueryFilter filter = new QueryFilter ();
             filter.andFilters ["EstateID"] = estateID;
             return
-                GD.Query (new string [] { "RegionID" }, m_estateRegionsTable, filter, null, null, null)
+                genData.Query (new string [] { "RegionID" }, m_estateRegionsTable, filter, null, null, null)
                   .ConvertAll (x => UUID.Parse (x));
         }
 
@@ -328,7 +338,8 @@ namespace WhiteCore.Services.DataService
                 return remoteValue != null ? (List<string>)remoteValue : new List<string> ();
             }
 
-            List<string> estates = GD.Query (new string [] { "EstateName" }, m_estateSettingsTable, null, null, null, null);
+            List<string> estates = genData.Query (new string [] { "EstateName" }, m_estateSettingsTable, null, null, null, null);
+
             return estates;
         }
 
@@ -342,29 +353,31 @@ namespace WhiteCore.Services.DataService
 
             QueryFilter filter = new QueryFilter ();
             filter.andFilters ["EstateOwner"] = ownerID;
-            List<string> estates = GD.Query (new string [] { "EstateName" }, m_estateSettingsTable, filter, null, null, null);
+
+            List<string> estates = genData.Query (new string [] { "EstateName" }, m_estateSettingsTable, filter, null, null, null);
+
             return estates;
         }
 
-        public List<EstateSettings> GetEstates (UUID OwnerID)
+        public List<EstateSettings> GetEstates (UUID ownerID)
         {
-            return GetEstates (OwnerID, new Dictionary<string, bool> (0));
+            return GetEstates (ownerID, new Dictionary<string, bool> (0));
         }
 
         [CanBeReflected (ThreatLevel = ThreatLevel.Low)]
-        public List<EstateSettings> GetEstates (UUID OwnerID, Dictionary<string, bool> boolFields)
+        public List<EstateSettings> GetEstates (UUID ownerID, Dictionary<string, bool> boolFields)
         {
             if (m_doRemoteOnly) {
-                object remoteValue = DoRemote (OwnerID, boolFields);
+                object remoteValue = DoRemote (ownerID, boolFields);
                 return remoteValue != null ? (List<EstateSettings>)remoteValue : new List<EstateSettings> ();
             }
 
             List<EstateSettings> settings = new List<EstateSettings> ();
 
             QueryFilter filter = new QueryFilter ();
-            filter.andFilters ["EstateOwner"] = OwnerID;
+            filter.andFilters ["EstateOwner"] = ownerID;
             List<int> retVal =
-                GD.Query (new string [1] { "EstateID" }, m_estateSettingsTable, filter, null, null, null)
+                genData.Query (new string [1] { "EstateID" }, m_estateSettingsTable, filter, null, null, null)
                   .ConvertAll (x => int.Parse (x));
             
             foreach (int estateID in retVal) {
@@ -384,6 +397,7 @@ namespace WhiteCore.Services.DataService
                 if (Add)
                     settings.Add (es);
             }
+
             return settings;
         }
 
@@ -396,7 +410,7 @@ namespace WhiteCore.Services.DataService
             QueryFilter filter = new QueryFilter ();
             filter.andFilters ["RegionID"] = regionID;
 
-            List<string> retVal = GD.Query (new string [] { "EstateID" }, m_estateRegionsTable, filter, null, null, null);
+            List<string> retVal = genData.Query (new string [] { "EstateID" }, m_estateRegionsTable, filter, null, null, null);
 
             return (retVal.Count > 0) ? int.Parse (retVal [0]) : 0;
         }
@@ -406,7 +420,7 @@ namespace WhiteCore.Services.DataService
             QueryFilter filter = new QueryFilter ();
             filter.andFilters ["EstateID"] = estateID;
 
-            List<string> retVals = GD.Query (new string [] { "*" }, m_estateSettingsTable, filter, null, null, null);
+            List<string> retVals = genData.Query (new string [] { "*" }, m_estateSettingsTable, filter, null, null, null);
             EstateSettings settings = new EstateSettings { EstateID = 0 };
 
             if (retVals.Count > 0)
@@ -417,7 +431,7 @@ namespace WhiteCore.Services.DataService
 
         uint GetNewEstateID ()
         {
-            List<string> QueryResults = GD.Query (
+            List<string> QueryResults = genData.Query (
                 new string []{
                     "COUNT(EstateID)",
                     "MAX(EstateID)"
@@ -428,6 +442,7 @@ namespace WhiteCore.Services.DataService
                 if (esID > 99)                                 // Mainland is #1, system estate is #10, user estates start at 100
                     return esID + 1;
             }
+
             return 100;
         }
 
@@ -443,9 +458,9 @@ namespace WhiteCore.Services.DataService
             if (!doInsert) {
                 QueryFilter filter = new QueryFilter ();
                 filter.andFilters ["EstateID"] = es.EstateID;
-                GD.Update (m_estateSettingsTable, values, null, filter, null, null);
+                genData.Update (m_estateSettingsTable, values, null, filter, null, null);
             } else {
-                GD.Insert (m_estateSettingsTable, values);
+                genData.Insert (m_estateSettingsTable, values);
             }
         }
 

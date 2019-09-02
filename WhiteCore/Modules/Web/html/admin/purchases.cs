@@ -93,9 +93,9 @@ namespace WhiteCore.Modules.Web
                         UserID = (UUID)Constants.LibraryOwnerUUID;         // This user should hopefully never have transactions
 
                         if (UserName.Split (' ').Length == 2) {
-                            var userAccount = accountService.GetUserAccount (null, UserName);
-                            if (userAccount != null)
-                                UserID = userAccount.PrincipalID;
+                            var userAcct = accountService.GetUserAccount (null, UserName);
+                            if (userAcct.Valid)
+                                UserID = userAcct.PrincipalID;
                         }
                     }
 
@@ -115,10 +115,8 @@ namespace WhiteCore.Modules.Web
                         noDetails = "";
 
                         foreach (var purchase in purchases) {
-                            var account = accountService.GetUserAccount (null, purchase.AgentID);
-                            string AgentName = "";
-                            if (account != null)
-                                AgentName = account.Name;
+                            var buyerAcct = accountService.GetUserAccount (null, purchase.AgentID);
+                            string AgentName = buyerAcct.Name;
 
                             purchasesList.Add (new Dictionary<string, object> {
                             { "ID", purchase.ID },

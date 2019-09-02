@@ -73,7 +73,7 @@ namespace WhiteCore.Services
                 //Send it on to whomever it concerns
                 OSDMap innerMessage = (OSDMap)message ["Message"];
                 if (innerMessage ["message"] == "ChatterBoxSessionAgentListUpdates")
-                //ONLY forward on this type of message
+                // ONLY forward on this type of message
                 {
                     UUID agentID = message ["AgentID"];
                     IEventQueueService eqs = m_registry.RequestModuleInterface<IEventQueueService> ();
@@ -85,7 +85,7 @@ namespace WhiteCore.Services
                     }
                 }
             } else if (message.ContainsKey ("Method") && message ["Method"] == "FixGroupRoleTitles") {
-                //This message comes in on WhiteCore.Server side from the region
+                // This message comes in on WhiteCore.Server side from the region
                 UUID groupID = message ["GroupID"].AsUUID ();
                 UUID agentID = message ["AgentID"].AsUUID ();
                 UUID roleID = message ["RoleID"].AsUUID ();
@@ -101,26 +101,26 @@ namespace WhiteCore.Services
                 List<UserInfo> regionsToBeUpdated = new List<UserInfo> ();
                 foreach (GroupRoleMembersData data in members) {
                     if (data.RoleID == roleID) {
-                        //They were affected by the change
+                        // They were affected by the change
                         switch ((GroupRoleUpdate)type) {
                         case GroupRoleUpdate.Create:
-                        case GroupRoleUpdate.NoUpdate:     //No changes...
+                        case GroupRoleUpdate.NoUpdate:     // No changes...
                             break;
 
-                        case GroupRoleUpdate.UpdatePowers: //Possible we don't need to send this?
+                        case GroupRoleUpdate.UpdatePowers: // Possible we don't need to send this?
                         case GroupRoleUpdate.UpdateAll:
                         case GroupRoleUpdate.UpdateData:
                         case GroupRoleUpdate.Delete:
                             if (type == (byte)GroupRoleUpdate.Delete)
-                                //Set them to the most limited role since their role is gone
+                                // Set them to the most limited role since their role is gone
                                 con.SetAgentGroupSelectedRole (data.MemberID, groupID, everyone.RoleID);
 
-                            //Need to update their title inworld
+                            // Need to update their title inworld
                             IAgentInfoService agentInfoService = m_registry.RequestModuleInterface<IAgentInfoService> ();
                             UserInfo info;
                             if (agentInfoService != null &&
                                     (info = agentInfoService.GetUserInfo (agentID.ToString ())) != null && info.IsOnline) {
-                                //Forward the message
+                                // Forward the message
                                 regionsToBeUpdated.Add (info);
                             }
                             break;
@@ -141,7 +141,7 @@ namespace WhiteCore.Services
                     }
                 }
             } else if (message.ContainsKey ("Method") && message ["Method"] == "ForceUpdateGroupTitles") {
-                //This message comes in on the region side from WhiteCore.Server
+                // This message comes in on the region side from WhiteCore.Server
                 UUID groupID = message ["GroupID"].AsUUID ();
                 UUID roleID = message ["RoleID"].AsUUID ();
                 UUID regionID = message ["RegionID"].AsUUID ();
