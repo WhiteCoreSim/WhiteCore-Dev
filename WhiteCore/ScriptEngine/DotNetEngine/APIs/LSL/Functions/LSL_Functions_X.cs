@@ -26,29 +26,80 @@
  */
 
 using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.Remoting.Lifetime;
+using System.Text;
+using System.Text.RegularExpressions;
+using System.Threading;
+using Nini.Config;
 using OpenMetaverse;
+using OpenMetaverse.Packets;
+using OpenMetaverse.StructuredData;
+using WhiteCore.Framework.ClientInterfaces;
+using WhiteCore.Framework.ConsoleFramework;
+using WhiteCore.Framework.DatabaseInterfaces;
+using WhiteCore.Framework.Modules;
+using WhiteCore.Framework.Physics;
+using WhiteCore.Framework.PresenceInfo;
 using WhiteCore.Framework.SceneInfo;
+using WhiteCore.Framework.SceneInfo.Entities;
+using WhiteCore.Framework.Serialization;
+using WhiteCore.Framework.Servers;
+using WhiteCore.Framework.Services;
+using WhiteCore.Framework.Services.ClassHelpers.Assets;
+using WhiteCore.Framework.Services.ClassHelpers.Inventory;
+using WhiteCore.Framework.Services.ClassHelpers.Profile;
+using WhiteCore.Framework.Utilities;
+using WhiteCore.ScriptEngine.DotNetEngine.Plugins;
+using WhiteCore.ScriptEngine.DotNetEngine.Runtime;
+using GridRegion = WhiteCore.Framework.Services.GridRegion;
+using LSL_Float = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.LSLFloat;
+using LSL_Integer = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.LSLInteger;
+using LSL_Key = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.LSLString;
+using LSL_List = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.list;
+using LSL_Rotation = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.Quaternion;
+using LSL_String = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.LSLString;
+using LSL_Vector = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.Vector3;
+using PrimType = WhiteCore.Framework.SceneInfo.PrimType;
+using RegionFlags = WhiteCore.Framework.Services.RegionFlags;
 
 namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
 {
-    public class LSL_Functions_X : MarshalByRefObject, IScriptApi
+    public partial class LSL_Api : MarshalByRefObject, IScriptApi
     {
-        public string Name => throw new NotImplementedException();
-
-        public string InterfaceName => throw new NotImplementedException();
-
-        public string[] ReferencedAssemblies => throw new NotImplementedException();
-
-        public string[] NamespaceAdditions => throw new NotImplementedException();
-
-        public IScriptApi Copy()
+        public LSL_String llXorBase64Strings (string str1, string str2)
         {
-            throw new NotImplementedException();
+            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+                return "";
+
+            Deprecated ("llXorBase64Strings", "Use llXorBase64 instead");
+            PScriptSleep (m_sleepMsOnXorBase64Strings);
+            return string.Empty;
         }
 
-        public void Initialize(IScriptModulePlugin engine, ISceneChildEntity part, uint localID, UUID item, ScriptProtectionModule module)
+
+        public LSL_String llXorBase64StringsCorrect (string str1, string str2)
         {
-            throw new NotImplementedException();
+            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+                return "";
+
+            string ret = string.Empty;
+            string src1 = llBase64ToString (str1);
+            string src2 = llBase64ToString (str2);
+            int c = 0;
+            foreach (char t in src1) {
+                ret += (char)(t ^ src2 [c]);
+
+                c++;
+                if (c >= src2.Length)
+                    c = 0;
+            }
+
+            PScriptSleep (m_sleepMsOnXorBase64Strings);
+            return llStringToBase64 (ret);
         }
+
     }
 }

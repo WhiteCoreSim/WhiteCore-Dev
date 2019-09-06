@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Copyright (c) Contributors, http://whitecore-sim.org/, http://aurora-sim.org
  * See CONTRIBUTORS.TXT for a full list of copyright holders.
  *
@@ -67,19 +67,105 @@ using RegionFlags = WhiteCore.Framework.Services.RegionFlags;
 
 namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
 {
-    public partial class LSL_Api : MarshalByRefObject, IScriptApi
+    public class NotecardCache
     {
-        public void llVolumeDetect (int detect)
+        protected class Notecard
         {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
-                return;
+            public string [] text;
+            public DateTime lastRef;
+        }
 
-            if (m_host.ParentEntity != null) {
-                if (!m_host.ParentEntity.IsDeleted) {
-                    m_host.ParentEntity.RootChild.ScriptSetVolumeDetect (detect != 0);
-                }
+        protected static Dictionary<UUID, Notecard> m_Notecards =
+            new Dictionary<UUID, Notecard> ();
+
+        public static void Cache (UUID assetID, string text)
+        {
+            CacheCheck ();
+
+            lock (m_Notecards) {
+                if (m_Notecards.ContainsKey (assetID))
+                    return;
+
+                Notecard nc = new Notecard { lastRef = DateTime.Now, text = SLUtil.ParseNotecardToList (text).ToArray () };
+                m_Notecards [assetID] = nc;
             }
         }
 
+        public static bool IsCached (UUID assetID)
+        {
+            lock (m_Notecards) {
+                return m_Notecards.ContainsKey (assetID);
+            }
+        }
+
+        public static int GetLines (UUID assetID)
+        {
+            if (!IsCached (assetID))
+                return -1;
+
+            lock (m_Notecards) {
+                m_Notecards [assetID].lastRef = DateTime.Now;
+                return m_Notecards [assetID].text.Length;
+            }
+        }
+
+        /// <summary>
+        /// Get a notecard line.
+        /// </summary>
+        /// <param name="assetID"></param>
+        /// <param name="lineNumber">Lines start at index 0</param>
+        /// <returns></returns>
+        public static string GetLine (UUID assetID, int lineNumber)
+        {
+            if (lineNumber < 0)
+                return "";
+
+            if (!IsCached (assetID))
+                return "";
+
+            lock (m_Notecards) {
+                m_Notecards [assetID].lastRef = DateTime.Now;
+
+                if (lineNumber >= m_Notecards [assetID].text.Length)
+                    return "\n\n\n";
+
+                string data = m_Notecards [assetID].text [lineNumber];
+
+                return data;
+            }
+        }
+
+        /// <summary>
+        /// Get a notecard line.
+        /// </summary>
+        /// <param name="assetID"></param>
+        /// <param name="lineNumber">Lines start at index 0</param>
+        /// <param name="maxLength">
+        /// Maximum length of the returned line.
+        /// </param>
+        /// <returns>
+        /// If the line length is longer than <paramref name="maxLength"/>,
+        /// the return string will be truncated.
+        /// </returns>
+        public static string GetLine (UUID assetID, int lineNumber, int maxLength)
+        {
+            string line = GetLine (assetID, lineNumber);
+
+            if (line.Length > maxLength)
+                line = line.Substring (0, maxLength);
+
+            return line;
+        }
+
+        public static void CacheCheck ()
+        {
+            lock (m_Notecards) {
+                foreach (UUID key in new List<UUID> (m_Notecards.Keys)) {
+                    Notecard nc = m_Notecards [key];
+                    if (nc.lastRef.AddSeconds (30) < DateTime.Now)
+                        m_Notecards.Remove (key);
+                }
+            }
+        }
     }
 }

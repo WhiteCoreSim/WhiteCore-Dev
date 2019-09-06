@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Copyright (c) Contributors, http://whitecore-sim.org/, http://aurora-sim.org
  * See CONTRIBUTORS.TXT for a full list of copyright holders.
  *
@@ -69,79 +69,76 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
 {
     public partial class LSL_Api : MarshalByRefObject, IScriptApi
     {
-        public void llUnSit (string id)
+
+        public void llEvade (LSL_String target, LSL_List options)
+        {
+            NotImplemented ("llEvade");
+        }
+
+        public void llFleeFrom (LSL_Vector source, LSL_Float distance, LSL_List options)
+        {
+            NotImplemented ("llFleeFrom");
+        }
+
+        public void llStopPointAt ()
+        {
+        }
+
+        public void llMoveToTarget (LSL_Vector target, double tau)
         {
             if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
                 return;
 
-
-            UUID key = new UUID ();
-            if (UUID.TryParse (id, out key)) {
-                IScenePresence av = World.GetScenePresence (key);
-
-                if (av != null) {
-                    if (m_host.ParentEntity.SitTargetAvatar.Contains (key)) {
-                        // if the avatar is sitting on this object, then
-                        // we can unsit them.  We don't want random scripts unsitting random people
-                        // Lets avoid the popcorn avatar scenario.
-                        av.StandUp ();
-                    } else {
-                        // If the object owner also owns the parcel
-                        // or
-                        // if the land is group owned and the object is group owned by the same group
-                        // or
-                        // if the object is owned by a person with estate access.
-
-                        IParcelManagementModule parcelManagement = World.RequestModuleInterface<IParcelManagementModule> ();
-                        if (parcelManagement != null) {
-                            ILandObject parcel = parcelManagement.GetLandObject (av.AbsolutePosition.X,
-                                                                                av.AbsolutePosition.Y);
-                            if (parcel != null) {
-                                if (m_host.OwnerID == parcel.LandData.OwnerID ||
-                                    (m_host.OwnerID == m_host.GroupID && m_host.GroupID == parcel.LandData.GroupID
-                                     && parcel.LandData.IsGroupOwned) || World.Permissions.IsGod (m_host.OwnerID)) {
-                                    av.StandUp ();
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+            m_host.MoveToTarget (new Vector3 ((float)target.x, (float)target.y, (float)target.z), (float)tau);
         }
 
-
-
-        public void llUpdateCharacter (LSL_List options)
+        public void llStopMoveToTarget ()
         {
-            IBotManager botManager = World.RequestModuleInterface<IBotManager> ();
-            if (botManager != null) {
-                IBotController controller = botManager.GetCharacterManager (m_host.ParentEntity.UUID);
-                if (controller == null)
-                    return;         // nothing to controll :(
+            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+                return;
 
-                for (int i = 0; i < options.Length; i += 2) {
-                    LSL_Integer opt = options.GetLSLIntegerItem (i);
-                    LSL_Float value = options.GetLSLFloatItem (i + 1);
-                    if (opt == ScriptBaseClass.CHARACTER_DESIRED_SPEED)
-                        controller.SetSpeedModifier ((float)value.value);
-                    else if (opt == ScriptBaseClass.CHARACTER_RADIUS) {
-                    } else if (opt == ScriptBaseClass.CHARACTER_LENGTH) {
-                    } else if (opt == ScriptBaseClass.CHARACTER_ORIENTATION) {
-                    } else if (opt == ScriptBaseClass.CHARACTER_AVOIDANCE_MODE) {
-                    } else if (opt == ScriptBaseClass.CHARACTER_TYPE) {
-                    } else if (opt == ScriptBaseClass.TRAVERSAL_TYPE) {
-                    } else if (opt == ScriptBaseClass.CHARACTER_MAX_ACCEL) {
-                    } else if (opt == ScriptBaseClass.CHARACTER_MAX_DECEL) {
-                    } else if (opt == ScriptBaseClass.CHARACTER_MAX_TURN_RADIUS) {
-                    } else if (opt == ScriptBaseClass.CHARACTER_DESIRED_TURN_SPEED) {
-                    } else if (opt == ScriptBaseClass.CHARACTER_MAX_SPEED) {
-                    } else if (opt == ScriptBaseClass.CHARACTER_ACCOUNT_FOR_SKIPPED_FRAMES) {
-                    } else if (opt == ScriptBaseClass.CHARACTER_STAY_WITHIN_PARCEL) {
-                    }
-                }
-            }
+            m_host.StopMoveToTarget ();
         }
 
+        public void llPatrolPoints (LSL_List patrolPoints, LSL_List options)
+        {
+            List<Vector3> positions = new List<Vector3> ();
+            List<TravelMode> travelMode = new List<TravelMode> ();
+            foreach (object pos in patrolPoints.Data) {
+                if (!(pos is LSL_Vector))
+                    continue;
+                LSL_Vector p = (LSL_Vector)pos;
+                positions.Add (p.ToVector3 ());
+                travelMode.Add (TravelMode.Walk);
+            }
+            IBotManager botManager = World.RequestModuleInterface<IBotManager> ();
+            if (botManager != null)
+                botManager.SetBotMap (m_host.ParentEntity.UUID, positions, travelMode, 1, m_host.ParentEntity.OwnerID);
+        }
+
+        public void llNavigateTo (LSL_Vector point, LSL_List options)
+        {
+            List<Vector3> positions = new List<Vector3> () { point.ToVector3 () };
+            List<TravelMode> travelMode = new List<TravelMode> () { TravelMode.Walk };
+            IBotManager botManager = World.RequestModuleInterface<IBotManager> ();
+            int flags = 0;
+            if (options.Length > 0)
+                flags |= options.GetLSLIntegerItem (0);
+            if (botManager != null)
+                botManager.SetBotMap (m_host.ParentEntity.UUID, positions, travelMode, flags, m_host.ParentEntity.OwnerID);
+        }
+
+        public void llWanderWithin (LSL_Vector origin, LSL_Float distance, LSL_List options)
+        {
+            NotImplemented ("llWanderWithin");
+        }
+
+        public LSL_List llGetClosestNavPoint (LSL_Vector point, LSL_List options)
+        {
+            Vector3 diff = new Vector3 (0, 0, 0.1f) *
+                           (Vector3.RotationBetween (m_host.ParentEntity.AbsolutePosition, point.ToVector3 ()));
+            return new LSL_List (new LSL_Vector ((m_host.ParentEntity.AbsolutePosition + diff)));
+        }
 
     }
 }

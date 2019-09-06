@@ -26,29 +26,156 @@
  */
 
 using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.Remoting.Lifetime;
+using System.Text;
+using System.Text.RegularExpressions;
+using System.Threading;
+using Nini.Config;
 using OpenMetaverse;
+using OpenMetaverse.Packets;
+using OpenMetaverse.StructuredData;
+using WhiteCore.Framework.ClientInterfaces;
+using WhiteCore.Framework.ConsoleFramework;
+using WhiteCore.Framework.DatabaseInterfaces;
+using WhiteCore.Framework.Modules;
+using WhiteCore.Framework.Physics;
+using WhiteCore.Framework.PresenceInfo;
 using WhiteCore.Framework.SceneInfo;
+using WhiteCore.Framework.SceneInfo.Entities;
+using WhiteCore.Framework.Serialization;
+using WhiteCore.Framework.Servers;
+using WhiteCore.Framework.Services;
+using WhiteCore.Framework.Services.ClassHelpers.Assets;
+using WhiteCore.Framework.Services.ClassHelpers.Inventory;
+using WhiteCore.Framework.Services.ClassHelpers.Profile;
+using WhiteCore.Framework.Utilities;
+using WhiteCore.ScriptEngine.DotNetEngine.Plugins;
+using WhiteCore.ScriptEngine.DotNetEngine.Runtime;
+using GridRegion = WhiteCore.Framework.Services.GridRegion;
+using LSL_Float = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.LSLFloat;
+using LSL_Integer = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.LSLInteger;
+using LSL_Key = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.LSLString;
+using LSL_List = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.list;
+using LSL_Rotation = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.Quaternion;
+using LSL_String = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.LSLString;
+using LSL_Vector = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.Vector3;
+using PrimType = WhiteCore.Framework.SceneInfo.PrimType;
+using RegionFlags = WhiteCore.Framework.Services.RegionFlags;
 
 namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
 {
-    public class LSL_Functions_B : MarshalByRefObject, IScriptApi
+    public partial class LSL_Api : MarshalByRefObject, IScriptApi
     {
-        public string Name => throw new NotImplementedException();
-
-        public string InterfaceName => throw new NotImplementedException();
-
-        public string[] ReferencedAssemblies => throw new NotImplementedException();
-
-        public string[] NamespaceAdditions => throw new NotImplementedException();
-
-        public IScriptApi Copy()
+        public void llBreakLink (int linknum)
         {
-            throw new NotImplementedException();
+            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+                return;
+
+            UUID invItemID = InventorySelf ();
+
+            lock (m_host.TaskInventory) {
+                if ((m_host.TaskInventory [invItemID].PermsMask & ScriptBaseClass.PERMISSION_CHANGE_LINKS) == 0
+                    && !m_automaticLinkPermission) {
+                    Error ("llBreakLink", "PERMISSION_CHANGE_LINKS permission not set");
+                    return;
+                }
+            }
+
+            if (linknum < ScriptBaseClass.LINK_THIS)
+                return;
+
+            ISceneEntity parentPrim = m_host.ParentEntity;
+
+            if (parentPrim.RootChild.AttachmentPoint != 0)
+                return; // Fail silently if attached
+            ISceneChildEntity childPrim = null;
+
+            if (linknum == ScriptBaseClass.LINK_ROOT) {
+            } else if (linknum == ScriptBaseClass.LINK_SET ||
+                       ScriptBaseClass.LINK_ALL_OTHERS ||
+                       ScriptBaseClass.LINK_ALL_CHILDREN ||
+                       ScriptBaseClass.LINK_THIS) {
+                foreach (ISceneChildEntity part in parentPrim.ChildrenEntities ()) {
+                    if (part.UUID != m_host.UUID) {
+                        childPrim = part;
+                        break;
+                    }
+                }
+            } else {
+                IEntity target = m_host.ParentEntity.GetLinkNumPart (linknum);
+                if (target is ISceneChildEntity) {
+                    childPrim = target as ISceneChildEntity;
+                } else
+                    return;
+                if (childPrim.UUID == m_host.UUID)
+                    childPrim = null;
+            }
+
+            if (linknum == ScriptBaseClass.LINK_ROOT) {
+                // Restructuring Multiple Prims.
+                List<ISceneChildEntity> parts = new List<ISceneChildEntity> (parentPrim.ChildrenEntities ());
+                parts.Remove (parentPrim.RootChild);
+                foreach (ISceneChildEntity part in parts) {
+                    parentPrim.DelinkFromGroup (part, true);
+                }
+                parentPrim.ScheduleGroupUpdate (PrimUpdateFlags.ForcedFullUpdate);
+                parentPrim.TriggerScriptChangedEvent (Changed.LINK);
+
+                if (parts.Count > 0) {
+                    ISceneChildEntity newRoot = parts [0];
+                    parts.Remove (newRoot);
+                    foreach (ISceneChildEntity part in parts) {
+                        newRoot.ParentEntity.LinkToGroup (part.ParentEntity);
+                    }
+                    newRoot.ParentEntity.ScheduleGroupUpdate (PrimUpdateFlags.ForcedFullUpdate);
+                }
+            } else {
+                if (childPrim == null)
+                    return;
+
+                parentPrim.DelinkFromGroup (childPrim, true);
+                childPrim.ParentEntity.ScheduleGroupUpdate (PrimUpdateFlags.ForcedFullUpdate);
+                parentPrim.ScheduleGroupUpdate (PrimUpdateFlags.ForcedFullUpdate);
+                parentPrim.TriggerScriptChangedEvent (Changed.LINK);
+            }
         }
 
-        public void Initialize(IScriptModulePlugin engine, ISceneChildEntity part, uint localID, UUID item, ScriptProtectionModule module)
+        public void llBreakAllLinks ()
         {
-            throw new NotImplementedException();
+            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+                return;
+
+            ISceneEntity parentPrim = m_host.ParentEntity;
+            if (parentPrim.RootChild.AttachmentPoint != 0)
+                return; // Fail silently if attached
+
+            List<ISceneChildEntity> parts = new List<ISceneChildEntity> (parentPrim.ChildrenEntities ());
+            parts.Remove (parentPrim.RootChild);
+
+            foreach (ISceneChildEntity part in parts) {
+                parentPrim.DelinkFromGroup (part, true);
+                parentPrim.TriggerScriptChangedEvent (Changed.LINK);
+                part.ParentEntity.ScheduleGroupUpdate (PrimUpdateFlags.ForcedFullUpdate);
+            }
+            parentPrim.ScheduleGroupUpdate (PrimUpdateFlags.ForcedFullUpdate);
         }
+
+        public LSL_String llBase64ToString (string str)
+        {
+            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+                return "";
+
+            try {
+                byte [] b = Convert.FromBase64String (str);
+                return Encoding.UTF8.GetString (b);
+            } catch {
+                Error ("llBase64ToString", "Error decoding string");
+                return string.Empty;
+            }
+        }
+
     }
 }

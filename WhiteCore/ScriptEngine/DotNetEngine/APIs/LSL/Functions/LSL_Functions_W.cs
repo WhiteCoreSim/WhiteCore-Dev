@@ -26,29 +26,96 @@
  */
 
 using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.Remoting.Lifetime;
+using System.Text;
+using System.Text.RegularExpressions;
+using System.Threading;
+using Nini.Config;
 using OpenMetaverse;
+using OpenMetaverse.Packets;
+using OpenMetaverse.StructuredData;
+using WhiteCore.Framework.ClientInterfaces;
+using WhiteCore.Framework.ConsoleFramework;
+using WhiteCore.Framework.DatabaseInterfaces;
+using WhiteCore.Framework.Modules;
+using WhiteCore.Framework.Physics;
+using WhiteCore.Framework.PresenceInfo;
 using WhiteCore.Framework.SceneInfo;
+using WhiteCore.Framework.SceneInfo.Entities;
+using WhiteCore.Framework.Serialization;
+using WhiteCore.Framework.Servers;
+using WhiteCore.Framework.Services;
+using WhiteCore.Framework.Services.ClassHelpers.Assets;
+using WhiteCore.Framework.Services.ClassHelpers.Inventory;
+using WhiteCore.Framework.Services.ClassHelpers.Profile;
+using WhiteCore.Framework.Utilities;
+using WhiteCore.ScriptEngine.DotNetEngine.Plugins;
+using WhiteCore.ScriptEngine.DotNetEngine.Runtime;
+using GridRegion = WhiteCore.Framework.Services.GridRegion;
+using LSL_Float = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.LSLFloat;
+using LSL_Integer = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.LSLInteger;
+using LSL_Key = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.LSLString;
+using LSL_List = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.list;
+using LSL_Rotation = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.Quaternion;
+using LSL_String = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.LSLString;
+using LSL_Vector = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.Vector3;
+using PrimType = WhiteCore.Framework.SceneInfo.PrimType;
+using RegionFlags = WhiteCore.Framework.Services.RegionFlags;
 
 namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
 {
-    public class LSL_Functions_W : MarshalByRefObject, IScriptApi
+    public partial class LSL_Api : MarshalByRefObject, IScriptApi
     {
-        public string Name => throw new NotImplementedException();
-
-        public string InterfaceName => throw new NotImplementedException();
-
-        public string[] ReferencedAssemblies => throw new NotImplementedException();
-
-        public string[] NamespaceAdditions => throw new NotImplementedException();
-
-        public IScriptApi Copy()
+        public void llWhisper (int channelID, string text)
         {
-            throw new NotImplementedException();
+            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID)) return;
+
+
+            if (text.Length > 1023)
+                text = text.Substring (0, 1023);
+
+            IChatModule chatModule = World.RequestModuleInterface<IChatModule> ();
+            if (chatModule != null)
+                chatModule.SimChat (text, ChatTypeEnum.Whisper, channelID,
+                                   m_host.ParentEntity.RootChild.AbsolutePosition, m_host.Name, m_host.UUID, false,
+                                   World);
+
+            if (m_comms != null)
+                m_comms.DeliverMessage (ChatTypeEnum.Whisper, channelID, m_host.Name, m_host.UUID, text);
         }
 
-        public void Initialize(IScriptModulePlugin engine, ISceneChildEntity part, uint localID, UUID item, ScriptProtectionModule module)
+        public LSL_Vector llWind (LSL_Vector offset)
         {
-            throw new NotImplementedException();
+            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+                return new LSL_Vector ();
+
+            LSL_Vector wind = new LSL_Vector (0, 0, 0);
+            IWindModule module = World.RequestModuleInterface<IWindModule> ();
+            if (module != null) {
+                Vector3 pos = m_host.GetWorldPosition ();
+                int x = (int)(pos.X + offset.x);
+                int y = (int)(pos.Y + offset.y);
+
+                Vector3 windSpeed = module.WindSpeed (x, y, 0);
+
+                wind.x = windSpeed.X;
+                wind.y = windSpeed.Y;
+            }
+            return wind;
         }
+
+        public LSL_Float llWater (LSL_Vector offset)
+        {
+            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+                return new LSL_Float ();
+
+            return World.RegionInfo.RegionSettings.WaterHeight;
+        }
+
+
+
     }
 }
