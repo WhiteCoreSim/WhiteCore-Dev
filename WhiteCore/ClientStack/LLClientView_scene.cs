@@ -1916,6 +1916,7 @@ namespace WhiteCore.ClientStack
         }
 
         static readonly object _lock = new object ();
+        static readonly object _landlock = new object();
         public void SendLandStatReply (uint reportType, uint requestFlags, uint resultCount, LandStatReportItem [] lsrpia)
         {
             var message = new LandStatReplyMessage {
@@ -1928,18 +1929,21 @@ namespace WhiteCore.ClientStack
             lock (_lock) {
                 for (int i = 0; i < lsrpia.Length; i++) {
                     var landItem = lsrpia [i];
-                    var block = new LandStatReplyMessage.ReportDataBlock ();
+                    lock (_landlock)
+                    {
+                        var block = new LandStatReplyMessage.ReportDataBlock();
 
-                    block.Location = landItem.Location;
-                    block.MonoScore = landItem.Score;
-                    block.OwnerName = landItem.OwnerName;
-                    block.Score = landItem.Score;
-                    block.TaskID = landItem.TaskID;
-                    block.TaskLocalID = landItem.TaskLocalID;
-                    block.TaskName = landItem.TaskName;
-                    block.TimeStamp = landItem.TimeModified;
+                        block.Location = landItem.Location;
+                        block.MonoScore = landItem.Score;
+                        block.OwnerName = landItem.OwnerName;
+                        block.Score = landItem.Score;
+                        block.TaskID = landItem.TaskID;
+                        block.TaskLocalID = landItem.TaskLocalID;
+                        block.TaskName = landItem.TaskName;
+                        block.TimeStamp = landItem.TimeModified;
 
-                    message.ReportDataBlocks [i] = block;
+                        message.ReportDataBlocks[i] = block;
+                    }
                 }
             }
             IEventQueueService eventService = m_scene.RequestModuleInterface<IEventQueueService> ();
