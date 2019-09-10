@@ -68,55 +68,57 @@ namespace WhiteCore.Services
         {
             if (!message.ContainsKey ("Method"))
                 return null;
-            switch (message ["Method"].AsString ()) {
-            case "CreateAgentRequest":
-                CreateAgentRequest createAgentRequest = new CreateAgentRequest ();
-                createAgentRequest.FromOSD (message);
-                CreateAgentResponse createAgentResponse = new CreateAgentResponse ();
-                createAgentResponse.Success = CreateAgent (createAgentRequest.Destination, createAgentRequest.CircuitData, createAgentRequest.TeleportFlags, out createAgentResponse);
-                return createAgentResponse.ToOSD ();
-            case "UpdateAgentPositionRequest":
-                UpdateAgentPositionRequest updateAgentPositionRequest = new UpdateAgentPositionRequest ();
-                updateAgentPositionRequest.FromOSD (message);
-                return new OSDMap () { new KeyValuePair<string, OSD> ("Success", UpdateAgent (updateAgentPositionRequest.Destination, updateAgentPositionRequest.Update)) };
-            case "UpdateAgentDataRequest":
-                UpdateAgentDataRequest updateAgentDataRequest = new UpdateAgentDataRequest ();
-                updateAgentDataRequest.FromOSD (message);
-                return new OSDMap () { new KeyValuePair<string, OSD> ("Success", UpdateAgent (updateAgentDataRequest.Destination, updateAgentDataRequest.Update)) };
-            case "FailedToMoveAgentIntoNewRegionRequest":
-                FailedToMoveAgentIntoNewRegionRequest failedToMoveAgentIntoNewRegionRequest = new FailedToMoveAgentIntoNewRegionRequest ();
-                failedToMoveAgentIntoNewRegionRequest.FromOSD (message);
-                FailedToMoveAgentIntoNewRegion (failedToMoveAgentIntoNewRegionRequest.AgentID, failedToMoveAgentIntoNewRegionRequest.RegionID);
-                break;
-            case "CloseAgentRequest":
-                CloseAgentRequest closeAgentRequest = new CloseAgentRequest ();
-                closeAgentRequest.FromOSD (message);
-                CloseAgent (closeAgentRequest.Destination, closeAgentRequest.AgentID);
-                break;
-            case "MakeChildAgentRequest":
-                MakeChildAgentRequest makeChildAgentRequest = new MakeChildAgentRequest ();
-                makeChildAgentRequest.FromOSD (message);
-                MakeChildAgent (makeChildAgentRequest.AgentID, makeChildAgentRequest.OldRegion, makeChildAgentRequest.Destination, makeChildAgentRequest.IsCrossing);
-                break;
-            case "FailedToTeleportAgentRequest":
-                FailedToTeleportAgentRequest failedToTeleportAgentRequest = new FailedToTeleportAgentRequest ();
-                failedToTeleportAgentRequest.FromOSD (message);
-                FailedToTeleportAgent (failedToTeleportAgentRequest.Destination, failedToTeleportAgentRequest.FailedRegionID,
-                    failedToTeleportAgentRequest.AgentID, failedToTeleportAgentRequest.Reason, failedToTeleportAgentRequest.IsCrossing);
-                break;
-            case "RetrieveAgentRequest":
-                RetrieveAgentRequest retrieveAgentRequest = new RetrieveAgentRequest ();
-                retrieveAgentRequest.FromOSD (message);
-                RetrieveAgentResponse retrieveAgentResponse = new RetrieveAgentResponse ();
-                retrieveAgentResponse.Success = RetrieveAgent (retrieveAgentRequest.Destination, retrieveAgentRequest.AgentID, retrieveAgentRequest.AgentIsLeaving,
-                    out retrieveAgentResponse.AgentData, out retrieveAgentResponse.CircuitData);
-                return retrieveAgentResponse.ToOSD ();
-            case "CreateObjectRequest":
-                CreateObjectRequest createObjectRequest = new CreateObjectRequest ();
-                createObjectRequest.FromOSD (message);
-                createObjectRequest.Scene = GetScene (createObjectRequest.Destination.RegionID);
-                createObjectRequest.DeserializeObject ();
-                return new OSDMap () { new KeyValuePair<string, OSD> ("Success", CreateObject (createObjectRequest.Destination, createObjectRequest.Object)) };
+            switch (message["Method"].AsString()) {
+                case "CreateAgentRequest":
+                    CreateAgentRequest createAgentRequest = new CreateAgentRequest();
+                    createAgentRequest.FromOSD(message);
+                    CreateAgentResponse createAgentResponse = new CreateAgentResponse();
+                    createAgentResponse.Success = CreateAgent(createAgentRequest.Destination, createAgentRequest.CircuitData, createAgentRequest.TeleportFlags, out createAgentResponse);
+                    return createAgentResponse.ToOSD();
+                case "UpdateAgentPositionRequest":
+                    UpdateAgentPositionRequest updateAgentPositionRequest = new UpdateAgentPositionRequest();
+                    updateAgentPositionRequest.FromOSD(message);
+                    return new OSDMap() { new KeyValuePair<string, OSD>("Success", UpdateAgent(updateAgentPositionRequest.Destination, updateAgentPositionRequest.Update)) };
+                case "UpdateAgentDataRequest":
+                    UpdateAgentDataRequest updateAgentDataRequest = new UpdateAgentDataRequest();
+                    updateAgentDataRequest.FromOSD(message);
+                    return new OSDMap() { new KeyValuePair<string, OSD>("Success", UpdateAgent(updateAgentDataRequest.Destination, updateAgentDataRequest.Update)) };
+                case "FailedToMoveAgentIntoNewRegionRequest":
+                    FailedToMoveAgentIntoNewRegionRequest failedToMoveAgentIntoNewRegionRequest = new FailedToMoveAgentIntoNewRegionRequest();
+                    failedToMoveAgentIntoNewRegionRequest.FromOSD(message);
+                    FailedToMoveAgentIntoNewRegion(failedToMoveAgentIntoNewRegionRequest.AgentID, failedToMoveAgentIntoNewRegionRequest.RegionID);
+                    break;
+                case "CloseAgentRequest":
+                    CloseAgentRequest closeAgentRequest = new CloseAgentRequest();
+                    closeAgentRequest.FromOSD(message);
+                    CloseAgent(closeAgentRequest.Destination, closeAgentRequest.AgentID);
+                    break;
+                case "MakeChildAgentRequest":
+                    MakeChildAgentRequest makeChildAgentRequest = new MakeChildAgentRequest();
+                    makeChildAgentRequest.FromOSD(message);
+                    MakeChildAgent(makeChildAgentRequest.AgentID, makeChildAgentRequest.OldRegion, makeChildAgentRequest.Destination, makeChildAgentRequest.IsCrossing);
+                    break;
+                case "FailedToTeleportAgentRequest":
+                    FailedToTeleportAgentRequest failedToTeleportAgentRequest = new FailedToTeleportAgentRequest();
+                    failedToTeleportAgentRequest.FromOSD(message);
+                    FailedToTeleportAgent(failedToTeleportAgentRequest.Destination, failedToTeleportAgentRequest.FailedRegionID,
+                        failedToTeleportAgentRequest.AgentID, failedToTeleportAgentRequest.Reason, failedToTeleportAgentRequest.IsCrossing);
+                    break;
+                case "RetrieveAgentRequest":
+                    RetrieveAgentRequest retrieveAgentRequest = new RetrieveAgentRequest();
+                    retrieveAgentRequest.FromOSD(message);
+                    RetrieveAgentResponse retrieveAgentResponse = new RetrieveAgentResponse();
+                    retrieveAgentResponse.Success = RetrieveAgent(retrieveAgentRequest.Destination, retrieveAgentRequest.AgentID, retrieveAgentRequest.AgentIsLeaving,
+                        out retrieveAgentResponse.AgentData, out retrieveAgentResponse.CircuitData);
+                    return retrieveAgentResponse.ToOSD();
+                case "CreateObjectRequest":
+                    CreateObjectRequest createObjectRequest = new CreateObjectRequest();
+                    createObjectRequest.FromOSD(message);
+                    createObjectRequest.Scene = GetScene(createObjectRequest.Destination.RegionID);
+                    createObjectRequest.DeserializeObject();
+                    return new OSDMap() { new KeyValuePair<string, OSD>("Success", CreateObject(createObjectRequest.Destination, createObjectRequest.Object)) };
+                default:
+                    return null;
             }
             return null;
         }

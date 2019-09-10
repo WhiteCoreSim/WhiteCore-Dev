@@ -143,6 +143,7 @@ namespace WhiteCore.Services.SQLServices.InventoryService
                     }
                 }
             } catch {
+                MainConsole.Instance.Debug("Exception whilst loading default invenrory IAR file");
             }
         }
 

@@ -903,7 +903,7 @@ namespace WhiteCore.Services.SQLServices.GridService
 
         NeighborLocation BuildNeighborLocation (GridRegion reg)
         {
-            return new NeighborLocation () {
+            return new NeighborLocation {
                 RegionID = reg.RegionID,
                 RegionLocX = reg.RegionLocX,
                 RegionLocY = reg.RegionLocY

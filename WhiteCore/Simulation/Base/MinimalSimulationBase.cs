@@ -426,13 +426,12 @@ namespace WhiteCore.Simulation.Base
         /// <param name="fileName">name of file to use as input to the console</param>
         void PrintFileToConsole(string fileName)
         {
-            if (File.Exists(fileName))
-            {
-                StreamReader readFile = File.OpenText(fileName);
-                string currentLine;
-                while ((currentLine = readFile.ReadLine()) != null)
-                {
-                    MainConsole.Instance.CleanInfo(currentLine);
+            if (File.Exists(fileName)) {
+                using (StreamReader readFile = File.OpenText(fileName)) {
+                    string currentLine;
+                    while ((currentLine = readFile.ReadLine()) != null) {
+                        MainConsole.Instance.CleanInfo(currentLine);
+                    }
                 }
             }
         }
@@ -650,7 +649,8 @@ namespace WhiteCore.Simulation.Base
                 }
                 catch
                 {
-                    //It doesn't matter, just shut down
+                    MainConsole.Instance.Debug("Exception whilst running shutdown commands");
+                    // It doesn't matter, just shut down
                 }
                 try
                 {
@@ -659,6 +659,7 @@ namespace WhiteCore.Simulation.Base
                 }
                 catch
                 {
+                    MainConsole.Instance.Debug("Exception whilst closing modules");
                     //Just shut down already
                 }
                 try
@@ -668,6 +669,7 @@ namespace WhiteCore.Simulation.Base
                 }
                 catch
                 {
+                    MainConsole.Instance.Debug("Exception whilst closing thread pool");
                     //Just shut down already
                 }
                 try
@@ -680,6 +682,7 @@ namespace WhiteCore.Simulation.Base
                 }
                 catch
                 {
+                    MainConsole.Instance.Debug("Exception whilst stopping http server");
                     //Again, just shut down
                 }
 
@@ -694,6 +697,7 @@ namespace WhiteCore.Simulation.Base
             }
             catch
             {
+                MainConsole.Instance.Debug("Exception whilst closing down");
             }
         }
 
@@ -735,6 +739,7 @@ namespace WhiteCore.Simulation.Base
                 }
                 catch (Exception)
                 {
+                    MainConsole.Instance.Debug("Exception whilst removing PID file");
                 }
             }
         }

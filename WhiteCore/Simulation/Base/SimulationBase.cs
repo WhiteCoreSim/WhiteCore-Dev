@@ -271,11 +271,11 @@ namespace WhiteCore.Simulation.Base
             // get memory allocation
             Process proc = Process.GetCurrentProcess();
             MainConsole.Instance.Info("[WhiteCore-Sim Startup]: Allocated RAM " + proc.WorkingSet64);
-            if (Utilities.IsLinuxOs)
-            {
-                var pc = new PerformanceCounter ("Mono Memory", "Total Physical Memory");
-                var bytes = pc.RawValue;
-                MainConsole.Instance.InfoFormat ("[WhiteCore-Sim Startup]: Physical RAM (Mbytes): {0}", bytes / 1024000);
+            if (Utilities.IsLinuxOs) {
+                using (PerformanceCounter pc = new PerformanceCounter("Mono Memory", "Total Physical Memory")) {
+                    var bytes = pc.RawValue;
+                    MainConsole.Instance.InfoFormat("[WhiteCore-Sim Startup]: Physical RAM (Mbytes): {0}", bytes / 1024000);
+                }
             }
 
             SetUpHTTPServer();
@@ -459,13 +459,12 @@ namespace WhiteCore.Simulation.Base
         /// <param name="fileName">name of file to use as input to the console</param>
         static void PrintFileToConsole(string fileName)
         {
-            if (File.Exists(fileName))
-            {
-                StreamReader readFile = File.OpenText(fileName);
-                string currentLine;
-                while ((currentLine = readFile.ReadLine()) != null)
-                {
-                    MainConsole.Instance.CleanInfo(currentLine);
+            if (File.Exists(fileName)) {
+                using (StreamReader readFile = File.OpenText(fileName)) {
+                    string currentLine;
+                    while ((currentLine = readFile.ReadLine()) != null) {
+                        MainConsole.Instance.CleanInfo(currentLine);
+                    }
                 }
             }
         }
@@ -683,7 +682,8 @@ namespace WhiteCore.Simulation.Base
                 }
                 catch
                 {
-                    ;//It doesn't matter, just shut down
+                    MainConsole.Instance.Debug("Exception whilst running shutdown commands");
+                    //It doesn't matter, just shut down
                 }
                 try
                 {
@@ -692,7 +692,8 @@ namespace WhiteCore.Simulation.Base
                 }
                 catch
                 {
-                    ; //Just shut down already
+                    MainConsole.Instance.Debug("Exception whilst closing modules");
+                    //Just shut down already
                 }
                 try
                 {
@@ -701,7 +702,8 @@ namespace WhiteCore.Simulation.Base
                 }
                 catch
                 {
-                    ; //Just shut down already
+                    MainConsole.Instance.Debug("Exception whilst closing thread pool");
+                    //Just shut down already
                 }
                 try
                 {
@@ -713,7 +715,8 @@ namespace WhiteCore.Simulation.Base
                 }
                 catch
                 {
-                    ; //Again, just shut down
+                    MainConsole.Instance.Debug("Exception whilst stopping http server");
+                    //Again, just shut down
                 }
 
                 if (close)
@@ -729,7 +732,8 @@ namespace WhiteCore.Simulation.Base
             }
             catch
             {
-                ; // just ignore this
+                MainConsole.Instance.Debug("Exception whilst closing down");
+                // just ignore this
             }
         }
 
@@ -771,7 +775,8 @@ namespace WhiteCore.Simulation.Base
                 }
                 catch (Exception)
                 {
-                    ; // ignore
+                    MainConsole.Instance.Debug("Exception whilst removing PID file");
+                    // ignore
                 }
             }
         }
