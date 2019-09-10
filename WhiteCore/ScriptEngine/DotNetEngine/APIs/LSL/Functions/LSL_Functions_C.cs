@@ -58,7 +58,7 @@ using GridRegion = WhiteCore.Framework.Services.GridRegion;
 using LSL_Float = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.LSLFloat;
 using LSL_Integer = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.LSLInteger;
 using LSL_Key = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.LSLString;
-using LSL_List = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.list;
+using LSL_List = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.List;
 using LSL_Rotation = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.Quaternion;
 using LSL_String = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.LSLString;
 using LSL_Vector = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.Vector3;
@@ -72,34 +72,33 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
 
 
 
-        public DateTime llCreateLink (string target, int parent)
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+        public DateTime llCreateLink(string target, int parent) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
                 return DateTime.Now;
 
-            UUID invItemID = InventorySelf ();
+            UUID invItemID = InventorySelf();
             UUID targetID;
 
-            if (!UUID.TryParse (target, out targetID))
+            if (!UUID.TryParse(target, out targetID))
                 return DateTime.Now;
 
             TaskInventoryItem item;
             lock (m_host.TaskInventory) {
-                item = m_host.TaskInventory [invItemID];
+                item = m_host.TaskInventory[invItemID];
             }
 
             if ((item.PermsMask & ScriptBaseClass.PERMISSION_CHANGE_LINKS) == 0
                 && !m_automaticLinkPermission) {
-                Error ("llCreateLink", "PERMISSION_CHANGE_LINKS permission not set");
+                Error("llCreateLink", "PERMISSION_CHANGE_LINKS permission not set");
                 return DateTime.Now;
             }
 
             IClientAPI client = null;
-            IScenePresence sp = World.GetScenePresence (item.PermsGranter);
+            IScenePresence sp = World.GetScenePresence(item.PermsGranter);
             if (sp != null)
                 client = sp.ControllingClient;
 
-            ISceneChildEntity targetPart = World.GetSceneObjectPart (targetID);
+            ISceneChildEntity targetPart = World.GetSceneObjectPart(targetID);
 
             if (targetPart.ParentEntity.RootChild.AttachmentPoint != 0)
                 return DateTime.Now;
@@ -114,18 +113,18 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
                 childPrim = m_host.ParentEntity;
             }
             //                byte uf = childPrim.RootPart.UpdateFlag;
-            parentPrim.LinkToGroup (childPrim);
+            parentPrim.LinkToGroup(childPrim);
             //                if (uf != (Byte)0)
             //                    parent.RootPart.UpdateFlag = uf;
 
-            parentPrim.TriggerScriptChangedEvent (Changed.LINK);
+            parentPrim.TriggerScriptChangedEvent(Changed.LINK);
             parentPrim.RootChild.CreateSelected = true;
-            parentPrim.ScheduleGroupUpdate (PrimUpdateFlags.ForcedFullUpdate);
+            parentPrim.ScheduleGroupUpdate(PrimUpdateFlags.ForcedFullUpdate);
 
             if (client != null)
-                parentPrim.GetProperties (client);
+                parentPrim.GetProperties(client);
 
-            return PScriptSleep (m_sleepMsOnCreateLink);
+            return PScriptSleep(m_sleepMsOnCreateLink);
         }
 
 
@@ -136,94 +135,89 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
         ///     of &apos;&lt;&apos; &apos;&gt;&apos; delimiters. Any whitespace
         ///     before or after an element is trimmed.
         /// </summary>
-        public LSL_List llCSV2List (string src)
-        {
-            LSL_List result = new LSL_List ();
+        public LSL_List llCSV2List(string src) {
+            LSL_List result = new LSL_List();
             int parens = 0;
             int start = 0;
             int length = 0;
 
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
-                return new LSL_List ();
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+                return new LSL_List();
 
 
             for (int i = 0; i < src.Length; i++) {
-                switch (src [i]) {
-                case '<':
-                    parens++;
-                    length++;
-                    break;
-                case '>':
-                    if (parens > 0)
-                        parens--;
-                    length++;
-                    break;
-                case ',':
-                    if (parens == 0) {
-                        result.Add (new LSL_String (src.Substring (start, length).Trim ()));
-                        start += length + 1;
-                        length = 0;
-                    } else {
+                switch (src[i]) {
+                    case '<':
+                        parens++;
                         length++;
-                    }
-                    break;
-                default:
-                    length++;
-                    break;
+                        break;
+                    case '>':
+                        if (parens > 0)
+                            parens--;
+                        length++;
+                        break;
+                    case ',':
+                        if (parens == 0) {
+                            result.Add(new LSL_String(src.Substring(start, length).Trim()));
+                            start += length + 1;
+                            length = 0;
+                        } else {
+                            length++;
+                        }
+                        break;
+                    default:
+                        length++;
+                        break;
                 }
             }
 
-            result.Add (new LSL_String (src.Substring (start, length).Trim ()));
+            result.Add(new LSL_String(src.Substring(start, length).Trim()));
 
             return result;
         }
 
-        public DateTime llCloseRemoteDataChannel (object _channel)
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+        public DateTime llCloseRemoteDataChannel(object _channel) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
                 return DateTime.Now;
 
-            IXMLRPC xmlrpcMod = World.RequestModuleInterface<IXMLRPC> ();
-            xmlrpcMod.CloseXMLRPCChannel (UUID.Parse (_channel.ToString ()));
-            return PScriptSleep (m_sleepMsOnCloseRemoteDataChannel);
+            IXMLRPC xmlrpcMod = World.RequestModuleInterface<IXMLRPC>();
+            xmlrpcMod.CloseXMLRPCChannel(UUID.Parse(_channel.ToString()));
+            return PScriptSleep(m_sleepMsOnCloseRemoteDataChannel);
         }
 
-        public LSL_Integer llClearPrimMedia (LSL_Integer face)
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+        public LSL_Integer llClearPrimMedia(LSL_Integer face) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
                 return 0;
-            PScriptSleep (m_sleepMsOnClearPrimMedia);
+            PScriptSleep(m_sleepMsOnClearPrimMedia);
 
-            ClearPrimMedia (m_host, face);
+            ClearPrimMedia(m_host, face);
 
             return ScriptBaseClass.STATUS_OK;
         }
 
-        public LSL_Integer llClearLinkMedia (LSL_Integer link, LSL_Integer face)
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+        public LSL_Integer llClearLinkMedia(LSL_Integer link, LSL_Integer face) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
                 return 0;
             //PScriptSleep(m_sleepMsOnClearLinkMedia);
 
-            List<ISceneChildEntity> entities = GetLinkParts (link);
-            if (entities.Count == 0 || face < 0 || face > entities [0].GetNumberOfSides () - 1)
+            List<ISceneChildEntity> entities = GetLinkParts(link);
+            if (entities.Count == 0 || face < 0 || face > entities[0].GetNumberOfSides() - 1)
                 return ScriptBaseClass.STATUS_OK;
 
             foreach (ISceneChildEntity child in entities)
-                ClearPrimMedia (child, face);
+                ClearPrimMedia(child, face);
 
             return ScriptBaseClass.STATUS_OK;
         }
 
 
-        public void llClearCameraParams ()
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+        public void llClearCameraParams() {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
                 return;
 
 
             // our key in the object we are in
-            UUID invItemID = InventorySelf ();
+            UUID invItemID = InventorySelf();
             if (invItemID == UUID.Zero) return;
 
             // the object we are in
@@ -233,27 +227,26 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             // we need the permission first, to know which avatar we want to clear the camera for
             UUID agentID;
             lock (m_host.TaskInventory) {
-                agentID = m_host.TaskInventory [invItemID].PermsGranter;
+                agentID = m_host.TaskInventory[invItemID].PermsGranter;
                 if (agentID == UUID.Zero) return;
-                if ((m_host.TaskInventory [invItemID].PermsMask & ScriptBaseClass.PERMISSION_CONTROL_CAMERA) == 0)
+                if ((m_host.TaskInventory[invItemID].PermsMask & ScriptBaseClass.PERMISSION_CONTROL_CAMERA) == 0)
                     return;
             }
 
-            IScenePresence presence = World.GetScenePresence (agentID);
+            IScenePresence presence = World.GetScenePresence(agentID);
 
             // we are not interested in child-agents
             if (presence.IsChildAgent) return;
 
-            presence.ControllingClient.SendClearFollowCamProperties (objectID);
+            presence.ControllingClient.SendClearFollowCamProperties(objectID);
         }
 
 
-        public void llCreateCharacter (LSL_List options)
-        {
-            IBotManager botManager = World.RequestModuleInterface<IBotManager> ();
+        public void llCreateCharacter(LSL_List options) {
+            IBotManager botManager = World.RequestModuleInterface<IBotManager>();
             if (botManager != null) {
-                botManager.CreateCharacter (m_host.ParentEntity.UUID, World);
-                llUpdateCharacter (options);
+                botManager.CreateCharacter(m_host.ParentEntity.UUID, World);
+                llUpdateCharacter(options);
             }
         }
 

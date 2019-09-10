@@ -58,7 +58,7 @@ using GridRegion = WhiteCore.Framework.Services.GridRegion;
 using LSL_Float = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.LSLFloat;
 using LSL_Integer = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.LSLInteger;
 using LSL_Key = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.LSLString;
-using LSL_List = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.list;
+using LSL_List = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.List;
 using LSL_Rotation = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.Quaternion;
 using LSL_String = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.LSLString;
 using LSL_Vector = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.Vector3;
@@ -69,14 +69,13 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
 {
     public partial class LSL_Api : MarshalByRefObject, IScriptApi
     {
-        public LSL_String llGetAnimation (string id)
-        {
+        public LSL_String llGetAnimation(string id) {
             // This should only return a value if the avatar is in the same region
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
                 return "";
 
             UUID avatar = (UUID)id;
-            IScenePresence presence = World.GetScenePresence (avatar);
+            IScenePresence presence = World.GetScenePresence(avatar);
             if (presence == null)
                 return "";
 
@@ -84,7 +83,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
                 Dictionary<UUID, string> animationstateNames = AnimationSet.Animations.AnimStateNames;
                 AnimationSet currentAnims = presence.Animator.Animations;
                 string currentAnimationState = string.Empty;
-                if (animationstateNames.TryGetValue (currentAnims.ImplicitDefaultAnimation.AnimID,
+                if (animationstateNames.TryGetValue(currentAnims.ImplicitDefaultAnimation.AnimID,
                                                     out currentAnimationState))
                     return currentAnimationState;
             }
@@ -94,80 +93,77 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
 
 
 
-        public void llSetAnimationOverride (LSL_String anim_state, LSL_String anim)
-        {
+        public void llSetAnimationOverride(LSL_String anim_state, LSL_String anim) {
             //anim_state - animation state to be overriden
             //anim       - an animation in the prim's inventory or the name of the built-in animation
 
-            UUID invItemID = InventorySelf ();
+            UUID invItemID = InventorySelf();
             if (invItemID == UUID.Zero)
                 return;
 
             TaskInventoryItem item;
 
             lock (m_host.TaskInventory) {
-                if (!m_host.TaskInventory.ContainsKey (InventorySelf ()))
+                if (!m_host.TaskInventory.ContainsKey(InventorySelf()))
                     return;
-                item = m_host.TaskInventory [InventorySelf ()];
+                item = m_host.TaskInventory[InventorySelf()];
             }
 
             if (item.PermsGranter == UUID.Zero)
                 return;
 
             if ((item.PermsMask & ScriptBaseClass.PERMISSION_OVERRIDE_ANIMATIONS) != 0) {
-                IScenePresence presence = World.GetScenePresence (item.PermsGranter);
+                IScenePresence presence = World.GetScenePresence(item.PermsGranter);
 
                 if (presence != null) {
                     // Do NOT try to parse UUID, animations cannot be triggered by ID
-                    UUID animID = KeyOrName (anim, AssetType.Animation, false);
+                    UUID animID = KeyOrName(anim, AssetType.Animation, false);
 
-                    presence.Animator.SetDefaultAnimationOverride (anim_state, animID, anim);
+                    presence.Animator.SetDefaultAnimationOverride(anim_state, animID, anim);
                 }
             }
         }
 
-        public void llResetAnimationOverride (LSL_String anim_state)
-        {
+        public void llResetAnimationOverride(LSL_String anim_state) {
             //anim_state - animation state to be reset
 
-            UUID invItemID = InventorySelf ();
+            UUID invItemID = InventorySelf();
             if (invItemID == UUID.Zero)
                 return;
 
             TaskInventoryItem item;
 
             lock (m_host.TaskInventory) {
-                if (!m_host.TaskInventory.ContainsKey (InventorySelf ()))
+                if (!m_host.TaskInventory.ContainsKey(InventorySelf()))
                     return;
-                item = m_host.TaskInventory [InventorySelf ()];
+                item = m_host.TaskInventory[InventorySelf()];
             }
 
             if (item.PermsGranter == UUID.Zero)
                 return;
 
             if ((item.PermsMask & ScriptBaseClass.PERMISSION_OVERRIDE_ANIMATIONS) != 0) {
-                IScenePresence presence = World.GetScenePresence (item.PermsGranter);
+                IScenePresence presence = World.GetScenePresence(item.PermsGranter);
 
                 if (presence != null) {
-                    presence.Animator.ResetDefaultAnimationOverride (anim_state);
+                    presence.Animator.ResetDefaultAnimationOverride(anim_state);
                 }
             }
         }
 
-        public LSL_String llGetAnimationOverride (string anim_state)
-        {
+        public LSL_String llGetAnimationOverride(string anim_state) {
             //anim_state - animation state to be reset
 
-            UUID invItemID = InventorySelf ();
+            UUID invItemID = InventorySelf();
             if (invItemID == UUID.Zero)
                 return "";
 
             TaskInventoryItem item;
 
             lock (m_host.TaskInventory) {
-                if (!m_host.TaskInventory.ContainsKey (InventorySelf ()))
+                if (!m_host.TaskInventory.ContainsKey(InventorySelf()))
                     return "";
-                item = m_host.TaskInventory [InventorySelf ()];
+                item = m_host.TaskInventory[InventorySelf()];
             }
 
             if (item.PermsGranter == UUID.Zero)
@@ -175,103 +171,101 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
 
             if ((item.PermsMask & ScriptBaseClass.PERMISSION_TRIGGER_ANIMATION) != 0 ||
                 (item.PermsMask & ScriptBaseClass.PERMISSION_OVERRIDE_ANIMATIONS) != 0) {
-                IScenePresence presence = World.GetScenePresence (item.PermsGranter);
+                IScenePresence presence = World.GetScenePresence(item.PermsGranter);
 
                 if (presence != null) {
-                    return new LSL_String (presence.Animator.GetDefaultAnimationOverride (anim_state));
+                    return new LSL_String(presence.Animator.GetDefaultAnimationOverride(anim_state));
                 }
             }
             return "";
         }
 
-        public void llStartAnimation (string anim)
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+        public void llStartAnimation(string anim) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
                 return;
 
 
-            UUID invItemID = InventorySelf ();
+            UUID invItemID = InventorySelf();
             if (invItemID == UUID.Zero)
                 return;
 
             TaskInventoryItem item;
 
             lock (m_host.TaskInventory) {
-                if (!m_host.TaskInventory.ContainsKey (InventorySelf ()))
+                if (!m_host.TaskInventory.ContainsKey(InventorySelf()))
                     return;
-                item = m_host.TaskInventory [InventorySelf ()];
+                item = m_host.TaskInventory[InventorySelf()];
             }
 
             if (item.PermsGranter == UUID.Zero)
                 return;
 
             if ((item.PermsMask & ScriptBaseClass.PERMISSION_TRIGGER_ANIMATION) != 0) {
-                IScenePresence presence = World.GetScenePresence (item.PermsGranter);
+                IScenePresence presence = World.GetScenePresence(item.PermsGranter);
 
                 if (presence != null) {
                     // Do NOT try to parse UUID, animations cannot be triggered by ID
-                    UUID animID = KeyOrName (anim, AssetType.Animation, false);
+                    UUID animID = KeyOrName(anim, AssetType.Animation, false);
                     if (animID == UUID.Zero) {
-                        bool RetVal = presence.Animator.AddAnimation (anim, m_host.UUID);
+                        bool RetVal = presence.Animator.AddAnimation(anim, m_host.UUID);
                         if (!RetVal) {
-                            IChatModule chatModule = World.RequestModuleInterface<IChatModule> ();
+                            IChatModule chatModule = World.RequestModuleInterface<IChatModule>();
                             if (chatModule != null)
-                                chatModule.SimChat ("Could not find animation '" + anim + "'.",
+                                chatModule.SimChat("Could not find animation '" + anim + "'.",
                                                     ChatTypeEnum.DebugChannel, 2147483647, m_host.AbsolutePosition,
                                                     m_host.Name, m_host.UUID, false, World);
                         }
                     } else
-                        presence.Animator.AddAnimation (animID, m_host.UUID);
+                        presence.Animator.AddAnimation(animID, m_host.UUID);
                 }
             }
         }
 
-        public void llStopAnimation (string anim)
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+        public void llStopAnimation(string anim) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
                 return;
 
 
-            UUID invItemID = InventorySelf ();
+            UUID invItemID = InventorySelf();
             if (invItemID == UUID.Zero)
                 return;
 
             TaskInventoryItem item;
 
             lock (m_host.TaskInventory) {
-                if (!m_host.TaskInventory.ContainsKey (InventorySelf ()))
+                if (!m_host.TaskInventory.ContainsKey(InventorySelf()))
                     return;
-                item = m_host.TaskInventory [InventorySelf ()];
+                item = m_host.TaskInventory[InventorySelf()];
             }
 
             if (item.PermsGranter == UUID.Zero)
                 return;
 
             if ((item.PermsMask & ScriptBaseClass.PERMISSION_TRIGGER_ANIMATION) != 0) {
-                UUID animID = new UUID ();
+                UUID animID = new UUID();
 
-                if (!UUID.TryParse (anim, out animID)) {
-                    animID = InventoryKey (anim, AssetType.Animation, false);
+                if (!UUID.TryParse(anim, out animID)) {
+                    animID = InventoryKey(anim, AssetType.Animation, false);
                 }
 
-                IScenePresence presence = World.GetScenePresence (item.PermsGranter);
+                IScenePresence presence = World.GetScenePresence(item.PermsGranter);
 
                 if (presence != null) {
                     if (animID == UUID.Zero) {
-                        if (UUID.TryParse (anim, out animID))
-                            presence.Animator.RemoveAnimation (animID);
+                        if (UUID.TryParse(anim, out animID))
+                            presence.Animator.RemoveAnimation(animID);
                         else {
-                            bool RetVal = presence.Animator.RemoveAnimation (anim);
+                            bool RetVal = presence.Animator.RemoveAnimation(anim);
                             if (!RetVal) {
-                                IChatModule chatModule = World.RequestModuleInterface<IChatModule> ();
+                                IChatModule chatModule = World.RequestModuleInterface<IChatModule>();
                                 if (chatModule != null)
-                                    chatModule.SimChat ("Could not find animation '" + anim + "'.",
+                                    chatModule.SimChat("Could not find animation '" + anim + "'.",
                                                        ChatTypeEnum.DebugChannel, 2147483647, m_host.AbsolutePosition,
                                                        m_host.Name, m_host.UUID, false, World);
                             }
                         }
                     } else
-                        presence.Animator.RemoveAnimation (animID);
+                        presence.Animator.RemoveAnimation(animID);
                 }
             }
         }

@@ -58,7 +58,7 @@ using GridRegion = WhiteCore.Framework.Services.GridRegion;
 using LSL_Float = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.LSLFloat;
 using LSL_Integer = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.LSLInteger;
 using LSL_Key = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.LSLString;
-using LSL_List = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.list;
+using LSL_List = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.List;
 using LSL_Rotation = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.Quaternion;
 using LSL_String = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.LSLString;
 using LSL_Vector = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.Vector3;
@@ -69,22 +69,21 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
 {
     public partial class LSL_Api : MarshalByRefObject, IScriptApi
     {
-        public void llUnSit (string id)
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+        public void llUnSit(string id) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
                 return;
 
 
-            UUID key = new UUID ();
-            if (UUID.TryParse (id, out key)) {
-                IScenePresence av = World.GetScenePresence (key);
+            UUID key = new UUID();
+            if (UUID.TryParse(id, out key)) {
+                IScenePresence av = World.GetScenePresence(key);
 
                 if (av != null) {
-                    if (m_host.ParentEntity.SitTargetAvatar.Contains (key)) {
+                    if (m_host.ParentEntity.SitTargetAvatar.Contains(key)) {
                         // if the avatar is sitting on this object, then
                         // we can unsit them.  We don't want random scripts unsitting random people
                         // Lets avoid the popcorn avatar scenario.
-                        av.StandUp ();
+                        av.StandUp();
                     } else {
                         // If the object owner also owns the parcel
                         // or
@@ -92,15 +91,15 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
                         // or
                         // if the object is owned by a person with estate access.
 
-                        IParcelManagementModule parcelManagement = World.RequestModuleInterface<IParcelManagementModule> ();
+                        IParcelManagementModule parcelManagement = World.RequestModuleInterface<IParcelManagementModule>();
                         if (parcelManagement != null) {
-                            ILandObject parcel = parcelManagement.GetLandObject (av.AbsolutePosition.X,
+                            ILandObject parcel = parcelManagement.GetLandObject(av.AbsolutePosition.X,
                                                                                 av.AbsolutePosition.Y);
                             if (parcel != null) {
                                 if (m_host.OwnerID == parcel.LandData.OwnerID ||
                                     (m_host.OwnerID == m_host.GroupID && m_host.GroupID == parcel.LandData.GroupID
-                                     && parcel.LandData.IsGroupOwned) || World.Permissions.IsGod (m_host.OwnerID)) {
-                                    av.StandUp ();
+                                     && parcel.LandData.IsGroupOwned) || World.Permissions.IsGod(m_host.OwnerID)) {
+                                    av.StandUp();
                                 }
                             }
                         }
@@ -111,19 +110,18 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
 
 
 
-        public void llUpdateCharacter (LSL_List options)
-        {
-            IBotManager botManager = World.RequestModuleInterface<IBotManager> ();
+        public void llUpdateCharacter(LSL_List options) {
+            IBotManager botManager = World.RequestModuleInterface<IBotManager>();
             if (botManager != null) {
-                IBotController controller = botManager.GetCharacterManager (m_host.ParentEntity.UUID);
+                IBotController controller = botManager.GetCharacterManager(m_host.ParentEntity.UUID);
                 if (controller == null)
                     return;         // nothing to controll :(
 
                 for (int i = 0; i < options.Length; i += 2) {
-                    LSL_Integer opt = options.GetLSLIntegerItem (i);
-                    LSL_Float value = options.GetLSLFloatItem (i + 1);
+                    LSL_Integer opt = options.GetLSLIntegerItem(i);
+                    LSL_Float value = options.GetLSLFloatItem(i + 1);
                     if (opt == ScriptBaseClass.CHARACTER_DESIRED_SPEED)
-                        controller.SetSpeedModifier ((float)value.value);
+                        controller.SetSpeedModifier((float)value.value);
                     else if (opt == ScriptBaseClass.CHARACTER_RADIUS) {
                     } else if (opt == ScriptBaseClass.CHARACTER_LENGTH) {
                     } else if (opt == ScriptBaseClass.CHARACTER_ORIENTATION) {

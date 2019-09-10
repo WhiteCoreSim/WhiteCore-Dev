@@ -58,7 +58,7 @@ using GridRegion = WhiteCore.Framework.Services.GridRegion;
 using LSL_Float = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.LSLFloat;
 using LSL_Integer = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.LSLInteger;
 using LSL_Key = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.LSLString;
-using LSL_List = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.list;
+using LSL_List = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.List;
 using LSL_Rotation = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.Quaternion;
 using LSL_String = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.LSLString;
 using LSL_Vector = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.Vector3;
@@ -71,41 +71,38 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
     {
         protected class Notecard
         {
-            public string [] text;
+            public string[] text;
             public DateTime lastRef;
         }
 
         protected static Dictionary<UUID, Notecard> m_Notecards =
-            new Dictionary<UUID, Notecard> ();
+            new Dictionary<UUID, Notecard>();
 
-        public static void Cache (UUID assetID, string text)
-        {
-            CacheCheck ();
+        public static void Cache(UUID assetID, string text) {
+            CacheCheck();
 
             lock (m_Notecards) {
-                if (m_Notecards.ContainsKey (assetID))
+                if (m_Notecards.ContainsKey(assetID))
                     return;
 
-                Notecard nc = new Notecard { lastRef = DateTime.Now, text = SLUtil.ParseNotecardToList (text).ToArray () };
-                m_Notecards [assetID] = nc;
+                Notecard nc = new Notecard { lastRef = DateTime.Now, text = SLUtil.ParseNotecardToList(text).ToArray() };
+                m_Notecards[assetID] = nc;
             }
         }
 
-        public static bool IsCached (UUID assetID)
-        {
+        public static bool IsCached(UUID assetID) {
             lock (m_Notecards) {
-                return m_Notecards.ContainsKey (assetID);
+                return m_Notecards.ContainsKey(assetID);
             }
         }
 
-        public static int GetLines (UUID assetID)
-        {
-            if (!IsCached (assetID))
+        public static int GetLines(UUID assetID) {
+            if (!IsCached(assetID))
                 return -1;
 
             lock (m_Notecards) {
-                m_Notecards [assetID].lastRef = DateTime.Now;
-                return m_Notecards [assetID].text.Length;
+                m_Notecards[assetID].lastRef = DateTime.Now;
+                return m_Notecards[assetID].text.Length;
             }
         }
 
@@ -115,21 +112,20 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
         /// <param name="assetID"></param>
         /// <param name="lineNumber">Lines start at index 0</param>
         /// <returns></returns>
-        public static string GetLine (UUID assetID, int lineNumber)
-        {
+        public static string GetLine(UUID assetID, int lineNumber) {
             if (lineNumber < 0)
                 return "";
 
-            if (!IsCached (assetID))
+            if (!IsCached(assetID))
                 return "";
 
             lock (m_Notecards) {
-                m_Notecards [assetID].lastRef = DateTime.Now;
+                m_Notecards[assetID].lastRef = DateTime.Now;
 
-                if (lineNumber >= m_Notecards [assetID].text.Length)
+                if (lineNumber >= m_Notecards[assetID].text.Length)
                     return "\n\n\n";
 
-                string data = m_Notecards [assetID].text [lineNumber];
+                string data = m_Notecards[assetID].text[lineNumber];
 
                 return data;
             }
@@ -147,23 +143,21 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
         /// If the line length is longer than <paramref name="maxLength"/>,
         /// the return string will be truncated.
         /// </returns>
-        public static string GetLine (UUID assetID, int lineNumber, int maxLength)
-        {
-            string line = GetLine (assetID, lineNumber);
+        public static string GetLine(UUID assetID, int lineNumber, int maxLength) {
+            string line = GetLine(assetID, lineNumber);
 
             if (line.Length > maxLength)
-                line = line.Substring (0, maxLength);
+                line = line.Substring(0, maxLength);
 
             return line;
         }
 
-        public static void CacheCheck ()
-        {
+        public static void CacheCheck() {
             lock (m_Notecards) {
-                foreach (UUID key in new List<UUID> (m_Notecards.Keys)) {
-                    Notecard nc = m_Notecards [key];
-                    if (nc.lastRef.AddSeconds (30) < DateTime.Now)
-                        m_Notecards.Remove (key);
+                foreach (UUID key in new List<UUID>(m_Notecards.Keys)) {
+                    Notecard nc = m_Notecards[key];
+                    if (nc.lastRef.AddSeconds(30) < DateTime.Now)
+                        m_Notecards.Remove(key);
                 }
             }
         }

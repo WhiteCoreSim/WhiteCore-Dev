@@ -58,7 +58,7 @@ using GridRegion = WhiteCore.Framework.Services.GridRegion;
 using LSL_Float = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.LSLFloat;
 using LSL_Integer = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.LSLInteger;
 using LSL_Key = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.LSLString;
-using LSL_List = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.list;
+using LSL_List = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.List;
 using LSL_Rotation = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.Quaternion;
 using LSL_String = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.LSLString;
 using LSL_Vector = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.Vector3;
@@ -69,51 +69,46 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
 {
     public partial class LSL_Api : MarshalByRefObject, IScriptApi
     {
-        public DateTime llAdjustSoundVolume (double volume)
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+        public DateTime llAdjustSoundVolume(double volume) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
                 return DateTime.Now;
 
-            m_host.AdjustSoundGain (volume);
-            return PScriptSleep (m_sleepMsOnAdjustSoundVolume);
+            m_host.AdjustSoundGain(volume);
+            return PScriptSleep(m_sleepMsOnAdjustSoundVolume);
         }
 
-        public LSL_String llGetParcelMusicURL ()
-        {
+        public LSL_String llGetParcelMusicURL() {
             ILandObject parcel =
-                m_host.ParentEntity.Scene.RequestModuleInterface<IParcelManagementModule> ()
-                      .GetLandObject (m_host.ParentEntity.AbsolutePosition.X, m_host.ParentEntity.AbsolutePosition.Y);
-            return new LSL_String (parcel.LandData.MusicURL);
+                m_host.ParentEntity.Scene.RequestModuleInterface<IParcelManagementModule>()
+                      .GetLandObject(m_host.ParentEntity.AbsolutePosition.X, m_host.ParentEntity.AbsolutePosition.Y);
+            return new LSL_String(parcel.LandData.MusicURL);
         }
 
-        public LSL_Integer llListen (int channelID, string name, string ID, string msg)
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
-                return new LSL_Integer ();
+        public LSL_Integer llListen(int channelID, string name, string ID, string msg) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+                return new LSL_Integer();
 
             UUID keyID;
-            UUID.TryParse (ID, out keyID);
+            UUID.TryParse(ID, out keyID);
             if (m_comms != null)
-                return m_comms.Listen (m_itemID, m_host.UUID, channelID, name, keyID, msg, 0);
+                return m_comms.Listen(m_itemID, m_host.UUID, channelID, name, keyID, msg, 0);
             return -1;
         }
 
-        public void llListenControl (int number, int active)
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+        public void llListenControl(int number, int active) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
                 return;
 
             if (m_comms != null)
-                m_comms.ListenControl (m_itemID, number, active);
+                m_comms.ListenControl(m_itemID, number, active);
         }
 
-        public void llListenRemove (int number)
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+        public void llListenRemove(int number) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
                 return;
 
             if (m_comms != null)
-                m_comms.ListenRemove (m_itemID, number);
+                m_comms.ListenRemove(m_itemID, number);
         }
 
 
@@ -125,120 +120,115 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
         // see large number of mantises (mantes?)
         // 20080530 Updated to remove code duplication
         // 20080530 Stop sound if there is one, otherwise volume only changes don't work
-        public void llLoopSound (string sound, double volume)
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+        public void llLoopSound(string sound, double volume) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
                 return;
 
-            if (m_host.Sound == KeyOrName (sound, AssetType.Sound, true))
+            if (m_host.Sound == KeyOrName(sound, AssetType.Sound, true))
                 return;
 
             if (m_host.Sound != UUID.Zero)
-                llStopSound ();
+                llStopSound();
 
-            m_host.Sound = KeyOrName (sound, AssetType.Sound, true);
+            m_host.Sound = KeyOrName(sound, AssetType.Sound, true);
             m_host.SoundGain = volume;
             m_host.SoundFlags = (byte)SoundFlags.Loop; // looping
-            if (FloatAlmostEqual (m_host.SoundRadius, 0))
+            if (FloatAlmostEqual(m_host.SoundRadius, 0))
                 m_host.SoundRadius = 20; // Magic number, 20 seems reasonable. Make configurable?
 
-            m_host.ScheduleUpdate (PrimUpdateFlags.FindBest);
+            m_host.ScheduleUpdate(PrimUpdateFlags.FindBest);
         }
 
-        public void llLoopSoundMaster (string sound, double volume)
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+        public void llLoopSoundMaster(string sound, double volume) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
                 return;
 
             lock (m_host.ParentEntity.LoopSoundSlavePrims) {
                 m_host.ParentEntity.LoopSoundMasterPrim = m_host.UUID;
                 foreach (UUID child in m_host.ParentEntity.LoopSoundSlavePrims) {
-                    ISceneChildEntity part = m_host.ParentEntity.GetChildPart (child);
+                    ISceneChildEntity part = m_host.ParentEntity.GetChildPart(child);
                     if (part == null)
                         continue;
-                    part.Sound = KeyOrName (sound, AssetType.Sound, true);
+                    part.Sound = KeyOrName(sound, AssetType.Sound, true);
                     part.SoundGain = volume;
-                    part.AdjustSoundGain (volume);
+                    part.AdjustSoundGain(volume);
                     part.SoundFlags = (byte)SoundFlags.Loop; // looping
-                    if (FloatAlmostEqual (part.SoundRadius, 0))
+                    if (FloatAlmostEqual(part.SoundRadius, 0))
                         part.SoundRadius = 20; // Magic number, 20 seems reasonable. Make configurable?
 
-                    part.ScheduleUpdate (PrimUpdateFlags.FindBest);
+                    part.ScheduleUpdate(PrimUpdateFlags.FindBest);
                 }
             }
             //if (m_host.Sound != UUID.Zero)
             //    llStopSound();
 
-            m_host.AdjustSoundGain (volume);
-            m_host.Sound = KeyOrName (sound, AssetType.Sound, true);
+            m_host.AdjustSoundGain(volume);
+            m_host.Sound = KeyOrName(sound, AssetType.Sound, true);
             m_host.SoundGain = volume;
             m_host.SoundFlags = (byte)SoundFlags.Loop; // looping
-            if (FloatAlmostEqual (m_host.SoundRadius, 0))
+            if (FloatAlmostEqual(m_host.SoundRadius, 0))
                 m_host.SoundRadius = 20; // Magic number, 20 seems reasonable. Make configurable?
 
-            m_host.ScheduleUpdate (PrimUpdateFlags.ForcedFullUpdate);
+            m_host.ScheduleUpdate(PrimUpdateFlags.ForcedFullUpdate);
         }
 
-        public void llLoopSoundSlave (string sound, double volume)
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+        public void llLoopSoundSlave(string sound, double volume) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
                 return;
 
             lock (m_host.ParentEntity.LoopSoundSlavePrims) {
                 if (m_host.UUID != m_host.ParentEntity.LoopSoundMasterPrim &&
-                    !m_host.ParentEntity.LoopSoundSlavePrims.Contains (m_host.UUID))//Can't set the master as a slave
-                    m_host.ParentEntity.LoopSoundSlavePrims.Add (m_host.UUID);
+                    !m_host.ParentEntity.LoopSoundSlavePrims.Contains(m_host.UUID))//Can't set the master as a slave
+                    m_host.ParentEntity.LoopSoundSlavePrims.Add(m_host.UUID);
             }
         }
 
 
-        public void llSound (string sound, double volume, int queue, int loop)
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+        public void llSound(string sound, double volume, int queue, int loop) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
                 return;
 
             // This function has been deprecated
             // see http://www.lslwiki.net/lslwiki/wakka.php?wakka=llSound
-            Deprecated ("llSound", "Use llPlaySound instead");
+            Deprecated("llSound", "Use llPlaySound instead");
             if (loop == 1)
-                llLoopSound (sound, volume);
+                llLoopSound(sound, volume);
             else
-                llPlaySound (sound, volume);
-            llSetSoundQueueing (queue);
+                llPlaySound(sound, volume);
+            llSetSoundQueueing(queue);
         }
 
         // Xantor 20080528: Clear prim data of sound instead
-        public void llStopSound ()
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+        public void llStopSound() {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
                 return;
 
-            m_host.AdjustSoundGain (0);
+            m_host.AdjustSoundGain(0);
             lock (m_host.ParentEntity.LoopSoundSlavePrims) {
                 if (m_host.ParentEntity.LoopSoundMasterPrim == m_host.UUID) {
                     foreach (UUID child in m_host.ParentEntity.LoopSoundSlavePrims) {
-                        ISceneChildEntity part = m_host.ParentEntity.GetChildPart (child);
+                        ISceneChildEntity part = m_host.ParentEntity.GetChildPart(child);
                         if (part == null)
                             continue;
                         part.Sound = UUID.Zero;
                         part.SoundGain = 0;
                         part.SoundFlags = (byte)SoundFlags.None;
-                        part.AdjustSoundGain (0);
-                        part.ScheduleUpdate (PrimUpdateFlags.FindBest);
+                        part.AdjustSoundGain(0);
+                        part.ScheduleUpdate(PrimUpdateFlags.FindBest);
                     }
                     m_host.ParentEntity.LoopSoundMasterPrim = UUID.Zero;
-                    m_host.ParentEntity.LoopSoundSlavePrims.Clear ();
+                    m_host.ParentEntity.LoopSoundSlavePrims.Clear();
                 } else {
-                    if (m_host.ParentEntity.LoopSoundSlavePrims.Contains (m_host.UUID)) {
+                    if (m_host.ParentEntity.LoopSoundSlavePrims.Contains(m_host.UUID)) {
                         m_host.Sound = UUID.Zero;
                         m_host.SoundGain = 0;
                         m_host.SoundFlags = (byte)SoundFlags.None;
-                        m_host.ScheduleUpdate (PrimUpdateFlags.FindBest);
+                        m_host.ScheduleUpdate(PrimUpdateFlags.FindBest);
                     } else {
                         m_host.Sound = UUID.Zero;
                         m_host.SoundGain = 0;
                         m_host.SoundFlags = (byte)SoundFlags.Stop | (byte)SoundFlags.None;
-                        m_host.ScheduleUpdate (PrimUpdateFlags.FindBest);
+                        m_host.ScheduleUpdate(PrimUpdateFlags.FindBest);
                     }
                 }
             }
@@ -248,48 +238,43 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
         ///     llSoundPreload is deprecated. In SL this appears to do absolutely nothing
         ///     and is documented to have no delay.
         /// </summary>
-        public void llSoundPreload (string sound)
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+        public void llSoundPreload(string sound) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
                 return;
-            Deprecated ("llSoundPreload", "Use llPreloadSound instead");
+            Deprecated("llSoundPreload", "Use llPreloadSound instead");
         }
 
-        public void llSetSoundQueueing (int queue)
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+        public void llSetSoundQueueing(int queue) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
                 return;
 
-            m_host.SetSoundQueueing (queue);
+            m_host.SetSoundQueueing(queue);
         }
 
-        public void llSetSoundRadius (double radius)
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+        public void llSetSoundRadius(double radius) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
                 return;
 
             m_host.SoundRadius = radius;
         }
 
-        public void llTriggerSound (string sound, double volume)
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+        public void llTriggerSound(string sound, double volume) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
                 return;
 
             // send the sound, once, to all clients in range
-            m_host.SendSound (KeyOrName (sound, AssetType.Sound, true).ToString (), volume, true, 0, 0);
+            m_host.SendSound(KeyOrName(sound, AssetType.Sound, true).ToString(), volume, true, 0, 0);
         }
 
-        public void llTriggerSoundLimited (string sound, double volume, LSL_Vector top_north_east,
-                          LSL_Vector bottom_south_west)
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+        public void llTriggerSoundLimited(string sound, double volume, LSL_Vector top_north_east,
+                          LSL_Vector bottom_south_west) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
                 return;
 
-            double radius1 = (float)llVecDist (llGetPos (), top_north_east);
-            double radius2 = (float)llVecDist (llGetPos (), bottom_south_west);
-            double radius = Math.Abs (radius1 - radius2);
-            m_host.SendSound (KeyOrName (sound, AssetType.Sound, true).ToString (), volume, true, 0, (float)radius);
+            double radius1 = (float)llVecDist(llGetPos(), top_north_east);
+            double radius2 = (float)llVecDist(llGetPos(), bottom_south_west);
+            double radius = Math.Abs(radius1 - radius2);
+            m_host.SendSound(KeyOrName(sound, AssetType.Sound, true).ToString(), volume, true, 0, (float)radius);
         }
 
 

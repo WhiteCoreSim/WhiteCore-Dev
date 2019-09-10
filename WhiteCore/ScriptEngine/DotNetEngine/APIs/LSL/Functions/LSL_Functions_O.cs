@@ -58,7 +58,7 @@ using GridRegion = WhiteCore.Framework.Services.GridRegion;
 using LSL_Float = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.LSLFloat;
 using LSL_Integer = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.LSLInteger;
 using LSL_Key = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.LSLString;
-using LSL_List = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.list;
+using LSL_List = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.List;
 using LSL_Rotation = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.Quaternion;
 using LSL_String = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.LSLString;
 using LSL_Vector = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.Vector3;
@@ -69,36 +69,34 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
 {
     public partial class LSL_Api : MarshalByRefObject, IScriptApi
     {
-        public DateTime llOffsetTexture (double u, double v, int face)
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+        public DateTime llOffsetTexture(double u, double v, int face) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
                 return DateTime.Now;
 
-            OffsetTexture (m_host, u, v, face);
-            return PScriptSleep (m_sleepMsOnOffsetTexture);
+            OffsetTexture(m_host, u, v, face);
+            return PScriptSleep(m_sleepMsOnOffsetTexture);
         }
 
-        public LSL_Integer llOverMyLand (string id)
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+        public LSL_Integer llOverMyLand(string id) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
                 return 0;
 
-            UUID key = new UUID ();
-            if (UUID.TryParse (id, out key)) {
+            UUID key = new UUID();
+            if (UUID.TryParse(id, out key)) {
                 try {
-                    IScenePresence presence = World.GetScenePresence (key);
-                    IParcelManagementModule parcelManagement = World.RequestModuleInterface<IParcelManagementModule> ();
+                    IScenePresence presence = World.GetScenePresence(key);
+                    IParcelManagementModule parcelManagement = World.RequestModuleInterface<IParcelManagementModule>();
                     if (presence != null) {     // object is an avatar
 
                         if (parcelManagement != null) {
-                            if (m_host.OwnerID == parcelManagement.GetLandObject (presence.AbsolutePosition.X,
+                            if (m_host.OwnerID == parcelManagement.GetLandObject(presence.AbsolutePosition.X,
                                                                                   presence.AbsolutePosition.Y).LandData.OwnerID)
                                 return 1;
                         }
                     } else {                    // object is not an avatar
-                        ISceneChildEntity obj = World.GetSceneObjectPart (key);
+                        ISceneChildEntity obj = World.GetSceneObjectPart(key);
                         if (obj != null && parcelManagement != null) {
-                            if (m_host.OwnerID == parcelManagement.GetLandObject (obj.AbsolutePosition.X,
+                            if (m_host.OwnerID == parcelManagement.GetLandObject(obj.AbsolutePosition.X,
                                                                                   obj.AbsolutePosition.Y).LandData.OwnerID)
                                 return 1;
                         }
@@ -112,28 +110,27 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             return 0;
         }
 
-        public DateTime llOpenRemoteDataChannel ()
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+        public DateTime llOpenRemoteDataChannel() {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
                 return DateTime.Now;
 
-            IXMLRPC xmlrpcMod = World.RequestModuleInterface<IXMLRPC> ();
-            if (xmlrpcMod.IsEnabled ()) {
-                UUID channelID = xmlrpcMod.OpenXMLRPCChannel (m_host.UUID, m_itemID, UUID.Zero);
-                IXmlRpcRouter xmlRpcRouter = World.RequestModuleInterface<IXmlRpcRouter> ();
+            IXMLRPC xmlrpcMod = World.RequestModuleInterface<IXMLRPC>();
+            if (xmlrpcMod.IsEnabled()) {
+                UUID channelID = xmlrpcMod.OpenXMLRPCChannel(m_host.UUID, m_itemID, UUID.Zero);
+                IXmlRpcRouter xmlRpcRouter = World.RequestModuleInterface<IXmlRpcRouter>();
                 if (xmlRpcRouter != null) {
                     string hostName = MainServer.Instance.HostName;
                     string protocol = MainServer.Instance.Secure ? "https://" : "http://";
 
-                    xmlRpcRouter.RegisterNewReceiver (
+                    xmlRpcRouter.RegisterNewReceiver(
                         m_ScriptEngine.ScriptModule,
                         channelID,
                         m_host.UUID,
                         m_itemID,
-                        string.Format ("{0}{1}:{2}/", protocol, hostName, xmlrpcMod.Port)
+                        string.Format("{0}{1}:{2}/", protocol, hostName, xmlrpcMod.Port)
                     );
                 }
-                object [] resobj = {
+                object[] resobj = {
                     new LSL_Integer(1),
                     new LSL_String(channelID.ToString()),
                     new LSL_String(UUID.Zero.ToString()),
@@ -141,24 +138,23 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
                     new LSL_Integer(0),
                     new LSL_String(string.Empty)
                 };
-                m_ScriptEngine.PostScriptEvent (
+                m_ScriptEngine.PostScriptEvent(
                     m_itemID,
                     m_host.UUID,
-                    new EventParams ("remote_data", resobj, new DetectParams [0])
+                    new EventParams("remote_data", resobj, new DetectParams[0])
                     , EventPriority.FirstStart
                 );
             }
-            return PScriptSleep (m_sleepMsOnOpenRemoteDataChannel);
+            return PScriptSleep(m_sleepMsOnOpenRemoteDataChannel);
         }
 
-        public void llOwnerSay (string msg)
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+        public void llOwnerSay(string msg) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
                 return;
 
-            IChatModule chatModule = World.RequestModuleInterface<IChatModule> ();
+            IChatModule chatModule = World.RequestModuleInterface<IChatModule>();
             if (chatModule != null)
-                chatModule.SimChatBroadcast (msg, ChatTypeEnum.Owner, 0,
+                chatModule.SimChatBroadcast(msg, ChatTypeEnum.Owner, 0,
                                             m_host.AbsolutePosition, m_host.Name, m_host.UUID, false, UUID.Zero, World);
         }
 

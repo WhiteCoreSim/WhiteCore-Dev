@@ -58,7 +58,7 @@ using GridRegion = WhiteCore.Framework.Services.GridRegion;
 using LSL_Float = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.LSLFloat;
 using LSL_Integer = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.LSLInteger;
 using LSL_Key = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.LSLString;
-using LSL_List = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.list;
+using LSL_List = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.List;
 using LSL_Rotation = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.Quaternion;
 using LSL_String = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.LSLString;
 using LSL_Vector = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.Vector3;
@@ -70,74 +70,65 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
     public partial class LSL_Api : MarshalByRefObject, IScriptApi
     {
 
-        public void llEvade (LSL_String target, LSL_List options)
-        {
-            NotImplemented ("llEvade");
+        public void llEvade(LSL_String target, LSL_List options) {
+            NotImplemented("llEvade");
         }
 
-        public void llFleeFrom (LSL_Vector source, LSL_Float distance, LSL_List options)
-        {
-            NotImplemented ("llFleeFrom");
+        public void llFleeFrom(LSL_Vector source, LSL_Float distance, LSL_List options) {
+            NotImplemented("llFleeFrom");
         }
 
-        public void llStopPointAt ()
-        {
+        public void llStopPointAt() {
         }
 
-        public void llMoveToTarget (LSL_Vector target, double tau)
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+        public void llMoveToTarget(LSL_Vector target, double tau) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
                 return;
 
-            m_host.MoveToTarget (new Vector3 ((float)target.x, (float)target.y, (float)target.z), (float)tau);
+            m_host.MoveToTarget(new Vector3((float)target.x, (float)target.y, (float)target.z), (float)tau);
         }
 
-        public void llStopMoveToTarget ()
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+        public void llStopMoveToTarget() {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
                 return;
 
-            m_host.StopMoveToTarget ();
+            m_host.StopMoveToTarget();
         }
 
-        public void llPatrolPoints (LSL_List patrolPoints, LSL_List options)
-        {
-            List<Vector3> positions = new List<Vector3> ();
-            List<TravelMode> travelMode = new List<TravelMode> ();
+        public void llPatrolPoints(LSL_List patrolPoints, LSL_List options) {
+            List<Vector3> positions = new List<Vector3>();
+            List<TravelMode> travelMode = new List<TravelMode>();
             foreach (object pos in patrolPoints.Data) {
                 if (!(pos is LSL_Vector))
                     continue;
                 LSL_Vector p = (LSL_Vector)pos;
-                positions.Add (p.ToVector3 ());
-                travelMode.Add (TravelMode.Walk);
+                positions.Add(p.ToVector3());
+                travelMode.Add(TravelMode.Walk);
             }
-            IBotManager botManager = World.RequestModuleInterface<IBotManager> ();
+            IBotManager botManager = World.RequestModuleInterface<IBotManager>();
             if (botManager != null)
-                botManager.SetBotMap (m_host.ParentEntity.UUID, positions, travelMode, 1, m_host.ParentEntity.OwnerID);
+                botManager.SetBotMap(m_host.ParentEntity.UUID, positions, travelMode, 1, m_host.ParentEntity.OwnerID);
         }
 
-        public void llNavigateTo (LSL_Vector point, LSL_List options)
-        {
-            List<Vector3> positions = new List<Vector3> () { point.ToVector3 () };
-            List<TravelMode> travelMode = new List<TravelMode> () { TravelMode.Walk };
-            IBotManager botManager = World.RequestModuleInterface<IBotManager> ();
+        public void llNavigateTo(LSL_Vector point, LSL_List options) {
+            List<Vector3> positions = new List<Vector3>() { point.ToVector3() };
+            List<TravelMode> travelMode = new List<TravelMode>() { TravelMode.Walk };
+            IBotManager botManager = World.RequestModuleInterface<IBotManager>();
             int flags = 0;
             if (options.Length > 0)
-                flags |= options.GetLSLIntegerItem (0);
+                flags |= options.GetLSLIntegerItem(0);
             if (botManager != null)
-                botManager.SetBotMap (m_host.ParentEntity.UUID, positions, travelMode, flags, m_host.ParentEntity.OwnerID);
+                botManager.SetBotMap(m_host.ParentEntity.UUID, positions, travelMode, flags, m_host.ParentEntity.OwnerID);
         }
 
-        public void llWanderWithin (LSL_Vector origin, LSL_Float distance, LSL_List options)
-        {
-            NotImplemented ("llWanderWithin");
+        public void llWanderWithin(LSL_Vector origin, LSL_Float distance, LSL_List options) {
+            NotImplemented("llWanderWithin");
         }
 
-        public LSL_List llGetClosestNavPoint (LSL_Vector point, LSL_List options)
-        {
-            Vector3 diff = new Vector3 (0, 0, 0.1f) *
-                           (Vector3.RotationBetween (m_host.ParentEntity.AbsolutePosition, point.ToVector3 ()));
-            return new LSL_List (new LSL_Vector ((m_host.ParentEntity.AbsolutePosition + diff)));
+        public LSL_List llGetClosestNavPoint(LSL_Vector point, LSL_List options) {
+            Vector3 diff = new Vector3(0, 0, 0.1f) *
+                           (Vector3.RotationBetween(m_host.ParentEntity.AbsolutePosition, point.ToVector3()));
+            return new LSL_List(new LSL_Vector((m_host.ParentEntity.AbsolutePosition + diff)));
         }
 
     }

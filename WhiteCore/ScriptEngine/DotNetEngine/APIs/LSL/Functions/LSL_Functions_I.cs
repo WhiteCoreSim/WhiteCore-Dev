@@ -58,7 +58,7 @@ using GridRegion = WhiteCore.Framework.Services.GridRegion;
 using LSL_Float = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.LSLFloat;
 using LSL_Integer = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.LSLInteger;
 using LSL_Key = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.LSLString;
-using LSL_List = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.list;
+using LSL_List = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.List;
 using LSL_Rotation = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.Quaternion;
 using LSL_String = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.LSLString;
 using LSL_Vector = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.Vector3;
@@ -75,10 +75,9 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
         ///     which case it is end-relative. The index may exceed either
         ///     string bound, with the result being a concatenation.
         /// </summary>
-        public LSL_String llInsertString (string dest, int index, string src)
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
-                return new LSL_String ();
+        public LSL_String llInsertString(string dest, int index, string src) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+                return new LSL_String();
 
 
             // Normalize indices (if negative).
@@ -106,12 +105,11 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             // be assigned to the first character of the inserted string.
             // So unlike the other string operations, we do not add one
             // to get the correct string length.
-            return dest.Substring (0, index) + src + dest.Substring (index);
+            return dest.Substring(0, index) + src + dest.Substring(index);
         }
 
-        public DateTime llInstantMessage (string user, string message)
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+        public DateTime llInstantMessage(string user, string message) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
                 return DateTime.Now;
 
 
@@ -120,11 +118,12 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             // but I don't think we have a list of scenes available from here.
             // (We also don't want to duplicate the code in OnInstantMessage if we can avoid it.)
 
-            UUID friendTransactionID = UUID.Random ();
+            UUID friendTransactionID = UUID.Random();
 
-            GridInstantMessage msg = new GridInstantMessage {
+            GridInstantMessage msg = new GridInstantMessage
+            {
                 FromAgentID = m_host.UUID,
-                ToAgentID = UUID.Parse (user),
+                ToAgentID = UUID.Parse(user),
                 SessionID = friendTransactionID,
                 FromAgentName = m_host.Name,
                 RegionID = m_host.ParentEntity.Scene.RegionInfo.RegionID
@@ -134,7 +133,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
 
             // Cap the message length at 1024.
             if (message != null && message.Length > 1024)
-                msg.Message = message.Substring (0, 1024);
+                msg.Message = message.Substring(0, 1024);
             else
                 msg.Message = message;
 
@@ -145,17 +144,17 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             msg.Position = m_host.AbsolutePosition;
             msg.RegionID = World.RegionInfo.RegionID;
             msg.BinaryBucket
-                = Util.StringToBytes256 (
+                = Util.StringToBytes256(
                     "{0}/{1}/{2}/{3}",
                     World.RegionInfo.RegionName,
-                    (int)Math.Floor (m_host.AbsolutePosition.X),
-                    (int)Math.Floor (m_host.AbsolutePosition.Y),
-                    (int)Math.Floor (m_host.AbsolutePosition.Z));
+                    (int)Math.Floor(m_host.AbsolutePosition.X),
+                    (int)Math.Floor(m_host.AbsolutePosition.Y),
+                    (int)Math.Floor(m_host.AbsolutePosition.Z));
 
             if (m_TransferModule != null) {
-                m_TransferModule.SendInstantMessage (msg);
+                m_TransferModule.SendInstantMessage(msg);
             }
-            return PScriptSleep (m_sleepMsOnInstantMessage);
+            return PScriptSleep(m_sleepMsOnInstantMessage);
         }
     }
 }

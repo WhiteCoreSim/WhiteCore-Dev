@@ -54,7 +54,7 @@ using Group = System.Text.RegularExpressions.Group;
 using LSL_Float = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.LSLFloat;
 using LSL_Integer = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.LSLInteger;
 using LSL_Key = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.LSLString;
-using LSL_List = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.list;
+using LSL_List = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.List;
 using LSL_Rotation = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.Quaternion;
 using LSL_String = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.LSLString;
 using LSL_Vector = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.Vector3;
@@ -105,9 +105,9 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
     //            taking money without consent, or allows deletion or
     //            modification of user data, or allows the compromise of
     //            sensitive data by design.
-    
-	[Serializable]
-	public class OS_Api : MarshalByRefObject, IScriptApi
+
+    [Serializable]
+    public class OS_Api : MarshalByRefObject, IScriptApi
     {
         internal ScriptProtectionModule ScriptProtection;
         internal LSL_Api m_LSL_Api; // get a reference to the LSL API so we can call methods housed there
@@ -119,8 +119,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
         internal UUID m_itemID;
         internal uint m_localID;
 
-        public IScene World
-        {
+        public IScene World {
             get { return m_host.ParentEntity.Scene; }
         }
 
@@ -130,44 +129,38 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
 
         #region IOSSL_Api Members
 
-        public LSL_Integer osSetTerrainHeight(int x, int y, double val)
-        {
+        public LSL_Integer osSetTerrainHeight(int x, int y, double val) {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.High, "osTerrainSetHeight", m_host, "OSSL", m_itemID))
                 return new LSL_Integer();
 
             if (x > (World.RegionInfo.RegionSizeX - 1) || x < 0 || y > (World.RegionInfo.RegionSizeY - 1) || y < 0)
                 OSSLError("osTerrainSetHeight: Coordinate out of bounds");
 
-            if (World.Permissions.CanTerraformLand(m_host.OwnerID, new Vector3(x, y, 0)))
-            {
+            if (World.Permissions.CanTerraformLand(m_host.OwnerID, new Vector3(x, y, 0))) {
                 ITerrainChannel heightmap = World.RequestModuleInterface<ITerrainChannel>();
-                heightmap[x, y] = (float) val;
+                heightmap[x, y] = (float)val;
                 ITerrainModule terrainModule = World.RequestModuleInterface<ITerrainModule>();
                 if (terrainModule != null) terrainModule.TaintTerrain();
                 return 1;
-            }
-            else
-            {
+            } else {
                 return 0;
             }
         }
 
-        public LSL_Key osGetRezzingObject()
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "osGetRezzingObject", m_host, "OSSL", m_itemID))
-                return new LSL_Key (UUID.Zero.ToString ());
+        public LSL_Key osGetRezzingObject() {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "osGetRezzingObject", m_host, "OSSL", m_itemID))
+                return new LSL_Key(UUID.Zero.ToString());
 
             // this is a hack for the present and may not work correctly -greythane-
             UUID rezID = m_host.CreatorID;   //.ParentGroup.RezzerID;
-            if(rezID == UUID.Zero || World.GetScenePresence(rezID) != null)
+            if (rezID == UUID.Zero || World.GetScenePresence(rezID) != null)
                 return new LSL_Key(UUID.Zero.ToString());
-            
+
             return new LSL_Key(rezID.ToString());
 
         }
 
-        public LSL_Float osGetTerrainHeight(int x, int y)
-        {
+        public LSL_Float osGetTerrainHeight(int x, int y) {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "osTerrainGetHeight", m_host, "OSSL", m_itemID))
                 return new LSL_Float();
 
@@ -179,8 +172,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             return heightmap[x, y];
         }
 
-        public void osTerrainFlush()
-        {
+        public void osTerrainFlush() {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.VeryLow, "osTerrainFlush", m_host, "OSSL", m_itemID))
                 return;
 
@@ -188,8 +180,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             if (terrainModule != null) terrainModule.TaintTerrain();
         }
 
-        public int osRegionRestart(double seconds)
-        {
+        public int osRegionRestart(double seconds) {
             // This is High here because region restart is not reliable
             // it may result in the region staying down or becoming
             // unstable. This should be changed to Low or VeryLow once
@@ -200,18 +191,15 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
                 return new int();
 
             IRestartModule restartModule = World.RequestModuleInterface<IRestartModule>();
-            if (World.Permissions.CanIssueEstateCommand(m_host.OwnerID, false) && (restartModule != null))
-            {
-                if (seconds < 15)
-                {
+            if (World.Permissions.CanIssueEstateCommand(m_host.OwnerID, false) && (restartModule != null)) {
+                if (seconds < 15) {
                     restartModule.AbortRestart("Restart aborted");
                     return 1;
                 }
 
                 List<int> times = new List<int>();
-                while (seconds > 0)
-                {
-                    times.Add((int) seconds);
+                while (seconds > 0) {
+                    times.Add((int)seconds);
                     if (seconds > 300)
                         seconds -= 120;
                     else if (seconds > 30)
@@ -222,40 +210,33 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
 
                 restartModule.ScheduleRestart(UUID.Zero, "Region will restart in {0}", times.ToArray(), true);
                 return 1;
-            }
-            else
-            {
+            } else {
                 return 0;
             }
         }
 
-        public void osShutDown()
-        {
+        public void osShutDown() {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.High, "osShutDown", m_host, "OSSL", m_itemID)) return;
 
-            if (World.Permissions.CanIssueEstateCommand(m_host.OwnerID, false))
-            {
+            if (World.Permissions.CanIssueEstateCommand(m_host.OwnerID, false)) {
                 MainConsole.Instance.RunCommand("shutdown");
             }
         }
 
-        public void osReturnObjects(LSL_Float Parameter)
-        {
+        public void osReturnObjects(LSL_Float Parameter) {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.Low, "osReturnObjects", m_host, "OSSL", m_itemID))
                 return;
 
             Dictionary<UUID, List<ISceneEntity>> returns =
                 new Dictionary<UUID, List<ISceneEntity>>();
             IParcelManagementModule parcelManagement = World.RequestModuleInterface<IParcelManagementModule>();
-            if (parcelManagement != null)
-            {
+            if (parcelManagement != null) {
                 ILandObject LO = parcelManagement.GetLandObject(m_host.AbsolutePosition.X, m_host.AbsolutePosition.Y);
                 IPrimCountModule primCountModule = World.RequestModuleInterface<IPrimCountModule>();
                 IPrimCounts primCounts = primCountModule.GetPrimCounts(LO.LandData.GlobalID);
                 if (Parameter == 0) // Owner objects
                 {
-                    foreach (ISceneEntity obj in primCounts.Objects.Where(obj => obj.OwnerID == LO.LandData.OwnerID))
-                    {
+                    foreach (ISceneEntity obj in primCounts.Objects.Where(obj => obj.OwnerID == LO.LandData.OwnerID)) {
                         if (!returns.ContainsKey(obj.OwnerID))
                             returns[obj.OwnerID] =
                                 new List<ISceneEntity>();
@@ -267,8 +248,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
                 {
                     foreach (ISceneEntity obj in primCounts.Objects.Where(obj => obj.OwnerID != LO.LandData.OwnerID &&
                                                                                  (obj.GroupID != LO.LandData.GroupID ||
-                                                                                  LO.LandData.GroupID == UUID.Zero)))
-                    {
+                                                                                  LO.LandData.GroupID == UUID.Zero))) {
                         if (!returns.ContainsKey(obj.OwnerID))
                             returns[obj.OwnerID] =
                                 new List<ISceneEntity>();
@@ -278,8 +258,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
                 }
                 if (Parameter == 2) // Group
                 {
-                    foreach (ISceneEntity obj in primCounts.Objects.Where(obj => obj.GroupID == LO.LandData.GroupID))
-                    {
+                    foreach (ISceneEntity obj in primCounts.Objects.Where(obj => obj.GroupID == LO.LandData.GroupID)) {
                         if (!returns.ContainsKey(obj.OwnerID))
                             returns[obj.OwnerID] =
                                 new List<ISceneEntity>();
@@ -288,10 +267,8 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
                     }
                 }
 
-                foreach (List<ISceneEntity> ol in returns.Values)
-                {
-                    if (World.Permissions.CanReturnObjects(LO, m_host.OwnerID, ol))
-                    {
+                foreach (List<ISceneEntity> ol in returns.Values) {
+                    if (World.Permissions.CanReturnObjects(LO, m_host.OwnerID, ol)) {
                         ILLClientInventory inventoryModule = World.RequestModuleInterface<ILLClientInventory>();
                         if (inventoryModule != null)
                             inventoryModule.ReturnObjects(ol.ToArray(), m_host.OwnerID);
@@ -300,23 +277,20 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             }
         }
 
-        public void osReturnObject(LSL_Key userID)
-        {
+        public void osReturnObject(LSL_Key userID) {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.Low, "osReturnObjects", m_host, "OSSL", m_itemID))
                 return;
 
             Dictionary<UUID, List<ISceneEntity>> returns =
                 new Dictionary<UUID, List<ISceneEntity>>();
             IParcelManagementModule parcelManagement = World.RequestModuleInterface<IParcelManagementModule>();
-            if (parcelManagement != null)
-            {
+            if (parcelManagement != null) {
                 ILandObject LO = parcelManagement.GetLandObject(m_host.AbsolutePosition.X, m_host.AbsolutePosition.Y);
 
                 IPrimCountModule primCountModule = World.RequestModuleInterface<IPrimCountModule>();
                 IPrimCounts primCounts = primCountModule.GetPrimCounts(LO.LandData.GlobalID);
 
-                foreach (ISceneEntity obj in primCounts.Objects.Where(obj => obj.OwnerID == new UUID(userID.m_string)))
-                {
+                foreach (ISceneEntity obj in primCounts.Objects.Where(obj => obj.OwnerID == new UUID(userID.m_string))) {
                     if (!returns.ContainsKey(obj.OwnerID))
                         returns[obj.OwnerID] =
                             new List<ISceneEntity>();
@@ -324,10 +298,8 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
                     returns[obj.OwnerID].Add(obj);
                 }
 
-                foreach (List<ISceneEntity> ol in returns.Values)
-                {
-                    if (World.Permissions.CanReturnObjects(LO, m_host.OwnerID, ol))
-                    {
+                foreach (List<ISceneEntity> ol in returns.Values) {
+                    if (World.Permissions.CanReturnObjects(LO, m_host.OwnerID, ol)) {
                         ILLClientInventory inventoryModule = World.RequestModuleInterface<ILLClientInventory>();
                         if (inventoryModule != null)
                             inventoryModule.ReturnObjects(ol.ToArray(), m_host.OwnerID);
@@ -336,8 +308,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             }
         }
 
-        public void osRegionNotice(string msg)
-        {
+        public void osRegionNotice(string msg) {
             // This implementation provides absolutely no security
             // It's high griefing potential makes this classification
             // necessary
@@ -353,8 +324,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
         }
 
         public string osSetDynamicTextureURL(string dynamicID, string contentType, string url, string extraParams,
-                                             int timer)
-        {
+                                             int timer) {
             // This may be upgraded depending on the griefing or DOS
             // potential, or guarded with a delay
             //
@@ -363,16 +333,13 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
 
 
             IDynamicTextureManager textureManager = World.RequestModuleInterface<IDynamicTextureManager>();
-            if (dynamicID == String.Empty)
-            {
+            if (dynamicID == String.Empty) {
                 UUID createdTexture =
                     textureManager.AddDynamicTextureURL(World.RegionInfo.RegionID, m_host.UUID, UUID.Zero, contentType,
                                                         url,
                                                         extraParams, timer);
                 return createdTexture.ToString();
-            }
-            else
-            {
+            } else {
                 UUID oldAssetID = UUID.Parse(dynamicID);
                 UUID createdTexture =
                     textureManager.AddDynamicTextureURL(World.RegionInfo.RegionID, m_host.UUID, oldAssetID, contentType,
@@ -383,82 +350,68 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
         }
 
         public string osSetDynamicTextureURLBlend(string dynamicID, string contentType, string url, string extraParams,
-                                                  int timer, int alpha)
-        {
+                                                  int timer, int alpha) {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.VeryLow, "osSetDynamicTextureURLBlend", m_host, "OSSL",
                                                    m_itemID)) return "";
 
 
             IDynamicTextureManager textureManager = World.RequestModuleInterface<IDynamicTextureManager>();
-            if (dynamicID == String.Empty)
-            {
+            if (dynamicID == String.Empty) {
                 UUID createdTexture =
                     textureManager.AddDynamicTextureURL(World.RegionInfo.RegionID, m_host.UUID, UUID.Zero, contentType,
                                                         url,
-                                                        extraParams, timer, true, (byte) alpha);
+                                                        extraParams, timer, true, (byte)alpha);
                 return createdTexture.ToString();
-            }
-            else
-            {
+            } else {
                 UUID oldAssetID = UUID.Parse(dynamicID);
                 UUID createdTexture =
                     textureManager.AddDynamicTextureURL(World.RegionInfo.RegionID, m_host.UUID, oldAssetID, contentType,
                                                         url,
-                                                        extraParams, timer, true, (byte) alpha);
+                                                        extraParams, timer, true, (byte)alpha);
                 return createdTexture.ToString();
             }
         }
 
         public string osSetDynamicTextureURLBlendFace(string dynamicID, string contentType, string url,
                                                       string extraParams,
-                                                      bool blend, int disp, int timer, int alpha, int face)
-        {
+                                                      bool blend, int disp, int timer, int alpha, int face) {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.VeryLow, "osSetDynamicTextureURLBlendFace", m_host,
                                                    "OSSL", m_itemID)) return "";
 
             IDynamicTextureManager textureManager = World.RequestModuleInterface<IDynamicTextureManager>();
-            if (dynamicID == String.Empty)
-            {
+            if (dynamicID == String.Empty) {
                 UUID createdTexture =
                     textureManager.AddDynamicTextureURL(World.RegionInfo.RegionID, m_host.UUID, UUID.Zero, contentType,
                                                         url,
-                                                        extraParams, timer, blend, disp, (byte) alpha, face);
+                                                        extraParams, timer, blend, disp, (byte)alpha, face);
                 return createdTexture.ToString();
-            }
-            else
-            {
+            } else {
                 UUID oldAssetID = UUID.Parse(dynamicID);
                 UUID createdTexture =
                     textureManager.AddDynamicTextureURL(World.RegionInfo.RegionID, m_host.UUID, oldAssetID, contentType,
                                                         url,
-                                                        extraParams, timer, blend, disp, (byte) alpha, face);
+                                                        extraParams, timer, blend, disp, (byte)alpha, face);
                 return createdTexture.ToString();
             }
         }
 
         public string osSetDynamicTextureData(string dynamicID, string contentType, string data, string extraParams,
-                                              int timer)
-        {
+                                              int timer) {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.VeryLow, "osSetDynamicTextureData", m_host, "OSSL",
                                                    m_itemID)) return "";
 
             IDynamicTextureManager textureManager = World.RequestModuleInterface<IDynamicTextureManager>();
-            if (textureManager != null)
-            {
-                if (extraParams == String.Empty)
-                {
+            if (textureManager != null) {
+                if (extraParams == String.Empty) {
                     extraParams = "256";
                 }
-                if (dynamicID == String.Empty)
-                {
+                if (dynamicID == String.Empty) {
                     UUID createdTexture =
                         textureManager.AddDynamicTextureData(World.RegionInfo.RegionID, m_host.UUID, UUID.Zero,
                                                              contentType, data,
                                                              extraParams, timer);
                     return createdTexture.ToString();
-                }
-                else
-                {
+                } else {
                     UUID oldAssetID = UUID.Parse(dynamicID);
                     UUID createdTexture =
                         textureManager.AddDynamicTextureData(World.RegionInfo.RegionID, m_host.UUID, oldAssetID,
@@ -472,33 +425,27 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
         }
 
         public string osSetDynamicTextureDataBlend(string dynamicID, string contentType, string data, string extraParams,
-                                                   int timer, int alpha)
-        {
+                                                   int timer, int alpha) {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.VeryLow, "osSetDynamicTextureDataBlend", m_host, "OSSL",
                                                    m_itemID)) return "";
 
             IDynamicTextureManager textureManager = World.RequestModuleInterface<IDynamicTextureManager>();
-            if (textureManager != null)
-            {
-                if (extraParams == String.Empty)
-                {
+            if (textureManager != null) {
+                if (extraParams == String.Empty) {
                     extraParams = "256";
                 }
-                if (dynamicID == String.Empty)
-                {
+                if (dynamicID == String.Empty) {
                     UUID createdTexture =
                         textureManager.AddDynamicTextureData(World.RegionInfo.RegionID, m_host.UUID, UUID.Zero,
                                                              contentType, data,
-                                                             extraParams, timer, true, (byte) alpha);
+                                                             extraParams, timer, true, (byte)alpha);
                     return createdTexture.ToString();
-                }
-                else
-                {
+                } else {
                     UUID oldAssetID = UUID.Parse(dynamicID);
                     UUID createdTexture =
                         textureManager.AddDynamicTextureData(World.RegionInfo.RegionID, m_host.UUID, oldAssetID,
                                                              contentType, data,
-                                                             extraParams, timer, true, (byte) alpha);
+                                                             extraParams, timer, true, (byte)alpha);
                     return createdTexture.ToString();
                 }
             }
@@ -515,13 +462,11 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             Custom
         };
 
-        private string GridUserInfo(InfoType type)
-        {
+        private string GridUserInfo(InfoType type) {
             return GridUserInfo(type, "");
         }
 
-        private string GridUserInfo(InfoType type, string key)
-        {
+        private string GridUserInfo(InfoType type, string key) {
             string retval = String.Empty;
             IConfigSource config = m_ScriptEngine.ConfigSource;
             string url = config.Configs["GridInfo"].GetString("GridInfoURI", String.Empty);
@@ -532,15 +477,14 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             string verb = "/json_grid_info";
             OSDMap json = new OSDMap();
 
-            OSDMap info = (OSDMap) Util.CombineParams(new[] {String.Format("{0}{1}", url, verb)}, 3000);
+            OSDMap info = (OSDMap)Util.CombineParams(new[] { String.Format("{0}{1}", url, verb) }, 3000);
 
             if (info["Success"] != true)
                 return "Get GridInfo Failed!";
 
-            json = (OSDMap) OSDParser.DeserializeJson(info["_RawResult"].AsString());
+            json = (OSDMap)OSDParser.DeserializeJson(info["_RawResult"].AsString());
 
-            switch (type)
-            {
+            switch (type) {
                 case InfoType.Nick:
                     retval = json["gridnick"];
                     break;
@@ -569,8 +513,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             return retval;
         }
 
-        public string osGetGridHomeURI()
-        {
+        public string osGetGridHomeURI() {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.High, "osGetGridHomeURI", m_host, "OSSL",
                                                    m_itemID)) return "";
 
@@ -582,8 +525,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             return HomeURI;
         }
 
-        public string osGetGridCustom(string key)
-        {
+        public string osGetGridCustom(string key) {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.High, "osGetGridCustom", m_host, "OSSL",
                                                    m_itemID)) return "";
 
@@ -595,8 +537,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             return retval;
         }
 
-        public string osGetThreatLevel(string key)
-        {
+        public string osGetThreatLevel(string key) {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.High, "osGetThreatLevel", m_host, "OSSL",
                                                    m_itemID)) return "";
 
@@ -608,11 +549,10 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             return retval;
         }
 
-        public string osGetGridGatekeeperURI()
-        {
+        public string osGetGridGatekeeperURI() {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.High, "osGetGridGatekeeperURI", m_host, "OSSL", m_itemID))
                 return "";
-            
+
             string gatekeeperURI = String.Empty;
             IConfigSource config = m_ScriptEngine.ConfigSource;
             if (config.Configs["GridService"] != null)
@@ -620,53 +560,45 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             return gatekeeperURI;
         }
 
-        public void osForceAttachToAvatar(int attachmentPoint)
-        {
+        public void osForceAttachToAvatar(int attachmentPoint) {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.High, "osForceAttachToAvatar", m_host, "OSSL", m_itemID))
                 return;
-            
+
             InitLSL();
             m_LSL_Api.AttachToAvatar(attachmentPoint, false);
         }
 
-        public void osForceDetachFromAvatar()
-        {
+        public void osForceDetachFromAvatar() {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.High, "osForceDetachFromAvatar", m_host, "OSSL", m_itemID))
                 return;
-            
-        	InitLSL();
+
+            InitLSL();
             m_LSL_Api.DetachFromAvatar();
         }
 
         public string osSetDynamicTextureDataBlendFace(string dynamicID, string contentType, string data,
                                                        string extraParams,
-                                                       bool blend, int disp, int timer, int alpha, int face)
-        {
+                                                       bool blend, int disp, int timer, int alpha, int face) {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.VeryLow, "osSetDynamicTextureDataBlendFace", m_host,
                                                    "OSSL", m_itemID)) return "";
 
             IDynamicTextureManager textureManager = World.RequestModuleInterface<IDynamicTextureManager>();
-            if (textureManager != null)
-            {
-                if (extraParams == String.Empty)
-                {
+            if (textureManager != null) {
+                if (extraParams == String.Empty) {
                     extraParams = "256";
                 }
-                if (dynamicID == String.Empty)
-                {
+                if (dynamicID == String.Empty) {
                     UUID createdTexture =
                         textureManager.AddDynamicTextureData(World.RegionInfo.RegionID, m_host.UUID, UUID.Zero,
                                                              contentType, data,
-                                                             extraParams, timer, blend, disp, (byte) alpha, face);
+                                                             extraParams, timer, blend, disp, (byte)alpha, face);
                     return createdTexture.ToString();
-                }
-                else
-                {
+                } else {
                     UUID oldAssetID = UUID.Parse(dynamicID);
                     UUID createdTexture =
                         textureManager.AddDynamicTextureData(World.RegionInfo.RegionID, m_host.UUID, oldAssetID,
                                                              contentType, data,
-                                                             extraParams, timer, blend, disp, (byte) alpha, face);
+                                                             extraParams, timer, blend, disp, (byte)alpha, face);
                     return createdTexture.ToString();
                 }
             }
@@ -674,15 +606,12 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             return UUID.Zero.ToString();
         }
 
-        public bool osConsoleCommand(string command)
-        {
+        public bool osConsoleCommand(string command) {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.Severe, "osConsoleCommand", m_host, "OSSL", m_itemID))
                 return false;
 
-            if (m_ScriptEngine.Config.GetBoolean("AllowosConsoleCommand", false))
-            {
-                if (World.Permissions.CanRunConsoleCommand(m_host.OwnerID))
-                {
+            if (m_ScriptEngine.Config.GetBoolean("AllowosConsoleCommand", false)) {
+                if (World.Permissions.CanRunConsoleCommand(m_host.OwnerID)) {
                     MainConsole.Instance.RunCommand(command);
                     return true;
                 }
@@ -690,81 +619,70 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             return false;
         }
 
-        public void osSetPrimFloatOnWater(int floatYN)
-        {
+        public void osSetPrimFloatOnWater(int floatYN) {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.VeryLow, "osSetPrimFloatOnWater", m_host, "OSSL",
                                                    m_itemID)) return;
 
-            if (m_host.ParentEntity != null)
-            {
-                if (m_host.ParentEntity.RootChild != null)
-                {
+            if (m_host.ParentEntity != null) {
+                if (m_host.ParentEntity.RootChild != null) {
                     m_host.ParentEntity.RootChild.SetFloatOnWater(floatYN);
                 }
             }
         }
 
-        public DateTime osTeleportOwner(string regionName, LSL_Vector position, LSL_Vector lookat)
-        {
+        public DateTime osTeleportOwner(string regionName, LSL_Vector position, LSL_Vector lookat) {
             // Threat level None because this is what can already be done with the World Map in the viewer
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "osTeleportOwner", m_host, "OSSL", m_itemID))
                 return DateTime.Now;
 
             List<GridRegion> regions = World.GridService.GetRegionsByName(World.RegionInfo.AllScopeIDs, regionName, 0, 1);
             // Try to link the region
-            if (regions.Count > 0)
-            {
+            if (regions.Count > 0) {
                 GridRegion regInfo = regions[0];
-                regions.Clear ();
+                regions.Clear();
 
                 ulong regionHandle = regInfo.RegionHandle;
                 return TeleportAgent(m_host.OwnerID, regionHandle,
-                                     new Vector3((float) position.x, (float) position.y, (float) position.z),
-                                     new Vector3((float) lookat.x, (float) lookat.y, (float) lookat.z));
+                                     new Vector3((float)position.x, (float)position.y, (float)position.z),
+                                     new Vector3((float)lookat.x, (float)lookat.y, (float)lookat.z));
             }
             return DateTime.Now;
         }
 
-        public DateTime osTeleportOwner(LSL_Vector position, LSL_Vector lookat)
-        {
+        public DateTime osTeleportOwner(LSL_Vector position, LSL_Vector lookat) {
             return osTeleportOwner(World.RegionInfo.RegionName, position, lookat);
         }
 
-        public DateTime osTeleportOwner(int regionX, int regionY, LSL_Vector position, LSL_Vector lookat)
-        {
+        public DateTime osTeleportOwner(int regionX, int regionY, LSL_Vector position, LSL_Vector lookat) {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "osTeleportOwner", m_host, "OSSL", m_itemID))
                 return DateTime.Now;
 
             GridRegion regInfo = World.GridService.GetRegionByPosition(World.RegionInfo.AllScopeIDs,
-                                                                       (regionX*Constants.RegionSize),
-                                                                       (regionY*Constants.RegionSize));
+                                                                       (regionX * Constants.RegionSize),
+                                                                       (regionY * Constants.RegionSize));
             // Try to link the region
-            if (regInfo != null)
-            {
+            if (regInfo != null) {
                 ulong regionHandle = regInfo.RegionHandle;
                 return TeleportAgent(m_host.OwnerID, regionHandle,
-                                     new Vector3((float) position.x, (float) position.y, (float) position.z),
-                                     new Vector3((float) lookat.x, (float) lookat.y, (float) lookat.z));
+                                     new Vector3((float)position.x, (float)position.y, (float)position.z),
+                                     new Vector3((float)lookat.x, (float)lookat.y, (float)lookat.z));
             }
             return DateTime.Now;
         }
 
         // Teleport functions
-        public DateTime osTeleportAgent(string agent, string regionName, LSL_Vector position, LSL_Vector lookat)
-        {
+        public DateTime osTeleportAgent(string agent, string regionName, LSL_Vector position, LSL_Vector lookat) {
             // High because there is no security check. High griefer potential
             //
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.High, "osTeleportAgent", m_host, "OSSL", m_itemID))
                 return DateTime.Now;
 
             UUID AgentID;
-            if (UUID.TryParse(agent, out AgentID))
-            {
+            if (UUID.TryParse(agent, out AgentID)) {
                 List<GridRegion> regions = World.GridService.GetRegionsByName(World.RegionInfo.AllScopeIDs, regionName,
                                                                               0, 1);
                 // Try to link the region
-                if (regions.Count > 0)
-                {
+                if (regions.Count > 0) {
                     GridRegion regInfo = regions[0];
 
                     ulong regionHandle = regInfo.RegionHandle;
@@ -777,20 +695,18 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
         }
 
         // Teleport functions
-        public DateTime osTeleportAgent(string agent, int regionX, int regionY, LSL_Vector position, LSL_Vector lookat)
-        {
+        public DateTime osTeleportAgent(string agent, int regionX, int regionY, LSL_Vector position, LSL_Vector lookat) {
             // High because there is no security check. High griefer potential
             //
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.High, "osTeleportAgent", m_host, "OSSL", m_itemID))
                 return DateTime.Now;
 
-            ulong regionHandle = Utils.UIntsToLong(((uint) regionX*Constants.RegionSize),
-                                                   ((uint) regionY*Constants.RegionSize));
+            ulong regionHandle = Utils.UIntsToLong(((uint)regionX * Constants.RegionSize),
+                                                   ((uint)regionY * Constants.RegionSize));
 
 
             UUID agentId = new UUID();
-            if (UUID.TryParse(agent, out agentId))
-            {
+            if (UUID.TryParse(agent, out agentId)) {
                 return TeleportAgent(agentId, regionHandle,
                                      position.ToVector3(),
                                      lookat.ToVector3());
@@ -798,8 +714,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             return DateTime.Now;
         }
 
-        public DateTime osTeleportAgent(string agent, LSL_Vector position, LSL_Vector lookat)
-        {
+        public DateTime osTeleportAgent(string agent, LSL_Vector position, LSL_Vector lookat) {
             return osTeleportAgent(agent, World.RegionInfo.RegionName, position, lookat);
         }
 
@@ -810,20 +725,17 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
         //resources based on the IP address of the clients connected.
         //I think High is a good risk level for this, as it is an
         //information leak.
-        public LSL_String osGetAgentIP(string agent)
-        {
+        public LSL_String osGetAgentIP(string agent) {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.High, "osGetAgentIP", m_host, "OSSL", m_itemID))
                 return new LSL_String();
 
-            UUID avatarID = (UUID) agent;
+            UUID avatarID = (UUID)agent;
 
             IScenePresence target;
-            if (World.TryGetScenePresence(avatarID, out target))
-            {
+            if (World.TryGetScenePresence(avatarID, out target)) {
                 EndPoint ep = target.ControllingClient.GetClientEP();
-                if (ep is IPEndPoint)
-                {
-                    IPEndPoint ip = (IPEndPoint) ep;
+                if (ep is IPEndPoint) {
+                    IPEndPoint ip = (IPEndPoint)ep;
                     return new LSL_String(ip.Address.ToString());
                 }
             }
@@ -832,46 +744,38 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
         }
 
         // Get a list of all the avatars/agents in the region
-        public LSL_List osGetAgents()
-        {
+        public LSL_List osGetAgents() {
             // threat level is None as we could get this information with an
             // in-world script as well, just not as efficient
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "osGetAgents", m_host, "OSSL", m_itemID))
                 return new LSL_List();
 
             LSL_List result = new LSL_List();
-            World.ForEachScenePresence(delegate(IScenePresence sp)
-                                           {
-                                               if (!sp.IsChildAgent)
-                                                   result.Add(new LSL_String(sp.Name));
-                                           });
+            World.ForEachScenePresence(delegate (IScenePresence sp) {
+                if (!sp.IsChildAgent)
+                    result.Add(new LSL_String(sp.Name));
+            });
             return result;
         }
 
         // Adam's super super custom animation functions
-        public void osAvatarPlayAnimation(string avatar, string animation)
-        {
+        public void osAvatarPlayAnimation(string avatar, string animation) {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.VeryHigh, "osAvatarPlayAnimation", m_host, "OSSL",
                                                    m_itemID)) return;
 
-            UUID avatarID = (UUID) avatar;
+            UUID avatarID = (UUID)avatar;
 
             IScenePresence target;
-            if (World.TryGetScenePresence(avatarID, out target))
-            {
-                if (target != null)
-                {
+            if (World.TryGetScenePresence(avatarID, out target)) {
+                if (target != null) {
                     UUID animID = new UUID();
-                    if (!UUID.TryParse(animation, out animID))
-                    {
+                    if (!UUID.TryParse(animation, out animID)) {
                         animID = UUID.Zero;
-                        lock (m_host.TaskInventory)
-                        {
+                        lock (m_host.TaskInventory) {
                             foreach (
                                 KeyValuePair<UUID, TaskInventoryItem> inv in
-                                    m_host.TaskInventory.Where(inv => inv.Value.Name == animation))
-                            {
-                                if (inv.Value.Type == (int) AssetType.Animation)
+                                    m_host.TaskInventory.Where(inv => inv.Value.Name == animation)) {
+                                if (inv.Value.Type == (int)AssetType.Animation)
                                     animID = inv.Value.AssetID;
                                 continue;
                             }
@@ -886,26 +790,21 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             }
         }
 
-        public void osAvatarStopAnimation(string avatar, string animation)
-        {
+        public void osAvatarStopAnimation(string avatar, string animation) {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.VeryHigh, "osAvatarStopAnimation", m_host, "OSSL",
                                                    m_itemID)) return;
 
-            UUID avatarID = (UUID) avatar;
+            UUID avatarID = (UUID)avatar;
 
             IScenePresence target;
-            if (World.TryGetScenePresence(avatarID, out target))
-            {
-                if (target != null)
-                {
+            if (World.TryGetScenePresence(avatarID, out target)) {
+                if (target != null) {
                     UUID animID = UUID.Zero;
-                    lock (m_host.TaskInventory)
-                    {
+                    lock (m_host.TaskInventory) {
                         foreach (
                             KeyValuePair<UUID, TaskInventoryItem> inv in
-                                m_host.TaskInventory.Where(inv => inv.Value.Name == animation))
-                        {
-                            if (inv.Value.Type == (int) AssetType.Animation)
+                                m_host.TaskInventory.Where(inv => inv.Value.Name == animation)) {
+                            if (inv.Value.Type == (int)AssetType.Animation)
                                 animID = inv.Value.AssetID;
                             continue;
                         }
@@ -920,40 +819,35 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
         }
 
         //Texture draw functions
-        public string osMovePen(string drawList, int x, int y)
-        {
+        public string osMovePen(string drawList, int x, int y) {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "osMovePen", m_host, "OSSL", m_itemID)) return "";
 
             drawList += "MoveTo " + x + "," + y + ";";
             return new LSL_String(drawList);
         }
 
-        public string osDrawLine(string drawList, int startX, int startY, int endX, int endY)
-        {
+        public string osDrawLine(string drawList, int startX, int startY, int endX, int endY) {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "osDrawLine", m_host, "OSSL", m_itemID)) return "";
 
             drawList += "MoveTo " + startX + "," + startY + "; LineTo " + endX + "," + endY + "; ";
             return new LSL_String(drawList);
         }
 
-        public string osDrawLine(string drawList, int endX, int endY)
-        {
+        public string osDrawLine(string drawList, int endX, int endY) {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "osDrawLine", m_host, "OSSL", m_itemID)) return "";
 
             drawList += "LineTo " + endX + "," + endY + "; ";
             return new LSL_String(drawList);
         }
 
-        public string osDrawText(string drawList, string text)
-        {
+        public string osDrawText(string drawList, string text) {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "osDrawText", m_host, "OSSL", m_itemID)) return "";
 
             drawList += "Text " + text + "; ";
             return new LSL_String(drawList);
         }
 
-        public string osDrawEllipse(string drawList, int width, int height)
-        {
+        public string osDrawEllipse(string drawList, int width, int height) {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "osDrawEllipse", m_host, "OSSL", m_itemID))
                 return "";
 
@@ -961,8 +855,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             return new LSL_String(drawList);
         }
 
-        public string osDrawRectangle(string drawList, int width, int height)
-        {
+        public string osDrawRectangle(string drawList, int width, int height) {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "osDrawRectangle", m_host, "OSSL", m_itemID))
                 return "";
 
@@ -970,8 +863,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             return new LSL_String(drawList);
         }
 
-        public string osDrawFilledRectangle(string drawList, int width, int height)
-        {
+        public string osDrawFilledRectangle(string drawList, int width, int height) {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "osDrawFilledRectangle", m_host, "OSSL", m_itemID))
                 return "";
 
@@ -979,44 +871,37 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             return new LSL_String(drawList);
         }
 
-        public string osDrawFilledPolygon(string drawList, LSL_List x, LSL_List y)
-        {
+        public string osDrawFilledPolygon(string drawList, LSL_List x, LSL_List y) {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "osDrawFilledPolygon", m_host, "OSSL", m_itemID))
                 return "";
 
-            if (x.Length != y.Length || x.Length < 3)
-            {
+            if (x.Length != y.Length || x.Length < 3) {
                 return new LSL_String("");
             }
             drawList += "FillPolygon " + x.GetLSLStringItem(0) + "," + y.GetLSLStringItem(0);
-            for (int i = 1; i < x.Length; i++)
-            {
+            for (int i = 1; i < x.Length; i++) {
                 drawList += "," + x.GetLSLStringItem(i) + "," + y.GetLSLStringItem(i);
             }
             drawList += "; ";
             return new LSL_String(drawList);
         }
 
-        public string osDrawPolygon(string drawList, LSL_List x, LSL_List y)
-        {
+        public string osDrawPolygon(string drawList, LSL_List x, LSL_List y) {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "osDrawFilledPolygon", m_host, "OSSL", m_itemID))
                 return "";
 
-            if (x.Length != y.Length || x.Length < 3)
-            {
+            if (x.Length != y.Length || x.Length < 3) {
                 return new LSL_String("");
             }
             drawList += "Polygon " + x.GetLSLStringItem(0) + "," + y.GetLSLStringItem(0);
-            for (int i = 1; i < x.Length; i++)
-            {
+            for (int i = 1; i < x.Length; i++) {
                 drawList += "," + x.GetLSLStringItem(i) + "," + y.GetLSLStringItem(i);
             }
             drawList += "; ";
             return new LSL_String(drawList);
         }
 
-        public string osSetFontSize(string drawList, int fontSize)
-        {
+        public string osSetFontSize(string drawList, int fontSize) {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "osSetFontSize", m_host, "OSSL", m_itemID))
                 return "";
 
@@ -1024,8 +909,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             return drawList;
         }
 
-        public string osSetFontName(string drawList, string fontName)
-        {
+        public string osSetFontName(string drawList, string fontName) {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "osSetFontName", m_host, "OSSL", m_itemID))
                 return "";
 
@@ -1033,8 +917,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             return new LSL_String(drawList);
         }
 
-        public string osSetPenSize(string drawList, int penSize)
-        {
+        public string osSetPenSize(string drawList, int penSize) {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "osSetPenSize", m_host, "OSSL", m_itemID))
                 return "";
 
@@ -1042,8 +925,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             return new LSL_String(drawList);
         }
 
-        public string osSetPenColor(string drawList, string colour)
-        {
+        public string osSetPenColor(string drawList, string colour) {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "osSetPenColor", m_host, "OSSL", m_itemID))
                 return "";
 
@@ -1051,8 +933,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             return new LSL_String(drawList);
         }
 
-        public string osSetPenCap(string drawList, string direction, string type)
-        {
+        public string osSetPenCap(string drawList, string direction, string type) {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "osSetPenColor", m_host, "OSSL", m_itemID))
                 return "";
 
@@ -1060,8 +941,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             return new LSL_String(drawList);
         }
 
-        public string osDrawImage(string drawList, int width, int height, string imageUrl)
-        {
+        public string osDrawImage(string drawList, int width, int height, string imageUrl) {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "osDrawImage", m_host, "OSSL", m_itemID))
                 return "";
 
@@ -1069,15 +949,13 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             return new LSL_String(drawList);
         }
 
-        public LSL_Vector osGetDrawStringSize(string contentType, string text, string fontName, int fontSize)
-        {
+        public LSL_Vector osGetDrawStringSize(string contentType, string text, string fontName, int fontSize) {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.VeryLow, "osGetDrawStringSize", m_host, "OSSL", m_itemID))
                 return new LSL_Vector();
 
             LSL_Vector vec = new LSL_Vector(0, 0, 0);
             IDynamicTextureManager textureManager = World.RequestModuleInterface<IDynamicTextureManager>();
-            if (textureManager != null)
-            {
+            if (textureManager != null) {
                 double xSize, ySize;
                 textureManager.GetDrawStringSize(contentType, text, fontName, fontSize,
                                                  out xSize, out ySize);
@@ -1087,16 +965,14 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             return vec;
         }
 
-        public void osSetRegionWaterHeight(double height)
-        {
+        public void osSetRegionWaterHeight(double height) {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.High, "osSetRegionWaterHeight", m_host, "OSSL", m_itemID))
                 return;
 
             //Check to make sure that the script's owner is the estate manager/master
             //World.Permissions.GenericEstatePermission(
-            if (World.Permissions.IsGod(m_host.OwnerID))
-            {
-                World.EventManager.TriggerRequestChangeWaterHeight((float) height);
+            if (World.Permissions.IsGod(m_host.OwnerID)) {
+                World.EventManager.TriggerRequestChangeWaterHeight((float)height);
             }
         }
 
@@ -1106,15 +982,13 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
         /// <param name="useEstateSun">True to use Estate Sun instead of Region Sun</param>
         /// <param name="sunFixed">True to keep the sun stationary</param>
         /// <param name="sunHour">The "Sun Hour" that is desired, 0...24, with 0 just after SunRise</param>
-        public void osSetRegionSunSettings(bool useEstateSun, bool sunFixed, double sunHour)
-        {
+        public void osSetRegionSunSettings(bool useEstateSun, bool sunFixed, double sunHour) {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.Nuisance, "osSetRegionSunSettings", m_host, "OSSL",
                                                    m_itemID)) return;
 
             //Check to make sure that the script's owner is the estate manager/master
             //World.Permissions.GenericEstatePermission(
-            if (World.Permissions.IsGod(m_host.OwnerID))
-            {
+            if (World.Permissions.IsGod(m_host.OwnerID)) {
                 while (sunHour > 24.0)
                     sunHour -= 24.0;
 
@@ -1127,7 +1001,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
                 World.RegionInfo.RegionSettings.FixedSun = sunFixed;
 
                 World.EventManager.TriggerEstateToolsSunUpdate(World.RegionInfo.RegionHandle, sunFixed, useEstateSun,
-                                                               (float) sunHour);
+                                                               (float)sunHour);
             }
         }
 
@@ -1136,15 +1010,13 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
         /// </summary>
         /// <param name="sunFixed">True to keep the sun stationary, false to use global time</param>
         /// <param name="sunHour">The "Sun Hour" that is desired, 0...24, with 0 just after SunRise</param>
-        public void osSetEstateSunSettings(bool sunFixed, double sunHour)
-        {
+        public void osSetEstateSunSettings(bool sunFixed, double sunHour) {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.Nuisance, "osSetEstateSunSettings", m_host, "OSSL",
                                                    m_itemID)) return;
 
             //Check to make sure that the script's owner is the estate manager/master
             //World.Permissions.GenericEstatePermission(
-            if (World.Permissions.IsGod(m_host.OwnerID))
-            {
+            if (World.Permissions.IsGod(m_host.OwnerID)) {
                 while (sunHour > 24.0)
                     sunHour -= 24.0;
 
@@ -1159,7 +1031,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
 
                 World.EventManager.TriggerEstateToolsSunUpdate(World.RegionInfo.RegionHandle, sunFixed,
                                                                World.RegionInfo.RegionSettings.UseEstateSun,
-                                                               (float) sunHour);
+                                                               (float)sunHour);
             }
         }
 
@@ -1167,8 +1039,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
         ///     Return the current Sun Hour 0...24, with 0 being roughly sun-rise
         /// </summary>
         /// <returns></returns>
-        public double osGetCurrentSunHour()
-        {
+        public double osGetCurrentSunHour() {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "osGetCurrentSunHour", m_host, "OSSL", m_itemID))
                 return 0;
 
@@ -1177,118 +1048,98 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
 
             // See if the sun module has registered itself, if so it's authoritative
             ISunModule module = World.RequestModuleInterface<ISunModule>();
-            if (module != null)
-            {
+            if (module != null) {
                 sunHour = module.GetCurrentSunHour();
             }
 
             return sunHour;
         }
 
-        public double osGetSunParam(string param)
-        {
+        public double osGetSunParam(string param) {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "osGetSunParam", m_host, "OSSL", m_itemID))
                 return 0;
-            
+
             return GetSunParam(param);
         }
 
-        private double GetSunParam(string param)
-        {
+        private double GetSunParam(string param) {
             double value = 0.0;
 
             ISunModule module = World.RequestModuleInterface<ISunModule>();
-            if (module != null)
-            {
+            if (module != null) {
                 value = module.GetSunParameter(param);
             }
 
             return value;
         }
 
-        public double osSunGetParam(string param)
-        {
+        public double osSunGetParam(string param) {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "osSunGetParam", m_host, "OSSL", m_itemID))
                 return 0;
 
             double value = 0.0;
 
             ISunModule module = World.RequestModuleInterface<ISunModule>();
-            if (module != null)
-            {
+            if (module != null) {
                 value = module.GetSunParameter(param);
             }
 
             return value;
         }
 
-        public void osSunSetParam(string param, double value)
-        {
+        public void osSunSetParam(string param, double value) {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "osSunSetParam", m_host, "OSSL", m_itemID)) return;
 
             ISunModule module = World.RequestModuleInterface<ISunModule>();
-            if (module != null)
-            {
+            if (module != null) {
                 module.SetSunParameter(World, param, value);
             }
         }
 
-        public void osSetSunParam(string param, double value)
-        {
+        public void osSetSunParam(string param, double value) {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "osSetSunParam", m_host, "OSSL", m_itemID)) return;
-            
+
             SetSunParam(param, value);
         }
 
-        private void SetSunParam(string param, double value)
-        {
+        private void SetSunParam(string param, double value) {
             ISunModule module = World.RequestModuleInterface<ISunModule>();
-            if (module != null)
-            {
+            if (module != null) {
                 module.SetSunParameter(World, param, value);
             }
         }
 
-        public string osWindActiveModelPluginName()
-        {
+        public string osWindActiveModelPluginName() {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "osWindActiveModelPluginName", m_host, "OSSL",
                                                    m_itemID)) return "";
 
             IWindModule module = World.RequestModuleInterface<IWindModule>();
-            if (module != null)
-            {
+            if (module != null) {
                 return new LSL_String(module.WindActiveModelPluginName);
             }
 
             return new LSL_String("");
         }
 
-        public void osSetWindParam(string plugin, string param, LSL_Float value)
-        {
+        public void osSetWindParam(string plugin, string param, LSL_Float value) {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.VeryLow, "osSetWindParam", m_host, "OSSL", m_itemID))
                 return;
 
             IWindModule module = World.RequestModuleInterface<IWindModule>();
-            if (module != null)
-            {
-                try
-                {
-                    module.WindParamSet(plugin, param, (float) value.value);
-                }
-                catch (Exception)
-                {
+            if (module != null) {
+                try {
+                    module.WindParamSet(plugin, param, (float)value.value);
+                } catch (Exception) {
                 }
             }
         }
 
-        public LSL_Float osGetWindParam(string plugin, string param)
-        {
+        public LSL_Float osGetWindParam(string plugin, string param) {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.VeryLow, "osWindParamGet", m_host, "OSSL", m_itemID))
                 return new LSL_Float();
 
             IWindModule module = World.RequestModuleInterface<IWindModule>();
-            if (module != null)
-            {
+            if (module != null) {
                 return module.WindParamGet(plugin, param);
             }
 
@@ -1296,41 +1147,36 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
         }
 
         // Routines for creating and managing parcels programmatically
-        public void osParcelJoin(LSL_Vector pos1, LSL_Vector pos2)
-        {
+        public void osParcelJoin(LSL_Vector pos1, LSL_Vector pos2) {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.High, "osParcelJoin", m_host, "OSSL", m_itemID)) return;
 
-            int startx = (int) (pos1.x < pos2.x ? pos1.x : pos2.x);
-            int starty = (int) (pos1.y < pos2.y ? pos1.y : pos2.y);
-            int endx = (int) (pos1.x > pos2.x ? pos1.x : pos2.x);
-            int endy = (int) (pos1.y > pos2.y ? pos1.y : pos2.y);
+            int startx = (int)(pos1.x < pos2.x ? pos1.x : pos2.x);
+            int starty = (int)(pos1.y < pos2.y ? pos1.y : pos2.y);
+            int endx = (int)(pos1.x > pos2.x ? pos1.x : pos2.x);
+            int endy = (int)(pos1.y > pos2.y ? pos1.y : pos2.y);
 
             IParcelManagementModule parcelManagement = World.RequestModuleInterface<IParcelManagementModule>();
-            if (parcelManagement != null)
-            {
+            if (parcelManagement != null) {
                 parcelManagement.Join(startx, starty, endx, endy, m_host.OwnerID);
             }
         }
 
-        public void osParcelSubdivide(LSL_Vector pos1, LSL_Vector pos2)
-        {
+        public void osParcelSubdivide(LSL_Vector pos1, LSL_Vector pos2) {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.High, "osParcelSubdivide", m_host, "OSSL", m_itemID))
                 return;
 
-            int startx = (int) (pos1.x < pos2.x ? pos1.x : pos2.x);
-            int starty = (int) (pos1.y < pos2.y ? pos1.y : pos2.y);
-            int endx = (int) (pos1.x > pos2.x ? pos1.x : pos2.x);
-            int endy = (int) (pos1.y > pos2.y ? pos1.y : pos2.y);
+            int startx = (int)(pos1.x < pos2.x ? pos1.x : pos2.x);
+            int starty = (int)(pos1.y < pos2.y ? pos1.y : pos2.y);
+            int endx = (int)(pos1.x > pos2.x ? pos1.x : pos2.x);
+            int endy = (int)(pos1.y > pos2.y ? pos1.y : pos2.y);
 
             IParcelManagementModule parcelManagement = World.RequestModuleInterface<IParcelManagementModule>();
-            if (parcelManagement != null)
-            {
+            if (parcelManagement != null) {
                 parcelManagement.Subdivide(startx, starty, endx, endy, m_host.OwnerID);
             }
         }
 
-        public void osSetParcelDetails(LSL_Vector pos, LSL_List rules)
-        {
+        public void osSetParcelDetails(LSL_Vector pos, LSL_List rules) {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.High, "osSetParcelDetails", m_host, "OSSL", m_itemID))
                 return;
 
@@ -1338,17 +1184,14 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             // can modify it
 
             IParcelManagementModule parcelManagement = World.RequestModuleInterface<IParcelManagementModule>();
-            if (parcelManagement != null)
-            {
-                ILandObject startLandObject = parcelManagement.GetLandObject((int) pos.x, (int) pos.y);
-                if (startLandObject == null)
-                {
+            if (parcelManagement != null) {
+                ILandObject startLandObject = parcelManagement.GetLandObject((int)pos.x, (int)pos.y);
+                if (startLandObject == null) {
                     OSSLShoutError("There is no land at that location");
                     return;
                 }
 
-                if (!World.Permissions.CanEditParcel(m_host.OwnerID, startLandObject))
-                {
+                if (!World.Permissions.CanEditParcel(m_host.OwnerID, startLandObject)) {
                     OSSLShoutError("You do not have permission to modify the parcel");
                     return;
                 }
@@ -1356,13 +1199,11 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
                 // Create a new land data object we can modify
 
                 // Process the rules, not sure what the impact would be of changing owner or group
-                for (int idx = 0; idx < rules.Length;)
-                {
+                for (int idx = 0; idx < rules.Length;) {
                     int code = rules.GetLSLIntegerItem(idx++);
                     string arg = rules.GetLSLStringItem(idx++);
                     UUID uuid;
-                    switch (code)
-                    {
+                    switch (code) {
                         case 0:
                             startLandObject.LandData.Name = arg;
                             break;
@@ -1399,15 +1240,13 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
         /// <param name="level"></param>
         /// <param name="texture"></param>
         /// <returns></returns>
-        public void osSetTerrainTexture(int level, LSL_Key texture)
-        {
+        public void osSetTerrainTexture(int level, LSL_Key texture) {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.High, "osSetParcelDetails", m_host, "OSSL", m_itemID))
                 return;
 
             //Check to make sure that the script's owner is the estate manager/master
             //World.Permissions.GenericEstatePermission(
-            if (World.Permissions.IsGod(m_host.OwnerID))
-            {
+            if (World.Permissions.IsGod(m_host.OwnerID)) {
                 if (level < 0 || level > 3)
                     return;
                 UUID textureID = new UUID();
@@ -1427,26 +1266,23 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
         /// <param name="low"></param>
         /// <param name="high"></param>
         /// <returns></returns>
-        public void osSetTerrainTextureHeight(int corner, double low, double high)
-        {
+        public void osSetTerrainTextureHeight(int corner, double low, double high) {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.High, "osSetParcelDetails", m_host, "OSSL", m_itemID))
                 return;
 
             //Check to make sure that the script's owner is the estate manager/master
             //World.Permissions.GenericEstatePermission(
-            if (World.Permissions.IsGod(m_host.OwnerID))
-            {
+            if (World.Permissions.IsGod(m_host.OwnerID)) {
                 if (corner < 0 || corner > 3)
                     return;
                 // estate module is required
                 IEstateModule estate = World.RequestModuleInterface<IEstateModule>();
                 if (estate != null)
-                    estate.setEstateTerrainTextureHeights(corner, (float) low, (float) high);
+                    estate.setEstateTerrainTextureHeights(corner, (float)low, (float)high);
             }
         }
 
-        public double osList2Double(LSL_List src, int index)
-        {
+        public double osList2Double(LSL_List src, int index) {
             // There is really no double type in OSSL. C# and other
             // have one, but the current implementation of LSL_Types.list
             // is not allowed to contain any.
@@ -1455,27 +1291,23 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "osList2Double", m_host, "OSSL", m_itemID))
                 return 0;
 
-            if (index < 0)
-            {
+            if (index < 0) {
                 index = src.Length + index;
             }
-            if (index >= src.Length)
-            {
+            if (index >= src.Length) {
                 return 0.0;
             }
             return Convert.ToDouble(src.Data[index]);
         }
 
-        public void osSetParcelMediaURL(string url)
-        {
+        public void osSetParcelMediaURL(string url) {
             // What actually is the difference to the LL function?
             //
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.VeryLow, "osSetParcelMediaURL", m_host, "OSSL", m_itemID))
                 return;
 
             IParcelManagementModule parcelManagement = World.RequestModuleInterface<IParcelManagementModule>();
-            if (parcelManagement != null)
-            {
+            if (parcelManagement != null) {
                 ILandObject land
                     = parcelManagement.GetLandObject(m_host.AbsolutePosition.X, m_host.AbsolutePosition.Y);
 
@@ -1486,21 +1318,18 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             }
         }
 
-        public void osSetParcelSIPAddress(string SIPAddress)
-        {
+        public void osSetParcelSIPAddress(string SIPAddress) {
             // What actually is the difference to the LL function?
             //
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.VeryLow, "osSetParcelMediaURL", m_host, "OSSL", m_itemID))
                 return;
 
             IParcelManagementModule parcelManagement = World.RequestModuleInterface<IParcelManagementModule>();
-            if (parcelManagement != null)
-            {
+            if (parcelManagement != null) {
                 ILandObject land
                     = parcelManagement.GetLandObject(m_host.AbsolutePosition.X, m_host.AbsolutePosition.Y);
 
-                if (land == null || land.LandData.OwnerID != m_host.OwnerID)
-                {
+                if (land == null || land.LandData.OwnerID != m_host.OwnerID) {
                     OSSLError("osSetParcelSIPAddress: Sorry, you need to own the land to use this function");
                     return;
                 }
@@ -1515,8 +1344,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             }
         }
 
-        public string osGetScriptEngineName()
-        {
+        public string osGetScriptEngineName() {
             // This gets a "high" because knowing the engine may be used
             // to exploit engine-specific bugs or induce usage patterns
             // that trigger engine-specific failures.
@@ -1527,8 +1355,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
 
             int scriptEngineNameIndex = 0;
 
-            if (!String.IsNullOrEmpty(m_ScriptEngine.ScriptEngineName))
-            {
+            if (!String.IsNullOrEmpty(m_ScriptEngine.ScriptEngineName)) {
                 // parse off the "ScriptEngine."
                 scriptEngineNameIndex = m_ScriptEngine.ScriptEngineName.IndexOf(".", scriptEngineNameIndex,
                                                                                 System.StringComparison.Ordinal);
@@ -1542,15 +1369,12 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
                 String scriptEngineName = new String(scriptEngineNameCharArray);
 
                 return scriptEngineName;
-            }
-            else
-            {
+            } else {
                 return String.Empty;
             }
         }
 
-        public string osGetSimulatorVersion()
-        {
+        public string osGetSimulatorVersion() {
             // High because it can be used to target attacks to known weaknesses
             // This would allow a new class of griefer scripts that don't even
             // require their user to know what they are doing (see script
@@ -1565,77 +1389,54 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             return "";
         }
 
-        private Hashtable osdToHashtable(OSDMap map)
-        {
+        private Hashtable osdToHashtable(OSDMap map) {
             Hashtable result = new Hashtable();
-            foreach (KeyValuePair<string, OSD> item in map)
-            {
+            foreach (KeyValuePair<string, OSD> item in map) {
                 result.Add(item.Key, osdToObject(item.Value));
             }
             return result;
         }
 
-        private ArrayList osdToArray(OSDArray list)
-        {
+        private ArrayList osdToArray(OSDArray list) {
             ArrayList result = new ArrayList();
-            foreach (OSD item in list)
-            {
+            foreach (OSD item in list) {
                 result.Add(osdToObject(item));
             }
             return result;
         }
 
-        private Object osdToObject(OSD decoded)
-        {
-            if (decoded is OSDString)
-            {
-                return (string) decoded.AsString();
-            }
-            else if (decoded is OSDInteger)
-            {
-                return (int) decoded.AsInteger();
-            }
-            else if (decoded is OSDReal)
-            {
-                return (float) decoded.AsReal();
-            }
-            else if (decoded is OSDBoolean)
-            {
-                return (bool) decoded.AsBoolean();
-            }
-            else if (decoded is OSDMap)
-            {
-                return osdToHashtable((OSDMap) decoded);
-            }
-            else if (decoded is OSDArray)
-            {
-                return osdToArray((OSDArray) decoded);
-            }
-            else
-            {
+        private Object osdToObject(OSD decoded) {
+            if (decoded is OSDString) {
+                return (string)decoded.AsString();
+            } else if (decoded is OSDInteger) {
+                return (int)decoded.AsInteger();
+            } else if (decoded is OSDReal) {
+                return (float)decoded.AsReal();
+            } else if (decoded is OSDBoolean) {
+                return (bool)decoded.AsBoolean();
+            } else if (decoded is OSDMap) {
+                return osdToHashtable((OSDMap)decoded);
+            } else if (decoded is OSDArray) {
+                return osdToArray((OSDArray)decoded);
+            } else {
                 return null;
             }
         }
 
-        public Object osParseJSONNew(string JSON)
-        {
+        public Object osParseJSONNew(string JSON) {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "osParseJSONNew", m_host, "OSSL", m_itemID))
                 return new object();
-            
-            try
-            {
+
+            try {
                 OSD decoded = OSDParser.DeserializeJson(JSON);
                 return osdToObject(decoded);
-            }
-            catch (Exception e)
-            {
+            } catch (Exception e) {
                 OSSLError("osParseJSONNew: Problems decoding JSON string " + JSON + " : " + e.Message);
                 return null;
             }
         }
 
-        public Hashtable osParseJSON(string JSON)
-        {
+        public Hashtable osParseJSON(string JSON) {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "osParseJSON", m_host, "OSSL", m_itemID))
                 return new Hashtable();
 
@@ -1644,16 +1445,13 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             string currentKey = null;
             Stack objectStack = new Stack(); // objects in JSON can be nested so we need to keep a track of this
             Hashtable jsondata = new Hashtable(); // the hashtable to be returned
-            try
-            {
+            try {
                 // iterate through the serialised stream of tokens and store at the right depth in the hashtable
                 // the top level hashtable may contain more nested hashtables within it each containing an objects representation
                 int i = 0;
-                for (i = 0; i < JSON.Length; i++)
-                {
+                for (i = 0; i < JSON.Length; i++) {
                     // MainConsole.Instance.Debug(""+JSON[i]);
-                    switch (JSON[i])
-                    {
+                    switch (JSON[i]) {
                         case '{':
                             // create hashtable and add it to the stack or array if we are populating one, we can have a lot of nested objects in JSON
 
@@ -1661,17 +1459,13 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
                             if (objectStack.Count == 0) // the stack should only be empty for the first outer object
                             {
                                 objectStack.Push(jsondata);
-                            }
-                            else if (objectStack.Peek().ToString() == "System.Collections.ArrayList")
-                            {
+                            } else if (objectStack.Peek().ToString() == "System.Collections.ArrayList") {
                                 // add it to the parent array
-                                ((ArrayList) objectStack.Peek()).Add(currentObject);
+                                ((ArrayList)objectStack.Peek()).Add(currentObject);
                                 objectStack.Push(currentObject);
-                            }
-                            else
-                            {
+                            } else {
                                 // add it to the parent hashtable
-                                if (currentKey != null) ((Hashtable) objectStack.Peek()).Add(currentKey, currentObject);
+                                if (currentKey != null) ((Hashtable)objectStack.Peek()).Add(currentKey, currentObject);
                                 objectStack.Push(currentObject);
                             }
 
@@ -1690,13 +1484,11 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
                             i++; // move to next char
 
                             // just loop through until the next quote mark storing the string, ignore quotes with pre-ceding \
-                            while (JSON[i] != '"')
-                            {
+                            while (JSON[i] != '"') {
                                 tokenValue += JSON[i];
 
                                 // handle escaped double quotes \"
-                                if (JSON[i] == '\\' && JSON[i + 1] == '"')
-                                {
+                                if (JSON[i] == '\\' && JSON[i + 1] == '"') {
                                     tokenValue += JSON[i + 1];
                                     i++;
                                 }
@@ -1704,19 +1496,15 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
                             }
 
                             // ok we've got a string, if we've got an array on the top of the stack then we store it
-                            if (objectStack.Peek().ToString() == "System.Collections.ArrayList")
-                            {
-                                ((ArrayList) objectStack.Peek()).Add(tokenValue);
-                            }
-                            else if (currentKey == null)
-                                // no key stored and its not an array this must be a key so store it
-                            {
+                            if (objectStack.Peek().ToString() == "System.Collections.ArrayList") {
+                                ((ArrayList)objectStack.Peek()).Add(tokenValue);
+                            } else if (currentKey == null)
+                              // no key stored and its not an array this must be a key so store it
+                              {
                                 currentKey = tokenValue;
-                            }
-                            else
-                            {
+                            } else {
                                 // we have a key so lets store this value
-                                ((Hashtable) objectStack.Peek()).Add(currentKey, tokenValue);
+                                ((Hashtable)objectStack.Peek()).Add(currentKey, tokenValue);
                                 // now lets clear the key, we're done with it and moving on
                                 currentKey = null;
                             }
@@ -1734,13 +1522,10 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
                         case '[': // array start
                             ArrayList currentArray = new ArrayList();
 
-                            if (objectStack.Peek().ToString() == "System.Collections.ArrayList")
-                            {
-                                ((ArrayList) objectStack.Peek()).Add(currentArray);
-                            }
-                            else
-                            {
-                                if (currentKey != null) ((Hashtable) objectStack.Peek()).Add(currentKey, currentArray);
+                            if (objectStack.Peek().ToString() == "System.Collections.ArrayList") {
+                                ((ArrayList)objectStack.Peek()).Add(currentArray);
+                            } else {
+                                if (currentKey != null) ((Hashtable)objectStack.Peek()).Add(currentKey, currentArray);
                                 // clear the key
                                 currentKey = null;
                             }
@@ -1759,13 +1544,10 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
 
                         case 't': // we've found a character start not in quotes, it must be a boolean true
 
-                            if (objectStack.Peek().ToString() == "System.Collections.ArrayList")
-                            {
-                                ((ArrayList) objectStack.Peek()).Add(true);
-                            }
-                            else
-                            {
-                                if (currentKey != null) ((Hashtable) objectStack.Peek()).Add(currentKey, true);
+                            if (objectStack.Peek().ToString() == "System.Collections.ArrayList") {
+                                ((ArrayList)objectStack.Peek()).Add(true);
+                            } else {
+                                if (currentKey != null) ((Hashtable)objectStack.Peek()).Add(currentKey, true);
                                 currentKey = null;
                             }
 
@@ -1775,13 +1557,10 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
 
                         case 'f': // we've found a character start not in quotes, it must be a boolean false
 
-                            if (objectStack.Peek().ToString() == "System.Collections.ArrayList")
-                            {
-                                ((ArrayList) objectStack.Peek()).Add(false);
-                            }
-                            else
-                            {
-                                if (currentKey != null) ((Hashtable) objectStack.Peek()).Add(currentKey, false);
+                            if (objectStack.Peek().ToString() == "System.Collections.ArrayList") {
+                                ((ArrayList)objectStack.Peek()).Add(false);
+                            } else {
+                                if (currentKey != null) ((Hashtable)objectStack.Peek()).Add(currentKey, false);
                                 currentKey = null;
                             }
                             //advance the counter to the letter 'e'
@@ -1804,22 +1583,18 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
 
                             // just loop through until the next known marker quote mark storing the string
                             while (JSON[i] != '"' && JSON[i] != ',' && JSON[i] != ']' && JSON[i] != '}' &&
-                                   JSON[i] != ' ')
-                            {
+                                   JSON[i] != ' ') {
                                 numberValue += "" + JSON[i++];
                             }
 
                             i--; // we want to process this caracter that marked the end of this string in the main loop
 
                             // ok we've got a string, if we've got an array on the top of the stack then we store it
-                            if (objectStack.Peek().ToString() == "System.Collections.ArrayList")
-                            {
-                                ((ArrayList) objectStack.Peek()).Add(numberValue);
-                            }
-                            else
-                            {
+                            if (objectStack.Peek().ToString() == "System.Collections.ArrayList") {
+                                ((ArrayList)objectStack.Peek()).Add(numberValue);
+                            } else {
                                 // we have a key so lets store this value
-                                if (currentKey != null) ((Hashtable) objectStack.Peek()).Add(currentKey, numberValue);
+                                if (currentKey != null) ((Hashtable)objectStack.Peek()).Add(currentKey, numberValue);
                                 // now lets clear the key, we're done with it and moving on
                                 currentKey = null;
                             }
@@ -1827,9 +1602,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
                             break;
                     }
                 }
-            }
-            catch (Exception)
-            {
+            } catch (Exception) {
                 OSSLError("osParseJSON: The JSON string is not valid " + JSON);
             }
 
@@ -1838,12 +1611,11 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
 
         // send a message to to object identified by the given UUID, a script in the object must implement the dataserver function
         // the dataserver function is passed the ID of the calling function and a string message
-        public void osMessageObject(LSL_Key objectUUID, string message)
-        {
+        public void osMessageObject(LSL_Key objectUUID, string message) {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.Low, "osMessageObject", m_host, "OSSL", m_itemID))
                 return;
 
-            object[] resobj = new object[] {new LSL_Key(m_host.UUID.ToString()), new LSL_Key(message)};
+            object[] resobj = new object[] { new LSL_Key(m_host.UUID.ToString()), new LSL_Key(message) };
 
             ISceneChildEntity sceneOP = World.GetSceneObjectPart(objectUUID);
 
@@ -1855,22 +1627,20 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
         // In a loop, it can cause asset bloat and DOS levels of asset
         // writes.
         //
-        public void osMakeNotecard(string notecardName, LSL_List contents)
-        {
+        public void osMakeNotecard(string notecardName, LSL_List contents) {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.High, "osMakeNotecard", m_host, "OSSL", m_itemID))
                 return;
 
             // Create new asset
             AssetBase asset = new AssetBase(UUID.Random(), notecardName, AssetType.Notecard, m_host.OwnerID)
-                                  {
-                                      Description
+            {
+                Description
                                           =
                                           "Script Generated Notecard"
-                                  };
+            };
             string notecardData = String.Empty;
 
-            for (int i = 0; i < contents.Length; i++)
-            {
+            for (int i = 0; i < contents.Length; i++) {
                 notecardData += contents.GetLSLStringItem(i) + "\n";
             }
 
@@ -1886,17 +1656,17 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
 
             taskItem.ResetIDs(m_host.UUID);
             taskItem.ParentID = m_host.UUID;
-            taskItem.CreationDate = (uint) Util.UnixTimeSinceEpoch();
+            taskItem.CreationDate = (uint)Util.UnixTimeSinceEpoch();
             taskItem.Name = asset.Name;
             taskItem.Description = asset.Description;
-            taskItem.Type = (int) AssetType.Notecard;
-            taskItem.InvType = (int) InventoryType.Notecard;
+            taskItem.Type = (int)AssetType.Notecard;
+            taskItem.InvType = (int)InventoryType.Notecard;
             taskItem.OwnerID = m_host.OwnerID;
             taskItem.CreatorID = m_host.OwnerID;
-            taskItem.BasePermissions = (uint) PermissionMask.All;
-            taskItem.CurrentPermissions = (uint) PermissionMask.All;
+            taskItem.BasePermissions = (uint)PermissionMask.All;
+            taskItem.CurrentPermissions = (uint)PermissionMask.All;
             taskItem.EveryonePermissions = 0;
-            taskItem.NextPermissions = (uint) PermissionMask.All;
+            taskItem.NextPermissions = (uint)PermissionMask.All;
             taskItem.GroupID = m_host.GroupID;
             taskItem.GroupPermissions = 0;
             taskItem.Flags = 0;
@@ -1917,40 +1687,32 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
                            may be dangerous and unreliable while running in grid mode.
                 */
 
-        public string osGetNotecardLine(string name, int line)
-        {
+        public string osGetNotecardLine(string name, int line) {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.VeryHigh, "osGetNotecardLine", m_host, "OSSL", m_itemID))
                 return "";
 
             UUID assetID = UUID.Zero;
 
-            if (!UUID.TryParse(name, out assetID))
-            {
+            if (!UUID.TryParse(name, out assetID)) {
                 foreach (
                     TaskInventoryItem item in
-                        m_host.TaskInventory.Values.Where(item => item.Type == 7 && item.Name == name))
-                {
+                        m_host.TaskInventory.Values.Where(item => item.Type == 7 && item.Name == name)) {
                     assetID = item.AssetID;
                 }
             }
 
-            if (assetID == UUID.Zero)
-            {
+            if (assetID == UUID.Zero) {
                 OSSLShoutError("Notecard '" + name + "' could not be found.");
                 return "ERROR!";
             }
 
-            if (!NotecardCache.IsCached(assetID))
-            {
+            if (!NotecardCache.IsCached(assetID)) {
                 byte[] a = World.AssetService.GetData(assetID.ToString());
-                if (a != null)
-                {
+                if (a != null) {
                     UTF8Encoding enc = new UTF8Encoding();
                     string data = enc.GetString(a);
                     NotecardCache.Cache(assetID, data);
-                }
-                else
-                {
+                } else {
                     OSSLShoutError("Notecard '" + name + "' could not be found.");
                     return "ERROR!";
                 }
@@ -1966,48 +1728,39 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
                     may be dangerous and unreliable while running in grid mode.
          */
 
-        public string osGetNotecard(string name)
-        {
+        public string osGetNotecard(string name) {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.VeryHigh, "osGetNotecard", m_host, "OSSL", m_itemID))
                 return "";
 
             UUID assetID = UUID.Zero;
             string NotecardData = "";
 
-            if (!UUID.TryParse(name, out assetID))
-            {
+            if (!UUID.TryParse(name, out assetID)) {
                 foreach (
                     TaskInventoryItem item in
-                        m_host.TaskInventory.Values.Where(item => item.Type == 7 && item.Name == name))
-                {
+                        m_host.TaskInventory.Values.Where(item => item.Type == 7 && item.Name == name)) {
                     assetID = item.AssetID;
                 }
             }
 
-            if (assetID == UUID.Zero)
-            {
+            if (assetID == UUID.Zero) {
                 OSSLShoutError("Notecard '" + name + "' could not be found.");
                 return "ERROR!";
             }
 
-            if (!NotecardCache.IsCached(assetID))
-            {
+            if (!NotecardCache.IsCached(assetID)) {
                 byte[] a = World.AssetService.GetData(assetID.ToString());
-                if (a != null)
-                {
+                if (a != null) {
                     UTF8Encoding enc = new UTF8Encoding();
                     string data = enc.GetString(a);
                     NotecardCache.Cache(assetID, data);
-                }
-                else
-                {
+                } else {
                     OSSLShoutError("Notecard '" + name + "' could not be found.");
                     return "ERROR!";
                 }
             }
 
-            for (int count = 0; count < NotecardCache.GetLines(assetID); count++)
-            {
+            for (int count = 0; count < NotecardCache.GetLines(assetID); count++) {
                 NotecardData += NotecardCache.GetLine(assetID, count, 255) + "\n";
             }
 
@@ -2021,40 +1774,32 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
                     may be dangerous and unreliable while running in grid mode.
          */
 
-        public int osGetNumberOfNotecardLines(string name)
-        {
+        public int osGetNumberOfNotecardLines(string name) {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.VeryHigh, "osGetNumberOfNotecardLines", m_host, "OSSL",
                                                    m_itemID)) return 0;
 
             UUID assetID = UUID.Zero;
 
-            if (!UUID.TryParse(name, out assetID))
-            {
+            if (!UUID.TryParse(name, out assetID)) {
                 foreach (
                     TaskInventoryItem item in
-                        m_host.TaskInventory.Values.Where(item => item.Type == 7 && item.Name == name))
-                {
+                        m_host.TaskInventory.Values.Where(item => item.Type == 7 && item.Name == name)) {
                     assetID = item.AssetID;
                 }
             }
 
-            if (assetID == UUID.Zero)
-            {
+            if (assetID == UUID.Zero) {
                 OSSLShoutError("Notecard '" + name + "' could not be found.");
                 return -1;
             }
 
-            if (!NotecardCache.IsCached(assetID))
-            {
+            if (!NotecardCache.IsCached(assetID)) {
                 byte[] a = World.AssetService.GetData(assetID.ToString());
-                if (a != null)
-                {
+                if (a != null) {
                     UTF8Encoding enc = new UTF8Encoding();
                     string data = enc.GetString(a);
                     NotecardCache.Cache(assetID, data);
-                }
-                else
-                {
+                } else {
                     OSSLShoutError("Notecard '" + name + "' could not be found.");
                     return -1;
                 }
@@ -2075,8 +1820,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
         /// If false, then a new item is created witha slightly different name (e.g. name 1)
         /// </param>
         /// <returns>Prim inventory item created.</returns>
-        protected TaskInventoryItem SaveNotecard(string name, string description, string data, bool forceSameName)
-        {
+        protected TaskInventoryItem SaveNotecard(string name, string description, string data, bool forceSameName) {
             // Create new asset
             AssetBase asset = new AssetBase(UUID.Random(), name, AssetType.Notecard, m_host.OwnerID);
             asset.Description = description;
@@ -2086,17 +1830,17 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             byte[] c;
 
             b = Util.UTF8.GetBytes(data);
-                       
+
             a = Util.UTF8.GetBytes(
                 "Linden text version 2\n{\nLLEmbeddedItems version 1\n{\ncount 0\n}\nText length " + b.Length + "\n");
 
             c = Util.UTF8.GetBytes("}");
-                        
+
             byte[] d = new byte[a.Length + b.Length + c.Length];
             Buffer.BlockCopy(a, 0, d, 0, a.Length);
             Buffer.BlockCopy(b, 0, d, a.Length, b.Length);
             Buffer.BlockCopy(c, 0, d, a.Length + b.Length, c.Length);
-                        
+
             asset.Data = d;
             World.AssetService.Store(asset);
 
@@ -2136,16 +1880,13 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
         /// </summary>
         /// <param name="notecardNameOrUuid"></param>
         /// <returns>The text loaded.  Null if no notecard was found.</returns>
-        protected string LoadNotecard(string notecardNameOrUuid)
-        {
+        protected string LoadNotecard(string notecardNameOrUuid) {
             UUID assetID = CacheNotecard(notecardNameOrUuid);
 
-            if (assetID != UUID.Zero)
-            {
+            if (assetID != UUID.Zero) {
                 StringBuilder notecardData = new StringBuilder();
 
-                for (int count = 0; count < NotecardCache.GetLines(assetID); count++)
-                {
+                for (int count = 0; count < NotecardCache.GetLines(assetID); count++) {
                     string line = NotecardCache.GetLine(assetID, count) + "\n";
 
                     // MainConsole.Instance.DebugFormat("[OSSL]: From notecard {0} loading line {1}", notecardNameOrUuid, line);
@@ -2167,16 +1908,12 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
         /// The asset id of the notecard, which is used for retrieving the cached data.
         /// UUID.Zero if no asset could be found.
         /// </returns>
-        protected UUID CacheNotecard(string notecardNameOrUuid)
-        {
+        protected UUID CacheNotecard(string notecardNameOrUuid) {
             UUID assetID = UUID.Zero;
 
-            if (!UUID.TryParse(notecardNameOrUuid, out assetID))
-            {
-                foreach (TaskInventoryItem item in m_host.TaskInventory.Values)
-                {
-                    if (item.Type == 7 && item.Name == notecardNameOrUuid)
-                    {
+            if (!UUID.TryParse(notecardNameOrUuid, out assetID)) {
+                foreach (TaskInventoryItem item in m_host.TaskInventory.Values) {
+                    if (item.Type == 7 && item.Name == notecardNameOrUuid) {
                         assetID = item.AssetID;
                     }
                 }
@@ -2185,8 +1922,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             if (assetID == UUID.Zero)
                 return UUID.Zero;
 
-            if (!NotecardCache.IsCached(assetID))
-            {
+            if (!NotecardCache.IsCached(assetID)) {
                 AssetBase asset = World.AssetService.Get(assetID.ToString());
 
                 if (asset == null)
@@ -2194,32 +1930,30 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
 
                 string data = Encoding.UTF8.GetString(asset.Data);
                 NotecardCache.Cache(assetID, data);
-                asset.Dispose ();
+                asset.Dispose();
             };
 
             return assetID;
         }
 
-        public string osAvatarName2Key(string firstname, string lastname)
-        {
+        public string osAvatarName2Key(string firstname, string lastname) {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.Low, "osAvatarName2Key", m_host, "OSSL", m_itemID))
                 return "";
 
             UserAccount userAcct = World.UserAccountService.GetUserAccount(World.RegionInfo.AllScopeIDs,
                                                                           firstname + " " + lastname);
             if (!userAcct.Valid) {
-                return UUID.Zero.ToString ();
+                return UUID.Zero.ToString();
             }
-            return userAcct.PrincipalID.ToString ();
+            return userAcct.PrincipalID.ToString();
         }
 
-        public string osKey2Name(string id)
-        {
+        public string osKey2Name(string id) {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.Low, "osKey2Name", m_host, "OSSL", m_itemID)) return "";
             UUID key = new UUID();
 
-            if (UUID.TryParse (id, out key)) {
-                UserAccount keyAcct = World.UserAccountService.GetUserAccount (World.RegionInfo.AllScopeIDs, key);
+            if (UUID.TryParse(id, out key)) {
+                UserAccount keyAcct = World.UserAccountService.GetUserAccount(World.RegionInfo.AllScopeIDs, key);
                 if (keyAcct.Valid) {
                     return keyAcct.Name;
                 }
@@ -2233,8 +1967,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
         /// for instance in a HG scenario, are a distinct possibility.
         /// 
         /// Use value from the config file and return it.
-        public string osGetGridNick()
-        {
+        public string osGetGridNick() {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.Moderate, "osGetGridNick", m_host, "OSSL", m_itemID))
                 return "";
 
@@ -2245,8 +1978,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             return nick;
         }
 
-        public string osGetGridName()
-        {
+        public string osGetGridName() {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.Moderate, "osGetGridName", m_host, "OSSL", m_itemID))
                 return "";
 
@@ -2257,8 +1989,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             return name;
         }
 
-        public string osGetGridLoginURI()
-        {
+        public string osGetGridLoginURI() {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.Moderate, "osGetGridLoginURI", m_host, "OSSL", m_itemID))
                 return "";
 
@@ -2269,16 +2000,14 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             return loginURI;
         }
 
-        public LSL_String osFormatString(string str, LSL_List strings)
-        {
+        public LSL_String osFormatString(string str, LSL_List strings) {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.Low, "osFormatString", m_host, "OSSL", m_itemID))
                 return new LSL_String();
 
             return String.Format(str, strings.Data);
         }
 
-        public LSL_List osMatchString(string src, string pattern, int start)
-        {
+        public LSL_List osMatchString(string src, string pattern, int start) {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.High, "osMatchString", m_host, "OSSL", m_itemID))
                 return new LSL_List();
 
@@ -2289,25 +2018,20 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             // negative, but that is now relative to
             // the start, rather than the end, of the
             // sequence.
-            if (start < 0)
-            {
+            if (start < 0) {
                 start = src.Length + start;
             }
 
-            if (start < 0 || start >= src.Length)
-            {
+            if (start < 0 || start >= src.Length) {
                 return result; // empty list
             }
 
             // Find matches beginning at start position
             Regex matcher = new Regex(pattern);
             Match match = matcher.Match(src, start);
-            while (match.Success)
-            {
-                foreach (Group g in match.Groups)
-                {
-                    if (g.Success)
-                    {
+            while (match.Success) {
+                foreach (Group g in match.Groups) {
+                    if (g.Success) {
                         result.Add(new LSL_Integer(g.Value));
                         result.Add(new LSL_Integer(g.Index));
                     }
@@ -2318,24 +2042,21 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             return result;
         }
 
-        public string osLoadedCreationDate()
-        {
+        public string osLoadedCreationDate() {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.Low, "osLoadedCreationDate", m_host, "OSSL", m_itemID))
                 return "";
 
             return World.RegionInfo.RegionSettings.LoadedCreationDate;
         }
 
-        public string osLoadedCreationTime()
-        {
+        public string osLoadedCreationTime() {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.Low, "osLoadedCreationTime", m_host, "OSSL", m_itemID))
                 return "";
 
             return World.RegionInfo.RegionSettings.LoadedCreationTime;
         }
 
-        public string osLoadedCreationID()
-        {
+        public string osLoadedCreationID() {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.Low, "osLoadedCreationID", m_host, "OSSL", m_itemID))
                 return "";
 
@@ -2348,8 +2069,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
         // to an unscrupulous third party, thus permitting unauthorized duplication of
         // the object's form.
         //
-        public LSL_List osGetLinkPrimitiveParams(int linknumber, LSL_List rules)
-        {
+        public LSL_List osGetLinkPrimitiveParams(int linknumber, LSL_List rules) {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.High, "osGetLinkPrimitiveParams", m_host, "OSSL",
                                                    m_itemID)) return new LSL_List();
 
@@ -2371,41 +2091,36 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
         /// </summary>
         /// <param name="notecard">The name of the notecard to which to save the appearance.</param>
         /// <returns>The asset ID of the notecard saved.</returns>
-        public LSL_Key osOwnerSaveAppearance(string notecard)
-        {
+        public LSL_Key osOwnerSaveAppearance(string notecard) {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.High, "osOwnerSaveAppearance", m_host, "OSSL", m_itemID))
                 return new LSL_Key();
 
             return SaveAppearanceToNotecard(m_host.OwnerID, notecard);
         }
 
-        public LSL_Key osAgentSaveAppearance(LSL_Key avatarId, string notecard)
-        {
+        public LSL_Key osAgentSaveAppearance(LSL_Key avatarId, string notecard) {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.High, "osAgentSaveAppearance", m_host, "OSSL", m_itemID))
                 return new LSL_Key();
- 
+
             return SaveAppearanceToNotecard(avatarId, notecard);
         }
 
-        protected LSL_Key SaveAppearanceToNotecard(IScenePresence sp, string notecard)
-        {
-            IAvatarAppearanceModule aa = sp.RequestModuleInterface<IAvatarAppearanceModule> ();
-            if (aa != null)
-            {
-                var appearance = new AvatarAppearance (aa.Appearance);
-                OSDMap appearancePacked = appearance.Pack ();
- 
+        protected LSL_Key SaveAppearanceToNotecard(IScenePresence sp, string notecard) {
+            IAvatarAppearanceModule aa = sp.RequestModuleInterface<IAvatarAppearanceModule>();
+            if (aa != null) {
+                var appearance = new AvatarAppearance(aa.Appearance);
+                OSDMap appearancePacked = appearance.Pack();
+
                 TaskInventoryItem item
-                = SaveNotecard (notecard, "Avatar Appearance", OSDParser.SerializeLLSDXmlString(appearancePacked), true);
- 
-                return new LSL_Key (item.AssetID.ToString ());
+                = SaveNotecard(notecard, "Avatar Appearance", OSDParser.SerializeLLSDXmlString(appearancePacked), true);
+
+                return new LSL_Key(item.AssetID.ToString());
             }
-        
+
             return new LSL_Key(UUID.Zero.ToString());
         }
 
-        protected LSL_Key SaveAppearanceToNotecard(UUID avatarId, string notecard)
-        {
+        protected LSL_Key SaveAppearanceToNotecard(UUID avatarId, string notecard) {
             IScenePresence sp = World.GetScenePresence(avatarId);
 
             if (sp == null || sp.IsChildAgent)
@@ -2414,8 +2129,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             return SaveAppearanceToNotecard(sp, notecard);
         }
 
-        protected LSL_Key SaveAppearanceToNotecard(LSL_Key rawAvatarId, string notecard)
-        {
+        protected LSL_Key SaveAppearanceToNotecard(LSL_Key rawAvatarId, string notecard) {
             UUID avatarId;
             if (!UUID.TryParse(rawAvatarId, out avatarId))
                 return new LSL_Key(UUID.Zero.ToString());
@@ -2427,8 +2141,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
         ///     Get current region's map texture UUID
         /// </summary>
         /// <returns></returns>
-        public LSL_Key osGetMapTexture()
-        {
+        public LSL_Key osGetMapTexture() {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "osGetMapTexture", m_host, "OSSL", m_itemID))
                 return new LSL_Key();
             return World.RegionInfo.RegionSettings.TerrainImageID.ToString();
@@ -2439,11 +2152,10 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
         /// </summary>
         /// <param name="regionName"></param>
         /// <returns></returns>
-        public LSL_Key osGetRegionMapTexture(string regionName)
-        {
+        public LSL_Key osGetRegionMapTexture(string regionName) {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.High, "osGetRegionMapTexture", m_host, "OSSL", m_itemID))
                 return new LSL_Key();
-            
+
             IScene scene = m_host.ParentEntity.Scene;
             UUID key = UUID.Zero;
 
@@ -2466,82 +2178,71 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
         ///     client's Statistics Bar (Ctrl-Shift-1)
         /// </summary>
         /// <returns>List of floats</returns>
-        public LSL_List osGetRegionStats()
-        {
+        public LSL_List osGetRegionStats() {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.Moderate, "osGetRegionStats", m_host, "OSSL", m_itemID))
                 return new LSL_List();
 
             LSL_List ret = new LSL_List();
             IMonitorModule mod = World.RequestModuleInterface<IMonitorModule>();
-            if (mod != null)
-            {
+            if (mod != null) {
                 float[] stats = mod.GetRegionStats(World);
 
-                for (int i = 0; i < 21; i++)
-                {
+                for (int i = 0; i < 21; i++) {
                     ret.Add(new LSL_Float(stats[i]));
                 }
             }
             return ret;
         }
 
-        public int osGetSimulatorMemory()
-        {
+        public int osGetSimulatorMemory() {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.Moderate, "osGetSimulatorMemory", m_host, "OSSL",
                                                    m_itemID)) return 0;
-            
-        	long pws = Process.GetCurrentProcess().WorkingSet64;
+
+            long pws = Process.GetCurrentProcess().WorkingSet64;
 
             if (pws > Int32.MaxValue)
                 return Int32.MaxValue;
             if (pws < 0)
                 return 0;
 
-            return (int) pws;
+            return (int)pws;
         }
 
-        public void osSetSpeed(LSL_Key UUID, LSL_Float SpeedModifier)
-        {
+        public void osSetSpeed(LSL_Key UUID, LSL_Float SpeedModifier) {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.Moderate, "osSetSpeed", m_host, "OSSL", m_itemID))
                 return;
 
             IScenePresence avatar = World.GetScenePresence(UUID);
-            if (avatar != null)
-            {
-                if (avatar.UUID != m_host.OwnerID)
-                {
+            if (avatar != null) {
+                if (avatar.UUID != m_host.OwnerID) {
                     //We need to make sure that they can do this then
                     if (!World.Permissions.IsGod(m_host.OwnerID))
                         return;
                 }
-                avatar.SpeedModifier = (float) SpeedModifier;
+                avatar.SpeedModifier = (float)SpeedModifier;
             }
         }
 
-        public void osKickAvatar(LSL_String FirstName, LSL_String SurName, LSL_String alert)
-        {
+        public void osKickAvatar(LSL_String FirstName, LSL_String SurName, LSL_String alert) {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.Severe, "osKickAvatar", m_host, "OSSL", m_itemID))
                 return;
-            
-            World.ForEachScenePresence(delegate(IScenePresence sp)
-                                           {
-                                               if (!sp.IsChildAgent &&
-                                                   sp.Name == FirstName + " " + SurName)
-                                               {
-                                                   // kick client...
-                                                   sp.ControllingClient.Kick(alert);
 
-                                                   // ...and close on our side
-                                                   IEntityTransferModule transferModule =
-                                                       sp.Scene.RequestModuleInterface<IEntityTransferModule>();
-                                                   if (transferModule != null)
-                                                       transferModule.IncomingCloseAgent(sp.Scene, sp.UUID);
-                                               }
-                                           });
+            World.ForEachScenePresence(delegate (IScenePresence sp) {
+                if (!sp.IsChildAgent &&
+                    sp.Name == FirstName + " " + SurName) {
+                    // kick client...
+                    sp.ControllingClient.Kick(alert);
+
+                    // ...and close on our side
+                    IEntityTransferModule transferModule =
+                        sp.Scene.RequestModuleInterface<IEntityTransferModule>();
+                    if (transferModule != null)
+                        transferModule.IncomingCloseAgent(sp.Scene, sp.UUID);
+                }
+            });
         }
 
-        public LSL_List osGetPrimitiveParams(LSL_Key prim, LSL_List rules)
-        {
+        public LSL_List osGetPrimitiveParams(LSL_Key prim, LSL_List rules) {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.High, "osGetPrimitiveParams", m_host, "OSSL", m_itemID))
                 return new LSL_List();
 
@@ -2549,8 +2250,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             return m_LSL_Api.GetLinkPrimitiveParamsEx(prim, rules);
         }
 
-        public void osSetPrimitiveParams(LSL_Key prim, LSL_List rules)
-        {
+        public void osSetPrimitiveParams(LSL_Key prim, LSL_List rules) {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.High, "osSetPrimitiveParams", m_host, "OSSL", m_itemID))
                 return;
 
@@ -2558,8 +2258,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             m_LSL_Api.SetPrimitiveParamsEx(prim, rules);
         }
 
-        public void osSetLinkPrimitiveParams(LSL_Integer link, LSL_List rules)
-        {
+        public void osSetLinkPrimitiveParams(LSL_Integer link, LSL_List rules) {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.Low, "osSetLinkPrimitiveParams", m_host, "OSSL", m_itemID))
                 return;
 
@@ -2570,11 +2269,10 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
                 m_LSL_Api.SetPrimParams(part, rules, true);
         }
 
-         /// <summary>
+        /// <summary>
         ///     Set parameters for light projection in host prim
         /// </summary>
-        public void osSetProjectionParams(bool projection, LSL_Key texture, double fov, double focus, double amb)
-        {
+        public void osSetProjectionParams(bool projection, LSL_Key texture, double fov, double focus, double amb) {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.High, "osSetProjectionParams", m_host, "OSSL", m_itemID))
                 return;
 
@@ -2585,18 +2283,14 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
         ///     Set parameters for light projection with uuid of target prim
         /// </summary>
         public void osSetProjectionParams(LSL_Key prim, bool projection, LSL_Key texture, double fov, double focus,
-                                          double amb)
-        {
+                                          double amb) {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.High, "osSetProjectionParams", m_host, "OSSL", m_itemID))
                 return;
 
             ISceneChildEntity obj = null;
-            if (prim == UUID.Zero.ToString())
-            {
+            if (prim == UUID.Zero.ToString()) {
                 obj = m_host;
-            }
-            else
-            {
+            } else {
                 obj = World.GetSceneObjectPart(prim);
                 if (obj == null)
                     return;
@@ -2604,9 +2298,9 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
 
             obj.Shape.ProjectionEntry = projection;
             obj.Shape.ProjectionTextureUUID = texture;
-            obj.Shape.ProjectionFOV = (float) fov;
-            obj.Shape.ProjectionFocus = (float) focus;
-            obj.Shape.ProjectionAmbiance = (float) amb;
+            obj.Shape.ProjectionFOV = (float)fov;
+            obj.Shape.ProjectionFocus = (float)focus;
+            obj.Shape.ProjectionAmbiance = (float)amb;
 
 
             obj.ParentEntity.HasGroupChanged = true;
@@ -2617,54 +2311,46 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
         ///     Like osGetAgents but returns enough info for a radar
         /// </summary>
         /// <returns>Strided list of the UUID, position and name of each avatar in the region</returns>
-        public LSL_List osGetAvatarList()
-        {
+        public LSL_List osGetAvatarList() {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "osGetAvatarList", m_host, "OSSL", m_itemID))
                 return new LSL_List();
 
             LSL_List result = new LSL_List();
-            World.ForEachScenePresence(delegate(IScenePresence avatar)
-                                           {
-                                               if (avatar != null && avatar.UUID != m_host.OwnerID)
-                                               {
-                                                   if (!avatar.IsChildAgent)
-                                                   {
-                                                       result.Add(new LSL_Key(avatar.UUID.ToString()));
-                                                       result.Add(new LSL_Vector(avatar.AbsolutePosition.X,
-                                                                                 avatar.AbsolutePosition.Y,
-                                                                                 avatar.AbsolutePosition.Z));
-                                                       result.Add(new LSL_String(avatar.Name));
-                                                   }
-                                               }
-                                           });
+            World.ForEachScenePresence(delegate (IScenePresence avatar) {
+                if (avatar != null && avatar.UUID != m_host.OwnerID) {
+                    if (!avatar.IsChildAgent) {
+                        result.Add(new LSL_Key(avatar.UUID.ToString()));
+                        result.Add(new LSL_Vector(avatar.AbsolutePosition.X,
+                                                  avatar.AbsolutePosition.Y,
+                                                  avatar.AbsolutePosition.Z));
+                        result.Add(new LSL_String(avatar.Name));
+                    }
+                }
+            });
             return result;
         }
 
-        public LSL_Integer osAddAgentToGroup(LSL_Key AgentID, LSL_String GroupName, LSL_String RequestedRole)
-        {
+        public LSL_Integer osAddAgentToGroup(LSL_Key AgentID, LSL_String GroupName, LSL_String RequestedRole) {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.Low, "osAddAgentToGroup", m_host, "OSSL", m_itemID))
                 return new LSL_Integer();
 
             IGroupsServiceConnector m_groupData = WhiteCore.Framework.Utilities.DataManager.RequestPlugin<IGroupsServiceConnector>();
 
             // No groups module, no functionality
-            if (m_groupData == null)
-            {
+            if (m_groupData == null) {
                 OSSLShoutError("No Groups Module found for osAddAgentToGroup.");
                 return 0;
             }
 
             UUID roleID = UUID.Zero;
             GroupRecord groupRecord = m_groupData.GetGroupRecord(m_host.OwnerID, UUID.Zero, GroupName.m_string);
-            if (groupRecord == null)
-            {
+            if (groupRecord == null) {
                 OSSLShoutError("Could not find the group.");
                 return 0;
             }
 
             List<GroupRolesData> roles = m_groupData.GetGroupRoles(m_host.OwnerID, groupRecord.GroupID);
-            foreach (GroupRolesData role in roles.Where(role => role.Name == RequestedRole.m_string))
-            {
+            foreach (GroupRolesData role in roles.Where(role => role.Name == RequestedRole.m_string)) {
                 roleID = role.RoleID;
             }
 
@@ -2680,8 +2366,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
 
         public DateTime osRezObject(string inventory, LSL_Vector pos, LSL_Vector vel, LSL_Rotation rot, int param,
                                     LSL_Integer isRezAtRoot, LSL_Integer doRecoil, LSL_Integer SetDieAtEdge,
-                                    LSL_Integer CheckPos)
-        {
+                                    LSL_Integer CheckPos) {
             InitLSL();
             return m_LSL_Api.llRezPrim(inventory, pos, vel, rot, param, isRezAtRoot == 1, doRecoil == 1,
                                        SetDieAtEdge == 1, CheckPos == 1);
@@ -2691,14 +2376,13 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
         ///     Convert a unix time to a llGetTimestamp() like string
         /// </summary>
         /// <returns></returns>
-        public LSL_String osUnixTimeToTimestamp(LSL_Integer time)
-        {
+        public LSL_String osUnixTimeToTimestamp(LSL_Integer time) {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.VeryLow, "osUnixTimeToTimestamp", m_host, "OSSL",
                                                    m_itemID)) return new LSL_String();
-            
-        	const long baseTicks = 621355968000000000;
+
+            const long baseTicks = 621355968000000000;
             const long tickResolution = 10000000;
-            long epochTicks = (time*tickResolution) + baseTicks;
+            long epochTicks = (time * tickResolution) + baseTicks;
             DateTime date = new DateTime(epochTicks);
 
             return date.ToString("yyyy-MM-ddTHH:mm:ss.fffffffZ");
@@ -2708,17 +2392,13 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
         ///     Get the description from an inventory item
         /// </summary>
         /// <returns>Item description</returns>
-        public LSL_String osGetInventoryDesc(string item)
-        {
+        public LSL_String osGetInventoryDesc(string item) {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.VeryLow, "osGetInventoryDesc", m_host, "OSSL",
                                                    m_itemID)) return new LSL_String();
 
-            lock (m_host.TaskInventory)
-            {
-                foreach (KeyValuePair<UUID, TaskInventoryItem> inv in m_host.TaskInventory)
-                {
-                    if (inv.Value.Name == item)
-                    {
+            lock (m_host.TaskInventory) {
+                foreach (KeyValuePair<UUID, TaskInventoryItem> inv in m_host.TaskInventory) {
+                    if (inv.Value.Name == item) {
                         return inv.Value.Description.ToString(CultureInfo.InvariantCulture);
                     }
                 }
@@ -2732,24 +2412,23 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
         /// </summary>
         /// <param name="agentId"></param>
         /// <returns></returns>
-        public LSL_Integer osInviteToGroup(LSL_Key agentId)
-        {
+        public LSL_Integer osInviteToGroup(LSL_Key agentId) {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.VeryLow, "osInviteToGroup", m_host, "OSSL", m_itemID))
                 return new LSL_Integer();
-            
-            UUID agent = new UUID((string) agentId);
+
+            UUID agent = new UUID((string)agentId);
             // groups module is required
             IGroupsModule groupsModule = World.RequestModuleInterface<IGroupsModule>();
-            if (groupsModule == null) 
+            if (groupsModule == null)
                 return ScriptBaseClass.FALSE;
-            
+
             // object has to be set to a group, but not group owned
             if (m_host.GroupID == UUID.Zero || m_host.GroupID == m_host.OwnerID)
                 return ScriptBaseClass.FALSE;
 
             // object owner has to be in that group and required permissions
             GroupMembershipData member = groupsModule.GetMembershipData(m_host.GroupID, m_host.OwnerID);
-            if (member == null || (member.GroupPowers & (ulong) GroupPowers.Invite) == 0) 
+            if (member == null || (member.GroupPowers & (ulong)GroupPowers.Invite) == 0)
                 return ScriptBaseClass.FALSE;
             // check if agent is in that group already
             //member = groupsModule.GetMembershipData(agent, m_host.GroupID, agent);
@@ -2758,9 +2437,9 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
 
             member = null;
 
-            if (World.GetScenePresence(agent) == null) 
+            if (World.GetScenePresence(agent) == null)
                 return ScriptBaseClass.FALSE;
-            
+
             groupsModule.InviteGroup(null, m_host.OwnerID, m_host.GroupID, agent, UUID.Zero);
             groupsModule = null;
 
@@ -2772,24 +2451,23 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
         /// </summary>
         /// <param name="agentId"></param>
         /// <returns></returns>
-        public LSL_Integer osEjectFromGroup(LSL_Key agentId)
-        {
+        public LSL_Integer osEjectFromGroup(LSL_Key agentId) {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.VeryLow, "osInviteToGroup", m_host, "OSSL", m_itemID))
                 return new LSL_Integer();
-            
-            UUID agent = new UUID((string) agentId);
+
+            UUID agent = new UUID((string)agentId);
             // groups module is required
             IGroupsModule groupsModule = World.RequestModuleInterface<IGroupsModule>();
-            if (groupsModule == null) 
+            if (groupsModule == null)
                 return ScriptBaseClass.FALSE;
 
             // object has to be set to a group, but not group owned
-            if (m_host.GroupID == UUID.Zero || m_host.GroupID == m_host.OwnerID) 
+            if (m_host.GroupID == UUID.Zero || m_host.GroupID == m_host.OwnerID)
                 return ScriptBaseClass.FALSE;
 
             // object owner has to be in that group and required permissions
             GroupMembershipData member = groupsModule.GetMembershipData(m_host.GroupID, m_host.OwnerID);
-            if (member == null || (member.GroupPowers & (ulong) GroupPowers.Eject) == 0) 
+            if (member == null || (member.GroupPowers & (ulong)GroupPowers.Eject) == 0)
                 return ScriptBaseClass.FALSE;
 
             // agent has to be in that group
@@ -2805,22 +2483,18 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             return ScriptBaseClass.TRUE;
         }
 
-        public void osCauseDamage(string avatar, double damage)
-        {
+        public void osCauseDamage(string avatar, double damage) {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.High, "osCauseDamage", m_host, "OSSL", m_itemID)) return;
 
             UUID avatarId = new UUID(avatar);
             Vector3 pos = m_host.GetWorldPosition();
 
             IScenePresence presence = World.GetScenePresence(avatarId);
-            if (presence != null)
-            {
+            if (presence != null) {
                 IParcelManagementModule parcelManagement = World.RequestModuleInterface<IParcelManagementModule>();
-                if (parcelManagement != null)
-                {
+                if (parcelManagement != null) {
                     LandData land = parcelManagement.GetLandObject(pos.X, pos.Y).LandData;
-                    if ((land.Flags & (uint) ParcelFlags.AllowDamage) == (uint) ParcelFlags.AllowDamage)
-                    {
+                    if ((land.Flags & (uint)ParcelFlags.AllowDamage) == (uint)ParcelFlags.AllowDamage) {
                         ICombatPresence cp = presence.RequestModuleInterface<ICombatPresence>();
                         cp.IncurDamage(World.GetScenePresence(m_host.OwnerID), damage);
                     }
@@ -2829,47 +2503,39 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
         }
 
         public void osCauseDamage(string avatar, double damage, string regionName, LSL_Vector position,
-                                  LSL_Vector lookat)
-        {
+                                  LSL_Vector lookat) {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.High, "osCauseDamage", m_host, "OSSL", m_itemID)) return;
 
             UUID avatarId = new UUID(avatar);
             Vector3 pos = m_host.GetWorldPosition();
 
             IScenePresence presence = World.GetScenePresence(avatarId);
-            if (presence != null)
-            {
+            if (presence != null) {
                 IParcelManagementModule parcelManagement = World.RequestModuleInterface<IParcelManagementModule>();
-                if (parcelManagement != null)
-                {
+                if (parcelManagement != null) {
                     LandData land = parcelManagement.GetLandObject(pos.X, pos.Y).LandData;
-                    if ((land.Flags & (uint) ParcelFlags.AllowDamage) == (uint) ParcelFlags.AllowDamage)
-                    {
+                    if ((land.Flags & (uint)ParcelFlags.AllowDamage) == (uint)ParcelFlags.AllowDamage) {
                         ICombatPresence cp = presence.RequestModuleInterface<ICombatPresence>();
                         cp.IncurDamage(World.GetScenePresence(m_host.OwnerID), damage, regionName,
-                                       new Vector3((float) position.x, (float) position.y, (float) position.z),
-                                       new Vector3((float) lookat.x, (float) lookat.y, (float) lookat.z));
+                                       new Vector3((float)position.x, (float)position.y, (float)position.z),
+                                       new Vector3((float)lookat.x, (float)lookat.y, (float)lookat.z));
                     }
                 }
             }
         }
 
-        public void osCauseHealing(string avatar, double healing)
-        {
+        public void osCauseHealing(string avatar, double healing) {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.High, "osCauseHealing", m_host, "OSSL", m_itemID))
                 return;
 
             UUID avatarId = new UUID(avatar);
             IScenePresence presence = World.GetScenePresence(avatarId);
-            if (presence != null)
-            {
+            if (presence != null) {
                 Vector3 pos = m_host.GetWorldPosition();
                 IParcelManagementModule parcelManagement = World.RequestModuleInterface<IParcelManagementModule>();
-                if (parcelManagement != null)
-                {
+                if (parcelManagement != null) {
                     LandData land = parcelManagement.GetLandObject(pos.X, pos.Y).LandData;
-                    if ((land.Flags & (uint) ParcelFlags.AllowDamage) == (uint) ParcelFlags.AllowDamage)
-                    {
+                    if ((land.Flags & (uint)ParcelFlags.AllowDamage) == (uint)ParcelFlags.AllowDamage) {
                         ICombatPresence cp = presence.RequestModuleInterface<ICombatPresence>();
                         cp.IncurHealing(healing);
                     }
@@ -2877,8 +2543,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             }
         }
 
-        public LSL_Float osGetHealth(string avatar)
-        {
+        public LSL_Float osGetHealth(string avatar) {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.High, "osGetHealth", m_host, "OSSL", m_itemID))
                 return new LSL_Float();
 
@@ -2889,11 +2554,9 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             Vector3 pos = m_host.GetWorldPosition();
 
             IParcelManagementModule parcelManagement = World.RequestModuleInterface<IParcelManagementModule>();
-            if (parcelManagement != null)
-            {
+            if (parcelManagement != null) {
                 LandData land = parcelManagement.GetLandObject(pos.X, pos.Y).LandData;
-                if ((land.Flags & (uint) ParcelFlags.AllowDamage) == (uint) ParcelFlags.AllowDamage)
-                {
+                if ((land.Flags & (uint)ParcelFlags.AllowDamage) == (uint)ParcelFlags.AllowDamage) {
                     ICombatPresence cp = presence.RequestModuleInterface<ICombatPresence>();
                     health = cp.Health;
                 }
@@ -2906,8 +2569,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
         #region IScriptApi Members
 
         public void Initialize(IScriptModulePlugin ScriptEngine, ISceneChildEntity host, uint localID, UUID itemID,
-                               ScriptProtectionModule module)
-        {
+                               ScriptProtectionModule module) {
             m_ScriptEngine = ScriptEngine;
             m_host = host;
             m_localID = localID;
@@ -2922,49 +2584,41 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             ScriptProtection = module;
         }
 
-        public IScriptApi Copy()
-        {
+        public IScriptApi Copy() {
             return new OS_Api();
         }
 
-        public string Name
-        {
+        public string Name {
             get { return "OS"; }
         }
 
-        public string InterfaceName
-        {
+        public string InterfaceName {
             get { return "IOS_Api"; }
         }
 
         /// <summary>
         ///     We don't have to add any assemblies here
         /// </summary>
-        public string[] ReferencedAssemblies
-        {
+        public string[] ReferencedAssemblies {
             get { return new string[0]; }
         }
 
         /// <summary>
         ///     We use the default namespace, so we don't have any to add
         /// </summary>
-        public string[] NamespaceAdditions
-        {
+        public string[] NamespaceAdditions {
             get { return new string[0]; }
         }
 
         #endregion
 
-        public void Dispose()
-        {
+        public void Dispose() {
         }
 
-        public override Object InitializeLifetimeService()
-        {
-            ILease lease = (ILease) base.InitializeLifetimeService();
+        public override Object InitializeLifetimeService() {
+            ILease lease = (ILease)base.InitializeLifetimeService();
 
-            if (lease.CurrentState == LeaseState.Initial)
-            {
+            if (lease.CurrentState == LeaseState.Initial) {
                 lease.InitialLeaseTime = TimeSpan.FromMinutes(0);
                 //                lease.RenewOnCallTime = TimeSpan.FromSeconds(10.0);
                 //                lease.SponsorshipTimeout = TimeSpan.FromMinutes(1.0);
@@ -2972,13 +2626,11 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             return lease;
         }
 
-        internal void OSSLError(string msg)
-        {
+        internal void OSSLError(string msg) {
             throw new Exception("OSSL Runtime Error: " + msg);
         }
 
-        private void InitLSL()
-        {
+        private void InitLSL() {
             if (m_LSL_Api != null)
                 return;
 
@@ -2989,8 +2641,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
         //Dumps an error message on the debug console.
         //
 
-        internal void OSSLShoutError(string message)
-        {
+        internal void OSSLShoutError(string message) {
             if (message.Length > 1023)
                 message = message.Substring(0, 1023);
 
@@ -3008,61 +2659,51 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
         /// </summary>
         /// <param name="delay"></param>
         /// <returns></returns>
-        protected DateTime PScriptSleep(int delay)
-        {
-            delay = (int) (delay*m_ScriptDelayFactor);
+        protected DateTime PScriptSleep(int delay) {
+            delay = (int)(delay * m_ScriptDelayFactor);
             if (delay == 0)
                 return DateTime.Now;
 
             return DateTime.Now.AddMilliseconds(delay);
         }
 
-        public void osSetRot(UUID target, Quaternion rotation)
-        {
+        public void osSetRot(UUID target, Quaternion rotation) {
             // This function has no security. It can be used to destroy
             // arbitrary builds the user would normally have no rights to
             //
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.VeryHigh, "osSetRot", m_host, "OSSL", m_itemID)) return;
 
             IEntity entity;
-            if (World.Entities.TryGetValue(target, out entity))
-            {
+            if (World.Entities.TryGetValue(target, out entity)) {
                 if (entity is ISceneEntity)
-                    ((ISceneEntity) entity).Rotation = rotation;
+                    ((ISceneEntity)entity).Rotation = rotation;
                 else if (entity is IScenePresence)
                     (entity).Rotation = rotation;
-            }
-            else
-            {
+            } else {
                 OSSLError("osSetRot: Invalid target");
             }
         }
 
-        public DateTime TeleportAgent(UUID agentID, ulong regionHandle, Vector3 position, Vector3 lookAt)
-        {
+        public DateTime TeleportAgent(UUID agentID, ulong regionHandle, Vector3 position, Vector3 lookAt) {
             IScenePresence presence = World.GetScenePresence(agentID);
-            if (presence != null)
-            {
+            if (presence != null) {
                 // agent must be over owners land to avoid abuse
                 IParcelManagementModule parcelManagement = World.RequestModuleInterface<IParcelManagementModule>();
-                if (parcelManagement != null)
-                {
+                if (parcelManagement != null) {
                     if (m_host.OwnerID != parcelManagement.GetLandObject(
                         presence.AbsolutePosition.X, presence.AbsolutePosition.Y).LandData.OwnerID &&
-                        !World.Permissions.CanIssueEstateCommand(m_host.OwnerID, false))
-                    {
+                        !World.Permissions.CanIssueEstateCommand(m_host.OwnerID, false)) {
                         return DateTime.Now;
                     }
                 }
-                presence.ControllingClient.SendTeleportStart((uint) TeleportFlags.ViaLocation);
+                presence.ControllingClient.SendTeleportStart((uint)TeleportFlags.ViaLocation);
 
                 IEntityTransferModule entityTransfer = World.RequestModuleInterface<IEntityTransferModule>();
-                if (entityTransfer != null)
-                {
+                if (entityTransfer != null) {
                     entityTransfer.RequestTeleportLocation(presence.ControllingClient,
                                                            regionHandle,
                                                            position,
-                                                           lookAt, (uint) TeleportFlags.ViaLocation);
+                                                           lookAt, (uint)TeleportFlags.ViaLocation);
                 }
 
                 return PScriptSleep(5000);
@@ -3070,8 +2711,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             return DateTime.Now;
         }
 
-        public LSL_String osGetPhysicsEngineType()
-        {
+        public LSL_String osGetPhysicsEngineType() {
             // High because it can be used to target attacks to known weaknesses
             // This would allow a new class of griefer scripts that don't even
             // require their user to know what they are doing (see script
@@ -3083,8 +2723,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.VeryHigh, "osGetPhysicsEngineType", m_host, "OSSL", m_itemID)) return "";
 
             string ret = null;
-            if (m_host.ParentEntity.Scene.PhysicsScene != null)
-            {
+            if (m_host.ParentEntity.Scene.PhysicsScene != null) {
                 ret = m_host.ParentEntity.Scene.PhysicsScene.EngineType;
             }
             // An old physics engine might have an uninitialized engine type
@@ -3100,8 +2739,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
         /// <param name="a"></param>
         /// <param name="b"></param>
         /// <returns></returns>
-        public LSL_Float osMin(double a, double b)
-        {
+        public LSL_Float osMin(double a, double b) {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "osMin", m_host, "OSSL", m_itemID)) return 0;
 
             return Math.Min(a, b);
@@ -3113,8 +2751,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
         /// <param name="a"></param>
         /// <param name="b"></param>
         /// <returns></returns>
-        public LSL_Float osMax(double a, double b)
-        {
+        public LSL_Float osMax(double a, double b) {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "osMax", m_host, "OSSL", m_itemID)) return 0;
 
             return Math.Max(a, b);
@@ -3125,16 +2762,14 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
         /// </summary>
         /// <param name="thing"></param>
         /// <returns>1 if thing is a valid UUID, 0 otherwise</returns>
-        public LSL_Integer osIsUUID(string thing)
-        {
+        public LSL_Integer osIsUUID(string thing) {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "osIsUUID", m_host, "OSSL", m_itemID)) return 0;
 
             UUID test;
             return UUID.TryParse(thing, out test) ? 1 : 0;
         }
 
-        public LSL_String osReplaceString(string src, string pattern, string replace, int count, int start)
-        {
+        public LSL_String osReplaceString(string src, string pattern, string replace, int count, int start) {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.VeryLow, "osReplaceString", m_host, "OSSL", m_itemID)) return "";
 
             // Normalize indices (if negative).
@@ -3142,13 +2777,11 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             // negative, but that is now relative to
             // the start, rather than the end, of the
             // sequence.
-            if (start < 0)
-            {
+            if (start < 0) {
                 start = src.Length + start;
             }
 
-            if (start < 0 || start >= src.Length)
-            {
+            if (start < 0 || start >= src.Length) {
                 return src;
             }
 
@@ -3161,8 +2794,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
         /// Sets the response type for an HTTP request/response
         /// </summary>
         /// <returns></returns>
-        public void osSetContentType(LSL_Key id, string type)
-        {
+        public void osSetContentType(LSL_Key id, string type) {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.High, "osSetContentType", m_host, "OSSL", m_itemID)) return;
 
             IUrlModule urlModule = World.RequestModuleInterface<IUrlModule>();
@@ -3170,29 +2802,25 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
                 urlModule.SetContentType(new UUID(id.m_string), type);
         }
 
-        public void osDropAttachment()
-        {
+        public void osDropAttachment() {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.Moderate, "osDropAttachment", m_host, "OSSL", m_itemID)) return;
-            
+
             DropAttachment(true);
         }
 
-        public void osForceDropAttachment()
-        {
+        public void osForceDropAttachment() {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.High, "osForceDropAttachment", m_host, "OSSL", m_itemID)) return;
 
             DropAttachment(false);
         }
 
-        public void osDropAttachmentAt(LSL_Vector pos, LSL_Rotation rot)
-        {
+        public void osDropAttachmentAt(LSL_Vector pos, LSL_Rotation rot) {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.Moderate, "osDropAttachmentAt", m_host, "OSSL", m_itemID)) return;
 
             DropAttachmentAt(true, pos, rot);
         }
 
-        public void osForceDropAttachmentAt(LSL_Vector pos, LSL_Rotation rot)
-        {
+        public void osForceDropAttachmentAt(LSL_Vector pos, LSL_Rotation rot) {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.High, "osForceDropAttachmentAt", m_host, "OSSL", m_itemID)) return;
 
             DropAttachmentAt(false, pos, rot);
@@ -3202,17 +2830,13 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
         /// </summary>
         /// <param name="perms"></param>
         /// <returns>boolean indicating whether an error was shouted.</returns>
-        protected bool ShoutErrorOnLackingOwnerPerms(int perms, string errorPrefix)
-        {
+        protected bool ShoutErrorOnLackingOwnerPerms(int perms, string errorPrefix) {
             bool fail = false;
             TaskInventoryItem item = m_host.TaskInventory[m_itemID];
-            if (item.PermsGranter != m_host.OwnerID)
-            {
+            if (item.PermsGranter != m_host.OwnerID) {
                 fail = true;
                 OSSLShoutError(string.Format("{0}. Permissions not granted to owner.", errorPrefix));
-            }
-            else if ((item.PermsMask & perms) == 0)
-            {
+            } else if ((item.PermsMask & perms) == 0) {
                 fail = true;
                 OSSLShoutError(string.Format("{0}. Permissions not granted.", errorPrefix));
             }
@@ -3220,68 +2844,53 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             return fail;
         }
 
-        protected void DropAttachment(bool checkPerms)
-        {
-            if (checkPerms && ShoutErrorOnLackingOwnerPerms(ScriptBaseClass.PERMISSION_ATTACH, "Cannot drop attachment"))
-            {
+        protected void DropAttachment(bool checkPerms) {
+            if (checkPerms && ShoutErrorOnLackingOwnerPerms(ScriptBaseClass.PERMISSION_ATTACH, "Cannot drop attachment")) {
                 return;
             }
 
             IAttachmentsModule attachmentsModule = World.RequestModuleInterface<IAttachmentsModule>();
             IScenePresence sp = attachmentsModule == null ? null : World.GetScenePresence(m_host.OwnerID);
 
-            if (attachmentsModule != null && sp != null)
-            {
+            if (attachmentsModule != null && sp != null) {
                 attachmentsModule.DetachSingleAttachmentToGround(m_host.FromUserInventoryItemID, sp.ControllingClient);
             }
         }
 
-        protected void DropAttachmentAt(bool checkPerms, LSL_Vector pos, LSL_Rotation rot)
-        {
-            if (checkPerms && ShoutErrorOnLackingOwnerPerms(ScriptBaseClass.PERMISSION_ATTACH, "Cannot drop attachment"))
-            {
+        protected void DropAttachmentAt(bool checkPerms, LSL_Vector pos, LSL_Rotation rot) {
+            if (checkPerms && ShoutErrorOnLackingOwnerPerms(ScriptBaseClass.PERMISSION_ATTACH, "Cannot drop attachment")) {
                 return;
             }
 
             IAttachmentsModule attachmentsModule = World.RequestModuleInterface<IAttachmentsModule>();
             IScenePresence sp = attachmentsModule == null ? null : World.GetScenePresence(m_host.OwnerID);
 
-            if (attachmentsModule != null && sp != null)
-            {
+            if (attachmentsModule != null && sp != null) {
                 attachmentsModule.DetachSingleAttachmentToGround(m_host.ParentEntity.UUID, sp.ControllingClient, pos.ToVector3(), rot.ToQuaternion());
             }
         }
 
-        public LSL_Integer osListenRegex(int channelID, string name, string ID, string msg, int regexBitfield)
-        {
+        public LSL_Integer osListenRegex(int channelID, string name, string ID, string msg, int regexBitfield) {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.Low, "osListenRegex", m_host, "OSSL", m_itemID)) return 0;
 
             UUID keyID;
             UUID.TryParse(ID, out keyID);
 
             // if we want the name to be used as a regular expression, ensure it is valid first.
-            if ((regexBitfield & ScriptBaseClass.OS_LISTEN_REGEX_NAME) == ScriptBaseClass.OS_LISTEN_REGEX_NAME)
-            {
-                try
-                {
+            if ((regexBitfield & ScriptBaseClass.OS_LISTEN_REGEX_NAME) == ScriptBaseClass.OS_LISTEN_REGEX_NAME) {
+                try {
                     Regex.IsMatch("", name);
-                }
-                catch (Exception)
-                {
+                } catch (Exception) {
                     OSSLShoutError("Name regex is invalid.");
                     return -1;
                 }
             }
 
             // if we want the msg to be used as a regular expression, ensure it is valid first.
-            if ((regexBitfield & ScriptBaseClass.OS_LISTEN_REGEX_MESSAGE) == ScriptBaseClass.OS_LISTEN_REGEX_MESSAGE)
-            {
-                try
-                {
+            if ((regexBitfield & ScriptBaseClass.OS_LISTEN_REGEX_MESSAGE) == ScriptBaseClass.OS_LISTEN_REGEX_MESSAGE) {
+                try {
                     Regex.IsMatch("", msg);
-                }
-                catch (Exception)
-                {
+                } catch (Exception) {
                     OSSLShoutError("Message regex is invalid.");
                     return -1;
                 }
@@ -3299,16 +2908,12 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             );
         }
 
-        public LSL_Integer osRegexIsMatch(string input, string pattern)
-        {
+        public LSL_Integer osRegexIsMatch(string input, string pattern) {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.Low, "osRegexIsMatch", m_host, "OSSL", m_itemID)) return 0;
 
-            try
-            {
+            try {
                 return Regex.IsMatch(input, pattern) ? 1 : 0;
-            }
-            catch (Exception)
-            {
+            } catch (Exception) {
                 OSSLShoutError("Possible invalid regular expression detected.");
                 return 0;
             }
@@ -3316,17 +2921,15 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
 
 
         // NPC functionality
-        public LSL_Key osNpcCreate(string firstname, string lastname, LSL_Types.Vector3 position, string notecard)
-        {
-            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.High, "osNpcCreate", m_host, "OSSL", m_itemID)) 
+        public LSL_Key osNpcCreate(string firstname, string lastname, LSL_Types.Vector3 position, string notecard) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.High, "osNpcCreate", m_host, "OSSL", m_itemID))
                 return "";
 
             return NpcCreate(firstname, lastname, position, notecard, true, false);
         }
 
-        public LSL_Key osNpcCreate(string firstname, string lastname, LSL_Types.Vector3 position, string notecard, int options)
-        {
-            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.High, "osNpcCreate", m_host, "OSSL", m_itemID)) 
+        public LSL_Key osNpcCreate(string firstname, string lastname, LSL_Types.Vector3 position, string notecard, int options) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.High, "osNpcCreate", m_host, "OSSL", m_itemID))
                 return "";
 
             return NpcCreate(
@@ -3337,32 +2940,26 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
 
 
         LSL_Key NpcCreate(
-            string firstname, string lastname, LSL_Types.Vector3 position, string notecard, bool owned, bool senseAsAgent)
-        {
+            string firstname, string lastname, LSL_Types.Vector3 position, string notecard, bool owned, bool senseAsAgent) {
             IBotManager manager = World.RequestModuleInterface<IBotManager>();
-            if (manager != null)
-            {
-                MainConsole.Instance.DebugFormat ("Creating NPC: {0} {1}, Position: {2}, Appearence: {3}, Options: {4} {5}",
+            if (manager != null) {
+                MainConsole.Instance.DebugFormat("Creating NPC: {0} {1}, Position: {2}, Appearence: {3}, Options: {4} {5}",
                     firstname, lastname, position, notecard, owned, senseAsAgent);
 
                 // check for notecard or UUID for appearance...
                 AvatarAppearance appearance = null;
                 UUID appearanceId;
-                UUID.TryParse (notecard, out appearanceId);
+                UUID.TryParse(notecard, out appearanceId);
 
-                if (appearanceId == UUID.Zero)
-                {
+                if (appearanceId == UUID.Zero) {
                     // not a UUID so try for a notecard
                     string appearanceSerialized = LoadNotecard(notecard);
 
-                    if (appearanceSerialized != null)
-                    {
+                    if (appearanceSerialized != null) {
                         var appearanceOsd = (OSDMap)OSDParser.DeserializeLLSDXml(appearanceSerialized);
                         appearance = new AvatarAppearance();
                         appearance.Unpack(appearanceOsd);
-                    }
-                    else
-                    {
+                    } else {
                         OSSLError(string.Format("osNpcCreate: Notecard reference '{0}' not found.", notecard));
                     }
                 }
@@ -3374,9 +2971,8 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
                 var npcPosition = position.ToVector3();
                 UUID newBotId;
 
-                if (appearance == null)
-                {
-                    newBotId = manager.CreateAvatar (
+                if (appearance == null) {
+                    newBotId = manager.CreateAvatar(
                         firstname,
                         lastname,
                         World,
@@ -3384,9 +2980,8 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
                         ownerID,
                         npcPosition
                     );
-                } else
-                {
-                    newBotId = manager.CreateAvatar (
+                } else {
+                    newBotId = manager.CreateAvatar(
                         firstname,
                         lastname,
                         World,
@@ -3402,14 +2997,12 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             return new LSL_Key(UUID.Zero.ToString());
         }
 
-        public void osNpcRemove(LSL_Key npc)
-        {
+        public void osNpcRemove(LSL_Key npc) {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.High, "osNpcRemove", m_host, "OSSL", m_itemID))
-                return ;
+                return;
 
             IBotManager manager = World.RequestModuleInterface<IBotManager>();
-            if (manager != null)
-            {
+            if (manager != null) {
                 UUID npcId;
                 if (!UUID.TryParse(npc.m_string, out npcId))
                     return;
@@ -3419,12 +3012,11 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             }
         }
 
-        public LSL_Integer osIsNpc(LSL_Key npc)
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "osIsNpc", m_host, "OSSL", m_itemID))
+        public LSL_Integer osIsNpc(LSL_Key npc) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "osIsNpc", m_host, "OSSL", m_itemID))
                 return ScriptBaseClass.FALSE;
 
-            IBotManager manager = World.RequestModuleInterface<IBotManager> ();
+            IBotManager manager = World.RequestModuleInterface<IBotManager>();
             if (manager != null) {
                 UUID npcId;
                 if (UUID.TryParse(npc.m_string, out npcId))
@@ -3441,14 +3033,12 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
         /// <param name="npc"></param>
         /// <param name="notecard">The name of the notecard to which to save the appearance.</param>
         /// <returns>The asset ID of the notecard saved.</returns>
-        public LSL_Key osNpcSaveAppearance(LSL_Key npc, string notecard)
-        {
-            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.High, "osNpcSaveAppearance", m_host, "OSSL", m_itemID)) 
+        public LSL_Key osNpcSaveAppearance(LSL_Key npc, string notecard) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.High, "osNpcSaveAppearance", m_host, "OSSL", m_itemID))
                 return "";
 
             IBotManager manager = World.RequestModuleInterface<IBotManager>();
-            if (manager != null)
-            {
+            if (manager != null) {
                 UUID npcId;
                 if (!UUID.TryParse(npc.m_string, out npcId))
                     return new LSL_Key(UUID.Zero.ToString());
@@ -3462,14 +3052,12 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             return new LSL_Key(UUID.Zero.ToString());
         }
 
-        public void osNpcLoadAppearance(LSL_Key npc, string notecard)
-        {
+        public void osNpcLoadAppearance(LSL_Key npc, string notecard) {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.High, "osNpcLoadAppearance", m_host, "OSSL", m_itemID))
                 return;
 
             IBotManager manager = World.RequestModuleInterface<IBotManager>();
-            if (manager != null)
-            {
+            if (manager != null) {
                 UUID npcId;
                 if (!UUID.TryParse(npc.m_string, out npcId))
                     return;
@@ -3490,17 +3078,14 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             }
         }
 
-        public LSL_Key osNpcGetOwner(LSL_Key npc)
-        {
+        public LSL_Key osNpcGetOwner(LSL_Key npc) {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.High, "osNpcGetOwner", m_host, "OSSL", m_itemID))
                 return "";
 
             IBotManager manager = World.RequestModuleInterface<IBotManager>();
-            if (manager != null)
-            {
+            if (manager != null) {
                 UUID npcId;
-                if (UUID.TryParse(npc.m_string, out npcId))
-                {
+                if (UUID.TryParse(npc.m_string, out npcId)) {
                     UUID owner = manager.GetOwner(npcId);
                     if (owner != UUID.Zero)
                         return new LSL_Key(owner.ToString());
@@ -3512,34 +3097,29 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             return new LSL_Key(UUID.Zero.ToString());
         }
 
-        public LSL_Vector osNpcGetPos(LSL_Key npc)
-        {
-            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.High, "osNpcGetPos", m_host, "OSSL", m_itemID)) 
+        public LSL_Vector osNpcGetPos(LSL_Key npc) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.High, "osNpcGetPos", m_host, "OSSL", m_itemID))
                 return new LSL_Vector(0, 0, 0);
 
             IBotManager manager = World.RequestModuleInterface<IBotManager>();
-            if (manager != null)
-            {
+            if (manager != null) {
                 UUID npcId;
-                if (!UUID.TryParse (npc.m_string, out npcId))
-                {
-                    var pos = manager.GetPosition (npcId, m_host.OwnerID);
+                if (!UUID.TryParse(npc.m_string, out npcId)) {
+                    var pos = manager.GetPosition(npcId, m_host.OwnerID);
 
-                    return new LSL_Vector (pos); 
+                    return new LSL_Vector(pos);
                 }
             }
 
             return new LSL_Vector(0, 0, 0);
         }
 
-        public void osNpcMoveTo(LSL_Key npc, LSL_Vector pos)
-        {
+        public void osNpcMoveTo(LSL_Key npc, LSL_Vector pos) {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.High, "osNpcMoveTo", m_host, "OSSL", m_itemID))
                 return;
 
             IBotManager manager = World.RequestModuleInterface<IBotManager>();
-            if (manager != null)
-            {
+            if (manager != null) {
                 UUID npcId;
                 if (!UUID.TryParse(npc.m_string, out npcId))
                     return;
@@ -3548,21 +3128,19 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             }
         }
 
-        public void osNpcMoveToTarget(LSL_Key npc, LSL_Vector target, int options)
-        {
-            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.High, "osNpcMoveToTarget", m_host, "OSSL", m_itemID)) 
+        public void osNpcMoveToTarget(LSL_Key npc, LSL_Vector target, int options) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.High, "osNpcMoveToTarget", m_host, "OSSL", m_itemID))
                 return;
 
             IBotManager manager = World.RequestModuleInterface<IBotManager>();
-            if (manager != null)
-            {
+            if (manager != null) {
                 UUID npcId;
                 if (!UUID.TryParse(npc.m_string, out npcId))
                     return;
 
                 Vector3 targetPos = target.ToVector3();
 
-                MainConsole.Instance.DebugFormat ("NPC: {0} moving to position: {1}, region: {2}, Options: {3}",
+                MainConsole.Instance.DebugFormat("NPC: {0} moving to position: {1}, region: {2}, Options: {3}",
                     npcId, targetPos, World, options);
 
                 manager.MoveToTarget(
@@ -3574,36 +3152,31 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             }
         }
 
-        public void osNpcStopMoveToTarget(LSL_Key npc)
-        {
-            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.High, "osNpcStopMoveToTarget", m_host, "OSSL", m_itemID)) 
+        public void osNpcStopMoveToTarget(LSL_Key npc) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.High, "osNpcStopMoveToTarget", m_host, "OSSL", m_itemID))
                 return;
 
             IBotManager manager = World.RequestModuleInterface<IBotManager>();
-            if (manager != null)
-            {
+            if (manager != null) {
                 UUID npcId;
                 if (!UUID.TryParse(npc.m_string, out npcId))
                     return;
 
                 //manager.StopMoveToTarget(npcId, World, m_host.OwnerID);
-                manager.StopMoving (npcId, m_host.OwnerID);               
+                manager.StopMoving(npcId, m_host.OwnerID);
             }
         }
 
-        public LSL_Rotation osNpcGetRot(LSL_Key npc)
-        {
-            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.High, "osNpcGetRot", m_host, "OSSL", m_itemID)) 
+        public LSL_Rotation osNpcGetRot(LSL_Key npc) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.High, "osNpcGetRot", m_host, "OSSL", m_itemID))
                 return new LSL_Rotation(0, 0, 0, 0);
 
             IBotManager manager = World.RequestModuleInterface<IBotManager>();
-            if (manager != null)
-            {
+            if (manager != null) {
                 UUID npcId;
-                if (UUID.TryParse (npc.m_string, out npcId))
-                {
-                    var rot = manager.GetRotation (npcId, m_host.OwnerID);
-                    var NpcRot = new LSL_Rotation ();
+                if (UUID.TryParse(npc.m_string, out npcId)) {
+                    var rot = manager.GetRotation(npcId, m_host.OwnerID);
+                    var NpcRot = new LSL_Rotation();
                     NpcRot.x = rot.X;
                     NpcRot.y = rot.Y;
                     NpcRot.z = rot.Z;
@@ -3612,75 +3185,65 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
                     return NpcRot;
                 }
             }
-            
-            return new LSL_Rotation( 0,0,0,0);
+
+            return new LSL_Rotation(0, 0, 0, 0);
 
         }
 
-        public void osNpcSetRot(LSL_Key npc, LSL_Rotation rotation)
-        {
+        public void osNpcSetRot(LSL_Key npc, LSL_Rotation rotation) {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.High, "osNpcSetRot", m_host, "OSSL", m_itemID))
                 return;
 
             IBotManager manager = World.RequestModuleInterface<IBotManager>();
-            if (manager != null)
-            {
+            if (manager != null) {
                 UUID npcId;
-                if (UUID.TryParse (npc.m_string, out npcId))
-                {
-                    if (!manager.CheckPermission (npcId, m_host.OwnerID))
+                if (UUID.TryParse(npc.m_string, out npcId)) {
+                    if (!manager.CheckPermission(npcId, m_host.OwnerID))
                         return;
 
-                    IScenePresence sp = World.GetScenePresence (npcId);
+                    IScenePresence sp = World.GetScenePresence(npcId);
 
                     if (sp != null)
-                        sp.Rotation = rotation.ToQuaternion ();
+                        sp.Rotation = rotation.ToQuaternion();
                 }
             }
         }
 
 
-        public void osNpcWhisper(LSL_Key npc, int channel, string message)
-        {
+        public void osNpcWhisper(LSL_Key npc, int channel, string message) {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.High, "osNpcWhisper", m_host, "OSSL", m_itemID))
                 return;
 
             IBotManager manager = World.RequestModuleInterface<IBotManager>();
-            if (manager != null)
-            {
+            if (manager != null) {
                 UUID npcId;
                 if (UUID.TryParse(npc.m_string, out npcId))
                     manager.SendChatMessage(npcId, message, 0, channel, m_host.OwnerID);
             }
         }
 
-        public void osNpcSay(LSL_Key npc, string message)
-        {
+        public void osNpcSay(LSL_Key npc, string message) {
             osNpcSay(npc, 0, message);
         }
 
-        public void osNpcSay(LSL_Key npc, int channel, string message)
-        {
-            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.High, "osNpcSay", m_host, "OSSL", m_itemID)) 
+        public void osNpcSay(LSL_Key npc, int channel, string message) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.High, "osNpcSay", m_host, "OSSL", m_itemID))
                 return;
 
             IBotManager manager = World.RequestModuleInterface<IBotManager>();
-            if (manager != null)
-            {
+            if (manager != null) {
                 UUID npcId;
                 if (UUID.TryParse(npc.m_string, out npcId))
                     manager.SendChatMessage(npcId, message, 1, channel, m_host.OwnerID);
             }
         }
 
-        public void osNpcShout(LSL_Key npc, int channel, string message)
-        {
+        public void osNpcShout(LSL_Key npc, int channel, string message) {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.High, "osNpcShout", m_host, "OSSL", m_itemID))
                 return;
 
             IBotManager manager = World.RequestModuleInterface<IBotManager>();
-            if (manager != null)
-            {
+            if (manager != null) {
                 UUID npcId;
                 if (UUID.TryParse(npc.m_string, out npcId))
                     manager.SendChatMessage(npcId, message, 2, channel, m_host.OwnerID);
@@ -3688,102 +3251,88 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
         }
 
 
-        public void osNpcSit(LSL_Key npc, LSL_Key target, int options)
-        {
+        public void osNpcSit(LSL_Key npc, LSL_Key target, int options) {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.High, "osNpcSit", m_host, "OSSL", m_itemID))
                 return;
 
             IBotManager manager = World.RequestModuleInterface<IBotManager>();
-            if (manager != null)
-            {
+            if (manager != null) {
                 UUID npcId;
-                if (UUID.TryParse (npc.m_string, out npcId))
-                {
-                    if (!manager.CheckPermission (npcId, m_host.OwnerID))
+                if (UUID.TryParse(npc.m_string, out npcId)) {
+                    if (!manager.CheckPermission(npcId, m_host.OwnerID))
                         return;
 
-                    IScenePresence sp = World.GetScenePresence (npcId);
+                    IScenePresence sp = World.GetScenePresence(npcId);
                     if (sp == null)
                         return;
 
-                    var sitObjectID = UUID.Parse (target.m_string);
-                    ISceneChildEntity child = World.GetSceneObjectPart (sitObjectID);
+                    var sitObjectID = UUID.Parse(target.m_string);
+                    ISceneChildEntity child = World.GetSceneObjectPart(sitObjectID);
                     if (child == null)
                         //throw new Exception("Failed to find entity to sit on");
                         return;
 
-                    sp.HandleAgentRequestSit (sp.ControllingClient, sitObjectID, new Vector3 (0,0,0));
+                    sp.HandleAgentRequestSit(sp.ControllingClient, sitObjectID, new Vector3(0, 0, 0));
 
                 }
             }
         }
 
-        public void osNpcStand(LSL_Key npc)
-        {
+        public void osNpcStand(LSL_Key npc) {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.High, "osNpcStand", m_host, "OSSL", m_itemID))
                 return;
 
             IBotManager manager = World.RequestModuleInterface<IBotManager>();
-            if (manager != null)
-            {
+            if (manager != null) {
                 UUID npcId;
-                if (UUID.TryParse (npc.m_string, out npcId))
-                {
-                    if (!manager.CheckPermission (npcId, m_host.OwnerID))
+                if (UUID.TryParse(npc.m_string, out npcId)) {
+                    if (!manager.CheckPermission(npcId, m_host.OwnerID))
                         return;
 
-                    IScenePresence sp = World.GetScenePresence (npcId);
+                    IScenePresence sp = World.GetScenePresence(npcId);
                     if (sp == null)
                         return;
-                 
-                    sp.StandUp ();
+
+                    sp.StandUp();
                 }
             }
         }
 
-        public void osNpcPlayAnimation(LSL_Key npc, string animation)
-        {
+        public void osNpcPlayAnimation(LSL_Key npc, string animation) {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.High, "osNpcPlayAnimation", m_host, "OSSL", m_itemID))
                 return;
 
             IBotManager manager = World.RequestModuleInterface<IBotManager>();
-            if (manager != null)
-            {
+            if (manager != null) {
                 UUID npcId;
-                if (UUID.TryParse (npc.m_string, out npcId))
-                {
-                    if (manager.CheckPermission (npcId, m_host.OwnerID))
-                        osAvatarPlayAnimation (npcId.ToString (), animation);
+                if (UUID.TryParse(npc.m_string, out npcId)) {
+                    if (manager.CheckPermission(npcId, m_host.OwnerID))
+                        osAvatarPlayAnimation(npcId.ToString(), animation);
                 }
             }
         }
 
-        public void osNpcStopAnimation(LSL_Key npc, string animation)
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.High, "osNpcStopAnimation", m_host, "OSSL", m_itemID))
+        public void osNpcStopAnimation(LSL_Key npc, string animation) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.High, "osNpcStopAnimation", m_host, "OSSL", m_itemID))
                 return;
 
             IBotManager manager = World.RequestModuleInterface<IBotManager>();
-            if (manager != null)
-            {
+            if (manager != null) {
                 UUID npcId;
-                if (UUID.TryParse (npc.m_string, out npcId))
-                {
-                    if (manager.CheckPermission (npcId, m_host.OwnerID))
-                        osAvatarStopAnimation (npcId.ToString (), animation);
+                if (UUID.TryParse(npc.m_string, out npcId)) {
+                    if (manager.CheckPermission(npcId, m_host.OwnerID))
+                        osAvatarStopAnimation(npcId.ToString(), animation);
                 }
             }
         }
 
-         public void osNpcTouch(LSL_Key npcLSL_Key, LSL_Key object_key, LSL_Integer link_num)
-        {
+        public void osNpcTouch(LSL_Key npcLSL_Key, LSL_Key object_key, LSL_Integer link_num) {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.High, "osNpcTouch", m_host, "OSSL", m_itemID))
                 return;
 
             IBotManager manager = World.RequestModuleInterface<IBotManager>();
             int linkNum = link_num.value;
-            if (manager != null || (linkNum < 0 && linkNum != ScriptBaseClass.LINK_THIS))
-            {
+            if (manager != null || (linkNum < 0 && linkNum != ScriptBaseClass.LINK_THIS)) {
                 UUID npcId;
                 if (!UUID.TryParse(npcLSL_Key, out npcId) || !manager.CheckPermission(npcId, m_host.OwnerID))
                     return;
@@ -3804,7 +3353,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
                 World.EventManager.TriggerObjectGrabbing(child.ParentEntity.RootChild, child, Vector3.Zero,
                     sp.ControllingClient, touchArgs);
                 World.EventManager.TriggerObjectDeGrab(child.ParentEntity.RootChild, child, sp.ControllingClient, touchArgs);
-                              
+
             }
         }
     }

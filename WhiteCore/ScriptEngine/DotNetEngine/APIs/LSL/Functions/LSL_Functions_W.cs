@@ -58,7 +58,7 @@ using GridRegion = WhiteCore.Framework.Services.GridRegion;
 using LSL_Float = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.LSLFloat;
 using LSL_Integer = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.LSLInteger;
 using LSL_Key = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.LSLString;
-using LSL_List = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.list;
+using LSL_List = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.List;
 using LSL_Rotation = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.Quaternion;
 using LSL_String = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.LSLString;
 using LSL_Vector = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.Vector3;
@@ -69,37 +69,35 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
 {
     public partial class LSL_Api : MarshalByRefObject, IScriptApi
     {
-        public void llWhisper (int channelID, string text)
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID)) return;
+        public void llWhisper(int channelID, string text) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID)) return;
 
 
             if (text.Length > 1023)
-                text = text.Substring (0, 1023);
+                text = text.Substring(0, 1023);
 
-            IChatModule chatModule = World.RequestModuleInterface<IChatModule> ();
+            IChatModule chatModule = World.RequestModuleInterface<IChatModule>();
             if (chatModule != null)
-                chatModule.SimChat (text, ChatTypeEnum.Whisper, channelID,
+                chatModule.SimChat(text, ChatTypeEnum.Whisper, channelID,
                                    m_host.ParentEntity.RootChild.AbsolutePosition, m_host.Name, m_host.UUID, false,
                                    World);
 
             if (m_comms != null)
-                m_comms.DeliverMessage (ChatTypeEnum.Whisper, channelID, m_host.Name, m_host.UUID, text);
+                m_comms.DeliverMessage(ChatTypeEnum.Whisper, channelID, m_host.Name, m_host.UUID, text);
         }
 
-        public LSL_Vector llWind (LSL_Vector offset)
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
-                return new LSL_Vector ();
+        public LSL_Vector llWind(LSL_Vector offset) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+                return new LSL_Vector();
 
-            LSL_Vector wind = new LSL_Vector (0, 0, 0);
-            IWindModule module = World.RequestModuleInterface<IWindModule> ();
+            LSL_Vector wind = new LSL_Vector(0, 0, 0);
+            IWindModule module = World.RequestModuleInterface<IWindModule>();
             if (module != null) {
-                Vector3 pos = m_host.GetWorldPosition ();
+                Vector3 pos = m_host.GetWorldPosition();
                 int x = (int)(pos.X + offset.x);
                 int y = (int)(pos.Y + offset.y);
 
-                Vector3 windSpeed = module.WindSpeed (x, y, 0);
+                Vector3 windSpeed = module.WindSpeed(x, y, 0);
 
                 wind.x = windSpeed.X;
                 wind.y = windSpeed.Y;
@@ -107,10 +105,9 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             return wind;
         }
 
-        public LSL_Float llWater (LSL_Vector offset)
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
-                return new LSL_Float ();
+        public LSL_Float llWater(LSL_Vector offset) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+                return new LSL_Float();
 
             return World.RegionInfo.RegionSettings.WaterHeight;
         }

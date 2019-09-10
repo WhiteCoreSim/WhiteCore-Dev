@@ -58,7 +58,7 @@ using GridRegion = WhiteCore.Framework.Services.GridRegion;
 using LSL_Float = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.LSLFloat;
 using LSL_Integer = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.LSLInteger;
 using LSL_Key = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.LSLString;
-using LSL_List = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.list;
+using LSL_List = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.List;
 using LSL_Rotation = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.Quaternion;
 using LSL_String = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.LSLString;
 using LSL_Vector = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.Vector3;
@@ -70,115 +70,102 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
     public partial class LSL_Api : MarshalByRefObject, IScriptApi
     {
         // convert a LSL_Rotation to a Quaternion
-        protected Quaternion Rot2Quaternion (LSL_Rotation r)
-        {
-            Quaternion q = new Quaternion ((float)r.x, (float)r.y, (float)r.z, (float)r.s);
-            q.Normalize ();
+        protected Quaternion Rot2Quaternion(LSL_Rotation r) {
+            Quaternion q = new Quaternion((float)r.x, (float)r.y, (float)r.z, (float)r.s);
+            q.Normalize();
             return q;
         }
 
         //These are the implementations of the various ll-functions used by the LSL scripts.
-        public LSL_Float llSin (double f)
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
-                return new LSL_Float ();
+        public LSL_Float llSin(double f) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+                return new LSL_Float();
 
-            return Math.Sin (f);
+            return Math.Sin(f);
         }
 
-        public LSL_Float llCos (double f)
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
-                return new LSL_Float ();
+        public LSL_Float llCos(double f) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+                return new LSL_Float();
 
-            return Math.Cos (f);
+            return Math.Cos(f);
         }
 
-        public LSL_Float llTan (double f)
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
-                return new LSL_Float ();
+        public LSL_Float llTan(double f) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+                return new LSL_Float();
 
-            return Math.Tan (f);
+            return Math.Tan(f);
         }
 
-        public LSL_Float llAtan2 (double x, double y)
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
-                return new LSL_Float ();
+        public LSL_Float llAtan2(double x, double y) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+                return new LSL_Float();
 
-            return Math.Atan2 (x, y);
+            return Math.Atan2(x, y);
         }
 
-        public LSL_Float llSqrt (double f)
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
-                return new LSL_Float ();
+        public LSL_Float llSqrt(double f) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+                return new LSL_Float();
 
-            return Math.Sqrt (f);
+            return Math.Sqrt(f);
         }
 
-        public LSL_Float llPow (double fbase, double fexponent)
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
-                return new LSL_Float ();
+        public LSL_Float llPow(double fbase, double fexponent) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+                return new LSL_Float();
 
-            return Math.Pow (fbase, fexponent);
+            return Math.Pow(fbase, fexponent);
         }
 
-        public LSL_Integer llAbs (int i)
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
-                return new LSL_Integer ();
+        public LSL_Integer llAbs(int i) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+                return new LSL_Integer();
 
             // changed to replicate LSL behaviour whereby minimum int value is returned untouched.
             if (i == int.MinValue)
                 return i;
-            return Math.Abs (i);
+            return Math.Abs(i);
         }
 
-        public LSL_Float llFabs (double f)
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
-                return new LSL_Float ();
+        public LSL_Float llFabs(double f) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+                return new LSL_Float();
 
-            return Math.Abs (f);
+            return Math.Abs(f);
         }
 
-        public LSL_Float llFrand (double mag)
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
-                return new LSL_Float ();
+        public LSL_Float llFrand(double mag) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+                return new LSL_Float();
 
-            return Util.RandomClass.NextDouble () * mag;
+            return Util.RandomClass.NextDouble() * mag;
         }
 
-        public LSL_Integer llFloor (double f)
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
-                return new LSL_Integer ();
+        public LSL_Integer llFloor(double f) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+                return new LSL_Integer();
 
-            return (int)Math.Floor (f);
+            return (int)Math.Floor(f);
         }
 
-        public LSL_Integer llCeil (double f)
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
-                return new LSL_Integer ();
+        public LSL_Integer llCeil(double f) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+                return new LSL_Integer();
 
-            return (int)Math.Ceiling (f);
+            return (int)Math.Ceiling(f);
         }
 
         // Xantor 01/May/2008 fixed midpointrounding (2.5 becomes 3.0 instead of 2.0, default = ToEven)
-        public LSL_Integer llRound (double f)
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
-                return new LSL_Integer ();
+        public LSL_Integer llRound(double f) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+                return new LSL_Integer();
 
-            double RoundedNumber = Math.Round (f, MidpointRounding.AwayFromZero);
+            double RoundedNumber = Math.Round(f, MidpointRounding.AwayFromZero);
             //Attempt to fix rounded numbers like -4.5 arounding away from zero
             if (f < 0) {
-                if (FloatAlmostEqual (f + 0.5, RoundedNumber) || FloatAlmostEqual (f - 0.5, RoundedNumber)) {
+                if (FloatAlmostEqual(f + 0.5, RoundedNumber) || FloatAlmostEqual(f - 0.5, RoundedNumber)) {
                     RoundedNumber += 1;
                 }
             }
@@ -186,30 +173,27 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
         }
 
         //This next group are vector operations involving squaring and square root. ckrinke
-        public LSL_Float llVecMag (LSL_Vector v)
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
-                return new LSL_Float ();
+        public LSL_Float llVecMag(LSL_Vector v) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+                return new LSL_Float();
 
-            return LSL_Vector.Mag (v);
+            return LSL_Vector.Mag(v);
         }
 
-        public LSL_Vector llVecNorm (LSL_Vector v)
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
-                return new LSL_Vector ();
-            return LSL_Vector.Norm (v);
+        public LSL_Vector llVecNorm(LSL_Vector v) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+                return new LSL_Vector();
+            return LSL_Vector.Norm(v);
         }
 
-        public LSL_Float llVecDist (LSL_Vector a, LSL_Vector b)
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
-                return new LSL_Float ();
+        public LSL_Float llVecDist(LSL_Vector a, LSL_Vector b) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+                return new LSL_Float();
 
             double dx = a.x - b.x;
             double dy = a.y - b.y;
             double dz = a.z - b.z;
-            return Math.Sqrt (dx * dx + dy * dy + dz * dz);
+            return Math.Sqrt(dx * dx + dy * dy + dz * dz);
         }
 
         //Now we start getting into quaternions which means sin/cos, matrices and vectors. ckrinke
@@ -217,23 +201,22 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
         // Old implementation of llRot2Euler. Normalization not required as Atan2 function will
         // only return values >= -PI (-180 degrees) and <= PI (180 degrees).
 
-        public LSL_Vector llRot2Euler (LSL_Rotation r)
-        {
+        public LSL_Vector llRot2Euler(LSL_Rotation r) {
             //This implementation is from http://lslwiki.net/lslwiki/wakka.php?wakka=LibraryRotationFunctions. ckrinke
-            LSL_Rotation t = new LSL_Rotation (r.x * r.x, r.y * r.y, r.z * r.z, r.s * r.s);
+            LSL_Rotation t = new LSL_Rotation(r.x * r.x, r.y * r.y, r.z * r.z, r.s * r.s);
             double m = (t.x + t.y + t.z + t.s);
-            if (FloatAlmostEqual (m, 0))
-                return new LSL_Vector ();
+            if (FloatAlmostEqual(m, 0))
+                return new LSL_Vector();
 
             double n = 2 * (r.y * r.s + r.x * r.z);
             double p = m * m - n * n;
             if (p > 0)
-                return new LSL_Vector (Math.Atan2 (2.0 * (r.x * r.s - r.y * r.z), (-t.x - t.y + t.z + t.s)),
-                                      Math.Atan2 (n, Math.Sqrt (p)),
-                                      Math.Atan2 (2.0 * (r.z * r.s - r.x * r.y), (t.x - t.y - t.z + t.s)));
+                return new LSL_Vector(Math.Atan2(2.0 * (r.x * r.s - r.y * r.z), (-t.x - t.y + t.z + t.s)),
+                                      Math.Atan2(n, Math.Sqrt(p)),
+                                      Math.Atan2(2.0 * (r.z * r.s - r.x * r.y), (t.x - t.y - t.z + t.s)));
             if (n > 0)
-                return new LSL_Vector (0.0, Math.PI * 0.5, Math.Atan2 ((r.z * r.s + r.x * r.y), 0.5 - t.x - t.z));
-            return new LSL_Vector (0.0, -Math.PI * 0.5, Math.Atan2 ((r.z * r.s + r.x * r.y), 0.5 - t.x - t.z));
+                return new LSL_Vector(0.0, Math.PI * 0.5, Math.Atan2((r.z * r.s + r.x * r.y), 0.5 - t.x - t.z));
+            return new LSL_Vector(0.0, -Math.PI * 0.5, Math.Atan2((r.z * r.s + r.x * r.y), 0.5 - t.x - t.z));
         }
 
         /* From wiki:
@@ -281,38 +264,36 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
          * Apparently in some cases this is better from a numerical precision perspective?
          */
 
-        public LSL_Rotation llEuler2Rot (LSL_Vector v)
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
-                return new LSL_Rotation ();
+        public LSL_Rotation llEuler2Rot(LSL_Vector v) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+                return new LSL_Rotation();
 
 
-            double c1 = Math.Cos (v.x * 0.5);
-            double c2 = Math.Cos (v.y * 0.5);
-            double c3 = Math.Cos (v.z * 0.5);
-            double s1 = Math.Sin (v.x * 0.5);
-            double s2 = Math.Sin (v.y * 0.5);
-            double s3 = Math.Sin (v.z * 0.5);
+            double c1 = Math.Cos(v.x * 0.5);
+            double c2 = Math.Cos(v.y * 0.5);
+            double c3 = Math.Cos(v.z * 0.5);
+            double s1 = Math.Sin(v.x * 0.5);
+            double s2 = Math.Sin(v.y * 0.5);
+            double s3 = Math.Sin(v.z * 0.5);
 
             double x = s1 * c2 * c3 + c1 * s2 * s3;
             double y = c1 * s2 * c3 - s1 * c2 * s3;
             double z = s1 * s2 * c3 + c1 * c2 * s3;
             double s = c1 * c2 * c3 - s1 * s2 * s3;
 
-            return new LSL_Rotation (x, y, z, s);
+            return new LSL_Rotation(x, y, z, s);
         }
 
-        public LSL_Rotation llAxes2Rot (LSL_Vector fwd, LSL_Vector left, LSL_Vector up)
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
-                return new LSL_Rotation ();
+        public LSL_Rotation llAxes2Rot(LSL_Vector fwd, LSL_Vector left, LSL_Vector up) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+                return new LSL_Rotation();
 
             double s;
             double tr = fwd.x + left.y + up.z + 1.0;
 
             if (tr >= 1.0) {
-                s = 0.5 / Math.Sqrt (tr);
-                return new LSL_Rotation (
+                s = 0.5 / Math.Sqrt(tr);
+                return new LSL_Rotation(
                     (left.z - up.y) * s,
                     (up.x - fwd.z) * s,
                     (fwd.y - left.x) * s,
@@ -321,47 +302,46 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             double max = (left.y > up.z) ? left.y : up.z;
 
             if (max < fwd.x) {
-                s = Math.Sqrt (fwd.x - (left.y + up.z) + 1.0);
+                s = Math.Sqrt(fwd.x - (left.y + up.z) + 1.0);
                 double x = s * 0.5;
                 s = 0.5 / s;
-                return new LSL_Rotation (
+                return new LSL_Rotation(
                     x,
                     (fwd.y + left.x) * s,
                     (up.x + fwd.z) * s,
                     (left.z - up.y) * s);
             }
-            if (FloatAlmostEqual (max, left.y)) {
-                s = Math.Sqrt (left.y - (up.z + fwd.x) + 1.0);
+            if (FloatAlmostEqual(max, left.y)) {
+                s = Math.Sqrt(left.y - (up.z + fwd.x) + 1.0);
                 double y = s * 0.5;
                 s = 0.5 / s;
-                return new LSL_Rotation (
+                return new LSL_Rotation(
                     (fwd.y + left.x) * s,
                     y,
                     (left.z + up.y) * s,
                     (up.x - fwd.z) * s);
             }
-            s = Math.Sqrt (up.z - (fwd.x + left.y) + 1.0);
+            s = Math.Sqrt(up.z - (fwd.x + left.y) + 1.0);
             double z = s * 0.5;
             s = 0.5 / s;
-            return new LSL_Rotation (
+            return new LSL_Rotation(
                 (up.x + fwd.z) * s,
                 (left.z + up.y) * s,
                 z,
                 (fwd.y - left.x) * s);
         }
 
-        public LSL_Vector llRot2Fwd (LSL_Rotation r)
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
-                return new LSL_Vector ();
+        public LSL_Vector llRot2Fwd(LSL_Rotation r) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+                return new LSL_Vector();
 
 
             double m = r.x * r.x + r.y * r.y + r.z * r.z + r.s * r.s;
             // m is always greater than zero
             // if m is not equal to 1 then Rotation needs to be normalized
-            if (Math.Abs (1.0 - m) > 0.000001) // allow a little slop here for calculation precision
+            if (Math.Abs(1.0 - m) > 0.000001) // allow a little slop here for calculation precision
             {
-                m = 1.0 / Math.Sqrt (m);
+                m = 1.0 / Math.Sqrt(m);
                 r.x *= m;
                 r.y *= m;
                 r.z *= m;
@@ -372,21 +352,20 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             double x = r.x * r.x - r.y * r.y - r.z * r.z + r.s * r.s;
             double y = 2 * (r.x * r.y + r.z * r.s);
             double z = 2 * (r.x * r.z - r.y * r.s);
-            return (new LSL_Vector (x, y, z));
+            return (new LSL_Vector(x, y, z));
         }
 
-        public LSL_Vector llRot2Left (LSL_Rotation r)
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
-                return new LSL_Vector ();
+        public LSL_Vector llRot2Left(LSL_Rotation r) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+                return new LSL_Vector();
 
 
             double m = r.x * r.x + r.y * r.y + r.z * r.z + r.s * r.s;
             // m is always greater than zero
             // if m is not equal to 1 then Rotation needs to be normalized
-            if (Math.Abs (1.0 - m) > 0.000001) // allow a little slop here for calculation precision
+            if (Math.Abs(1.0 - m) > 0.000001) // allow a little slop here for calculation precision
             {
-                m = 1.0 / Math.Sqrt (m);
+                m = 1.0 / Math.Sqrt(m);
                 r.x *= m;
                 r.y *= m;
                 r.z *= m;
@@ -397,20 +376,19 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             double x = 2 * (r.x * r.y - r.z * r.s);
             double y = -r.x * r.x + r.y * r.y - r.z * r.z + r.s * r.s;
             double z = 2 * (r.x * r.s + r.y * r.z);
-            return (new LSL_Vector (x, y, z));
+            return (new LSL_Vector(x, y, z));
         }
 
-        public LSL_Vector llRot2Up (LSL_Rotation r)
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
-                return new LSL_Vector ();
+        public LSL_Vector llRot2Up(LSL_Rotation r) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+                return new LSL_Vector();
 
             double m = r.x * r.x + r.y * r.y + r.z * r.z + r.s * r.s;
             // m is always greater than zero
             // if m is not equal to 1 then Rotation needs to be normalized
-            if (Math.Abs (1.0 - m) > 0.000001) // allow a little slop here for calculation precision
+            if (Math.Abs(1.0 - m) > 0.000001) // allow a little slop here for calculation precision
             {
-                m = 1.0 / Math.Sqrt (m);
+                m = 1.0 / Math.Sqrt(m);
                 r.x *= m;
                 r.y *= m;
                 r.z *= m;
@@ -421,24 +399,23 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             double x = 2 * (r.x * r.z + r.y * r.s);
             double y = 2 * (-r.x * r.s + r.y * r.z);
             double z = -r.x * r.x - r.y * r.y + r.z * r.z + r.s * r.s;
-            return (new LSL_Vector (x, y, z));
+            return (new LSL_Vector(x, y, z));
         }
 
-        public LSL_Rotation llRotBetween (LSL_Vector a, LSL_Vector b)
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
-                return new LSL_Rotation ();
+        public LSL_Rotation llRotBetween(LSL_Vector a, LSL_Vector b) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+                return new LSL_Rotation();
             //A and B should both be normalized
 
             LSL_Rotation rotBetween;
             // Check for zero vectors. If either is zero, return zero rotation. Otherwise,
             // continue calculation.
-            if (a == new LSL_Vector (0.0f, 0.0f, 0.0f) || b == new LSL_Vector (0.0f, 0.0f, 0.0f)) {
-                rotBetween = new LSL_Rotation (0.0f, 0.0f, 0.0f, 1.0f);
+            if (a == new LSL_Vector(0.0f, 0.0f, 0.0f) || b == new LSL_Vector(0.0f, 0.0f, 0.0f)) {
+                rotBetween = new LSL_Rotation(0.0f, 0.0f, 0.0f, 1.0f);
             } else {
-                a = LSL_Vector.Norm (a);
-                b = LSL_Vector.Norm (b);
-                double dotProduct = LSL_Vector.Dot (a, b);
+                a = LSL_Vector.Norm(a);
+                b = LSL_Vector.Norm(b);
+                double dotProduct = LSL_Vector.Dot(a, b);
                 // There are two degenerate cases possible. These are for vectors 180 or
                 // 0 degrees apart. These have to be detected and handled individually.
                 //
@@ -446,27 +423,27 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
                 // A dot product of -1 would mean the angle between vectors is 180 degrees.
                 if (dotProduct < -0.9999999f) {
                     // First assume X axis is orthogonal to the vectors.
-                    LSL_Vector orthoVector = new LSL_Vector (1.0f, 0.0f, 0.0f);
-                    orthoVector = orthoVector - a * (a.x / LSL_Vector.Dot (a, a));
+                    LSL_Vector orthoVector = new LSL_Vector(1.0f, 0.0f, 0.0f);
+                    orthoVector = orthoVector - a * (a.x / LSL_Vector.Dot(a, a));
                     // Check for near zero vector. A very small non-zero number here will create
                     // a rotation in an undesired direction.
-                    rotBetween = LSL_Vector.Mag (orthoVector) > 0.0001
-                                     ? new LSL_Rotation (orthoVector.x, orthoVector.y, orthoVector.z, 0.0f)
-                                     : new LSL_Rotation (0.0f, 0.0f, 1.0f, 0.0f);
+                    rotBetween = LSL_Vector.Mag(orthoVector) > 0.0001
+                                     ? new LSL_Rotation(orthoVector.x, orthoVector.y, orthoVector.z, 0.0f)
+                                     : new LSL_Rotation(0.0f, 0.0f, 1.0f, 0.0f);
                 }
                 // Check for parallel vectors.
                 // A dot product of 1 would mean the angle between vectors is 0 degrees.
                 else if (dotProduct > 0.9999999f) {
                     // Set zero rotation.
-                    rotBetween = new LSL_Rotation (0.0f, 0.0f, 0.0f, 1.0f);
+                    rotBetween = new LSL_Rotation(0.0f, 0.0f, 0.0f, 1.0f);
                 } else {
                     // All special checks have been performed so get the axis of rotation.
-                    LSL_Vector crossProduct = LSL_Vector.Cross (a, b);
+                    LSL_Vector crossProduct = LSL_Vector.Cross(a, b);
                     // Quarternion s value is the length of the unit vector + dot product.
                     double qs = 1.0 + dotProduct;
-                    rotBetween = new LSL_Rotation (crossProduct.x, crossProduct.y, crossProduct.z, qs);
+                    rotBetween = new LSL_Rotation(crossProduct.x, crossProduct.y, crossProduct.z, qs);
                     // Normalize the rotation.
-                    double mag = LSL_Rotation.Mag (rotBetween);
+                    double mag = LSL_Rotation.Mag(rotBetween);
                     // We shouldn't have to worry about a divide by zero here. The qs value will be
                     // non-zero because we already know if we're here, then the dotProduct is not -1 so
                     // qs will not be zero. Also, we've already handled the input vectors being zero so the
@@ -477,9 +454,9 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
                     rotBetween.s = rotBetween.s / mag;
                     // Check for undefined values and set zero rotation if any found. This code might not actually be required
                     // any longer since zero vectors are checked for at the top.
-                    if (double.IsNaN (rotBetween.x) || double.IsNaN (rotBetween.y) ||
-                        double.IsNaN (rotBetween.z) || double.IsNaN (rotBetween.s)) {
-                        rotBetween = new LSL_Rotation (0.0f, 0.0f, 0.0f, 1.0f);
+                    if (double.IsNaN(rotBetween.x) || double.IsNaN(rotBetween.y) ||
+                        double.IsNaN(rotBetween.z) || double.IsNaN(rotBetween.s)) {
+                        rotBetween = new LSL_Rotation(0.0f, 0.0f, 0.0f, 1.0f);
                     }
                 }
             }
@@ -489,19 +466,18 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
 
         // Xantor 29/apr/2008
         // converts a Quaternion to X,Y,Z axis rotations
-        public LSL_Vector llRot2Axis (LSL_Rotation rot)
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
-                return new LSL_Vector ();
+        public LSL_Vector llRot2Axis(LSL_Rotation rot) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+                return new LSL_Vector();
 
             double x, y, z;
 
             if (rot.s > 1) // normalization needed
             {
-                double length = Math.Sqrt (rot.x * rot.x + rot.y * rot.y +
+                double length = Math.Sqrt(rot.x * rot.x + rot.y * rot.y +
                                           rot.z * rot.z + rot.s * rot.s);
-                if (FloatAlmostEqual (length, 0))
-                    return new LSL_Vector (0, 0, 0);
+                if (FloatAlmostEqual(length, 0))
+                    return new LSL_Vector(0, 0, 0);
                 length = 1 / length;
                 rot.x *= length;
                 rot.y *= length;
@@ -510,7 +486,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             }
 
             // double angle = 2 * Math.Acos(rot.s);
-            double s = Math.Sqrt (1 - rot.s * rot.s);
+            double s = Math.Sqrt(1 - rot.s * rot.s);
             if (s < 0.001) {
                 x = 1;
                 y = z = 0;
@@ -521,23 +497,22 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
                 z = rot.z * s;
             }
 
-            return new LSL_Vector (x, y, z);
+            return new LSL_Vector(x, y, z);
         }
 
 
         // Returns the angle of a quaternion (see llRot2Axis for the axis)
-        public LSL_Float llRot2Angle (LSL_Rotation rot)
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
-                return new LSL_Float ();
+        public LSL_Float llRot2Angle(LSL_Rotation rot) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+                return new LSL_Float();
 
 
             if (rot.s > 1) // normalization needed
             {
-                double length = Math.Sqrt (rot.x * rot.x + rot.y * rot.y +
+                double length = Math.Sqrt(rot.x * rot.x + rot.y * rot.y +
                                           rot.z * rot.z + rot.s * rot.s);
 
-                if (FloatAlmostEqual (length, 0))
+                if (FloatAlmostEqual(length, 0))
                     return 0;
                 //                rot.x /= length;
                 //                rot.y /= length;
@@ -545,58 +520,53 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
                 rot.s /= length;
             }
 
-            double angle = 2 * Math.Acos (rot.s);
+            double angle = 2 * Math.Acos(rot.s);
 
             return angle;
         }
 
-        public LSL_Float llAcos (double val)
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
-                return new LSL_Float ();
+        public LSL_Float llAcos(double val) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+                return new LSL_Float();
 
-            return Math.Acos (val);
+            return Math.Acos(val);
         }
 
-        public LSL_Float llAsin (double val)
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
-                return new LSL_Float ();
+        public LSL_Float llAsin(double val) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+                return new LSL_Float();
 
-            return Math.Asin (val);
+            return Math.Asin(val);
         }
 
-        public LSL_Float llAngleBetween (LSL_Rotation a, LSL_Rotation b)
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
-                return new LSL_Float ();
+        public LSL_Float llAngleBetween(LSL_Rotation a, LSL_Rotation b) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+                return new LSL_Float();
 
 
             double aa = (a.x * a.x + a.y * a.y + a.z * a.z + a.s * a.s);
             double bb = (b.x * b.x + b.y * b.y + b.z * b.z + b.s * b.s);
             double aa_bb = aa * bb;
-            if (FloatAlmostEqual (aa_bb, 0))
+            if (FloatAlmostEqual(aa_bb, 0))
                 return 0.0;
             double ab = (a.x * b.x + a.y * b.y + a.z * b.z + a.s * b.s);
             double quotient = (ab * ab) / aa_bb;
             if (quotient >= 1.0) return 0.0;
-            return Math.Acos (2 * quotient - 1);
+            return Math.Acos(2 * quotient - 1);
         }
 
-        public LSL_Float llLog10 (double val)
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
-                return new LSL_Float ();
+        public LSL_Float llLog10(double val) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+                return new LSL_Float();
 
-            return Math.Log10 (val);
+            return Math.Log10(val);
         }
 
-        public LSL_Float llLog (double val)
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
-                return new LSL_Float ();
+        public LSL_Float llLog(double val) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+                return new LSL_Float();
 
-            return Math.Log (val);
+            return Math.Log(val);
         }
 
 
@@ -650,7 +620,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
         //  base-64 characters
         //  </summary>
 
-        protected static readonly char [] i2ctable =
+        protected static readonly char[] i2ctable =
             {
                 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H',
                 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P',
@@ -670,7 +640,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
         //  into 6-bit integers.
         //  </summary>
 
-        protected static readonly int [] c2itable =
+        protected static readonly int[] c2itable =
             {
                 -1, -1, -1, -1, -1, -1, -1, -1, // 0x
                 -1, -1, -1, -1, -1, -1, -1, -1,
@@ -721,28 +691,27 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
         //  characters are padded with "=".
         //  </returns>
 
-        public LSL_String llIntegerToBase64 (int number)
-        {
+        public LSL_String llIntegerToBase64(int number) {
             // uninitialized string
 
-            char [] imdt = new char [8];
+            char[] imdt = new char[8];
 
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
                 return "";
 
 
             // Manually unroll the loop
 
-            imdt [7] = '=';
-            imdt [6] = '=';
-            imdt [5] = i2ctable [number << 4 & 0x3F];
-            imdt [4] = i2ctable [number >> 2 & 0x3F];
-            imdt [3] = i2ctable [number >> 8 & 0x3F];
-            imdt [2] = i2ctable [number >> 14 & 0x3F];
-            imdt [1] = i2ctable [number >> 20 & 0x3F];
-            imdt [0] = i2ctable [number >> 26 & 0x3F];
+            imdt[7] = '=';
+            imdt[6] = '=';
+            imdt[5] = i2ctable[number << 4 & 0x3F];
+            imdt[4] = i2ctable[number >> 2 & 0x3F];
+            imdt[3] = i2ctable[number >> 8 & 0x3F];
+            imdt[2] = i2ctable[number >> 14 & 0x3F];
+            imdt[1] = i2ctable[number >> 20 & 0x3F];
+            imdt[0] = i2ctable[number >> 26 & 0x3F];
 
-            return new string (imdt);
+            return new string(imdt);
         }
 
         //  <summary>
@@ -777,12 +746,11 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
         //  </para>
         //  </remarks>
 
-        public LSL_Integer llBase64ToInteger (string str)
-        {
+        public LSL_Integer llBase64ToInteger(string str) {
             int number = 0;
             int digit;
 
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
                 return 0;
 
 
@@ -798,32 +766,32 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             //      -1 == invalid
             //       0 == padding
 
-            if ((digit = c2itable [str [0]]) <= 0) {
+            if ((digit = c2itable[str[0]]) <= 0) {
                 return digit < 0 ? 0 : number;
             }
             number += --digit << 26;
 
-            if ((digit = c2itable [str [1]]) <= 0) {
+            if ((digit = c2itable[str[1]]) <= 0) {
                 return digit < 0 ? 0 : number;
             }
             number += --digit << 20;
 
-            if ((digit = c2itable [str [2]]) <= 0) {
+            if ((digit = c2itable[str[2]]) <= 0) {
                 return digit < 0 ? 0 : number;
             }
             number += --digit << 14;
 
-            if ((digit = c2itable [str [3]]) <= 0) {
+            if ((digit = c2itable[str[3]]) <= 0) {
                 return digit < 0 ? 0 : number;
             }
             number += --digit << 8;
 
-            if ((digit = c2itable [str [4]]) <= 0) {
+            if ((digit = c2itable[str[4]]) <= 0) {
                 return digit < 0 ? 0 : number;
             }
             number += --digit << 2;
 
-            if ((digit = c2itable [str [5]]) <= 0) {
+            if ((digit = c2itable[str[5]]) <= 0) {
                 return digit < 0 ? 0 : number;
             }
             number += --digit >> 4;
@@ -833,15 +801,14 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             return number;
         }
 
-        public LSL_Integer llModPow (int a, int b, int c)
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+        public LSL_Integer llModPow(int a, int b, int c) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
                 return 0;
 
             long tmp = 0;
-            Math.DivRem (Convert.ToInt64 (Math.Pow (a, b)), c, out tmp);
-            PScriptSleep (m_sleepMsOnModPow);
-            return Convert.ToInt32 (tmp);
+            Math.DivRem(Convert.ToInt64(Math.Pow(a, b)), c, out tmp);
+            PScriptSleep(m_sleepMsOnModPow);
+            return Convert.ToInt32(tmp);
         }
 
 

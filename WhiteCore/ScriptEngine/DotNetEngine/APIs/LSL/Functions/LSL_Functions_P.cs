@@ -58,7 +58,7 @@ using GridRegion = WhiteCore.Framework.Services.GridRegion;
 using LSL_Float = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.LSLFloat;
 using LSL_Integer = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.LSLInteger;
 using LSL_Key = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.LSLString;
-using LSL_List = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.list;
+using LSL_List = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.List;
 using LSL_Rotation = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.Quaternion;
 using LSL_String = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.LSLString;
 using LSL_Vector = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.Vector3;
@@ -71,38 +71,36 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
     {
         // Xantor 20080528 PlaySound updated so it accepts an objectinventory name -or- a key to a sound
         // 20080530 Updated to remove code duplication
-        public void llPlaySound (string sound, double volume)
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+        public void llPlaySound(string sound, double volume) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
                 return;
 
 
             // send the sound, once, to all clients in range
-            m_host.SendSound (KeyOrName (sound, AssetType.Sound, true).ToString (), volume, false, 0, 0);
+            m_host.SendSound(KeyOrName(sound, AssetType.Sound, true).ToString(), volume, false, 0, 0);
         }
 
 
-        public void llPlaySoundSlave (string sound, double volume)
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+        public void llPlaySoundSlave(string sound, double volume) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
                 return;
 
 
             // send the sound, once, to all clients in range
             //This kinda works, but I haven't found a way to be able to tell the client to sync it with the looping master sound
             if (m_host.ParentEntity.LoopSoundMasterPrim != UUID.Zero) {
-                ISceneChildEntity part = m_host.ParentEntity.GetChildPart (m_host.ParentEntity.LoopSoundMasterPrim);
+                ISceneChildEntity part = m_host.ParentEntity.GetChildPart(m_host.ParentEntity.LoopSoundMasterPrim);
                 if (part != null) {
-                    foreach (IScenePresence sp in m_host.ParentEntity.Scene.GetScenePresences ()) {
+                    foreach (IScenePresence sp in m_host.ParentEntity.Scene.GetScenePresences()) {
                         //sp.ControllingClient.SendPlayAttachedSound(part.Sound, part.UUID, part.OwnerID, (float)part.SoundGain, (byte)SoundFlags.Stop);
-                        sp.ControllingClient.SendPlayAttachedSound (
-                            KeyOrName (sound, AssetType.Sound, true),
+                        sp.ControllingClient.SendPlayAttachedSound(
+                            KeyOrName(sound, AssetType.Sound, true),
                             m_host.UUID,
                             m_host.OwnerID,
-                            (float)(FloatAlmostEqual (m_host.SoundGain, 0) ? 1.0 : m_host.SoundGain),
+                            (float)(FloatAlmostEqual(m_host.SoundGain, 0) ? 1.0 : m_host.SoundGain),
                             (byte)(SoundFlags.Queue | SoundFlags.SyncMaster));
 
-                        sp.ControllingClient.SendPlayAttachedSound (
+                        sp.ControllingClient.SendPlayAttachedSound(
                             part.Sound,
                             part.UUID,
                             part.OwnerID,
@@ -113,33 +111,29 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
                     //    part.SendSound(part.Sound.ToString(), part.SoundGain, false, (int)(SoundFlags.Loop | SoundFlags.Queue), (float)part.SoundRadius);
                 }
             } else
-                m_host.SendSound (KeyOrName (sound, AssetType.Sound, true).ToString (), volume, false, 0, 0);
+                m_host.SendSound(KeyOrName(sound, AssetType.Sound, true).ToString(), volume, false, 0, 0);
         }
 
-        public DateTime llPreloadSound (string sound)
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+        public DateTime llPreloadSound(string sound) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
                 return DateTime.Now;
 
-            m_host.PreloadSound (sound);
-            return PScriptSleep (m_sleepMsOnPreloadSound);
+            m_host.PreloadSound(sound);
+            return PScriptSleep(m_sleepMsOnPreloadSound);
         }
 
-        public void llPointAt (LSL_Vector pos)
-        {
+        public void llPointAt(LSL_Vector pos) {
         }
 
-        public void llPassTouches (int pass)
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+        public void llPassTouches(int pass) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
                 return;
 
             m_host.PassTouch = pass;
         }
 
-        public void llPushObject (string target, LSL_Vector impulse, LSL_Vector ang_impulse, int local)
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+        public void llPushObject(string target, LSL_Vector impulse, LSL_Vector ang_impulse, int local) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
                 return;
 
             bool pushAllowed = false;
@@ -147,14 +141,14 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             bool pusheeIsAvatar = false;
             UUID targetID = UUID.Zero;
 
-            if (!UUID.TryParse (target, out targetID))
+            if (!UUID.TryParse(target, out targetID))
                 return;
 
             IScenePresence pusheeav = null;
             Vector3 PusheePos = Vector3.Zero;
             ISceneChildEntity pusheeob = null;
 
-            IScenePresence avatar = World.GetScenePresence (targetID);
+            IScenePresence avatar = World.GetScenePresence(targetID);
             if (avatar != null) {
                 pusheeIsAvatar = true;
 
@@ -167,7 +161,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
                 // Find pushee position
                 // Pushee Linked?
                 if (pusheeav.ParentID != UUID.Zero) {
-                    ISceneChildEntity parentobj = World.GetSceneObjectPart (pusheeav.ParentID);
+                    ISceneChildEntity parentobj = World.GetSceneObjectPart(pusheeav.ParentID);
                     PusheePos = parentobj != null ? parentobj.AbsolutePosition : pusheeav.AbsolutePosition;
                 } else {
                     PusheePos = pusheeav.AbsolutePosition;
@@ -176,7 +170,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
 
             if (!pusheeIsAvatar) {
                 // not an avatar so push is not affected by parcel flags
-                pusheeob = World.GetSceneObjectPart (UUID.Parse (target));
+                pusheeob = World.GetSceneObjectPart(UUID.Parse(target));
 
                 // We can't find object
                 if (pusheeob == null)
@@ -189,13 +183,13 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
                 PusheePos = pusheeob.AbsolutePosition;
                 pushAllowed = true;
             } else {
-                IParcelManagementModule parcelManagement = World.RequestModuleInterface<IParcelManagementModule> ();
+                IParcelManagementModule parcelManagement = World.RequestModuleInterface<IParcelManagementModule>();
                 if (World.RegionInfo.RegionSettings.RestrictPushing) {
                     pushAllowed = m_host.OwnerID == targetID ||
-                                  m_host.ParentEntity.Scene.Permissions.IsGod (m_host.OwnerID);
+                                  m_host.ParentEntity.Scene.Permissions.IsGod(m_host.OwnerID);
                 } else {
                     if (parcelManagement != null) {
-                        ILandObject targetlandObj = parcelManagement.GetLandObject (PusheePos.X, PusheePos.Y);
+                        ILandObject targetlandObj = parcelManagement.GetLandObject(PusheePos.X, PusheePos.Y);
                         if (targetlandObj == null)
                             // We didn't find the parcel but region isn't push restricted so assume it's ok
                             pushAllowed = true;
@@ -203,7 +197,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
                             // Parcel push restriction
                             pushAllowed = (targetlandObj.LandData.Flags & (uint)ParcelFlags.RestrictPushObject) !=
                                           (uint)ParcelFlags.RestrictPushObject ||
-                                          m_host.ParentEntity.Scene.Permissions.CanPushObject (m_host.OwnerID,
+                                          m_host.ParentEntity.Scene.Permissions.CanPushObject(m_host.OwnerID,
                                                                                               targetlandObj);
                         }
                     }
@@ -211,9 +205,9 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             }
 
             if (pushAllowed) {
-                float distance = (PusheePos - m_host.AbsolutePosition).Length ();
+                float distance = (PusheePos - m_host.AbsolutePosition).Length();
                 float distance_term = distance * distance * distance; // Script Energy
-                float pusher_mass = m_host.GetMass ();
+                float pusher_mass = m_host.GetMass();
 
                 const float PUSH_ATTENUATION_DISTANCE = 17f;
                 const float PUSH_ATTENUATION_SCALE = 5f;
@@ -223,9 +217,9 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
                     distance_attenuation = 1f / normalized_units;
                 }
 
-                Vector3 applied_linear_impulse = new Vector3 ((float)impulse.x, (float)impulse.y, (float)impulse.z);
+                Vector3 applied_linear_impulse = new Vector3((float)impulse.x, (float)impulse.y, (float)impulse.z);
                 {
-                    float impulse_length = applied_linear_impulse.Length ();
+                    float impulse_length = applied_linear_impulse.Length();
 
                     float desired_energy = impulse_length * pusher_mass;
                     if (desired_energy > 0f)
@@ -241,57 +235,55 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
 
                         if (pa != null) {
                             if (local != 0) {
-                                applied_linear_impulse *= m_host.GetWorldRotation ();
+                                applied_linear_impulse *= m_host.GetWorldRotation();
                             }
                             //Put a limit on it...
                             int MaxPush = (int)pusheeav.PhysicsActor.Mass * 25;
 
                             if (applied_linear_impulse.X > 0 &&
-                                Math.Abs (applied_linear_impulse.X) > MaxPush)
+                                Math.Abs(applied_linear_impulse.X) > MaxPush)
                                 applied_linear_impulse.X = MaxPush;
                             if (applied_linear_impulse.X < 0 &&
-                                Math.Abs (applied_linear_impulse.X) > MaxPush)
+                                Math.Abs(applied_linear_impulse.X) > MaxPush)
                                 applied_linear_impulse.X = -MaxPush;
 
                             if (applied_linear_impulse.Y > 0 &&
-                                Math.Abs (applied_linear_impulse.X) > MaxPush)
+                                Math.Abs(applied_linear_impulse.X) > MaxPush)
                                 applied_linear_impulse.Y = MaxPush;
                             if (applied_linear_impulse.Y < 0 &&
-                                Math.Abs (applied_linear_impulse.Y) > MaxPush)
+                                Math.Abs(applied_linear_impulse.Y) > MaxPush)
                                 applied_linear_impulse.Y = -MaxPush;
 
                             if (applied_linear_impulse.Z > 0 &&
-                                Math.Abs (applied_linear_impulse.X) > MaxPush)
+                                Math.Abs(applied_linear_impulse.X) > MaxPush)
                                 applied_linear_impulse.Z = MaxPush;
                             if (applied_linear_impulse.Z < 0 &&
-                                Math.Abs (applied_linear_impulse.Z) > MaxPush)
+                                Math.Abs(applied_linear_impulse.Z) > MaxPush)
                                 applied_linear_impulse.Z = -MaxPush;
 
-                            pa.AddForce (applied_linear_impulse, true);
+                            pa.AddForce(applied_linear_impulse, true);
                         }
                     }
                 } else {
                     if (pusheeob.PhysActor != null) {
-                        pusheeob.ApplyImpulse (applied_linear_impulse, local != 0);
+                        pusheeob.ApplyImpulse(applied_linear_impulse, local != 0);
                     }
                 }
             }
         }
 
-        public void llPassCollisions (int pass)
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+        public void llPassCollisions(int pass) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
                 return;
 
             m_host.PassCollisions = pass;
         }
 
-        public void llParticleSystem (LSL_List rules)
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+        public void llParticleSystem(LSL_List rules) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
                 return;
 
-            SetParticleSystem (m_host, rules);
+            SetParticleSystem(m_host, rules);
         }
 
         //  <summary>
@@ -325,29 +317,28 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
         //  The implementation tries to avoid any copying of arrays or other objects.
         //  </remarks>
 
-        LSL_List ParseString (string src, LSL_List separators, LSL_List spacers, bool keepNulls)
-        {
+        LSL_List ParseString(string src, LSL_List separators, LSL_List spacers, bool keepNulls) {
             int beginning = 0;
             int srclen = src.Length;
             int seplen = separators.Length;
-            object [] separray = separators.Data;
+            object[] separray = separators.Data;
             int spclen = spacers.Length;
-            object [] spcarray = spacers.Data;
+            object[] spcarray = spacers.Data;
             int mlen = seplen + spclen;
 
-            int [] offset = new int [mlen + 1];
-            bool [] active = new bool [mlen];
+            int[] offset = new int[mlen + 1];
+            bool[] active = new bool[mlen];
 
             //    Initial capacity reduces resize cost
 
-            LSL_List tokens = new LSL_List ();
+            LSL_List tokens = new LSL_List();
 
             //    All entries are initially valid
 
             for (int i = 0; i < mlen; i++)
-                active [i] = true;
+                active[i] = true;
 
-            offset [mlen] = srclen;
+            offset[mlen] = srclen;
 
             while (beginning < srclen) {
                 int best = mlen;
@@ -356,20 +347,20 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
 
                 int j;
                 for (j = 0; j < seplen; j++) {
-                    if (separray [j].ToString () == string.Empty)
-                        active [j] = false;
+                    if (separray[j].ToString() == string.Empty)
+                        active[j] = false;
 
-                    if (active [j]) {
+                    if (active[j]) {
                         // scan all of the markers
-                        if ((offset [j] = src.IndexOf (separray [j].ToString (), beginning, StringComparison.Ordinal)) == -1) {
+                        if ((offset[j] = src.IndexOf(separray[j].ToString(), beginning, StringComparison.Ordinal)) == -1) {
                             // not present at all
-                            active [j] = false;
+                            active[j] = false;
                         } else {
                             // present and correct
-                            if (offset [j] < offset [best]) {
+                            if (offset[j] < offset[best]) {
                                 // closest so far
                                 best = j;
-                                if (offset [best] == beginning)
+                                if (offset[best] == beginning)
                                     break;
                             }
                         }
@@ -378,19 +369,19 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
 
                 //    Scan for spacers
 
-                if (offset [best] != beginning) {
-                    for (j = seplen; (j < mlen) && (offset [best] > beginning); j++) {
-                        if (spcarray [j - seplen].ToString () == string.Empty)
-                            active [j] = false;
+                if (offset[best] != beginning) {
+                    for (j = seplen; (j < mlen) && (offset[best] > beginning); j++) {
+                        if (spcarray[j - seplen].ToString() == string.Empty)
+                            active[j] = false;
 
-                        if (active [j]) {
+                        if (active[j]) {
                             // scan all of the markers
-                            if ((offset [j] = src.IndexOf (spcarray [j - seplen].ToString (), beginning, StringComparison.Ordinal)) == -1) {
+                            if ((offset[j] = src.IndexOf(spcarray[j - seplen].ToString(), beginning, StringComparison.Ordinal)) == -1) {
                                 // not present at all
-                                active [j] = false;
+                                active[j] = false;
                             } else {
                                 // present and correct
-                                if (offset [j] < offset [best]) {
+                                if (offset[j] < offset[best]) {
                                     // closest so far
                                     best = j;
                                 }
@@ -405,22 +396,22 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
                     // no markers were found on this pass
                     // so we're pretty much done
                     if ((keepNulls) || ((srclen - beginning) > 0))
-                        tokens.Add (new LSL_String (src.Substring (beginning, srclen - beginning)));
+                        tokens.Add(new LSL_String(src.Substring(beginning, srclen - beginning)));
                     break;
                 }
 
                 //    Otherwise we just add the newly delimited token
                 //    and recalculate where the search should continue.
-                if ((keepNulls) || ((offset [best] - beginning) > 0))
-                    tokens.Add (new LSL_String (src.Substring (beginning, offset [best] - beginning)));
+                if ((keepNulls) || ((offset[best] - beginning) > 0))
+                    tokens.Add(new LSL_String(src.Substring(beginning, offset[best] - beginning)));
 
                 if (best < seplen) {
-                    beginning = offset [best] + (separray [best].ToString ()).Length;
+                    beginning = offset[best] + (separray[best].ToString()).Length;
                 } else {
-                    beginning = offset [best] + (spcarray [best - seplen].ToString ()).Length;
-                    string str = spcarray [best - seplen].ToString ();
+                    beginning = offset[best] + (spcarray[best - seplen].ToString()).Length;
+                    string str = spcarray[best - seplen].ToString();
                     if ((keepNulls) || ((str.Length > 0)))
-                        tokens.Add (new LSL_String (str));
+                        tokens.Add(new LSL_String(str));
                 }
             }
 
@@ -432,41 +423,38 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
 
             if ((beginning == srclen) && (keepNulls)) {
                 if (srclen != 0)
-                    tokens.Add (new LSL_String (""));
+                    tokens.Add(new LSL_String(""));
             }
 
             return tokens;
         }
 
-        public LSL_List llParseString2List (string src, LSL_List separators, LSL_List spacers)
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "llParseString2List", m_host, "LSL", m_itemID))
-                return new LSL_List ();
-            return ParseString (src, separators, spacers, false);
+        public LSL_List llParseString2List(string src, LSL_List separators, LSL_List spacers) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "llParseString2List", m_host, "LSL", m_itemID))
+                return new LSL_List();
+            return ParseString(src, separators, spacers, false);
         }
 
-        public LSL_List llParseStringKeepNulls (string src, LSL_List separators, LSL_List spacers)
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "llParseStringKeepNulls", m_host, "LSL", m_itemID))
-                return new LSL_List ();
-            return ParseString (src, separators, spacers, true);
+        public LSL_List llParseStringKeepNulls(string src, LSL_List separators, LSL_List spacers) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "llParseStringKeepNulls", m_host, "LSL", m_itemID))
+                return new LSL_List();
+            return ParseString(src, separators, spacers, true);
         }
 
-        public DateTime llParcelMediaCommandList (LSL_List commandList)
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+        public DateTime llParcelMediaCommandList(LSL_List commandList) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
                 return DateTime.Now;
 
 
             // according to the docs, this command only works if script owner and land owner are the same
             // lets add estate owners and gods, too, and use the generic permission check.
-            IParcelManagementModule parcelManagement = World.RequestModuleInterface<IParcelManagementModule> ();
+            IParcelManagementModule parcelManagement = World.RequestModuleInterface<IParcelManagementModule>();
             if (parcelManagement != null) {
-                ILandObject landObject = parcelManagement.GetLandObject (m_host.AbsolutePosition.X,
+                ILandObject landObject = parcelManagement.GetLandObject(m_host.AbsolutePosition.X,
                                                                         m_host.AbsolutePosition.Y);
                 if (landObject == null)
                     return DateTime.Now;
-                if (!World.Permissions.CanEditParcel (m_host.OwnerID, landObject))
+                if (!World.Permissions.CanEditParcel(m_host.OwnerID, landObject))
                     return DateTime.Now;
 
                 bool update = false; // send a ParcelMediaUpdate (and possibly change the land's media URL)?
@@ -474,7 +462,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
 
                 LandData landData = landObject.LandData;
                 string url = landData.MediaURL;
-                string texture = landData.MediaID.ToString ();
+                string texture = landData.MediaID.ToString();
                 bool autoAlign = landData.MediaAutoScale != 0;
                 string mediaType = landData.MediaType;
                 string description = landData.MediaDescription;
@@ -488,128 +476,128 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
                 IScenePresence presence = null;
 
                 for (int i = 0; i < commandList.Data.Length; i++) {
-                    int tmp = ((LSL_Integer)commandList.Data [i]).value;
+                    int tmp = ((LSL_Integer)commandList.Data[i]).value;
                     ParcelMediaCommandEnum command = (ParcelMediaCommandEnum)tmp;
                     switch (command) {
-                    case ParcelMediaCommandEnum.Agent:
-                        // we send only to one agent
-                        if ((i + 1) < commandList.Length) {
-                            if (commandList.Data [i + 1] is LSL_String) {
-                                UUID agentID;
-                                if (UUID.TryParse ((LSL_String)commandList.Data [i + 1], out agentID)) {
-                                    presence = World.GetScenePresence (agentID);
-                                }
-                            } else Error ("llParcelMediaCommandList", "The argument of PARCEL_MEDIA_COMMAND_AGENT must be a key");
-                            ++i;
-                        }
-                        break;
+                        case ParcelMediaCommandEnum.Agent:
+                            // we send only to one agent
+                            if ((i + 1) < commandList.Length) {
+                                if (commandList.Data[i + 1] is LSL_String) {
+                                    UUID agentID;
+                                    if (UUID.TryParse((LSL_String)commandList.Data[i + 1], out agentID)) {
+                                        presence = World.GetScenePresence(agentID);
+                                    }
+                                } else Error("llParcelMediaCommandList", "The argument of PARCEL_MEDIA_COMMAND_AGENT must be a key");
+                                ++i;
+                            }
+                            break;
 
-                    case ParcelMediaCommandEnum.Loop:
-                        loop = 1;
-                        commandToSend = command;
-                        update = true; //need to send the media update packet to set looping
-                        break;
+                        case ParcelMediaCommandEnum.Loop:
+                            loop = 1;
+                            commandToSend = command;
+                            update = true; //need to send the media update packet to set looping
+                            break;
 
-                    case ParcelMediaCommandEnum.LoopSet:
-                        if ((i + 1) < commandList.Length) {
-                            if (commandList.Data [i + 1] is LSL_Float) {
-                                mediaLoopSet = (float)((LSL_Float)commandList.Data [i + 1]).value;
-                            } else Error ("llParcelMediaCommandList", "The argument of PARCEL_MEDIA_COMMAND_LOOP_SET must be a float");
-                            ++i;
-                        }
-                        commandToSend = command;
-                        break;
+                        case ParcelMediaCommandEnum.LoopSet:
+                            if ((i + 1) < commandList.Length) {
+                                if (commandList.Data[i + 1] is LSL_Float) {
+                                    mediaLoopSet = (float)((LSL_Float)commandList.Data[i + 1]).value;
+                                } else Error("llParcelMediaCommandList", "The argument of PARCEL_MEDIA_COMMAND_LOOP_SET must be a float");
+                                ++i;
+                            }
+                            commandToSend = command;
+                            break;
 
-                    case ParcelMediaCommandEnum.Play:
-                        loop = 0;
-                        commandToSend = command;
-                        update = true; //need to send the media update packet to make sure it doesn't loop
-                        break;
+                        case ParcelMediaCommandEnum.Play:
+                            loop = 0;
+                            commandToSend = command;
+                            update = true; //need to send the media update packet to make sure it doesn't loop
+                            break;
 
-                    case ParcelMediaCommandEnum.Pause:
-                    case ParcelMediaCommandEnum.Stop:
-                    case ParcelMediaCommandEnum.Unload:
-                        commandToSend = command;
-                        break;
+                        case ParcelMediaCommandEnum.Pause:
+                        case ParcelMediaCommandEnum.Stop:
+                        case ParcelMediaCommandEnum.Unload:
+                            commandToSend = command;
+                            break;
 
-                    case ParcelMediaCommandEnum.Url:
-                        if ((i + 1) < commandList.Length) {
-                            if (commandList.Data [i + 1] is LSL_String) {
-                                url = (LSL_String)commandList.Data [i + 1];
-                                update = true;
-                            } else Error ("llParcelMediaCommandList", "The argument of PARCEL_MEDIA_COMMAND_URL must be a string.");
-                            ++i;
-                        }
-                        break;
+                        case ParcelMediaCommandEnum.Url:
+                            if ((i + 1) < commandList.Length) {
+                                if (commandList.Data[i + 1] is LSL_String) {
+                                    url = (LSL_String)commandList.Data[i + 1];
+                                    update = true;
+                                } else Error("llParcelMediaCommandList", "The argument of PARCEL_MEDIA_COMMAND_URL must be a string.");
+                                ++i;
+                            }
+                            break;
 
-                    case ParcelMediaCommandEnum.Texture:
-                        if ((i + 1) < commandList.Length) {
-                            if (commandList.Data [i + 1] is LSL_String) {
-                                texture = (LSL_String)commandList.Data [i + 1];
-                                update = true;
-                            } else
-                                Error ("llParcelMediaCommandList", "The argument of PARCEL_MEDIA_COMMAND_TEXTURE must be a string or key.");
-                            ++i;
-                        }
-                        break;
-
-                    case ParcelMediaCommandEnum.Time:
-                        if ((i + 1) < commandList.Length) {
-                            if (commandList.Data [i + 1] is LSL_Float) {
-                                time = (float)(LSL_Float)commandList.Data [i + 1];
-                            } else Error ("llParcelMediaCommandList", "The argument of PARCEL_MEDIA_COMMAND_TIME must be a float.");
-                            ++i;
-                        }
-                        commandToSend = command;
-                        break;
-
-                    case ParcelMediaCommandEnum.AutoAlign:
-                        if ((i + 1) < commandList.Length) {
-                            if (commandList.Data [i + 1] is LSL_Integer) {
-                                autoAlign = (LSL_Integer)commandList.Data [i + 1];
-                                update = true;
-                            } else Error ("llParcelMediaCommandList", "The argument of PARCEL_MEDIA_COMMAND_AUTO_ALIGN must be an integer.");
-                            ++i;
-                        }
-                        break;
-
-                    case ParcelMediaCommandEnum.Type:
-                        if ((i + 1) < commandList.Length) {
-                            if (commandList.Data [i + 1] is LSL_String) {
-                                mediaType = (LSL_String)commandList.Data [i + 1];
-                                update = true;
-                            } else Error ("llParcelMediaCommandList", "The argument of PARCEL_MEDIA_COMMAND_TYPE must be a string.");
-                            ++i;
-                        }
-                        break;
-
-                    case ParcelMediaCommandEnum.Desc:
-                        if ((i + 1) < commandList.Length) {
-                            if (commandList.Data [i + 1] is LSL_String) {
-                                description = (LSL_String)commandList.Data [i + 1];
-                                update = true;
-                            } else Error ("llParcelMediaCommandList", "The argument of PARCEL_MEDIA_COMMAND_DESC must be a string.");
-                            ++i;
-                        }
-                        break;
-                    case ParcelMediaCommandEnum.Size:
-                        if ((i + 2) < commandList.Length) {
-                            if (commandList.Data [i + 1] is LSL_Integer) {
-                                if (commandList.Data [i + 2] is LSL_Integer) {
-                                    width = (LSL_Integer)commandList.Data [i + 1];
-                                    height = (LSL_Integer)commandList.Data [i + 2];
+                        case ParcelMediaCommandEnum.Texture:
+                            if ((i + 1) < commandList.Length) {
+                                if (commandList.Data[i + 1] is LSL_String) {
+                                    texture = (LSL_String)commandList.Data[i + 1];
                                     update = true;
                                 } else
-                                    Error ("llParcelMediaCommandList", "The second argument of PARCEL_MEDIA_COMMAND_SIZE must be an integer.");
-                            } else Error ("llParcelMediaCommandList", "The first argument of PARCEL_MEDIA_COMMAND_SIZE must be an integer.");
-                            i += 2;
-                        }
-                        break;
+                                    Error("llParcelMediaCommandList", "The argument of PARCEL_MEDIA_COMMAND_TEXTURE must be a string or key.");
+                                ++i;
+                            }
+                            break;
 
-                    default:
-                        NotImplemented ("llParcelMediaCommandList", "Parameter not supported yet: " +
-                                       Enum.Parse (typeof (ParcelMediaCommandEnum), commandList.Data [i].ToString ()));
-                        break;
+                        case ParcelMediaCommandEnum.Time:
+                            if ((i + 1) < commandList.Length) {
+                                if (commandList.Data[i + 1] is LSL_Float) {
+                                    time = (float)(LSL_Float)commandList.Data[i + 1];
+                                } else Error("llParcelMediaCommandList", "The argument of PARCEL_MEDIA_COMMAND_TIME must be a float.");
+                                ++i;
+                            }
+                            commandToSend = command;
+                            break;
+
+                        case ParcelMediaCommandEnum.AutoAlign:
+                            if ((i + 1) < commandList.Length) {
+                                if (commandList.Data[i + 1] is LSL_Integer) {
+                                    autoAlign = (LSL_Integer)commandList.Data[i + 1];
+                                    update = true;
+                                } else Error("llParcelMediaCommandList", "The argument of PARCEL_MEDIA_COMMAND_AUTO_ALIGN must be an integer.");
+                                ++i;
+                            }
+                            break;
+
+                        case ParcelMediaCommandEnum.Type:
+                            if ((i + 1) < commandList.Length) {
+                                if (commandList.Data[i + 1] is LSL_String) {
+                                    mediaType = (LSL_String)commandList.Data[i + 1];
+                                    update = true;
+                                } else Error("llParcelMediaCommandList", "The argument of PARCEL_MEDIA_COMMAND_TYPE must be a string.");
+                                ++i;
+                            }
+                            break;
+
+                        case ParcelMediaCommandEnum.Desc:
+                            if ((i + 1) < commandList.Length) {
+                                if (commandList.Data[i + 1] is LSL_String) {
+                                    description = (LSL_String)commandList.Data[i + 1];
+                                    update = true;
+                                } else Error("llParcelMediaCommandList", "The argument of PARCEL_MEDIA_COMMAND_DESC must be a string.");
+                                ++i;
+                            }
+                            break;
+                        case ParcelMediaCommandEnum.Size:
+                            if ((i + 2) < commandList.Length) {
+                                if (commandList.Data[i + 1] is LSL_Integer) {
+                                    if (commandList.Data[i + 2] is LSL_Integer) {
+                                        width = (LSL_Integer)commandList.Data[i + 1];
+                                        height = (LSL_Integer)commandList.Data[i + 2];
+                                        update = true;
+                                    } else
+                                        Error("llParcelMediaCommandList", "The second argument of PARCEL_MEDIA_COMMAND_SIZE must be an integer.");
+                                } else Error("llParcelMediaCommandList", "The first argument of PARCEL_MEDIA_COMMAND_SIZE must be an integer.");
+                                i += 2;
+                            }
+                            break;
+
+                        default:
+                            NotImplemented("llParcelMediaCommandList", "Parameter not supported yet: " +
+                                           Enum.Parse(typeof(ParcelMediaCommandEnum), commandList.Data[i].ToString()));
+                            break;
                     } //end switch
                 } //end for
 
@@ -620,7 +608,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
                 if (update) {
                     if (presence == null) {
                         // we send to all
-                        landData.MediaID = new UUID (texture);
+                        landData.MediaID = new UUID(texture);
                         landData.MediaAutoScale = autoAlign ? (byte)1 : (byte)0;
                         landData.MediaWidth = width;
                         landData.MediaHeight = height;
@@ -630,13 +618,13 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
                         landData.MediaLoopSet = mediaLoopSet;
 
                         // do that one last, it will cause a ParcelPropertiesUpdate
-                        landObject.SetMediaUrl (url);
+                        landObject.SetMediaUrl(url);
 
                         // now send to all (non-child) agents
-                        World.ForEachScenePresence (delegate (IScenePresence sp) {
+                        World.ForEachScenePresence(delegate (IScenePresence sp) {
                             if (!sp.IsChildAgent &&
                                 (sp.CurrentParcelUUID == landData.GlobalID)) {
-                                sp.ControllingClient.SendParcelMediaUpdate (
+                                sp.ControllingClient.SendParcelMediaUpdate(
                                     landData.MediaURL,
                                     landData.MediaID,
                                     landData.MediaAutoScale,
@@ -648,8 +636,8 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
                         });
                     } else if (!presence.IsChildAgent) {
                         // we only send to one (root) agent
-                        presence.ControllingClient.SendParcelMediaUpdate (url,
-                                                                         new UUID (texture),
+                        presence.ControllingClient.SendParcelMediaUpdate(url,
+                                                                         new UUID(texture),
                                                                          autoAlign ? (byte)1 : (byte)0,
                                                                          mediaType,
                                                                          description,
@@ -666,120 +654,118 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
                     // the commandList contained a start/stop/... command, too
                     if (presence == null) {
                         // send to all (non-child) agents
-                        World.ForEachScenePresence (delegate (IScenePresence sp) {
+                        World.ForEachScenePresence(delegate (IScenePresence sp) {
                             if (!sp.IsChildAgent) {
-                                sp.ControllingClient.SendParcelMediaCommand (
+                                sp.ControllingClient.SendParcelMediaCommand(
                                     landData.Flags,
                                     (ParcelMediaCommandEnum)commandToSend,
                                     ParamToSend);
                             }
                         });
                     } else if (!presence.IsChildAgent) {
-                        presence.ControllingClient.SendParcelMediaCommand (landData.Flags,
+                        presence.ControllingClient.SendParcelMediaCommand(landData.Flags,
                                                                           (ParcelMediaCommandEnum)commandToSend,
                                                                           ParamToSend);
                     }
                 }
             }
-            return PScriptSleep (m_sleepMsOnParcelMediaCommandList);
+            return PScriptSleep(m_sleepMsOnParcelMediaCommandList);
         }
 
-        public LSL_List llParcelMediaQuery (LSL_List aList)
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
-                return new LSL_List ();
+        public LSL_List llParcelMediaQuery(LSL_List aList) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+                return new LSL_List();
 
-            LSL_List list = new LSL_List ();
+            LSL_List list = new LSL_List();
             foreach (object t in aList.Data) {
                 if (t != null) {
-                    IParcelManagementModule parcelManagement = World.RequestModuleInterface<IParcelManagementModule> ();
+                    IParcelManagementModule parcelManagement = World.RequestModuleInterface<IParcelManagementModule>();
                     if (parcelManagement != null) {
                         LSL_Integer tmp = (LSL_Integer)t;
                         switch ((ParcelMediaCommandEnum)tmp.value) {
-                        case ParcelMediaCommandEnum.Url:
-                            list.Add (
-                                new LSL_String (
-                                    parcelManagement.GetLandObject (m_host.AbsolutePosition.X,
-                                                                   m_host.AbsolutePosition.Y).LandData.MediaURL));
-                            break;
-                        case ParcelMediaCommandEnum.Desc:
-                            list.Add (
-                                new LSL_String (
-                                    parcelManagement.GetLandObject (m_host.AbsolutePosition.X,
-                                                                   m_host.AbsolutePosition.Y)
-                                                    .LandData.MediaDescription));
-                            break;
-                        case ParcelMediaCommandEnum.Texture:
-                            list.Add (
-                                new LSL_String (
-                                    parcelManagement.GetLandObject (m_host.AbsolutePosition.X,
-                                                                   m_host.AbsolutePosition.Y)
-                                                    .LandData.MediaID.ToString ()));
-                            break;
-                        case ParcelMediaCommandEnum.Type:
-                            list.Add (
-                                new LSL_String (
-                                    parcelManagement.GetLandObject (m_host.AbsolutePosition.X,
-                                                                   m_host.AbsolutePosition.Y).LandData.MediaType));
-                            break;
-                        case ParcelMediaCommandEnum.Loop:
-                            list.Add (
-                                new LSL_Integer (
-                                    parcelManagement.GetLandObject (m_host.AbsolutePosition.X,
-                                                                   m_host.AbsolutePosition.Y).LandData.MediaLoop
-                                        ? 1
-                                        : 0));
-                            break;
-                        case ParcelMediaCommandEnum.LoopSet:
-                            list.Add (
-                                new LSL_Integer (
-                                    parcelManagement.GetLandObject (m_host.AbsolutePosition.X,
-                                                                   m_host.AbsolutePosition.Y).LandData.MediaLoopSet));
-                            break;
-                        case ParcelMediaCommandEnum.Size:
-                            list.Add (
-                                new LSL_String (
-                                    parcelManagement.GetLandObject (m_host.AbsolutePosition.X,
-                                                                   m_host.AbsolutePosition.Y).LandData.MediaHeight));
-                            list.Add (
-                                new LSL_String (
-                                    parcelManagement.GetLandObject (m_host.AbsolutePosition.X,
-                                                                   m_host.AbsolutePosition.Y).LandData.MediaWidth));
-                            break;
-                        default:
-                            const ParcelMediaCommandEnum mediaCommandEnum = ParcelMediaCommandEnum.Url;
-                            NotImplemented ("llParcelMediaQuery", "Parameter not supported yet: " +
-                                           Enum.Parse (mediaCommandEnum.GetType (), t.ToString ()));
-                            break;
+                            case ParcelMediaCommandEnum.Url:
+                                list.Add(
+                                    new LSL_String(
+                                        parcelManagement.GetLandObject(m_host.AbsolutePosition.X,
+                                                                       m_host.AbsolutePosition.Y).LandData.MediaURL));
+                                break;
+                            case ParcelMediaCommandEnum.Desc:
+                                list.Add(
+                                    new LSL_String(
+                                        parcelManagement.GetLandObject(m_host.AbsolutePosition.X,
+                                                                       m_host.AbsolutePosition.Y)
+                                                        .LandData.MediaDescription));
+                                break;
+                            case ParcelMediaCommandEnum.Texture:
+                                list.Add(
+                                    new LSL_String(
+                                        parcelManagement.GetLandObject(m_host.AbsolutePosition.X,
+                                                                       m_host.AbsolutePosition.Y)
+                                                        .LandData.MediaID.ToString()));
+                                break;
+                            case ParcelMediaCommandEnum.Type:
+                                list.Add(
+                                    new LSL_String(
+                                        parcelManagement.GetLandObject(m_host.AbsolutePosition.X,
+                                                                       m_host.AbsolutePosition.Y).LandData.MediaType));
+                                break;
+                            case ParcelMediaCommandEnum.Loop:
+                                list.Add(
+                                    new LSL_Integer(
+                                        parcelManagement.GetLandObject(m_host.AbsolutePosition.X,
+                                                                       m_host.AbsolutePosition.Y).LandData.MediaLoop
+                                            ? 1
+                                            : 0));
+                                break;
+                            case ParcelMediaCommandEnum.LoopSet:
+                                list.Add(
+                                    new LSL_Integer(
+                                        parcelManagement.GetLandObject(m_host.AbsolutePosition.X,
+                                                                       m_host.AbsolutePosition.Y).LandData.MediaLoopSet));
+                                break;
+                            case ParcelMediaCommandEnum.Size:
+                                list.Add(
+                                    new LSL_String(
+                                        parcelManagement.GetLandObject(m_host.AbsolutePosition.X,
+                                                                       m_host.AbsolutePosition.Y).LandData.MediaHeight));
+                                list.Add(
+                                    new LSL_String(
+                                        parcelManagement.GetLandObject(m_host.AbsolutePosition.X,
+                                                                       m_host.AbsolutePosition.Y).LandData.MediaWidth));
+                                break;
+                            default:
+                                const ParcelMediaCommandEnum mediaCommandEnum = ParcelMediaCommandEnum.Url;
+                                NotImplemented("llParcelMediaQuery", "Parameter not supported yet: " +
+                                               Enum.Parse(mediaCommandEnum.GetType(), t.ToString()));
+                                break;
                         }
                     }
                 }
             }
-            PScriptSleep (m_sleepMsOnParcelMediaQuery);
+            PScriptSleep(m_sleepMsOnParcelMediaQuery);
             return list;
         }
 
 
-        public void llPursue (LSL_String target, LSL_List options)
-        {
-            IBotManager botManager = World.RequestModuleInterface<IBotManager> ();
+        public void llPursue(LSL_String target, LSL_List options) {
+            IBotManager botManager = World.RequestModuleInterface<IBotManager>();
             if (botManager != null) {
                 float fuzz = 2;
                 Vector3 offset = Vector3.Zero;
                 bool requireLOS = false;
                 // 20131224 not used                bool intercept;  = false; //Not implemented
                 for (int i = 0; i < options.Length; i += 2) {
-                    LSL_Integer opt = options.GetLSLIntegerItem (i);
+                    LSL_Integer opt = options.GetLSLIntegerItem(i);
                     if (opt == ScriptBaseClass.PURSUIT_FUZZ_FACTOR)
-                        fuzz = (float)options.GetLSLFloatItem (i + 1).value;
+                        fuzz = (float)options.GetLSLFloatItem(i + 1).value;
                     if (opt == ScriptBaseClass.PURSUIT_OFFSET)
-                        offset = options.GetVector3Item (i + 1).ToVector3 ();
+                        offset = options.GetVector3Item(i + 1).ToVector3();
                     if (opt == ScriptBaseClass.REQUIRE_LINE_OF_SIGHT)
-                        requireLOS = options.GetLSLIntegerItem (i + 1) == 1;
+                        requireLOS = options.GetLSLIntegerItem(i + 1) == 1;
                     // 20131224 not used                    if (opt == ScriptBaseClass.PURSUIT_INTERCEPT)
                     // 20131224 not used                        intercept = options.GetLSLIntegerItem(i + 1) == 1;
                 }
-                botManager.FollowAvatar (m_host.ParentEntity.UUID, target.m_string, fuzz, fuzz, requireLOS, offset,
+                botManager.FollowAvatar(m_host.ParentEntity.UUID, target.m_string, fuzz, fuzz, requireLOS, offset,
                                         m_host.ParentEntity.OwnerID);
             }
         }

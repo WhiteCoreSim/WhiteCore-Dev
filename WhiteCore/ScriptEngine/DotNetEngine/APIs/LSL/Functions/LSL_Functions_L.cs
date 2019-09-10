@@ -58,7 +58,7 @@ using GridRegion = WhiteCore.Framework.Services.GridRegion;
 using LSL_Float = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.LSLFloat;
 using LSL_Integer = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.LSLInteger;
 using LSL_Key = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.LSLString;
-using LSL_List = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.list;
+using LSL_List = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.List;
 using LSL_Rotation = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.Quaternion;
 using LSL_String = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.LSLString;
 using LSL_Vector = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.Vector3;
@@ -72,57 +72,52 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
 
 
 
-        public void llLookAt (LSL_Vector target, double strength, double damping)
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+        public void llLookAt(LSL_Vector target, double strength, double damping) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
                 return;
 
-            LookAt (target, strength, damping, m_host);
+            LookAt(target, strength, damping, m_host);
         }
 
         // 04122016 Fly-Man-
         // This function is unknown on the SL Wiki
-        public void llLinkLookAt (LSL_Integer link, LSL_Vector target, double strength, double damping)
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+        public void llLinkLookAt(LSL_Integer link, LSL_Vector target, double strength, double damping) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
                 return;
 
-            List<ISceneChildEntity> parts = GetLinkParts (link);
+            List<ISceneChildEntity> parts = GetLinkParts(link);
 
             foreach (ISceneChildEntity part in parts)
-                LookAt (target, strength, damping, part);
+                LookAt(target, strength, damping, part);
         }
 
 
         // 04122016 Fly-Man-
         // This function is unknown on the SL Wiki
-        public void llLinkRotLookAt (LSL_Integer link, LSL_Rotation target, double strength, double damping)
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+        public void llLinkRotLookAt(LSL_Integer link, LSL_Rotation target, double strength, double damping) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
                 return;
 
-            Quaternion rot = new Quaternion ((float)target.x, (float)target.y, (float)target.z, (float)target.s);
-            List<ISceneChildEntity> parts = GetLinkParts (link);
+            Quaternion rot = new Quaternion((float)target.x, (float)target.y, (float)target.z, (float)target.s);
+            List<ISceneChildEntity> parts = GetLinkParts(link);
 
             foreach (ISceneChildEntity part in parts)
-                part.RotLookAt (rot, (float)strength, (float)damping);
+                part.RotLookAt(rot, (float)strength, (float)damping);
         }
 
-        public LSL_List llListSort (LSL_List src, int stride, int ascending)
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
-                return new LSL_List ();
+        public LSL_List llListSort(LSL_List src, int stride, int ascending) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+                return new LSL_List();
 
 
             if (stride <= 0) {
                 stride = 1;
             }
-            return src.Sort (stride, ascending);
+            return src.Sort(stride, ascending);
         }
 
-        public LSL_Integer llList2Integer (LSL_List src, int index)
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+        public LSL_Integer llList2Integer(LSL_List src, int index) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
                 return 0;
 
             if (index < 0) {
@@ -132,11 +127,11 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
                 return 0;
             }
             try {
-                if (src.Data [index] is LSL_Integer)
-                    return (LSL_Integer)src.Data [index];
-                if (src.Data [index] is LSL_Float)
-                    return Convert.ToInt32 (((LSL_Float)src.Data [index]).value);
-                return new LSL_Integer (src.Data [index].ToString ());
+                if (src.Data[index] is LSL_Integer)
+                    return (LSL_Integer)src.Data[index];
+                if (src.Data[index] is LSL_Float)
+                    return Convert.ToInt32(((LSL_Float)src.Data[index]).value);
+                return new LSL_Integer(src.Data[index].ToString());
             } catch (FormatException) {
                 return 0;
             } catch (InvalidCastException) {
@@ -144,10 +139,9 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             }
         }
 
-        public LSL_Float llList2Float (LSL_List src, int index)
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
-                return new LSL_Float ();
+        public LSL_Float llList2Float(LSL_List src, int index) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+                return new LSL_Float();
 
             if (index < 0) {
                 index = src.Length + index;
@@ -156,13 +150,13 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
                 return 0.0;
             }
             try {
-                if (src.Data [index] is LSL_Integer)
-                    return Convert.ToDouble (((LSL_Integer)src.Data [index]).value);
-                if (src.Data [index] is LSL_Float)
-                    return Convert.ToDouble (((LSL_Float)src.Data [index]).value);
-                if (src.Data [index] is LSL_String)
-                    return Convert.ToDouble (((LSL_String)src.Data [index]).m_string);
-                return Convert.ToDouble (src.Data [index]);
+                if (src.Data[index] is LSL_Integer)
+                    return Convert.ToDouble(((LSL_Integer)src.Data[index]).value);
+                if (src.Data[index] is LSL_Float)
+                    return Convert.ToDouble(((LSL_Float)src.Data[index]).value);
+                if (src.Data[index] is LSL_String)
+                    return Convert.ToDouble(((LSL_String)src.Data[index]).m_string);
+                return Convert.ToDouble(src.Data[index]);
             } catch (FormatException) {
                 return 0.0;
             } catch (InvalidCastException) {
@@ -170,9 +164,8 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             }
         }
 
-        public LSL_String llList2String (LSL_List src, int index)
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+        public LSL_String llList2String(LSL_List src, int index) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
                 return "";
 
             if (index < 0) {
@@ -181,12 +174,11 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             if (index >= src.Length || index < 0) {
                 return string.Empty;
             }
-            return new LSL_String (src.Data [index].ToString ());
+            return new LSL_String(src.Data[index].ToString());
         }
 
-        public LSL_String llList2Key (LSL_List src, int index)
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+        public LSL_String llList2Key(LSL_List src, int index) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
                 return "";
 
             if (index < 0) {
@@ -195,49 +187,46 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             if (index >= src.Length || index < 0) {
                 return "";
             }
-            return src.Data [index].ToString ();
+            return src.Data[index].ToString();
         }
 
-        public LSL_Vector llList2Vector (LSL_List src, int index)
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
-                return new LSL_Vector ();
+        public LSL_Vector llList2Vector(LSL_List src, int index) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+                return new LSL_Vector();
 
             if (index < 0) {
                 index = src.Length + index;
             }
             if (index >= src.Length || index < 0) {
-                return new LSL_Vector (0, 0, 0);
+                return new LSL_Vector(0, 0, 0);
             }
-            if (src.Data [index] is LSL_Vector) {
-                return (LSL_Vector)src.Data [index];
+            if (src.Data[index] is LSL_Vector) {
+                return (LSL_Vector)src.Data[index];
             }
-            return new LSL_Vector (src.Data [index].ToString ());
+            return new LSL_Vector(src.Data[index].ToString());
         }
 
-        public LSL_Rotation llList2Rot (LSL_List src, int index)
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
-                return new LSL_Rotation ();
+        public LSL_Rotation llList2Rot(LSL_List src, int index) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+                return new LSL_Rotation();
 
             if (index < 0) {
                 index = src.Length + index;
             }
             if (index >= src.Length || index < 0) {
-                return new LSL_Rotation (0, 0, 0, 1);
+                return new LSL_Rotation(0, 0, 0, 1);
             }
-            if (src.Data [index] is LSL_Rotation) {
-                return (LSL_Rotation)src.Data [index];
+            if (src.Data[index] is LSL_Rotation) {
+                return (LSL_Rotation)src.Data[index];
             }
-            return new LSL_Rotation (src.Data [index].ToString ());
+            return new LSL_Rotation(src.Data[index].ToString());
         }
 
-        public LSL_List llList2List (LSL_List src, int start, int end)
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
-                return new LSL_List ();
+        public LSL_List llList2List(LSL_List src, int start, int end) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+                return new LSL_List();
 
-            return src.GetSublist (start, end);
+            return src.GetSublist(start, end);
         }
 
 
@@ -247,19 +236,18 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
         ///     separated list. There is a space after
         ///     each comma.
         /// </summary>
-        public LSL_String llList2CSV (LSL_List src)
-        {
+        public LSL_String llList2CSV(LSL_List src) {
             string ret = string.Empty;
             int x = 0;
 
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
                 return "";
 
 
             if (src.Data.Length > 0) {
-                ret = src.Data [x++].ToString ();
+                ret = src.Data[x++].ToString();
                 for (; x < src.Data.Length; x++) {
-                    ret += ", " + src.Data [x].ToString ();
+                    ret += ", " + src.Data[x].ToString();
                 }
             }
 
@@ -276,13 +264,12 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
         ///     This could take a while for very large list
         ///     sizes.
         /// </remarks>
-        public LSL_List llListRandomize (LSL_List src, int stride)
-        {
+        public LSL_List llListRandomize(LSL_List src, int stride) {
             LSL_List result;
-            Random rand = new Random ();
+            Random rand = new Random();
 
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
-                return new LSL_List ();
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+                return new LSL_List();
 
 
             if (stride <= 0) {
@@ -296,35 +283,35 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             if (src.Length != stride && src.Length % stride == 0) {
                 int chunkk = src.Length / stride;
 
-                int [] chunks = new int [chunkk];
+                int[] chunks = new int[chunkk];
 
                 for (int i = 0; i < chunkk; i++)
-                    chunks [i] = i;
+                    chunks[i] = i;
 
                 // Knuth shuffle the chunkk index
                 for (int i = chunkk - 1; i >= 1; i--) {
                     // Elect an unrandomized chunk to swap
-                    int index = rand.Next (i + 1);
+                    int index = rand.Next(i + 1);
 
                     // and swap position with first unrandomized chunk
-                    int tmp = chunks [i];
-                    chunks [i] = chunks [index];
-                    chunks [index] = tmp;
+                    int tmp = chunks[i];
+                    chunks[i] = chunks[index];
+                    chunks[index] = tmp;
                 }
 
                 // Construct the randomized list
 
-                result = new LSL_List ();
+                result = new LSL_List();
 
                 for (int i = 0; i < chunkk; i++) {
                     for (int j = 0; j < stride; j++) {
-                        result.Add (src.Data [chunks [i] * stride + j]);
+                        result.Add(src.Data[chunks[i] * stride + j]);
                     }
                 }
             } else {
-                object [] array = new object [src.Length];
-                Array.Copy (src.Data, 0, array, 0, src.Length);
-                result = new LSL_List (array);
+                object[] array = new object[src.Length];
+                Array.Copy(src.Data, 0, array, 0, src.Length);
+                result = new LSL_List(array);
             }
 
             return result;
@@ -337,15 +324,14 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
         ///     Only those elements that are also in the specified
         ///     range are included in the result.
         /// </summary>
-        public LSL_List llList2ListStrided (LSL_List src, int start, int end, int stride)
-        {
-            LSL_List result = new LSL_List ();
-            int [] si = new int [2];
-            int [] ei = new int [2];
+        public LSL_List llList2ListStrided(LSL_List src, int start, int end, int stride) {
+            LSL_List result = new LSL_List();
+            int[] si = new int[2];
+            int[] ei = new int[2];
             bool twopass = false;
 
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
-                return new LSL_List ();
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+                return new LSL_List();
 
 
             //  First step is always to deal with negative indices
@@ -371,13 +357,13 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
 
             if (start != end) {
                 if (start <= end) {
-                    si [0] = start;
-                    ei [0] = end;
+                    si[0] = start;
+                    ei[0] = end;
                 } else {
-                    si [1] = start;
-                    ei [1] = src.Length;
-                    si [0] = 0;
-                    ei [0] = end;
+                    si[1] = start;
+                    ei[1] = src.Length;
+                    si[0] = 0;
+                    ei[0] = end;
                     twopass = true;
                 }
 
@@ -390,22 +376,22 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
 
                 if (stride > 0) {
                     for (int i = 0; i < src.Length; i += stride) {
-                        if (i <= ei [0] && i >= si [0])
-                            result.Add (src.Data [i]);
-                        if (twopass && i >= si [1] && i <= ei [1])
-                            result.Add (src.Data [i]);
+                        if (i <= ei[0] && i >= si[0])
+                            result.Add(src.Data[i]);
+                        if (twopass && i >= si[1] && i <= ei[1])
+                            result.Add(src.Data[i]);
                     }
                 } else if (stride < 0) {
                     for (int i = src.Length - 1; i >= 0; i += stride) {
-                        if (i <= ei [0] && i >= si [0])
-                            result.Add (src.Data [i]);
-                        if (twopass && i >= si [1] && i <= ei [1])
-                            result.Add (src.Data [i]);
+                        if (i <= ei[0] && i >= si[0])
+                            result.Add(src.Data[i]);
+                        if (twopass && i >= si[1] && i <= ei[1])
+                            result.Add(src.Data[i]);
                     }
                 }
             } else {
                 if (start % stride == 0) {
-                    result.Add (src.Data [start]);
+                    result.Add(src.Data[start]);
                 }
             }
 
@@ -417,10 +403,9 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
         ///     list designated by &lt;dest&gt; such that the first
         ///     new element has the index specified by &lt;index&gt;
         /// </summary>
-        public LSL_List llListInsertList (LSL_List dest, LSL_List src, int index)
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
-                return new LSL_List ();
+        public LSL_List llListInsertList(LSL_List dest, LSL_List src, int index) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+                return new LSL_List();
 
             LSL_List pref = null;
             LSL_List suff = null;
@@ -434,15 +419,15 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             }
 
             if (index != 0) {
-                pref = dest.GetSublist (0, index - 1);
+                pref = dest.GetSublist(0, index - 1);
                 if (index < dest.Length) {
-                    suff = dest.GetSublist (index, -1);
+                    suff = dest.GetSublist(index, -1);
                     return pref + src + suff;
                 }
                 return pref + src;
             }
             if (index < dest.Length) {
-                suff = dest.GetSublist (index, -1);
+                suff = dest.GetSublist(index, -1);
                 return src + suff;
             }
             return src;
@@ -452,21 +437,20 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
         ///     Returns the index of the first occurrence of test
         ///     in src.
         /// </summary>
-        public LSL_Integer llListFindList (LSL_List src, LSL_List test)
-        {
+        public LSL_Integer llListFindList(LSL_List src, LSL_List test) {
             int index = -1;
             int length = src.Length - test.Length + 1;
 
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
                 return 0;
 
             // If either list is empty, do not match
             if (src.Length != 0 && test.Length != 0) {
                 for (int i = 0; i < length; i++) {
-                    if (src.Data [i].Equals (test.Data [0]) || test.Data [0].Equals (src.Data [i])) {
+                    if (src.Data[i].Equals(test.Data[0]) || test.Data[0].Equals(src.Data[i])) {
                         int j;
                         for (j = 1; j < test.Length; j++)
-                            if (!(src.Data [i + j].Equals (test.Data [j]) || test.Data [j].Equals (src.Data [i + j])))
+                            if (!(src.Data[i + j].Equals(test.Data[j]) || test.Data[j].Equals(src.Data[i + j])))
                                 break;
 
                         if (j == test.Length) {
@@ -480,32 +464,30 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             return index;
         }
 
-        public void llLinkParticleSystem (int linknumber, LSL_List rules)
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+        public void llLinkParticleSystem(int linknumber, LSL_List rules) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
                 return;
 
 
-            List<ISceneChildEntity> parts = GetLinkParts (linknumber);
+            List<ISceneChildEntity> parts = GetLinkParts(linknumber);
 
             foreach (var part in parts) {
-                SetParticleSystem (part, rules);
+                SetParticleSystem(part, rules);
             }
         }
 
-        public void llLinkSitTarget (LSL_Integer link, LSL_Vector offset, LSL_Rotation rot)
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+        public void llLinkSitTarget(LSL_Integer link, LSL_Vector offset, LSL_Rotation rot) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
                 return;
 
             if (link == ScriptBaseClass.LINK_ROOT)
-                SitTarget (m_host.ParentEntity.RootChild, offset, rot);
+                SitTarget(m_host.ParentEntity.RootChild, offset, rot);
             else if (link == ScriptBaseClass.LINK_THIS)
-                SitTarget (m_host, offset, rot);
+                SitTarget(m_host, offset, rot);
             else {
-                var entity = m_host.ParentEntity.GetLinkNumPart (link);
+                var entity = m_host.ParentEntity.GetLinkNumPart(link);
                 if (entity != null) {
-                    SitTarget ((ISceneChildEntity)entity, offset, rot);
+                    SitTarget((ISceneChildEntity)entity, offset, rot);
                 }
             }
         }
@@ -522,10 +504,9 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
         ///     bound the list to be removed, then 0->end, and start->lim are removed
         ///     and the source list is added as a suffix.
         /// </summary>
-        public LSL_List llListReplaceList (LSL_List dest, LSL_List src, int start, int end)
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
-                return new LSL_List ();
+        public LSL_List llListReplaceList(LSL_List dest, LSL_List src, int start, int end) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+                return new LSL_List();
 
 
             // Note that although we have normalized, both
@@ -546,11 +527,11 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
                 // of the indices mean that we're going to add the
                 // source list as a prefix.
                 if (start > 0) {
-                    LSL_List pref = dest.GetSublist (0, start - 1);
+                    LSL_List pref = dest.GetSublist(0, start - 1);
                     // Only add a suffix if there is something
                     // beyond the end index (it's inclusive too).
                     if (end + 1 < dest.Length) {
-                        return pref + src + dest.GetSublist (end + 1, -1);
+                        return pref + src + dest.GetSublist(end + 1, -1);
                     }
                     return pref + src;
                 }
@@ -561,7 +542,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
                 // bound in this case, the entire destination list
                 // is removed.
                 if (end + 1 < dest.Length) {
-                    return src + dest.GetSublist (end + 1, -1);
+                    return src + dest.GetSublist(end + 1, -1);
                 }
                 return src;
             }
@@ -571,37 +552,36 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             // that's my interpretation. We can get sublist to do
             // this for us. Note that one, or both of the indices
             // might have been negative.
-            return dest.GetSublist (end + 1, start - 1) + src;
+            return dest.GetSublist(end + 1, start - 1) + src;
         }
 
-        public LSL_Float llListStatistics (int operation, LSL_List src)
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
-                return new LSL_Float ();
+        public LSL_Float llListStatistics(int operation, LSL_List src) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+                return new LSL_Float();
 
-            LSL_List nums = LSL_List.ToDoubleList (src);
+            LSL_List nums = LSL_List.ToDoubleList(src);
             if (operation == ScriptBaseClass.LIST_STAT_RANGE)
-                return nums.Range ();
+                return nums.Range();
             if (operation == ScriptBaseClass.LIST_STAT_MIN)
-                return nums.Min ();
+                return nums.Min();
             if (operation == ScriptBaseClass.LIST_STAT_MAX)
-                return nums.Max ();
+                return nums.Max();
             if (operation == ScriptBaseClass.LIST_STAT_MEAN)
-                return nums.Mean ();
+                return nums.Mean();
             if (operation == ScriptBaseClass.LIST_STAT_MEDIAN)
-                return nums.Median ();
+                return nums.Median();
             if (operation == ScriptBaseClass.LIST_STAT_NUM_COUNT)
-                return nums.NumericLength ();
+                return nums.NumericLength();
             if (operation == ScriptBaseClass.LIST_STAT_STD_DEV)
-                return nums.StdDev ();
+                return nums.StdDev();
             if (operation == ScriptBaseClass.LIST_STAT_SUM)
-                return nums.Sum ();
+                return nums.Sum();
             if (operation == ScriptBaseClass.LIST_STAT_SUM_SQUARES)
-                return nums.SumSqrs ();
+                return nums.SumSqrs();
             if (operation == ScriptBaseClass.LIST_STAT_GEOMETRIC_MEAN)
-                return nums.GeometricMean ();
+                return nums.GeometricMean();
             if (operation == ScriptBaseClass.LIST_STAT_HARMONIC_MEAN)
-                return nums.HarmonicMean ();
+                return nums.HarmonicMean();
             return 0.0;
         }
 

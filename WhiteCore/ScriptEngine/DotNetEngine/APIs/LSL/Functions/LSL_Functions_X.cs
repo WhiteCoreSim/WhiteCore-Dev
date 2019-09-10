@@ -58,7 +58,7 @@ using GridRegion = WhiteCore.Framework.Services.GridRegion;
 using LSL_Float = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.LSLFloat;
 using LSL_Integer = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.LSLInteger;
 using LSL_Key = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.LSLString;
-using LSL_List = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.list;
+using LSL_List = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.List;
 using LSL_Rotation = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.Quaternion;
 using LSL_String = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.LSLString;
 using LSL_Vector = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.Vector3;
@@ -69,36 +69,34 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
 {
     public partial class LSL_Api : MarshalByRefObject, IScriptApi
     {
-        public LSL_String llXorBase64Strings (string str1, string str2)
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+        public LSL_String llXorBase64Strings(string str1, string str2) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
                 return "";
 
-            Deprecated ("llXorBase64Strings", "Use llXorBase64 instead");
-            PScriptSleep (m_sleepMsOnXorBase64Strings);
+            Deprecated("llXorBase64Strings", "Use llXorBase64 instead");
+            PScriptSleep(m_sleepMsOnXorBase64Strings);
             return string.Empty;
         }
 
 
-        public LSL_String llXorBase64StringsCorrect (string str1, string str2)
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+        public LSL_String llXorBase64StringsCorrect(string str1, string str2) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
                 return "";
 
             string ret = string.Empty;
-            string src1 = llBase64ToString (str1);
-            string src2 = llBase64ToString (str2);
+            string src1 = llBase64ToString(str1);
+            string src2 = llBase64ToString(str2);
             int c = 0;
             foreach (char t in src1) {
-                ret += (char)(t ^ src2 [c]);
+                ret += (char)(t ^ src2[c]);
 
                 c++;
                 if (c >= src2.Length)
                     c = 0;
             }
 
-            PScriptSleep (m_sleepMsOnXorBase64Strings);
-            return llStringToBase64 (ret);
+            PScriptSleep(m_sleepMsOnXorBase64Strings);
+            return llStringToBase64(ret);
         }
 
     }

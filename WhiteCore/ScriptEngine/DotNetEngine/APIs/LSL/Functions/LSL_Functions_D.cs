@@ -58,7 +58,7 @@ using GridRegion = WhiteCore.Framework.Services.GridRegion;
 using LSL_Float = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.LSLFloat;
 using LSL_Integer = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.LSLInteger;
 using LSL_Key = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.LSLString;
-using LSL_List = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.list;
+using LSL_List = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.List;
 using LSL_Rotation = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.Quaternion;
 using LSL_String = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.LSLString;
 using LSL_Vector = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.Vector3;
@@ -69,210 +69,193 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
 {
     public partial class LSL_Api : MarshalByRefObject, IScriptApi
     {
-        public LSL_String llDetectedName (int number)
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
-                return new LSL_String ();
+        public LSL_String llDetectedName(int number) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+                return new LSL_String();
 
-            DetectParams detectedParams = m_ScriptEngine.GetDetectParams (m_host.UUID, m_itemID, number);
+            DetectParams detectedParams = m_ScriptEngine.GetDetectParams(m_host.UUID, m_itemID, number);
             if (detectedParams == null)
                 return string.Empty;
             return detectedParams.Name;
         }
 
-        public LSL_String llDetectedKey (int number)
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
-                return new LSL_String ();
+        public LSL_String llDetectedKey(int number) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+                return new LSL_String();
 
-            DetectParams detectedParams = m_ScriptEngine.GetDetectParams (m_host.UUID, m_itemID, number);
+            DetectParams detectedParams = m_ScriptEngine.GetDetectParams(m_host.UUID, m_itemID, number);
             if (detectedParams == null)
                 return string.Empty;
-            return detectedParams.Key.ToString ();
+            return detectedParams.Key.ToString();
         }
 
-        public LSL_String llDetectedOwner (int number)
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
-                return new LSL_String ();
+        public LSL_String llDetectedOwner(int number) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+                return new LSL_String();
 
-            DetectParams detectedParams = m_ScriptEngine.GetDetectParams (m_host.UUID, m_itemID, number);
+            DetectParams detectedParams = m_ScriptEngine.GetDetectParams(m_host.UUID, m_itemID, number);
             if (detectedParams == null)
                 return string.Empty;
-            return detectedParams.Owner.ToString ();
+            return detectedParams.Owner.ToString();
         }
 
-        public LSL_Integer llDetectedType (int number)
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
-                return new LSL_Integer ();
+        public LSL_Integer llDetectedType(int number) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+                return new LSL_Integer();
 
-            DetectParams detectedParams = m_ScriptEngine.GetDetectParams (m_host.UUID, m_itemID, number);
+            DetectParams detectedParams = m_ScriptEngine.GetDetectParams(m_host.UUID, m_itemID, number);
             if (detectedParams == null)
                 return 0;
-            return new LSL_Integer (detectedParams.Type);
+            return new LSL_Integer(detectedParams.Type);
         }
 
-        public LSL_Vector llDetectedPos (int number)
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
-                return new LSL_Vector ();
+        public LSL_Vector llDetectedPos(int number) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+                return new LSL_Vector();
 
-            DetectParams detectedParams = m_ScriptEngine.GetDetectParams (m_host.UUID, m_itemID, number);
+            DetectParams detectedParams = m_ScriptEngine.GetDetectParams(m_host.UUID, m_itemID, number);
             if (detectedParams == null)
-                return new LSL_Vector ();
+                return new LSL_Vector();
             return detectedParams.Position;
         }
 
-        public LSL_Vector llDetectedVel (int number)
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
-                return new LSL_Vector ();
+        public LSL_Vector llDetectedVel(int number) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+                return new LSL_Vector();
 
-            DetectParams detectedParams = m_ScriptEngine.GetDetectParams (m_host.UUID, m_itemID, number);
+            DetectParams detectedParams = m_ScriptEngine.GetDetectParams(m_host.UUID, m_itemID, number);
             if (detectedParams == null)
-                return new LSL_Vector ();
+                return new LSL_Vector();
             return detectedParams.Velocity;
         }
 
-        public LSL_Vector llDetectedGrab (int number)
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
-                return new LSL_Vector ();
+        public LSL_Vector llDetectedGrab(int number) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+                return new LSL_Vector();
 
-            DetectParams parms = m_ScriptEngine.GetDetectParams (m_host.UUID, m_itemID, number);
+            DetectParams parms = m_ScriptEngine.GetDetectParams(m_host.UUID, m_itemID, number);
             if (parms == null)
-                return new LSL_Vector (0, 0, 0);
+                return new LSL_Vector(0, 0, 0);
 
             return parms.OffsetPos;
         }
 
-        public LSL_Rotation llDetectedRot (int number)
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
-                return new LSL_Rotation ();
+        public LSL_Rotation llDetectedRot(int number) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+                return new LSL_Rotation();
 
-            DetectParams detectedParams = m_ScriptEngine.GetDetectParams (m_host.UUID, m_itemID, number);
+            DetectParams detectedParams = m_ScriptEngine.GetDetectParams(m_host.UUID, m_itemID, number);
             if (detectedParams == null)
-                return new LSL_Rotation ();
+                return new LSL_Rotation();
             return detectedParams.Rotation;
         }
 
-        public LSL_Integer llDetectedGroup (int number)
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
-                return new LSL_Integer ();
+        public LSL_Integer llDetectedGroup(int number) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+                return new LSL_Integer();
 
-            DetectParams detectedParams = m_ScriptEngine.GetDetectParams (m_host.UUID, m_itemID, number);
+            DetectParams detectedParams = m_ScriptEngine.GetDetectParams(m_host.UUID, m_itemID, number);
             if (detectedParams == null)
-                return new LSL_Integer (0);
+                return new LSL_Integer(0);
             if (m_host.GroupID == detectedParams.Group)
-                return new LSL_Integer (1);
-            return new LSL_Integer (0);
+                return new LSL_Integer(1);
+            return new LSL_Integer(0);
         }
 
-        public LSL_Integer llDetectedLinkNumber (int number)
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
-                return new LSL_Integer ();
+        public LSL_Integer llDetectedLinkNumber(int number) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+                return new LSL_Integer();
 
-            DetectParams parms = m_ScriptEngine.GetDetectParams (m_host.UUID, m_itemID, number);
+            DetectParams parms = m_ScriptEngine.GetDetectParams(m_host.UUID, m_itemID, number);
             if (parms == null)
-                return new LSL_Integer (0);
+                return new LSL_Integer(0);
 
-            return new LSL_Integer (parms.LinkNum);
+            return new LSL_Integer(parms.LinkNum);
         }
 
         /// <summary>
         ///     See http://wiki.secondlife.com/wiki/LlDetectedTouchBinormal for details
         /// </summary>
-        public LSL_Vector llDetectedTouchBinormal (int index)
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
-                return new LSL_Vector ();
+        public LSL_Vector llDetectedTouchBinormal(int index) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+                return new LSL_Vector();
 
-            DetectParams detectedParams = m_ScriptEngine.GetDetectParams (m_host.UUID, m_itemID, index);
+            DetectParams detectedParams = m_ScriptEngine.GetDetectParams(m_host.UUID, m_itemID, index);
             if (detectedParams == null)
-                return new LSL_Vector ();
+                return new LSL_Vector();
             return detectedParams.TouchBinormal;
         }
 
         /// <summary>
         ///     See http://wiki.secondlife.com/wiki/LlDetectedTouchFace for details
         /// </summary>
-        public LSL_Integer llDetectedTouchFace (int index)
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
-                return new LSL_Integer ();
+        public LSL_Integer llDetectedTouchFace(int index) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+                return new LSL_Integer();
 
-            DetectParams detectedParams = m_ScriptEngine.GetDetectParams (m_host.UUID, m_itemID, index);
+            DetectParams detectedParams = m_ScriptEngine.GetDetectParams(m_host.UUID, m_itemID, index);
             if (detectedParams == null)
-                return new LSL_Integer (-1);
-            return new LSL_Integer (detectedParams.TouchFace);
+                return new LSL_Integer(-1);
+            return new LSL_Integer(detectedParams.TouchFace);
         }
 
         /// <summary>
         ///     See http://wiki.secondlife.com/wiki/LlDetectedTouchNormal for details
         /// </summary>
-        public LSL_Vector llDetectedTouchNormal (int index)
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
-                return new LSL_Vector ();
+        public LSL_Vector llDetectedTouchNormal(int index) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+                return new LSL_Vector();
 
-            DetectParams detectedParams = m_ScriptEngine.GetDetectParams (m_host.UUID, m_itemID, index);
+            DetectParams detectedParams = m_ScriptEngine.GetDetectParams(m_host.UUID, m_itemID, index);
             if (detectedParams == null)
-                return new LSL_Vector ();
+                return new LSL_Vector();
             return detectedParams.TouchNormal;
         }
 
         /// <summary>
         ///     See http://wiki.secondlife.com/wiki/LlDetectedTouchPos for details
         /// </summary>
-        public LSL_Vector llDetectedTouchPos (int index)
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
-                return new LSL_Vector ();
+        public LSL_Vector llDetectedTouchPos(int index) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+                return new LSL_Vector();
 
-            DetectParams detectedParams = m_ScriptEngine.GetDetectParams (m_host.UUID, m_itemID, index);
+            DetectParams detectedParams = m_ScriptEngine.GetDetectParams(m_host.UUID, m_itemID, index);
             if (detectedParams == null)
-                return new LSL_Vector ();
+                return new LSL_Vector();
             return detectedParams.TouchPos;
         }
 
         /// <summary>
         ///     See http://wiki.secondlife.com/wiki/LlDetectedTouchST for details
         /// </summary>
-        public LSL_Vector llDetectedTouchST (int index)
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
-                return new LSL_Vector ();
+        public LSL_Vector llDetectedTouchST(int index) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+                return new LSL_Vector();
 
-            DetectParams detectedParams = m_ScriptEngine.GetDetectParams (m_host.UUID, m_itemID, index);
+            DetectParams detectedParams = m_ScriptEngine.GetDetectParams(m_host.UUID, m_itemID, index);
             if (detectedParams == null)
-                return new LSL_Vector (-1.0, -1.0, 0.0);
+                return new LSL_Vector(-1.0, -1.0, 0.0);
             return detectedParams.TouchST;
         }
 
         /// <summary>
         ///     See http://wiki.secondlife.com/wiki/LlDetectedTouchUV for details
         /// </summary>
-        public LSL_Vector llDetectedTouchUV (int index)
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
-                return new LSL_Vector ();
+        public LSL_Vector llDetectedTouchUV(int index) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+                return new LSL_Vector();
 
-            DetectParams detectedParams = m_ScriptEngine.GetDetectParams (m_host.UUID, m_itemID, index);
+            DetectParams detectedParams = m_ScriptEngine.GetDetectParams(m_host.UUID, m_itemID, index);
             if (detectedParams == null)
-                return new LSL_Vector (-1.0, -1.0, 0.0);
+                return new LSL_Vector(-1.0, -1.0, 0.0);
             return detectedParams.TouchUV;
         }
 
-        public virtual void llDie ()
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+        public virtual void llDie() {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
                 return;
 
-            throw new SelfDeleteException ();
+            throw new SelfDeleteException();
         }
 
         /// <summary>
@@ -281,10 +264,9 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
         ///     negative (indicating end-relative) and may be inverted,
         ///     i.e. end < start. />
         /// </summary>
-        public LSL_String llDeleteSubString (string src, int start, int end)
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
-                return new LSL_String ();
+        public LSL_String llDeleteSubString(string src, int start, int end) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+                return new LSL_String();
 
 
             // Normalize indices (if negative).
@@ -315,7 +297,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
                     end = src.Length - 1;
                 }
 
-                return src.Remove (start, end - start + 1);
+                return src.Remove(start, end - start + 1);
             }
             // Inverted substring
             // In this case, out of bounds means that
@@ -326,19 +308,18 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
 
             if (end > 0) {
                 if (start < src.Length) {
-                    return src.Remove (start).Remove (0, end + 1);
+                    return src.Remove(start).Remove(0, end + 1);
                 }
-                return src.Remove (0, end + 1);
+                return src.Remove(0, end + 1);
             }
             if (start < src.Length) {
-                return src.Remove (start);
+                return src.Remove(start);
             }
             return src;
         }
 
-        public void llDetachFromAvatar ()
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+        public void llDetachFromAvatar() {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
                 return;
 
             if (m_host.ParentEntity.RootChild.AttachmentPoint == 0)
@@ -347,86 +328,82 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             TaskInventoryItem item;
 
             lock (m_host.TaskInventory) {
-                if (!m_host.TaskInventory.ContainsKey (InventorySelf ()))
+                if (!m_host.TaskInventory.ContainsKey(InventorySelf()))
                     return;
-                item = m_host.TaskInventory [InventorySelf ()];
+                item = m_host.TaskInventory[InventorySelf()];
             }
 
             if (item.PermsGranter != m_host.OwnerID)
                 return;
 
             if ((item.PermsMask & ScriptBaseClass.PERMISSION_ATTACH) != 0)
-                DetachFromAvatar ();
+                DetachFromAvatar();
         }
 
-        public LSL_List llDeleteSubList (LSL_List src, int start, int end)
-        {
-            return src.DeleteSublist (start, end);
+        public LSL_List llDeleteSubList(LSL_List src, int start, int end) {
+            return src.DeleteSublist(start, end);
         }
 
-        public LSL_String llDumpList2String (LSL_List src, string seperator)
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+        public LSL_String llDumpList2String(LSL_List src, string seperator) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
                 return "";
 
             if (src.Length == 0) {
                 return string.Empty;
             }
 
-            string ret = src.Data.Aggregate ("", (current, o) => current + (o + seperator));
+            string ret = src.Data.Aggregate("", (current, o) => current + (o + seperator));
 
-            ret = ret.Substring (0, ret.Length - seperator.Length);
+            ret = ret.Substring(0, ret.Length - seperator.Length);
             return ret;
         }
 
-        public DateTime llDialog (string avatar, string message, LSL_List buttons, int chat_channel)
-        {
-            IDialogModule dm = World.RequestModuleInterface<IDialogModule> ();
+        public DateTime llDialog(string avatar, string message, LSL_List buttons, int chat_channel) {
+            IDialogModule dm = World.RequestModuleInterface<IDialogModule>();
 
             if (dm == null)
                 return DateTime.Now;
 
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
                 return DateTime.Now;
 
-            UUID av = new UUID ();
-            if (!UUID.TryParse (avatar, out av)) {
+            UUID av = new UUID();
+            if (!UUID.TryParse(avatar, out av)) {
                 //Silently accepted in in SL NOTE: it does sleep though!
                 //LSLError("First parameter to llDialog needs to be a key");
-                return PScriptSleep (m_sleepMsOnDialog);
+                return PScriptSleep(m_sleepMsOnDialog);
             }
             if (buttons.Length > 12) {
-                Error ("llDialog", "No more than 12 buttons can be shown");
+                Error("llDialog", "No more than 12 buttons can be shown");
                 return DateTime.Now;
             }
-            string [] buts = new string [buttons.Length];
+            string[] buts = new string[buttons.Length];
             for (int i = 0; i < buttons.Length; i++) {
-                if (buttons.Data [i].ToString () == string.Empty) {
-                    Error ("llDialog", "Button label cannot be blank");
+                if (buttons.Data[i].ToString() == string.Empty) {
+                    Error("llDialog", "Button label cannot be blank");
                     return DateTime.Now;
                 }
-                if (buttons.Data [i].ToString ().Length > 24) {
-                    Error ("llDialog", "Button label cannot be longer than 24 characters");
+                if (buttons.Data[i].ToString().Length > 24) {
+                    Error("llDialog", "Button label cannot be longer than 24 characters");
                     return DateTime.Now;
                 }
-                buts [i] = buttons.Data [i].ToString ();
+                buts[i] = buttons.Data[i].ToString();
             }
             if (buts.Length == 0)
-                buts = new [] { "OK" };
+                buts = new[] { "OK" };
 
-            dm.SendDialogToUser (
+            dm.SendDialogToUser(
                 av, m_host.Name, m_host.UUID, m_host.OwnerID,
-                message, new UUID ("00000000-0000-2222-3333-100000001000"), chat_channel, buts);
+                message, new UUID("00000000-0000-2222-3333-100000001000"), chat_channel, buts);
 
-            return PScriptSleep (m_sleepMsOnDialog);
+            return PScriptSleep(m_sleepMsOnDialog);
         }
 
 
-        public void llDeleteCharacter ()
-        {
-            IBotManager botManager = World.RequestModuleInterface<IBotManager> ();
+        public void llDeleteCharacter() {
+            IBotManager botManager = World.RequestModuleInterface<IBotManager>();
             if (botManager != null)
-                botManager.RemoveCharacter (m_host.ParentEntity.UUID);
+                botManager.RemoveCharacter(m_host.ParentEntity.UUID);
         }
 
 

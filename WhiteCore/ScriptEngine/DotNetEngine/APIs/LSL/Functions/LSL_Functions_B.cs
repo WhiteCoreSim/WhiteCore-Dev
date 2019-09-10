@@ -58,7 +58,7 @@ using GridRegion = WhiteCore.Framework.Services.GridRegion;
 using LSL_Float = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.LSLFloat;
 using LSL_Integer = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.LSLInteger;
 using LSL_Key = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.LSLString;
-using LSL_List = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.list;
+using LSL_List = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.List;
 using LSL_Rotation = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.Quaternion;
 using LSL_String = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.LSLString;
 using LSL_Vector = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.Vector3;
@@ -69,17 +69,16 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
 {
     public partial class LSL_Api : MarshalByRefObject, IScriptApi
     {
-        public void llBreakLink (int linknum)
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+        public void llBreakLink(int linknum) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
                 return;
 
-            UUID invItemID = InventorySelf ();
+            UUID invItemID = InventorySelf();
 
             lock (m_host.TaskInventory) {
-                if ((m_host.TaskInventory [invItemID].PermsMask & ScriptBaseClass.PERMISSION_CHANGE_LINKS) == 0
+                if ((m_host.TaskInventory[invItemID].PermsMask & ScriptBaseClass.PERMISSION_CHANGE_LINKS) == 0
                     && !m_automaticLinkPermission) {
-                    Error ("llBreakLink", "PERMISSION_CHANGE_LINKS permission not set");
+                    Error("llBreakLink", "PERMISSION_CHANGE_LINKS permission not set");
                     return;
                 }
             }
@@ -98,14 +97,14 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
                        ScriptBaseClass.LINK_ALL_OTHERS ||
                        ScriptBaseClass.LINK_ALL_CHILDREN ||
                        ScriptBaseClass.LINK_THIS) {
-                foreach (ISceneChildEntity part in parentPrim.ChildrenEntities ()) {
+                foreach (ISceneChildEntity part in parentPrim.ChildrenEntities()) {
                     if (part.UUID != m_host.UUID) {
                         childPrim = part;
                         break;
                     }
                 }
             } else {
-                IEntity target = m_host.ParentEntity.GetLinkNumPart (linknum);
+                IEntity target = m_host.ParentEntity.GetLinkNumPart(linknum);
                 if (target is ISceneChildEntity) {
                     childPrim = target as ISceneChildEntity;
                 } else
@@ -116,63 +115,61 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
 
             if (linknum == ScriptBaseClass.LINK_ROOT) {
                 // Restructuring Multiple Prims.
-                List<ISceneChildEntity> parts = new List<ISceneChildEntity> (parentPrim.ChildrenEntities ());
-                parts.Remove (parentPrim.RootChild);
+                List<ISceneChildEntity> parts = new List<ISceneChildEntity>(parentPrim.ChildrenEntities());
+                parts.Remove(parentPrim.RootChild);
                 foreach (ISceneChildEntity part in parts) {
-                    parentPrim.DelinkFromGroup (part, true);
+                    parentPrim.DelinkFromGroup(part, true);
                 }
-                parentPrim.ScheduleGroupUpdate (PrimUpdateFlags.ForcedFullUpdate);
-                parentPrim.TriggerScriptChangedEvent (Changed.LINK);
+                parentPrim.ScheduleGroupUpdate(PrimUpdateFlags.ForcedFullUpdate);
+                parentPrim.TriggerScriptChangedEvent(Changed.LINK);
 
                 if (parts.Count > 0) {
-                    ISceneChildEntity newRoot = parts [0];
-                    parts.Remove (newRoot);
+                    ISceneChildEntity newRoot = parts[0];
+                    parts.Remove(newRoot);
                     foreach (ISceneChildEntity part in parts) {
-                        newRoot.ParentEntity.LinkToGroup (part.ParentEntity);
+                        newRoot.ParentEntity.LinkToGroup(part.ParentEntity);
                     }
-                    newRoot.ParentEntity.ScheduleGroupUpdate (PrimUpdateFlags.ForcedFullUpdate);
+                    newRoot.ParentEntity.ScheduleGroupUpdate(PrimUpdateFlags.ForcedFullUpdate);
                 }
             } else {
                 if (childPrim == null)
                     return;
 
-                parentPrim.DelinkFromGroup (childPrim, true);
-                childPrim.ParentEntity.ScheduleGroupUpdate (PrimUpdateFlags.ForcedFullUpdate);
-                parentPrim.ScheduleGroupUpdate (PrimUpdateFlags.ForcedFullUpdate);
-                parentPrim.TriggerScriptChangedEvent (Changed.LINK);
+                parentPrim.DelinkFromGroup(childPrim, true);
+                childPrim.ParentEntity.ScheduleGroupUpdate(PrimUpdateFlags.ForcedFullUpdate);
+                parentPrim.ScheduleGroupUpdate(PrimUpdateFlags.ForcedFullUpdate);
+                parentPrim.TriggerScriptChangedEvent(Changed.LINK);
             }
         }
 
-        public void llBreakAllLinks ()
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+        public void llBreakAllLinks() {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
                 return;
 
             ISceneEntity parentPrim = m_host.ParentEntity;
             if (parentPrim.RootChild.AttachmentPoint != 0)
                 return; // Fail silently if attached
 
-            List<ISceneChildEntity> parts = new List<ISceneChildEntity> (parentPrim.ChildrenEntities ());
-            parts.Remove (parentPrim.RootChild);
+            List<ISceneChildEntity> parts = new List<ISceneChildEntity>(parentPrim.ChildrenEntities());
+            parts.Remove(parentPrim.RootChild);
 
             foreach (ISceneChildEntity part in parts) {
-                parentPrim.DelinkFromGroup (part, true);
-                parentPrim.TriggerScriptChangedEvent (Changed.LINK);
-                part.ParentEntity.ScheduleGroupUpdate (PrimUpdateFlags.ForcedFullUpdate);
+                parentPrim.DelinkFromGroup(part, true);
+                parentPrim.TriggerScriptChangedEvent(Changed.LINK);
+                part.ParentEntity.ScheduleGroupUpdate(PrimUpdateFlags.ForcedFullUpdate);
             }
-            parentPrim.ScheduleGroupUpdate (PrimUpdateFlags.ForcedFullUpdate);
+            parentPrim.ScheduleGroupUpdate(PrimUpdateFlags.ForcedFullUpdate);
         }
 
-        public LSL_String llBase64ToString (string str)
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+        public LSL_String llBase64ToString(string str) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
                 return "";
 
             try {
-                byte [] b = Convert.FromBase64String (str);
-                return Encoding.UTF8.GetString (b);
+                byte[] b = Convert.FromBase64String(str);
+                return Encoding.UTF8.GetString(b);
             } catch {
-                Error ("llBase64ToString", "Error decoding string");
+                Error("llBase64ToString", "Error decoding string");
                 return string.Empty;
             }
         }

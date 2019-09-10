@@ -58,7 +58,7 @@ using GridRegion = WhiteCore.Framework.Services.GridRegion;
 using LSL_Float = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.LSLFloat;
 using LSL_Integer = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.LSLInteger;
 using LSL_Key = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.LSLString;
-using LSL_List = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.list;
+using LSL_List = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.List;
 using LSL_Rotation = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.Quaternion;
 using LSL_String = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.LSLString;
 using LSL_Vector = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.Vector3;
@@ -71,53 +71,49 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
     {
 
 
-        public void llMinEventDelay (double delay)
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+        public void llMinEventDelay(double delay) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
                 return;
 
-            m_ScriptEngine.SetMinEventDelay (m_itemID, m_host.UUID, delay);
+            m_ScriptEngine.SetMinEventDelay(m_itemID, m_host.UUID, delay);
         }
 
-         public void llMessageLinked (int linknumber, int num, string msg, string id)
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+        public void llMessageLinked(int linknumber, int num, string msg, string id) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
                 return;
 
 
-            List<ISceneChildEntity> parts = GetLinkParts (linknumber);
+            List<ISceneChildEntity> parts = GetLinkParts(linknumber);
 
             foreach (ISceneChildEntity part in parts) {
                 int linkNumber = m_host.LinkNum;
-                if (m_host.ParentEntity.ChildrenEntities ().Count == 1)
+                if (m_host.ParentEntity.ChildrenEntities().Count == 1)
                     linkNumber = 0;
 
-                object [] resobj = { new LSL_Integer(linkNumber),
+                object[] resobj = { new LSL_Integer(linkNumber),
                                     new LSL_Integer(num),
                                     new LSL_String(msg),
                                     new LSL_String(id)
                                   };
 
-                m_ScriptEngine.PostObjectEvent (part.UUID, "link_message", resobj);
+                m_ScriptEngine.PostObjectEvent(part.UUID, "link_message", resobj);
             }
         }
 
-        public LSL_String llMD5String (string src, int nonce)
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
-                return new LSL_String ();
+        public LSL_String llMD5String(string src, int nonce) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+                return new LSL_String();
 
-            return Util.Md5Hash (string.Format ("{0}:{1}", src, nonce));
+            return Util.Md5Hash(string.Format("{0}:{1}", src, nonce));
         }
 
 
-        public DateTime llMapDestination (string simname, LSL_Vector pos, LSL_Vector lookAt)
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+        public DateTime llMapDestination(string simname, LSL_Vector pos, LSL_Vector lookAt) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
                 return DateTime.Now;
 
             UUID avatarID = m_host.OwnerID;
-            DetectParams detectedParams = m_ScriptEngine.GetDetectParams (m_host.UUID, m_itemID, 0);
+            DetectParams detectedParams = m_ScriptEngine.GetDetectParams(m_host.UUID, m_itemID, 0);
             // only works on the first detected avatar
             //This only works in touch events or if the item is attached to the avatar
             if (detectedParams == null && !m_host.IsAttachment) return DateTime.Now;
@@ -125,47 +121,47 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             if (detectedParams != null)
                 avatarID = detectedParams.Key;
 
-            IScenePresence avatar = World.GetScenePresence (avatarID);
+            IScenePresence avatar = World.GetScenePresence(avatarID);
             if (avatar != null) {
-                IMuteListModule module = m_host.ParentEntity.Scene.RequestModuleInterface<IMuteListModule> ();
+                IMuteListModule module = m_host.ParentEntity.Scene.RequestModuleInterface<IMuteListModule>();
                 if (module != null) {
                     bool cached = false; //Unneeded
-                    if (module.GetMutes (avatar.UUID, out cached).Any (mute => mute.MuteID == m_host.OwnerID)) {
+                    if (module.GetMutes(avatar.UUID, out cached).Any(mute => mute.MuteID == m_host.OwnerID)) {
                         return DateTime.Now; //If the avatar is muted, they don't get any contact from the muted av
                     }
                 }
-                avatar.ControllingClient.SendScriptTeleportRequest (m_host.Name, simname,
-                                                                   new Vector3 ((float)pos.x, (float)pos.y,
+                avatar.ControllingClient.SendScriptTeleportRequest(m_host.Name, simname,
+                                                                   new Vector3((float)pos.x, (float)pos.y,
                                                                                (float)pos.z),
-                                                                   new Vector3 ((float)lookAt.x, (float)lookAt.y,
+                                                                   new Vector3((float)lookAt.x, (float)lookAt.y,
                                                                                (float)lookAt.z));
             }
-            return PScriptSleep (m_sleepMsOnMapDestination);
+            return PScriptSleep(m_sleepMsOnMapDestination);
         }
 
-        public LSL_Integer llManageEstateAccess (LSL_Integer action, LSL_String avatar)
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+        public LSL_Integer llManageEstateAccess(LSL_Integer action, LSL_String avatar) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
                 return LSL_Integer.FALSE;
-            if (World.Permissions.CanIssueEstateCommand (m_host.OwnerID, false)) {
+            if (World.Permissions.CanIssueEstateCommand(m_host.OwnerID, false)) {
                 if (action == ScriptBaseClass.ESTATE_ACCESS_ALLOWED_AGENT_ADD)
-                    World.RegionInfo.EstateSettings.AddEstateUser (UUID.Parse (avatar));
+                    World.RegionInfo.EstateSettings.AddEstateUser(UUID.Parse(avatar));
                 else if (action == ScriptBaseClass.ESTATE_ACCESS_ALLOWED_AGENT_REMOVE)
-                    World.RegionInfo.EstateSettings.RemoveEstateUser (UUID.Parse (avatar));
+                    World.RegionInfo.EstateSettings.RemoveEstateUser(UUID.Parse(avatar));
                 else if (action == ScriptBaseClass.ESTATE_ACCESS_ALLOWED_GROUP_ADD)
-                    World.RegionInfo.EstateSettings.AddEstateGroup (UUID.Parse (avatar));
+                    World.RegionInfo.EstateSettings.AddEstateGroup(UUID.Parse(avatar));
                 else if (action == ScriptBaseClass.ESTATE_ACCESS_ALLOWED_GROUP_REMOVE)
-                    World.RegionInfo.EstateSettings.RemoveEstateGroup (UUID.Parse (avatar));
+                    World.RegionInfo.EstateSettings.RemoveEstateGroup(UUID.Parse(avatar));
                 else if (action == ScriptBaseClass.ESTATE_ACCESS_BANNED_AGENT_ADD)
-                    World.RegionInfo.EstateSettings.AddBan (new EstateBan {
+                    World.RegionInfo.EstateSettings.AddBan(new EstateBan
+                    {
                         EstateID = World.RegionInfo.EstateSettings.EstateID,
-                        BannedUserID = UUID.Parse (avatar)
+                        BannedUserID = UUID.Parse(avatar)
                     });
                 else if (action == ScriptBaseClass.ESTATE_ACCESS_BANNED_AGENT_REMOVE)
-                    World.RegionInfo.EstateSettings.RemoveBan (UUID.Parse (avatar));
+                    World.RegionInfo.EstateSettings.RemoveBan(UUID.Parse(avatar));
                 return LSL_Integer.TRUE;
             } else
-                Error ("llManageEstateAccess", "llManageEstateAccess object owner must manage estate.");
+                Error("llManageEstateAccess", "llManageEstateAccess object owner must manage estate.");
             return LSL_Integer.FALSE;
         }
 

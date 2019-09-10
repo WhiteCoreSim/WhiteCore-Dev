@@ -128,9 +128,9 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
                        s.z != 0;
             }
 
-            public static implicit operator list(Vector3 vec)
+            public static implicit operator List(Vector3 vec)
             {
-                return new list(new object[] {vec});
+                return new List(new object[] {vec});
             }
 
             public static bool operator ==(Vector3 lhs, Vector3 rhs)
@@ -433,9 +433,9 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
                 return result;
             }
 
-            public static implicit operator list(Quaternion r)
+            public static implicit operator List(Quaternion r)
             {
-                return new list(new object[] {r});
+                return new List(new object[] {r});
             }
 
             public static bool operator ==(Quaternion lhs, Quaternion rhs)
@@ -500,11 +500,11 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
         }
 
         [Serializable]
-        public class list : IEnumerator
+        public class List : IEnumerator
         {
             object[] m_data;
 
-            public list(params object[] args)
+            public List(params object[] args)
             {
                 m_data = args;
             }
@@ -686,13 +686,13 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
                         : "null"));
             }
 
-            public static list operator +(list a, list b)
+            public static List operator +(List a, List b)
             {
                 object[] tmp;
                 tmp = new object[a.Length + b.Length];
                 a.Data.CopyTo(tmp, 0);
                 b.Data.CopyTo(tmp, a.Length);
-                return new list(tmp);
+                return new List(tmp);
             }
 
             void ExtendAndAdd(object o)
@@ -701,30 +701,30 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
                 m_data.SetValue(o, Length - 1);
             }
 
-            public static implicit operator bool(list s)
+            public static implicit operator bool(List s)
             {
                 return s.Length != 0;
             }
 
-            public static list operator +(list a, LSLString s)
+            public static List operator +(List a, LSLString s)
             {
                 a.ExtendAndAdd(s);
                 return a;
             }
 
-            public static list operator +(list a, LSLInteger i)
+            public static List operator +(List a, LSLInteger i)
             {
                 a.ExtendAndAdd(i);
                 return a;
             }
 
-            public static list operator +(list a, LSLFloat d)
+            public static List operator +(List a, LSLFloat d)
             {
                 a.ExtendAndAdd(d);
                 return a;
             }
 
-            public static bool operator ==(list a, list b)
+            public static bool operator ==(List a, List b)
             {
                 int la = -1;
                 int lb = -1;
@@ -746,7 +746,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
                 return la == lb;
             }
 
-            public static bool operator !=(list a, list b)
+            public static bool operator !=(List a, List b)
             {
                 int la = -1;
                 int lb = -1;
@@ -791,7 +791,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
                 return ret;
             }
 
-            public list DeleteSublist(int start, int end)
+            public List DeleteSublist(int start, int end)
             {
                 // Not an easy one
                 // If start <= end, remove that part
@@ -814,7 +814,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
                 if (start > end)
                 {
                     if (end >= m_data.Length)
-                        return new list(new object [0]);
+                        return new List(new object [0]);
 
                     if (start >= m_data.Length)
                         start = m_data.Length - 1;
@@ -828,7 +828,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
                     ret = new object[m_data.Length];
                     Array.Copy(m_data, 0, ret, 0, m_data.Length);
 
-                    return new list(ret);
+                    return new List(ret);
                 }
 
                 if (end >= m_data.Length)
@@ -839,7 +839,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
 
                 ret = new object [m_data.Length - remove];
                 if (ret.Length == 0)
-                    return new list(ret);
+                    return new List(ret);
 
                 int src;
                 int dest = 0;
@@ -850,10 +850,10 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
                         ret[dest++] = m_data[src];
                 }
 
-                return new list(ret);
+                return new List(ret);
             }
 
-            public list GetSublist(int start, int end)
+            public List GetSublist(int start, int end)
             {
                 object[] ret;
 
@@ -884,7 +884,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
                     // Start sublist beyond length
                     // Also deals with start AND end still negative
                     if (start >= m_data.Length || end < 0) {
-                        return new list ();
+                        return new List ();
                     }
 
                     // Sublist extends beyond the end of the supplied list
@@ -901,13 +901,13 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
 
                     Array.Copy (m_data, start, ret, 0, end - start + 1);
 
-                    return new list (ret);
+                    return new List (ret);
                 }
-                list result = null;
+                List result = null;
 
                 // If end is negative, then prefix list is empty
                 if (end < 0) {
-                    result = new list ();
+                    result = new List ();
                     // If start is still negative, then the whole of
                     // the existing list is returned. This case is
                     // only admitted if end is also still negative.
@@ -990,10 +990,10 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
                 }
             }
 
-            public list Sort(int stride, int ascending)
+            public List Sort(int stride, int ascending)
             {
                 if (Data.Length == 0)
-                    return new list(); // Don't even bother
+                    return new List(); // Don't even bother
 
                 object[] ret = new object[Data.Length];
                 Array.Copy(Data, 0, ret, 0, Data.Length);
@@ -1026,7 +1026,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
                         {
                             Array.Reverse(ret);
                         }
-                        return new list(ret);
+                        return new List(ret);
                     }
                 }
 
@@ -1058,14 +1058,14 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
 
                 // end bubble sort
 
-                return new list(ret);
+                return new List(ret);
             }
 
             #region CSV Methods
 
-            public static list FromCSV(string csv)
+            public static List FromCSV(string csv)
             {
-                return new list(csv.Split(','));
+                return new List(csv.Split(','));
             }
 
             public string ToCSV()
@@ -1100,12 +1100,12 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
                 return output;
             }
 
-            public static explicit operator string(list l)
+            public static explicit operator string(List l)
             {
                 return l.ToSoup();
             }
 
-            public static explicit operator LSLString(list l)
+            public static explicit operator LSLString(List l)
             {
                 return new LSLString(l.ToSoup());
             }
@@ -1166,9 +1166,9 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
                 return count;
             }
 
-            public static list ToDoubleList(list src)
+            public static List ToDoubleList(List src)
             {
-                list ret = new list();
+                List ret = new List();
                 double entry;
                 for (int i = 0; i < src.Data.Length - 1; i++)
                 {
@@ -1237,7 +1237,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
             public double GeometricMean()
             {
                 double ret = 1.0;
-                list nums = ToDoubleList(this);
+                List nums = ToDoubleList(this);
                 for (int i = 0; i < nums.Data.Length; i++)
                 {
                     ret *= (double) nums.Data[i];
@@ -1248,7 +1248,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
             public double HarmonicMean()
             {
                 double ret = 0.0;
-                list nums = ToDoubleList(this);
+                List nums = ToDoubleList(this);
                 for (int i = 0; i < nums.Data.Length; i++)
                 {
                     ret += 1.0/(double) nums.Data[i];
@@ -1259,7 +1259,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
             public double Variance()
             {
                 double s = 0;
-                list num = ToDoubleList(this);
+                List num = ToDoubleList(this);
                 for (int i = 0; i < num.Data.Length; i++)
                 {
                     s += Math.Pow((double) num.Data[i], 2);
@@ -1274,7 +1274,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
 
             public double Qi(double i)
             {
-                list j = this;
+                List j = this;
                 j.NumericSort();
 
                 if (FloatAlmostEqual (Math.Ceiling (Length * i), Length * i)) {
@@ -1343,10 +1343,10 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
 
             public override bool Equals(object obj)
             {
-                if (!(obj is list))
+                if (!(obj is List))
                     return false;
 
-                return Data.Length == ((list) obj).Data.Length;
+                return Data.Length == ((List) obj).Data.Length;
             }
 
             public override int GetHashCode()
@@ -1461,9 +1461,9 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
                 return new LSLFloat(s);
             }
 
-            public static implicit operator list(LSLString s)
+            public static implicit operator List(LSLString s)
             {
-                return new list(new object[] {s});
+                return new List(new object[] {s});
             }
 
             #endregion
@@ -1688,9 +1688,9 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
                 return new LSLString(i.ToString());
             }
 
-            public static implicit operator list(LSLInteger i)
+            public static implicit operator List(LSLInteger i)
             {
-                return new list(new object[] {i});
+                return new List(new object[] {i});
             }
 
             public static implicit operator bool (LSLInteger i)
@@ -2009,9 +2009,9 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
                 return new LSLFloat(s);
             }
 
-            public static implicit operator list(LSLFloat f)
+            public static implicit operator List(LSLFloat f)
             {
-                return new list(new object[] {f});
+                return new List(new object[] {f});
             }
 
             public static implicit operator LSLFloat(double d)

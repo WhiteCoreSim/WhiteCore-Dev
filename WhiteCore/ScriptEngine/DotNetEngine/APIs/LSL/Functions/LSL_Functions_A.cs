@@ -58,7 +58,7 @@ using GridRegion = WhiteCore.Framework.Services.GridRegion;
 using LSL_Float = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.LSLFloat;
 using LSL_Integer = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.LSLInteger;
 using LSL_Key = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.LSLString;
-using LSL_List = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.list;
+using LSL_List = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.List;
 using LSL_Rotation = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.Quaternion;
 using LSL_String = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.LSLString;
 using LSL_Vector = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.Vector3;
@@ -70,9 +70,8 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
     public partial class LSL_Api : MarshalByRefObject, IScriptApi
     {
 
-        public void llAttachToAvatarTemp (int attachmentPoint)
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+        public void llAttachToAvatarTemp(int attachmentPoint) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
                 return;
 
             if (m_host.ParentEntity.RootChild.AttachmentPoint != 0)
@@ -81,27 +80,26 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             TaskInventoryItem item;
 
             lock (m_host.TaskInventory) {
-                if (!m_host.TaskInventory.ContainsKey (InventorySelf ()))
+                if (!m_host.TaskInventory.ContainsKey(InventorySelf()))
                     return;
-                item = m_host.TaskInventory [InventorySelf ()];
+                item = m_host.TaskInventory[InventorySelf()];
             }
 
             if (item.PermsGranter != m_host.OwnerID)
                 return;
 
             if ((item.NextPermissions & (uint)PermissionMask.Transfer) != (uint)PermissionMask.Transfer) {
-                Error ("llAttachToAvatarTemp", "No permission to transfer");
+                Error("llAttachToAvatarTemp", "No permission to transfer");
                 return;
             }
 
             if ((item.PermsMask & ScriptBaseClass.PERMISSION_ATTACH) != 0) {
-                AttachToAvatar (attachmentPoint, true);
+                AttachToAvatar(attachmentPoint, true);
             }
         }
 
-        public void llAttachToAvatar (int attachmentPoint)
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+        public void llAttachToAvatar(int attachmentPoint) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
                 return;
 
 
@@ -111,16 +109,16 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
             TaskInventoryItem item;
 
             lock (m_host.TaskInventory) {
-                if (!m_host.TaskInventory.ContainsKey (InventorySelf ()))
+                if (!m_host.TaskInventory.ContainsKey(InventorySelf()))
                     return;
-                item = m_host.TaskInventory [InventorySelf ()];
+                item = m_host.TaskInventory[InventorySelf()];
             }
 
             if (item.PermsGranter != m_host.OwnerID)
                 return;
 
             if ((item.PermsMask & ScriptBaseClass.PERMISSION_ATTACH) != 0) {
-                AttachToAvatar (attachmentPoint, false);
+                AttachToAvatar(attachmentPoint, false);
             }
         }
 
@@ -150,46 +148,42 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
         // Xantor 29/apr/2008
         // Returns rotation described by rotating angle radians about axis.
         // q = cos(a/2) + i (x * sin(a/2)) + j (y * sin(a/2)) + k (z * sin(a/2))
-        public LSL_Rotation llAxisAngle2Rot (LSL_Vector axis, LSL_Float angle)
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
-                return new LSL_Rotation ();
+        public LSL_Rotation llAxisAngle2Rot(LSL_Vector axis, LSL_Float angle) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+                return new LSL_Rotation();
 
 
-            double s = Math.Cos (angle * 0.5);
-            double t = Math.Sin (angle * 0.5);
+            double s = Math.Cos(angle * 0.5);
+            double t = Math.Sin(angle * 0.5);
             double x = axis.x * t;
             double y = axis.y * t;
             double z = axis.z * t;
 
-            return new LSL_Rotation (x, y, z, s);
+            return new LSL_Rotation(x, y, z, s);
         }
 
-        public void llAllowInventoryDrop (int add)
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+        public void llAllowInventoryDrop(int add) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
                 return;
 
 
             m_host.ParentEntity.RootChild.AllowedDrop = add != 0;
 
             // Update the object flags
-            m_host.ParentEntity.RootChild.aggregateScriptEvents ();
+            m_host.ParentEntity.RootChild.aggregateScriptEvents();
         }
 
-        public LSL_String llAvatarOnSitTarget ()
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+        public LSL_String llAvatarOnSitTarget() {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
                 return ScriptBaseClass.NULL_KEY;
 
             return m_host.SitTargetAvatar.Count > 0
-                       ? new LSL_String (m_host.SitTargetAvatar [0].ToString ())
+                       ? new LSL_String(m_host.SitTargetAvatar[0].ToString())
                        : ScriptBaseClass.NULL_KEY;
         }
 
-        public LSL_Key llAvatarOnLinkSitTarget (LSL_Integer link)
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+        public LSL_Key llAvatarOnLinkSitTarget(LSL_Integer link) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
                 return ScriptBaseClass.NULL_KEY;
 
             if (link == ScriptBaseClass.LINK_SET ||
@@ -198,57 +192,55 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
                 link == 0)
                 return ScriptBaseClass.NULL_KEY;
 
-            var entities = GetLinkParts (link);
+            var entities = GetLinkParts(link);
             return entities.Count == 0
                            ? ScriptBaseClass.NULL_KEY
-                           : new LSL_String (entities [0].SitTargetAvatar.ToString ());
+                           : new LSL_String(entities[0].SitTargetAvatar.ToString());
         }
 
-        public DateTime llAddToLandPassList (string avatar, double hours)
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+        public DateTime llAddToLandPassList(string avatar, double hours) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
                 return DateTime.Now;
 
-            IParcelManagementModule parcelManagement = World.RequestModuleInterface<IParcelManagementModule> ();
+            IParcelManagementModule parcelManagement = World.RequestModuleInterface<IParcelManagementModule>();
             if (parcelManagement != null) {
                 LandData land =
-                    parcelManagement.GetLandObject (m_host.AbsolutePosition.X, m_host.AbsolutePosition.Y).LandData;
+                    parcelManagement.GetLandObject(m_host.AbsolutePosition.X, m_host.AbsolutePosition.Y).LandData;
                 if (land.OwnerID == m_host.OwnerID) {
-                    ParcelManager.ParcelAccessEntry entry = new ParcelManager.ParcelAccessEntry ();
+                    ParcelManager.ParcelAccessEntry entry = new ParcelManager.ParcelAccessEntry();
                     UUID key;
-                    if (UUID.TryParse (avatar, out key)) {
+                    if (UUID.TryParse(avatar, out key)) {
                         entry.AgentID = key;
                         entry.Flags = AccessList.Access;
-                        entry.Time = DateTime.Now.AddHours (hours);
-                        land.ParcelAccessList.Add (entry);
+                        entry.Time = DateTime.Now.AddHours(hours);
+                        land.ParcelAccessList.Add(entry);
                     }
                 }
             }
-            return PScriptSleep (m_sleepMsOnAddToLandPassList);
+            return PScriptSleep(m_sleepMsOnAddToLandPassList);
         }
 
 
-        public DateTime llAddToLandBanList (string avatar, double hours)
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+        public DateTime llAddToLandBanList(string avatar, double hours) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
                 return DateTime.Now;
 
-            IParcelManagementModule parcelManagement = World.RequestModuleInterface<IParcelManagementModule> ();
+            IParcelManagementModule parcelManagement = World.RequestModuleInterface<IParcelManagementModule>();
             if (parcelManagement != null) {
                 LandData land =
-                    parcelManagement.GetLandObject (m_host.AbsolutePosition.X, m_host.AbsolutePosition.Y).LandData;
+                    parcelManagement.GetLandObject(m_host.AbsolutePosition.X, m_host.AbsolutePosition.Y).LandData;
                 if (land.OwnerID == m_host.OwnerID) {
-                    ParcelManager.ParcelAccessEntry entry = new ParcelManager.ParcelAccessEntry ();
+                    ParcelManager.ParcelAccessEntry entry = new ParcelManager.ParcelAccessEntry();
                     UUID key;
-                    if (UUID.TryParse (avatar, out key)) {
+                    if (UUID.TryParse(avatar, out key)) {
                         entry.AgentID = key;
                         entry.Flags = AccessList.Ban;
-                        entry.Time = DateTime.Now.AddHours (hours);
-                        land.ParcelAccessList.Add (entry);
+                        entry.Time = DateTime.Now.AddHours(hours);
+                        land.ParcelAccessList.Add(entry);
                     }
                 }
             }
-            return PScriptSleep (m_sleepMsOnAddToLandBanList);
+            return PScriptSleep(m_sleepMsOnAddToLandBanList);
         }
 
 

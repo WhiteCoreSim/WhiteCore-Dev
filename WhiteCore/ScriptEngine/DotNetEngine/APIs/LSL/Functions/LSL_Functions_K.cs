@@ -58,7 +58,7 @@ using GridRegion = WhiteCore.Framework.Services.GridRegion;
 using LSL_Float = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.LSLFloat;
 using LSL_Integer = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.LSLInteger;
 using LSL_Key = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.LSLString;
-using LSL_List = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.list;
+using LSL_List = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.List;
 using LSL_Rotation = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.Quaternion;
 using LSL_String = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.LSLString;
 using LSL_Vector = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.Vector3;
@@ -69,20 +69,19 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
 {
     public partial class LSL_Api : MarshalByRefObject, IScriptApi
     {
-        public LSL_String llKey2Name (string id)
-        {
-            if (!ScriptProtection.CheckThreatLevel (ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
+        public LSL_String llKey2Name(string id) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.None, "LSL", m_host, "LSL", m_itemID))
                 return "";
 
-            UUID key = new UUID ();
-            if (UUID.TryParse (id, out key)) {
-                IScenePresence presence = World.GetScenePresence (key);
+            UUID key = new UUID();
+            if (UUID.TryParse(id, out key)) {
+                IScenePresence presence = World.GetScenePresence(key);
 
                 if (presence != null)
                     return presence.Name;
 
-                if (World.GetSceneObjectPart (key) != null) {
-                    return World.GetSceneObjectPart (key).Name;
+                if (World.GetSceneObjectPart(key) != null) {
+                    return World.GetSceneObjectPart(key).Name;
                 }
             }
             return string.Empty;
