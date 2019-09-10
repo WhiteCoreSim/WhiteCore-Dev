@@ -40,7 +40,7 @@ using WhiteCore.ScriptEngine.DotNetEngine;
 using LSL_Float = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.LSLFloat;
 using LSL_Integer = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.LSLInteger;
 using LSL_Key = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.LSLString;
-using LSL_List = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.list;
+using LSL_List = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.List;
 using LSL_Rotation = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.Quaternion;
 using LSL_String = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.LSLString;
 using LSL_Vector = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.Vector3;
