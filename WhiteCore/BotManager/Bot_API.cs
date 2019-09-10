@@ -40,7 +40,7 @@ using WhiteCore.ScriptEngine.DotNetEngine;
 using LSL_Float = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.LSLFloat;
 using LSL_Integer = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.LSLInteger;
 using LSL_Key = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.LSLString;
-using LSL_List = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.list;
+using LSL_List = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.List;
 using LSL_Rotation = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.Quaternion;
 using LSL_String = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.LSLString;
 using LSL_Vector = WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.Vector3;
@@ -58,10 +58,8 @@ namespace WhiteCore.BotManager
         /// <summary>
         ///     Created by John Sibly @ http://stackoverflow.com/questions/52797/c-how-do-i-get-the-path-of-the-assembly-the-code-is-in
         /// </summary>
-        public static string AssemblyFileName
-        {
-            get
-            {
+        public static string AssemblyFileName {
+            get {
                 string codeBase = Assembly.GetExecutingAssembly().CodeBase;
                 UriBuilder uri = new UriBuilder(codeBase);
                 string path = Uri.UnescapeDataString(uri.Path);
@@ -69,15 +67,12 @@ namespace WhiteCore.BotManager
             }
         }
 
-        public IScene World
-        {
+        public IScene World {
             get { return m_host.ParentEntity.Scene; }
         }
 
         #region IBot_Api Members
-
-        public LSL_String botCreateBot(string firstName, string lastName, string appearanceToClone, LSL_Vector startPos)
-        {
+        public LSL_String botCreateBot(string firstName, string lastName, string appearanceToClone, LSL_Vector startPos) {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.Moderate, "botCreateBot", m_host, "bot", m_itemID))
                 return "";
             IBotManager manager = World.RequestModuleInterface<IBotManager>();
@@ -86,18 +81,16 @@ namespace WhiteCore.BotManager
                     new LSL_String(
                         manager.CreateAvatar(firstName, lastName, m_host.ParentEntity.Scene,
                                              UUID.Parse(appearanceToClone), m_host.OwnerID,
-                                             new Vector3((float) startPos.x, (float) startPos.y, (float) startPos.z)).
+                                             new Vector3((float)startPos.x, (float)startPos.y, (float)startPos.z)).
                                 ToString());
             return new LSL_String("");
         }
 
-        public LSL_Vector botGetWaitingTime(LSL_Integer waitTime)
-        {
+        public LSL_Vector botGetWaitingTime(LSL_Integer waitTime) {
             return new LSL_Vector(waitTime, 0, 0);
         }
 
-        public void botPauseMovement(string bot)
-        {
+        public void botPauseMovement(string bot) {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.Moderate, "botPauseMovement", m_host, "bot", m_itemID))
                 return;
             IBotManager manager = World.RequestModuleInterface<IBotManager>();
@@ -105,8 +98,7 @@ namespace WhiteCore.BotManager
                 manager.PauseMovement(UUID.Parse(bot), m_host.OwnerID);
         }
 
-        public void botResumeMovement(string bot)
-        {
+        public void botResumeMovement(string bot) {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.Moderate, "botResumeMovement", m_host, "bot", m_itemID))
                 return;
             IBotManager manager = World.RequestModuleInterface<IBotManager>();
@@ -114,8 +106,7 @@ namespace WhiteCore.BotManager
                 manager.ResumeMovement(UUID.Parse(bot), m_host.OwnerID);
         }
 
-        public void botSetShouldFly(string keyOfBot, int ShouldFly)
-        {
+        public void botSetShouldFly(string keyOfBot, int ShouldFly) {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.Moderate, "botSetShouldFly", m_host, "bot", m_itemID))
                 return;
             IBotManager manager = World.RequestModuleInterface<IBotManager>();
@@ -123,20 +114,17 @@ namespace WhiteCore.BotManager
                 manager.SetBotShouldFly(UUID.Parse(keyOfBot), ShouldFly == 1, m_host.OwnerID);
         }
 
-        public void botSetMap(string keyOfBot, LSL_List positions, LSL_List movementType, LSL_Integer flags)
-        {
+        public void botSetMap(string keyOfBot, LSL_List positions, LSL_List movementType, LSL_Integer flags) {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.Moderate, "botSetMap", m_host, "bot", m_itemID)) return;
             List<Vector3> PositionsMap = new List<Vector3>();
-            for (int i = 0; i < positions.Length; i++)
-            {
+            for (int i = 0; i < positions.Length; i++) {
                 LSL_Vector pos = positions.GetVector3Item(i);
-                PositionsMap.Add(new Vector3((float) pos.x, (float) pos.y, (float) pos.z));
+                PositionsMap.Add(new Vector3((float)pos.x, (float)pos.y, (float)pos.z));
             }
             List<TravelMode> TravelMap = new List<TravelMode>();
-            for (int i = 0; i < movementType.Length; i++)
-            {
+            for (int i = 0; i < movementType.Length; i++) {
                 LSL_Integer travel = movementType.GetLSLIntegerItem(i);
-                TravelMap.Add((TravelMode) travel.value);
+                TravelMap.Add((TravelMode)travel.value);
             }
 
             IBotManager manager = World.RequestModuleInterface<IBotManager>();
@@ -144,8 +132,7 @@ namespace WhiteCore.BotManager
                 manager.SetBotMap(UUID.Parse(keyOfBot), PositionsMap, TravelMap, flags.value, m_host.OwnerID);
         }
 
-        public void botRemoveBot(string bot)
-        {
+        public void botRemoveBot(string bot) {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.Moderate, "botRemoveBot", m_host, "bot", m_itemID))
                 return;
             IBotManager manager = World.RequestModuleInterface<IBotManager>();
@@ -153,8 +140,7 @@ namespace WhiteCore.BotManager
                 manager.RemoveAvatar(UUID.Parse(bot), m_host.ParentEntity.Scene, m_host.OwnerID);
         }
 
-        public void botSetSpeed(LSL_Key bot, LSL_Float SpeedModifier)
-        {
+        public void botSetSpeed(LSL_Key bot, LSL_Float SpeedModifier) {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.Moderate, "botSetSpeed", m_host, "OSSL", m_itemID))
                 return;
 
@@ -164,19 +150,17 @@ namespace WhiteCore.BotManager
         }
 
         public void botFollowAvatar(string bot, string avatarName, LSL_Float startFollowDistance,
-                                    LSL_Float endFollowDistance)
-        {
+                                    LSL_Float endFollowDistance) {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.Moderate, "botFollowAvatar", m_host, "bot", m_itemID))
                 return;
             IBotManager manager = World.RequestModuleInterface<IBotManager>();
             if (manager != null)
-                manager.FollowAvatar(UUID.Parse(bot), avatarName, (float) startFollowDistance, (float) endFollowDistance,
+                manager.FollowAvatar(UUID.Parse(bot), avatarName, (float)startFollowDistance, (float)endFollowDistance,
                                      false, Vector3.Zero,
                                      m_host.OwnerID);
         }
 
-        public void botStopFollowAvatar(string bot)
-        {
+        public void botStopFollowAvatar(string bot) {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.Moderate, "botStopFollowAvatar", m_host, "bot", m_itemID))
                 return;
             IBotManager manager = World.RequestModuleInterface<IBotManager>();
@@ -184,8 +168,7 @@ namespace WhiteCore.BotManager
                 manager.StopFollowAvatar(UUID.Parse(bot), m_host.OwnerID);
         }
 
-        public void botSendChatMessage(string bot, string message, int channel, int sayType)
-        {
+        public void botSendChatMessage(string bot, string message, int channel, int sayType) {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.Moderate, "botSendChatMessage", m_host, "bot", m_itemID))
                 return;
             IBotManager manager = World.RequestModuleInterface<IBotManager>();
@@ -193,8 +176,7 @@ namespace WhiteCore.BotManager
                 manager.SendChatMessage(UUID.Parse(bot), message, sayType, channel, m_host.OwnerID);
         }
 
-        public void botSendIM(string bot, string user, string message)
-        {
+        public void botSendIM(string bot, string user, string message) {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.Moderate, "botSendIM", m_host, "bot", m_itemID))
                 return;
             IBotManager manager = World.RequestModuleInterface<IBotManager>();
@@ -202,8 +184,7 @@ namespace WhiteCore.BotManager
                 manager.SendIM(UUID.Parse(bot), UUID.Parse(user), message, m_host.OwnerID);
         }
 
-        public void botTouchObject(string bot, string objectID)
-        {
+        public void botTouchObject(string bot, string objectID) {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.Moderate, "botTouchObject", m_host, "bot", m_itemID))
                 return;
             SurfaceTouchEventArgs touchArgs = new SurfaceTouchEventArgs();
@@ -222,8 +203,7 @@ namespace WhiteCore.BotManager
             World.EventManager.TriggerObjectDeGrab(child.ParentEntity.RootChild, child, sp.ControllingClient, touchArgs);
         }
 
-        public void botSitObject(string bot, string objectID, LSL_Vector offset)
-        {
+        public void botSitObject(string bot, string objectID, LSL_Vector offset) {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.Moderate, "botTouchObject", m_host, "bot", m_itemID))
                 return;
             IScenePresence sp = World.GetScenePresence(UUID.Parse(bot));
@@ -234,11 +214,10 @@ namespace WhiteCore.BotManager
                 throw new Exception("Failed to find entity to sit on");
 
             sp.HandleAgentRequestSit(sp.ControllingClient, UUID.Parse(objectID),
-                                     new Vector3((float) offset.x, (float) offset.y, (float) offset.z));
+                                     new Vector3((float)offset.x, (float)offset.y, (float)offset.z));
         }
 
-        public void botStandUp(string bot)
-        {
+        public void botStandUp(string bot) {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.Moderate, "botStandUp", m_host, "bot", m_itemID)) return;
             IScenePresence sp = World.GetScenePresence(UUID.Parse(bot));
             if (sp == null)
@@ -246,30 +225,25 @@ namespace WhiteCore.BotManager
             sp.StandUp();
         }
 
-        public void botSetRot(LSL_Key npc, LSL_Rotation rotation)
-        {
-            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.Moderate, "botStandUp", m_host, "bot", m_itemID)) return;
+        public void botSetRotation(LSL_Key npc, LSL_Rotation rotation) {
+            if (!ScriptProtection.CheckThreatLevel(ThreatLevel.Moderate, "botSetRotation", m_host, "bot", m_itemID)) return;
             IScenePresence sp = World.GetScenePresence(UUID.Parse(npc));
             if (sp == null)
                 return;
-            UUID npcId;
-            if (!UUID.TryParse(npc.m_string, out npcId))
+            if (!UUID.TryParse(npc.m_string, out _))    // not actually interested in the UUID, just need to make sure it is 'real'
                 return;
 
-            if (sp != null)
-                sp.Rotation = rotation.ToQuaternion();
+            sp.Rotation = rotation.ToQuaternion();
         }
 
-        public void botAddTag(string bot, string tag)
-        {
+        public void botAddTag(string bot, string tag) {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.Moderate, "botAddTag", m_host, "bot", m_itemID)) return;
             IBotManager manager = World.RequestModuleInterface<IBotManager>();
             if (manager != null)
                 manager.AddTagToBot(UUID.Parse(bot), tag, m_host.OwnerID);
         }
 
-        public LSL_List botGetBotsWithTag(string tag)
-        {
+        public LSL_List botGetBotsWithTag(string tag) {
             if (!ScriptProtection.CheckThreatLevel(ThreatLevel.Moderate, "botGetBotsWithTag", m_host, "bot", m_itemID))
                 return new LSL_List();
             IBotManager manager = World.RequestModuleInterface<IBotManager>();
@@ -283,8 +257,7 @@ namespace WhiteCore.BotManager
             return b;
         }
 
-        public void botRemoveBotsWithTag(string tag)
-        {
+        public void botRemoveBotsWithTag(string tag) {
             if (
                 !ScriptProtection.CheckThreatLevel(ThreatLevel.Moderate, "botRemoveBotsWithTag", m_host, "bot", m_itemID))
                 return;
@@ -298,26 +271,22 @@ namespace WhiteCore.BotManager
         #region IScriptApi Members
 
         public void Initialize(IScriptModulePlugin scriptEngine, ISceneChildEntity host, uint localID, UUID itemID,
-                               ScriptProtectionModule module)
-        {
+                               ScriptProtectionModule module) {
             m_itemID = itemID;
             m_ScriptEngine = scriptEngine;
             m_host = host;
             ScriptProtection = module;
         }
 
-        public IScriptApi Copy()
-        {
+        public IScriptApi Copy() {
             return new Bot_Api();
         }
 
-        public string Name
-        {
+        public string Name {
             get { return "bot"; }
         }
 
-        public string InterfaceName
-        {
+        public string InterfaceName {
             get { return "IBot_Api"; }
         }
 
@@ -325,11 +294,9 @@ namespace WhiteCore.BotManager
         ///     We have to add a ref here, as this API is NOT inside of the script engine
         ///     So we add the referenced assembly to ourselves
         /// </summary>
-        public string[] ReferencedAssemblies
-        {
-            get
-            {
-                return new string[1]
+        public string[] ReferencedAssemblies {
+            get {
+                return new string[]
                            {
                                AssemblyFileName
                            };
@@ -339,23 +306,19 @@ namespace WhiteCore.BotManager
         /// <summary>
         ///     We use "WhiteCore.BotManager", and that isn't a default namespace, so we need to add it
         /// </summary>
-        public string[] NamespaceAdditions
-        {
-            get { return new string[1] {"WhiteCore.BotManager"}; }
+        public string[] NamespaceAdditions {
+            get { return new string[] { "WhiteCore.BotManager" }; }
         }
 
         #endregion
 
-        public void Dispose()
-        {
+        public void Dispose() {
         }
 
-        public override Object InitializeLifetimeService()
-        {
-            ILease lease = (ILease) base.InitializeLifetimeService();
+        public override object InitializeLifetimeService() {
+            ILease lease = (ILease)base.InitializeLifetimeService();
 
-            if (lease.CurrentState == LeaseState.Initial)
-            {
+            if (lease.CurrentState == LeaseState.Initial) {
                 lease.InitialLeaseTime = TimeSpan.FromMinutes(0);
                 //                lease.RenewOnCallTime = TimeSpan.FromSeconds(10.0);
                 //                lease.SponsorshipTimeout = TimeSpan.FromMinutes(1.0);

@@ -86,8 +86,7 @@ namespace WhiteCore.BotManager.AStar
         /// <param name="x">X-coordinate</param>
         /// <param name="y">Y-coordinate</param>
         /// <returns>Returns movement cost at the specified point in the map</returns>
-        public static int GetMap(int x, int y)
-        {
+        public static int GetMap(int x, int y) {
             if ((x < 0) || (x > 9))
                 return (-1);
             if ((y < 0) || (y > 9))
@@ -99,15 +98,11 @@ namespace WhiteCore.BotManager.AStar
         ///     Prints the solution
         /// </summary>
         /// <param name="aSolution">The list that holds the solution</param>
-        public static void PrintSolution(ArrayList aSolution)
-        {
-            for (int j = 0; j < 10; j++)
-            {
-                for (int i = 0; i < 10; i++)
-                {
+        public static void PrintSolution(ArrayList aSolution) {
+            for (int j = 0; j < 10; j++) {
+                for (int i = 0; i < 10; i++) {
                     bool solution = false;
-                    foreach (AStarNode2D n in aSolution)
-                    {
+                    foreach (AStarNode2D n in aSolution) {
                         AStarNode2D tmp = new AStarNode2D(null, null, 0, i, j);
                         solution = n.IsSameState(tmp);
                         if (solution)
@@ -128,14 +123,13 @@ namespace WhiteCore.BotManager.AStar
         ///     The main entry point for the application.
         /// </summary>
         [STAThread]
-        static void Main(string[] args)
-        {
+        static void Main(string[] args) {
             Console.WriteLine("Starting...");
 
             AStar astar = new AStar();
 
             AStarNode2D GoalNode = new AStarNode2D(null, null, 0, 9, 9);
-            AStarNode2D StartNode = new AStarNode2D(null, GoalNode, 0, 0, 0) {GoalNode = GoalNode};
+            AStarNode2D StartNode = new AStarNode2D(null, GoalNode, 0, 0, 0) { GoalNode = GoalNode };
             astar.FindPath(StartNode, GoalNode);
 
             PrintSolution(astar.Solution);
