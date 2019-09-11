@@ -230,7 +230,8 @@ namespace WhiteCore.BotManager
             IScenePresence sp = World.GetScenePresence(UUID.Parse(npc));
             if (sp == null)
                 return;
-            if (!UUID.TryParse(npc.m_string, out _))    // not actually interested in the UUID, just need to make sure it is 'real'
+            UUID uid;
+            if (!UUID.TryParse(npc.m_string, out uid))    // not actually interested in the UUID, just need to make sure it is 'real'
                 return;
 
             sp.Rotation = rotation.ToQuaternion();
