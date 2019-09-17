@@ -853,6 +853,12 @@ msgstr "Управление новостями"
 msgid "NewsTitleText"
 msgstr "Заголовок"
 
+msgid "Next3Days"
+msgstr "Следующие 3 дня"
+
+msgid "Next7Days"
+msgstr "Следующие 7 дня"
+
 msgid "Next10Hours"
 msgstr "Следущие 10 часов"
 

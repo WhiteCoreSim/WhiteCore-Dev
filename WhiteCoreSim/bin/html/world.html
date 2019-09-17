@@ -1,20 +1,29 @@
 <!-- World map -->
 
-<!--<link type="text/css" rel="stylesheet" href="map/wcmapapi.css">-->
-<link type="text/css" rel="stylesheet" href="map/leaflet.css">
+<link type="text/css" rel="stylesheet" href="map/leaflet.css?v=20180420">
+<link type="text/css" rel="stylesheet" href="css/mapapi.css?v=20180420">
 
-
-<!--    <div class="container" id="container"> -->
 <div class="row">
   <div class="col-md-2">
-  <label><p>{RegionText}</p></label>
+    <label><p>{RegionText}</p></label>
     {RegionListArrayBegin}
     <div class="mapregion">
-      <label><p>{RegionName}</p></label>
-      <p>{RegionLocX},{RegionLocY}
-      {RegionInfo}
-      {RegionStatus}</p>
-<!--      <label><p><a target="_self" class='regioninfo' href="regionprofile/?regionid={RegionID}">{MoreInfoText}</a></p></td></label> -->
+      <a class="regionslurl"
+        onclick="document.location.href='hop://{MainServerURL}/{RegionName}/128/128/50'">
+        <img height="60" src="{RegionWorldViewURL}" alt="{RegionName}" title="{RegionName}" />
+        <label><p>{RegionName}</p></label>
+        <p>
+          <!--{RegionLocX},{RegionLocY}-->
+          {RegionInfo}
+          {RegionStatus}
+        </p>
+      </a>
+
+      <label>
+        <p>
+          <a target="_self" class='regioninfo' href="regionprofile/?regionid={RegionID}">{MoreInfoText}</a>
+        </p>
+      </label>
     </div>
     {RegionListArrayEnd}
   </div>
@@ -23,19 +32,21 @@
   </div>
 </div>
 
-    <script src="map/leaflet.js"></script>
-    <script src="map/mapapi.js"></script>
+
+
+<script src="map/leaflet.js?v=20180420"></script>
+<script src="map/mapapi.js?v=20180420"></script>
 
 <script>
   function loadmap() {
     // creates the map
-    var worldmap = SLMap(document.getElementById('map-container'));
+    var worldmap = WCMap(document.getElementById('map-container'));
     worldmap.setView([{MapCenterX}, {MapCenterY}], 5);
 
   };
 
   $(document).ready(function() {
-    loadmap();
+     loadmap();
   });
 </script>
 

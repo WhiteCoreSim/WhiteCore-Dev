@@ -58,6 +58,9 @@ namespace WhiteCore.Services
         protected IAvatarService m_avatarService;
         protected IInventoryService m_inventoryService;
 
+        TextureData [] textures = new TextureData [(int)AvatarTextureIndex.NumberOfEntries];
+        // List<UUID> m_lastInventoryItemIDs = ne List<UUID>();
+
         public void Initialize (IConfigSource config, IRegistryCore registry)
         {
             IConfig ssaConfig = config.Configs ["SSAService"];
@@ -97,6 +100,7 @@ namespace WhiteCore.Services
         {
             if (!m_enabled)
                 return;
+            
             IGridInfo gridInfo = m_registry.RequestModuleInterface<IGridInfo> ();
             if (gridInfo != null)
                 gridInfo.AgentAppearanceURI = ServiceURI;
@@ -106,13 +110,13 @@ namespace WhiteCore.Services
         {
             string [] req = path.Split ('/');
             UUID avID = UUID.Parse (req [2]);
-            //string type = req[3];
+            // string type = req[3];
             UUID textureID = UUID.Parse (req [4]);
 
-            //IAvatarService avService = m_registry.RequestModuleInterface<IAvatarService>();
-            //WhiteCore.Framework.ClientInterfaces.AvatarAppearance appearance = avService.GetAppearance(avID);
-            //AvatarTextureIndex textureIndex = AppearanceManager.BakeTypeToAgentTextureIndex((BakeType)Enum.Parse(typeof(BakeType), type, true));
-            //AssetBase texture = m_assetService.Get(appearance.Texture.FaceTextures[(int)textureIndex].TextureID.ToString());
+            // IAvatarService avService = m_registry.RequestModuleInterface<IAvatarService>();
+            // WhiteCore.Framework.ClientInterfaces.AvatarAppearance appearance = avService.GetAppearance(avID);
+            // AvatarTextureIndex textureIndex = AppearanceManager.BakeTypeToAgentTextureIndex((BakeType)Enum.Parse(typeof(BakeType), type, true));
+            // AssetBase texture = m_assetService.Get(appearance.Texture.FaceTextures[(int)textureIndex].TextureID.ToString());
             AssetBase texture = m_assetService.Get (textureID.ToString ());
             if (texture == null) {
                 MainConsole.Instance.WarnFormat ("[Agent appearance service]: Could not find baked texture {0} for {1}", textureID, avID);
@@ -123,18 +127,16 @@ namespace WhiteCore.Services
             httpResponse.StatusCode = (int)System.Net.HttpStatusCode.OK;
             try {
                 httpResponse.ContentType = texture.TypeString;
-            } catch {
+            } catch (Exception e) {
+                MainConsole.Instance.Debug ("[Agent appearance service]: Exception setting httpResponse.ContenType\n" + e);
             }
 
             byte [] tdata = new byte [texture.Data.Length];
             texture.Data.CopyTo (tdata, 0);
+
             texture.Dispose ();
             return tdata;
         }
-
-        TextureData [] Textures = new TextureData [(int)AvatarTextureIndex.NumberOfEntries];
-        // List<UUID> m_lastInventoryItemIDs = new List<UUID>();
-
 
         public AvatarAppearance BakeAppearance (UUID agentID, int cof_version)
         {
@@ -161,8 +163,8 @@ namespace WhiteCore.Services
             foreach (InventoryItemBase itm in items)
                 MainConsole.Instance.Info ("[ServerSide appearance]: Baking " + itm.Name);
 
-            for (int i = 0; i < Textures.Length; i++)
-                Textures [i] = new TextureData ();
+            for (int i = 0; i < textures.Length; i++)
+                textures [i] = new TextureData ();
 
             WearableData alphaWearable = null;
             List<UUID> currentItemIDs = new List<UUID> ();
@@ -189,7 +191,7 @@ namespace WhiteCore.Services
                                     alphaWearable = wearable;
                                     continue;
                                 }
-                                AppearanceManager.DecodeWearableParams (wearable, ref Textures);
+                                AppearanceManager.DecodeWearableParams (wearable, ref textures);
                             }
                         }
                         if (asset != null)  // have asset but not an object
@@ -213,33 +215,33 @@ namespace WhiteCore.Services
                             {
                                 int i = (int)entry.Key;
 
-                                Textures[i].Texture = null;
-                                Textures[i].TextureID = UUID.Zero;
+                                textures[i].Texture = null;
+                                textures[i].TextureID = UUID.Zero;
                             }
                         }
                     }
                 }
             }*/
             //m_lastInventoryItemIDs = currentItemIDs;
-            for (int i = 0; i < Textures.Length; i++) {
-                /*if (Textures[i].TextureID == UUID.Zero)
+            for (int i = 0; i < textures.Length; i++) {
+                /*if (textures[i].TextureID == UUID.Zero)
                     continue;
-                if (Textures[i].Texture != null)
+                if (textures[i].Texture != null)
                     continue;*/
-                AssetBase asset = m_assetService.Get (Textures [i].TextureID.ToString ());
+                AssetBase asset = m_assetService.Get (textures [i].TextureID.ToString ());
                 if (asset != null) {
                     var assetData = new byte [asset.Data.Length];
                     asset.Data.CopyTo (assetData, 0);
                     asset.Dispose ();
-                    Textures [i].Texture = new AssetTexture (Textures [i].TextureID, assetData);
-                    Textures [i].Texture.Decode ();
+                    textures [i].Texture = new AssetTexture (textures [i].TextureID, assetData);
+                    textures [i].Texture.Decode ();
                 }
             }
 
             for (int bakedIndex = 0; bakedIndex < AppearanceManager.BAKED_TEXTURE_COUNT; bakedIndex++) {
                 AvatarTextureIndex textureIndex = AppearanceManager.BakeTypeToAgentTextureIndex ((BakeType)bakedIndex);
 
-                if (Textures [(int)textureIndex].TextureID == UUID.Zero) {
+                if (textures [(int)textureIndex].TextureID == UUID.Zero) {
                     // If this is the skirt layer and we're not wearing a skirt then skip it
                     if (bakedIndex == (int)BakeType.Skirt && appearance.Wearables [(int)WearableType.Skirt].Count == 0)
                         continue;
@@ -257,7 +259,7 @@ namespace WhiteCore.Services
 
                 for (int i = 0; i < textureIndices.Count; i++) {
                     int textureIndex = (int)textureIndices [i];
-                    TextureData texture = Textures [textureIndex];
+                    TextureData texture = textures [textureIndex];
                     texture.TextureIndex = (AvatarTextureIndex)textureIndex;
                     if (alphaWearable != null) {
                         if (alphaWearable.Asset.Textures.ContainsKey (texture.TextureIndex) &&
@@ -286,6 +288,7 @@ namespace WhiteCore.Services
                         MainConsole.Instance.ErrorFormat ("[Serverside apperance]: Unable to delete asset {0} during bake", faceTextureID);
                 }
                 assetID = m_assetService.Store (newBakedAsset);
+
             bake_complete:
                 newBakeIDs.Add (assetID);
                 MainConsole.Instance.WarnFormat ("[ServerSide appearance]: Baked {0}", assetID);
@@ -298,9 +301,10 @@ namespace WhiteCore.Services
             appearance.Serial = cof_version + 1;
             cof = m_inventoryService.GetFolderForType (agentID, InventoryType.Unknown, FolderType.CurrentOutfit);
             if (cof.Version > cof_version) {
-                //it changed during the baking... kill it with fire!
+                // it changed during the baking... kill it with fire!
                 return null;
             }
+
             m_avatarService.SetAppearance (agentID, appearance);
             return appearance;
         }
@@ -318,9 +322,9 @@ namespace WhiteCore.Services
 
             IUserAccountService uas = m_registry.RequestModuleInterface<IUserAccountService> ();
             if (uas != null) {
-                UserAccount account = uas.GetUserAccount (null, name);
-                if (account != null)
-                    BakeAppearance (account.PrincipalID, 0);
+                UserAccount userAcct = uas.GetUserAccount (null, name);
+                if (userAcct.Valid)
+                    BakeAppearance (userAcct.PrincipalID, 0);
                 else
                     MainConsole.Instance.WarnFormat ("Sorry! No user account found for {0}", name);
             }

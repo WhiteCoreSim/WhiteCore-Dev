@@ -2523,11 +2523,13 @@ namespace WhiteCore.Region
             }
             else if ((Shape.ProfileCurve & 0x07) == (byte) ProfileShape.Circle)
             {
-                if (Shape.PathCurve == (byte) Extrusion.Straight)
+                if (Shape.PathCurve == (byte)Extrusion.Straight)
                     return PrimType.CYLINDER;
-                    // ProfileCurve seems to combine hole shape and profile curve so we need to only compare against the lower 3 bits
-                else if (Shape.PathCurve == (byte) Extrusion.Curve1)
+                // ProfileCurve seems to combine hole shape and profile curve so we need to only compare against the lower 3 bits
+                else if (Shape.PathCurve == (byte)Extrusion.Curve1)
                     return PrimType.TORUS;
+                else if (Shape.PathCurve == (byte)Extrusion.Flexible)
+                    return PrimType.CYLINDER;
             }
             else if ((Shape.ProfileCurve & 0x07) == (byte) ProfileShape.HalfCircle)
             {
@@ -2536,10 +2538,12 @@ namespace WhiteCore.Region
             }
             else if ((Shape.ProfileCurve & 0x07) == (byte) ProfileShape.EquilateralTriangle)
             {
-                if (Shape.PathCurve == (byte) Extrusion.Straight)
+                if (Shape.PathCurve == (byte)Extrusion.Straight)
                     return PrimType.PRISM;
-                else if (Shape.PathCurve == (byte) Extrusion.Curve1)
+                else if (Shape.PathCurve == (byte)Extrusion.Curve1)
                     return PrimType.RING;
+                else if (Shape.PathCurve == (byte)Extrusion.Flexible)
+                    return PrimType.PRISM;
             }
 
             return PrimType.BOX;

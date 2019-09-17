@@ -156,7 +156,7 @@ namespace WhiteCore.Services.SQLServices.InventoryService
 
         #region IInventoryService Members
 
-        //[CanBeReflected(ThreatLevel = ThreatLevel.Full)]
+        // [CanBeReflected(ThreatLevel = ThreatLevel.Full)]
         public virtual bool CreateUserInventory (UUID principalID, bool createDefaultItems)
         {
             /*object remoteValue = DoRemoteByURL("InventoryServerURI", principalID, createDefaultItems);
@@ -294,6 +294,15 @@ namespace WhiteCore.Services.SQLServices.InventoryService
             }))
                 CreateFolder (principalID, rootFolder.ID, (int)FolderType.VMMListings, "Marketplace Listings");
 
+            // IWC / HG Suitcase for going outside the boxes
+            // Unused at the moment but implementing for future use
+
+            if (!Array.Exists(sysFolders, delegate (InventoryFolderBase f) {
+                if (f.Type == (short)FolderType.HGSuitcase) return true;
+                return false;
+            }))
+                CreateFolder(principalID, rootFolder.ID, (int)FolderType.HGSuitcase, "My Suitcase");
+
             if (createDefaultItems && m_LibraryService != null) {
                 defaultItems = new List<InventoryItemBase> ();
                 InventoryFolderBase bodypartFolder = GetFolderForType (principalID, InventoryType.Unknown, FolderType.BodyPart);
@@ -308,7 +317,7 @@ namespace WhiteCore.Services.SQLServices.InventoryService
                     Flags = (uint)WearableType.Shape,
                     ID = UUID.Random ()
                 };
-                //Give a new copy to every person
+                // Give a new copy to every person
                 AssetBase asset = m_AssetService.Get (AvatarWearable.DEFAULT_SHAPE_ASSET.ToString ());
                 if (asset != null) {
                     asset.ID = UUID.Random ();
@@ -334,7 +343,7 @@ namespace WhiteCore.Services.SQLServices.InventoryService
                     ID = UUID.Random ()
                 };
 
-                //Give a new copy to every person
+                // Give a new copy to every person
                 asset = m_AssetService.Get (AvatarWearable.DEFAULT_SKIN_ASSET.ToString ());
                 if (asset != null) {
                     asset.ID = UUID.Random ();
@@ -360,7 +369,7 @@ namespace WhiteCore.Services.SQLServices.InventoryService
                     ID = UUID.Random ()
                 };
 
-                //Give a new copy to every person
+                // Give a new copy to every person
                 asset = m_AssetService.Get (AvatarWearable.DEFAULT_HAIR_ASSET.ToString ());
                 if (asset != null) {
                     asset.ID = UUID.Random ();
@@ -386,7 +395,7 @@ namespace WhiteCore.Services.SQLServices.InventoryService
                     ID = UUID.Random ()
                 };
 
-                //Give a new copy to every person
+                // Give a new copy to every person
                 asset = m_AssetService.Get (AvatarWearable.DEFAULT_EYES_ASSET.ToString ());
                 if (asset != null) {
                     asset.ID = UUID.Random ();
@@ -412,7 +421,7 @@ namespace WhiteCore.Services.SQLServices.InventoryService
                     ID = UUID.Random ()
                 };
 
-                //Give a new copy to every person
+                // Give a new copy to every person
                 asset = m_AssetService.Get (AvatarWearable.DEFAULT_SHIRT_ASSET.ToString ());
                 if (asset != null) {
                     asset.ID = UUID.Random ();
@@ -438,7 +447,7 @@ namespace WhiteCore.Services.SQLServices.InventoryService
                     ID = UUID.Random ()
                 };
 
-                //Give a new copy to every person
+                // Give a new copy to every person
                 asset = m_AssetService.Get (AvatarWearable.DEFAULT_PANTS_ASSET.ToString ());
                 if (asset != null) {
                     asset.ID = UUID.Random ();
@@ -463,16 +472,16 @@ namespace WhiteCore.Services.SQLServices.InventoryService
         //[CanBeReflected(ThreatLevel = ThreatLevel.Full)]
         public virtual List<InventoryFolderBase> GetInventorySkeleton (UUID principalID)
         {
-            /*object remoteValue = DoRemoteByURL("InventoryServerURI", principalID);
+            /* object remoteValue = DoRemoteByURL("InventoryServerURI", principalID);
             if (remoteValue != null || m_doRemoteOnly)
-                return (List<InventoryFolderBase>)remoteValue;*/
+                return (List<InventoryFolderBase>)remoteValue; */
 
             List<InventoryFolderBase> allFolders = m_Database.GetFolders (
                 new [] { "agentID" },
                 new [] { principalID.ToString () });
             
-            if (allFolders.Count == 0)
-                return null;
+            // if (allFolders.Count == 0)   // return will be empty list if nothing found -greythane- 20190813
+            //      return null;
 
             return allFolders;
         }
@@ -488,7 +497,7 @@ namespace WhiteCore.Services.SQLServices.InventoryService
             return m_Database.FolderExists (folderID);
         }
 
-        //[CanBeReflected(ThreatLevel = ThreatLevel.Low)]
+        // [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
         public virtual bool FolderItemExists (UUID folderID, UUID itemID)
         {
             if (m_doRemoteOnly) {
@@ -499,7 +508,7 @@ namespace WhiteCore.Services.SQLServices.InventoryService
             return m_Database.FolderItemExists (folderID, itemID);
         }
 
-        //[CanBeReflected(ThreatLevel = ThreatLevel.Low)]
+        // [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
         public virtual bool ItemExists (UUID itemID)
         {
             if (m_doRemoteOnly) {
@@ -567,7 +576,7 @@ namespace WhiteCore.Services.SQLServices.InventoryService
                 return remoteValue != null ? (InventoryFolderBase)remoteValue : null;
             }
 
-            //Fix for snapshots, as they get the texture asset type, but need to get checked as snapshot folder types
+            // Fix for snapshots, as they get the texture asset type, but need to get checked as snapshot folder types
             if (invType == InventoryType.Snapshot)
                 type = FolderType.Snapshot;
 
@@ -838,7 +847,7 @@ namespace WhiteCore.Services.SQLServices.InventoryService
                 return remoteValue != null ? (bool)remoteValue : false;
             }
 
-            if (!m_AllowDelete) //Initial item MUST be created as a link or link folder
+            if (!m_AllowDelete)         // Initial item MUST be created as a link or link folder
                 if (item.AssetType == (sbyte)AssetType.Link || item.AssetType == (sbyte)AssetType.LinkFolder)
                     return false;
             m_Database.IncrementFolder (item.Folder);
@@ -865,7 +874,7 @@ namespace WhiteCore.Services.SQLServices.InventoryService
             }
 
             foreach (InventoryItemBase i in items) {
-                //re-fetch because we don't have Owner filled in properly
+                // re-fetch because we don't have Owner filled in properly
                 InventoryItemBase item = GetItem (UUID.Zero, i.ID);
                 if (item == null)
                     continue;
@@ -876,7 +885,7 @@ namespace WhiteCore.Services.SQLServices.InventoryService
 
                 m_Database.IncrementFolder (i.Folder); //Increment the new folder
                 m_Database.IncrementFolderByItem (i.ID);
-                //And the old folder too (have to use this one because we don't know the old folder)
+                // And the old folder too (have to use this one because we don't know the old folder)
                 m_Database.MoveItem (i.ID.ToString (), i.Folder.ToString ());
             }
 
@@ -974,7 +983,7 @@ namespace WhiteCore.Services.SQLServices.InventoryService
             return items [0];
         }
 
-        //[CanBeReflected(ThreatLevel = ThreatLevel.Full)]
+        // [CanBeReflected(ThreatLevel = ThreatLevel.Full)]
         public virtual OSDArray GetOSDItem (UUID avatarID, UUID itemID)
         {
             /* if (m_doRemoteOnly) {
@@ -1029,12 +1038,12 @@ namespace WhiteCore.Services.SQLServices.InventoryService
             return folders [0];
         }
 
-        //[CanBeReflected(ThreatLevel = ThreatLevel.Full)]
+        // [CanBeReflected(ThreatLevel = ThreatLevel.Full)]
         public virtual List<InventoryItemBase> GetActiveGestures (UUID principalID)
         {
-            /*object remoteValue = DoRemoteByURL("InventoryServerURI", principalID);
+            /* object remoteValue = DoRemoteByURL("InventoryServerURI", principalID);
             if (remoteValue != null || m_doRemoteOnly)
-                return (List<InventoryItemBase>)remoteValue;*/
+                return (List<InventoryItemBase>)remoteValue; */
 
             return new List<InventoryItemBase> (m_Database.GetActiveGestures (principalID));
         }
@@ -1043,7 +1052,7 @@ namespace WhiteCore.Services.SQLServices.InventoryService
         {
             UUID user = (UUID)param;
             var skel = GetInventorySkeleton (user);
-            if (skel != null) {
+            if (skel.Count > 0) {
                 foreach (var folder in skel) {
                     var items = GetFolderContent (user, folder.ID);
                     DeleteItems (user, items.Items.ConvertAll (item => item.ID));
@@ -1379,29 +1388,29 @@ namespace WhiteCore.Services.SQLServices.InventoryService
         public virtual void CmdFixInventory (IScene scene, string [] cmd)
         {
             var userName = MainConsole.Instance.Prompt ("Name of user <First Last>");
-            var account = m_UserAccountService.GetUserAccount (null, userName);
-            if (account == null) {
-                MainConsole.Instance.WarnFormat ("Sorry.. Could not find user '{0}'", userName);
+            var userAcct = m_UserAccountService.GetUserAccount (null, userName);
+            if (!userAcct.Valid) {
+                MainConsole.Instance.Warn ("Sorry.. Could not find user " + userName);
                 return;
             }
 
-            MainConsole.Instance.Info ("Verifying inventory for " + account.Name);
-            var rootFolder = GetRootFolder (account.PrincipalID);
+            MainConsole.Instance.Info ("Verifying inventory for " + userAcct.Name);
+            var rootFolder = GetRootFolder (userAcct.PrincipalID);
 
-            //Fix having a default root folder
+            // Fix having a default root folder
             if (rootFolder == null) {
                 MainConsole.Instance.Warn ("Fixing default root folder...");
 
                 List<InventoryFolderBase> skel;
-                skel = GetInventorySkeleton (account.PrincipalID);
-                if (skel == null) {
+                skel = GetInventorySkeleton (userAcct.PrincipalID);
+                if (skel.Count == 0) {
                     MainConsole.Instance.Info ("  .... skipping as user has not logged in yet");
                     return;
                 }
 
                 if (skel.Count == 0) {
-                    CreateUserInventory (account.PrincipalID, false);
-                    rootFolder = GetRootFolder (account.PrincipalID);
+                    CreateUserInventory (userAcct.PrincipalID, false);
+                    rootFolder = GetRootFolder (userAcct.PrincipalID);
                 }
                 // recheck to make sure
                 if (rootFolder == null) {
@@ -1410,7 +1419,7 @@ namespace WhiteCore.Services.SQLServices.InventoryService
                         Type = (short)FolderType.Root,
                         Version = 1,
                         ID = skel [0].ParentID,
-                        Owner = account.PrincipalID,
+                        Owner = userAcct.PrincipalID,
                         ParentID = UUID.Zero
                     };
                     m_Database.StoreFolder (rootFolder);
@@ -1424,12 +1433,12 @@ namespace WhiteCore.Services.SQLServices.InventoryService
                 }
             }
 
-            //Check against multiple root folders
-            var rootFolders = GetRootFolders (account.PrincipalID);
+            // Check against multiple root folders
+            var rootFolders = GetRootFolders (userAcct.PrincipalID);
             var badFolders = new List<UUID> ();
 
             if (rootFolders.Count != 1) {
-                //No duplicate folders!
+                // No duplicate folders!
                 foreach (InventoryFolderBase f in rootFolders
                          .Where (f => !badFolders.Contains (f.ID) && f.ID != rootFolder.ID)) {
                     MainConsole.Instance.Warn ("Removing duplicate root folder " + f.Name);
@@ -1437,15 +1446,15 @@ namespace WhiteCore.Services.SQLServices.InventoryService
                 }
             }
 
-            //Fix any root folders that shouldn't be root folders
-            var skeleton = GetInventorySkeleton (account.PrincipalID);
+            // Fix any root folders that shouldn't be root folders
+            var skeleton = GetInventorySkeleton (userAcct.PrincipalID);
             var foundFolders = new List<UUID> ();
 
             foreach (InventoryFolderBase f in skeleton) {
                 if (!foundFolders.Contains (f.ID))
                     foundFolders.Add (f.ID);
                 if (f.Name == InventoryFolderBase.ROOT_FOLDER_NAME && f.ParentID != UUID.Zero) {
-                    //Merge them all together
+                    // Merge them all together
                     badFolders.Add (f.ID);
                 }
             }
@@ -1453,25 +1462,25 @@ namespace WhiteCore.Services.SQLServices.InventoryService
             foreach (InventoryFolderBase f in skeleton) {
                 if ((!foundFolders.Contains (f.ParentID) && f.ParentID != UUID.Zero) ||
                     f.ID == f.ParentID) {
-                    //The viewer loses the parentID when something goes wrong
-                    //it puts it in the top where My Inventory should be
-                    //We need to put it back in the root (My Inventory) folder, as the sub folders are right for some reason
+                    // The viewer loses the parentID when something goes wrong
+                    // it puts it in the top where My Inventory should be
+                    // We need to put it back in the root (My Inventory) folder, as the sub folders are right for some reason
                     f.ParentID = rootFolder.ID;
                     m_Database.StoreFolder (f);
                     MainConsole.Instance.WarnFormat ("Fixing folder {0}", f.Name);
                 } else if (badFolders.Contains (f.ParentID)) {
-                    //Put it back in the root (My Inventory) folder
+                    // Put it back in the root (My Inventory) folder
                     f.ParentID = rootFolder.ID;
                     m_Database.StoreFolder (f);
                     MainConsole.Instance.WarnFormat ("Fixing folder {0}", f.Name);
                 } else if (f.Type == (short)FolderType.CurrentOutfit) {
-                    List<InventoryItemBase> items = GetFolderItems (account.PrincipalID, f.ID);
-                    //Check the links!
+                    List<InventoryItemBase> items = GetFolderItems (userAcct.PrincipalID, f.ID);
+                    // Check the links!
                     List<UUID> brokenLinks = new List<UUID> ();
                     foreach (InventoryItemBase item in items) {
                         InventoryItemBase linkedItem;
-                        if ((linkedItem = GetItem (account.PrincipalID, item.AssetID)) == null) {
-                            //Broken link...
+                        if ((linkedItem = GetItem (userAcct.PrincipalID, item.AssetID)) == null) {
+                            // Broken link...
                             brokenLinks.Add (item.ID);
                         } else if (linkedItem.ID == AvatarWearable.DEFAULT_EYES_ITEM ||
                                    linkedItem.ID == AvatarWearable.DEFAULT_SHAPE_ITEM ||
@@ -1479,12 +1488,12 @@ namespace WhiteCore.Services.SQLServices.InventoryService
                                    linkedItem.ID == AvatarWearable.DEFAULT_PANTS_ITEM ||
                                    linkedItem.ID == AvatarWearable.DEFAULT_SHIRT_ITEM ||
                                    linkedItem.ID == AvatarWearable.DEFAULT_SKIN_ITEM) {
-                            //Default item link, needs removed
+                            // Default item link, needs removed
                             brokenLinks.Add (item.ID);
                         }
                     }
                     if (brokenLinks.Count != 0)
-                        DeleteItems (account.PrincipalID, brokenLinks);
+                        DeleteItems (userAcct.PrincipalID, brokenLinks);
                 } else if (f.Type == (short)FolderType.Mesh) {
                     MainConsole.Instance.Warn ("Purging mesh folder");
                     ForcePurgeFolder (f);  // Why?
@@ -1495,11 +1504,11 @@ namespace WhiteCore.Services.SQLServices.InventoryService
                 m_Database.DeleteFolders ("folderID", id.ToString (), false);
             }
 
-            //Make sure that all default folders exist
-            CreateUserInventory (account.PrincipalID, false);
+            // Make sure that all default folders exist
+            CreateUserInventory (userAcct.PrincipalID, false);
 
-            //Re-fetch the skeleton now
-            skeleton = GetInventorySkeleton (account.PrincipalID);
+            // Re-fetch the skeleton now
+            skeleton = GetInventorySkeleton (userAcct.PrincipalID);
             var defaultFolders = new Dictionary<int, UUID> ();
             var changedFolders = new Dictionary<UUID, UUID> ();
 
@@ -1511,7 +1520,7 @@ namespace WhiteCore.Services.SQLServices.InventoryService
             }
             foreach (InventoryFolderBase folder in skeleton) {
                 if (folder.Type != (short)FolderType.None && defaultFolders [folder.Type] != folder.ID) {
-                    //Delete the dup
+                    // Delete the dup
                     ForcePurgeFolder (folder);
                     MainConsole.Instance.Warn ("Purging duplicate default inventory type folder " + folder.Name);
                 }
@@ -1530,8 +1539,7 @@ namespace WhiteCore.Services.SQLServices.InventoryService
         {
             List<UserAccount> userAccounts;
             userAccounts = m_UserAccountService.GetUserAccounts (null, "*");
-            if (userAccounts != null)       // unlikely but..
-            {
+            if (userAccounts.Count > 0) {      // unlikely but..
                 foreach (var account in userAccounts) {
                     if (!Utilities.IsSystemUser (account.PrincipalID)) {
                         InventoryFolderBase rootFolder = GetRootFolder (account.PrincipalID);

@@ -47,5 +47,9 @@ namespace WhiteCore.Framework.Services
         /// <param name="EstateID">Estate ID.</param>
         string GetSystemEstateName (int EstateID);
 
+        // Estate checks
+        void CheckSystemEstates ();
+        void CheckGridOwnerEstate ();
+
     }
 }

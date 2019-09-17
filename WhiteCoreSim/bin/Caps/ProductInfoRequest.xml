@@ -56,5 +56,29 @@
 			<key>sku</key>
 			<string>101</string>
 		</map>
+		<map>
+			<key>description</key>
+			<string>WhiteCore Developed / Full Region</string>
+			<key>name</key>
+			<string>whitecore_developed_full</string>
+			<key>sku</key>
+			<string>201</string>
+		</map>
+		<map>
+			<key>description</key>
+			<string>WhiteCore Developed / Homestead Region</string>
+			<key>name</key>
+			<string>whitecore_developed_homestead</string>
+			<key>sku</key>
+			<string>211</string>
+		</map>
+		<map>
+			<key>description</key>
+			<string>WhiteCore Developed / Openspace Region</string>
+			<key>name</key>
+			<string>whitecore_developed_openspace</string>
+			<key>sku</key>
+			<string>221</string>
+		</map>
 	</array>
 </llsd>

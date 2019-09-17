@@ -849,6 +849,12 @@ msgstr "新闻经理"
 msgid "NewsTitleText"
 msgstr "新闻标题"
 
+msgid "Next3Days"
+msgstr "接下来的3天"
+
+msgid "Next7Days"
+msgstr "接下来的7天"
+
 msgid "Next10Hours"
 msgstr "接下来的10个小时"
 

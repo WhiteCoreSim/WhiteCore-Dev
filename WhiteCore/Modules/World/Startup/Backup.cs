@@ -143,8 +143,8 @@ namespace WhiteCore.Modules.Startup
                     if (child.Name == cmdparams [2]) {
                         child.Resize (
                             new Vector3 (Convert.ToSingle (cmdparams [3]),
-                                        Convert.ToSingle (cmdparams [4]),
-                                        Convert.ToSingle (cmdparams [5])));
+                                         Convert.ToSingle (cmdparams [4]),
+                                         Convert.ToSingle (cmdparams [5])));
 
                         MainConsole.Instance.InfoFormat ("Edited scale of Primitive: {0}", child.Name);
                     }
@@ -423,7 +423,8 @@ namespace WhiteCore.Modules.Startup
                     //Now remove the entire region at once
                     m_scene.SimulationDataService.RemoveRegion ();
                     LoadingPrims = false;
-                } catch {
+                } catch (Exception e) {
+                    MainConsole.Instance.Debug("[Backup]: Exception deleting all scene objects\n" + e);
                 }
             }
 
@@ -448,7 +449,8 @@ namespace WhiteCore.Modules.Startup
                             }
                         }
                     }
-                } catch {
+                } catch (Exception e) {
+                    MainConsole.Instance.Debug("[Backup]: Exception resetting region to default\n" + e);
                 }
 
                 LoadingPrims = false;
@@ -499,9 +501,9 @@ namespace WhiteCore.Modules.Startup
             ///     Synchronously delete the given object from the scene.
             /// </summary>
             /// <param name="group">Object Id</param>
-            /// <param name="DeleteScripts">Remove the scripts from the ScriptEngine as well</param>
+            /// <param name="deleteScripts">Remove the scripts from the ScriptEngine as well</param>
             /// <param name="removeFromDatabase">Remove from the database?</param>
-            protected bool DeleteSceneObject (ISceneEntity group, bool DeleteScripts, bool removeFromDatabase)
+            protected bool DeleteSceneObject (ISceneEntity group, bool deleteScripts, bool removeFromDatabase)
             {
                 //MainConsole.Instance.DebugFormat("[Backup]: Deleting scene object {0} {1}", group.Name, group.UUID);
 
@@ -516,7 +518,7 @@ namespace WhiteCore.Modules.Startup
 
                 // Serialise calls to RemoveScriptInstances to avoid
                 // deadlocking on m_parts inside SceneObjectGroup
-                if (DeleteScripts) {
+                if (deleteScripts) {
                     group.RemoveScriptInstances (true);
                 }
 
@@ -603,8 +605,7 @@ namespace WhiteCore.Modules.Startup
                             writer.WriteFile ("newstylewater/" + scene.RegionInfo.RegionID + ".terrain", sdata);
 
                             sdata = WriteTerrainToStream (tModule.TerrainWaterRevertMap);
-                            writer.WriteFile (
-                                "newstylerevertwater/" + scene.RegionInfo.RegionID + ".terrain", sdata);
+                            writer.WriteFile ("newstylerevertwater/" + scene.RegionInfo.RegionID + ".terrain", sdata);
                             sdata = null;
                         }
                     } catch (Exception ex) {
@@ -879,14 +880,14 @@ namespace WhiteCore.Modules.Startup
 
             bool ResolveUserUuid (UUID uuid)
             {
-                UserAccount acc;
-                if (m_cache.Get (uuid, out acc))
-                    return acc != null;
+                UserAccount userAcct;
+                if (m_cache.Get (uuid, out userAcct))
+                    return userAcct != null;
 
-                acc = m_scene.UserAccountService.GetUserAccount (m_scene.RegionInfo.AllScopeIDs, uuid);
-                m_cache.Cache (uuid, acc);
+                userAcct = m_scene.UserAccountService.GetUserAccount (m_scene.RegionInfo.AllScopeIDs, uuid);
+                m_cache.Cache (uuid, userAcct);
 
-                return acc != null;
+                return userAcct.Valid;
             }
 
             #endregion

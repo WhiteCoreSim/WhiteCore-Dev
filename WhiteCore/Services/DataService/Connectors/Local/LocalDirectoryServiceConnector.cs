@@ -40,7 +40,6 @@ using WhiteCore.Framework.SceneInfo;
 using WhiteCore.Framework.Services;
 using WhiteCore.Framework.Services.ClassHelpers.Profile;
 using WhiteCore.Framework.Utilities;
-
 using EventFlags = OpenMetaverse.DirectoryManager.EventFlags;
 using GridRegion = WhiteCore.Framework.Services.GridRegion;
 
@@ -48,7 +47,7 @@ namespace WhiteCore.Services.DataService
 {
     public class LocalDirectoryServiceConnector : ConnectorBase, IDirectoryServiceConnector
     {
-        IGenericData GD;
+        IGenericData genData;
         string m_userClassifiedsTable = "user_classifieds";
         string m_eventInfoTable = "event_information";
         string m_eventNotificationTable = "event_notifications";
@@ -56,35 +55,34 @@ namespace WhiteCore.Services.DataService
 
         #region IDirectoryServiceConnector Members
 
-        public void Initialize(IGenericData GenericData, IConfigSource source, IRegistryCore simBase,
+        public void Initialize (IGenericData genericData, IConfigSource source, IRegistryCore simBase,
                                string defaultConnectionString)
         {
-            GD = GenericData;
+            genData = genericData;
             m_registry = simBase;
 
-            if (source.Configs[Name] != null)
-                defaultConnectionString = source.Configs[Name].GetString("ConnectionString", defaultConnectionString);
+            if (source.Configs [Name] != null)
+                defaultConnectionString = source.Configs [Name].GetString ("ConnectionString", defaultConnectionString);
 
-            if (GD != null)
-                GD.ConnectToDatabase(defaultConnectionString, "Directory",
-                                     source.Configs["WhiteCoreConnectors"].GetBoolean("ValidateTables", true));
+            if (genData != null)
+                genData.ConnectToDatabase (defaultConnectionString, "Directory",
+                                     source.Configs ["WhiteCoreConnectors"].GetBoolean ("ValidateTables", true));
 
-            Framework.Utilities.DataManager.RegisterPlugin(Name + "Local", this);
+            Framework.Utilities.DataManager.RegisterPlugin (Name + "Local", this);
 
-            if (source.Configs["WhiteCoreConnectors"].GetString("DirectoryServiceConnector", "LocalConnector") ==
-                "LocalConnector")
-            {
-                Framework.Utilities.DataManager.RegisterPlugin(this);
+            if (source.Configs ["WhiteCoreConnectors"].GetString ("DirectoryServiceConnector", "LocalConnector") ==
+                "LocalConnector") {
+                Framework.Utilities.DataManager.RegisterPlugin (this);
             }
-            Init(simBase, Name);
+
+            Init (simBase, Name);
         }
 
-        public string Name
-        {
+        public string Name {
             get { return "IDirectoryServiceConnector"; }
         }
 
-        public void Dispose()
+        public void Dispose ()
         {
         }
 
@@ -94,8 +92,8 @@ namespace WhiteCore.Services.DataService
         ///     This also updates the parcel, not for just adding a new one
         /// </summary>
         /// <param name="parcels"></param>
-        [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
-        public void AddRegion(List<LandData> parcels)
+        [CanBeReflected (ThreatLevel = ThreatLevel.Low)]
+        public void AddRegion (List<LandData> parcels)
         {
             if (m_doRemoteOnly) {
                 DoRemote (parcels);
@@ -105,16 +103,15 @@ namespace WhiteCore.Services.DataService
             if (parcels.Count == 0)
                 return;
 
-            ClearRegion(parcels[0].RegionID);
+            ClearRegion (parcels [0].RegionID);
 
-            foreach (var parcel in parcels)
-            {
-                var OrFilters = new Dictionary<string, object>();
-                OrFilters.Add("ParcelID", parcel.GlobalID);
-                GD.Delete(m_SearchParcelTable, new QueryFilter { orFilters = OrFilters });
+            foreach (var parcel in parcels) {
+                var orFilters = new Dictionary<string, object> ();
+                orFilters.Add ("ParcelID", parcel.GlobalID);
+                genData.Delete (m_SearchParcelTable, new QueryFilter { orFilters = orFilters });
             }
 
-            List<object[]> insertValues = parcels.Select( args => new List<object> {
+            List<object []> insertValues = parcels.Select (args => new List<object> {
                 args.RegionID,
                 args.GlobalID,
                 args.LocalID,
@@ -138,85 +135,95 @@ namespace WhiteCore.Services.DataService
                 args.SnapshotID,
                 OSDParser.SerializeLLSDXmlString(args.Bitmap),
                 (int) args.Category,
-                args.ScopeID
-            }).Select(Values => Values.ToArray()).ToList();
+                args.ScopeID,
+                args.UserLookAt.X,
+                args.UserLookAt.Y,
+                args.UserLookAt.Z,
+                (int) args.LandingType
+            }).Select (Values => Values.ToArray ()).ToList ();
 
-            GD.InsertMultiple(m_SearchParcelTable, insertValues);
+            genData.InsertMultiple (m_SearchParcelTable, insertValues);
         }
 
-        [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
-        public void ClearRegion(UUID regionID)
+        [CanBeReflected (ThreatLevel = ThreatLevel.Low)]
+        public void ClearRegion (UUID regionID)
         {
             if (m_doRemoteOnly) {
                 DoRemote (regionID);
                 return;
             }
 
-            QueryFilter filter = new QueryFilter();
-            filter.andFilters["RegionID"] = regionID;
-            GD.Delete(m_SearchParcelTable, filter);
+            QueryFilter filter = new QueryFilter ();
+            filter.andFilters ["RegionID"] = regionID;
+            genData.Delete (m_SearchParcelTable, filter);
         }
 
         #endregion
 
         #region Parcels
 
-        static List<LandData> Query2LandData(List<string> Query)
+        static List<LandData> Query2LandData (List<string> query)
         {
-            List<LandData> Lands = new List<LandData>();
+            List<LandData> lands = new List<LandData> ();
 
-            for (int i = 0; i < Query.Count; i += 24)
-            {
+            for (int i = 0; i < query.Count; i += 28) {
                 LandData landData = new LandData ();
 
-                landData.RegionID = UUID.Parse (Query [i]);
-                landData.GlobalID = UUID.Parse (Query [i + 1]);
-                landData.LocalID = int.Parse (Query [i + 2]);
+                landData.RegionID = UUID.Parse (query [i]);
+                landData.GlobalID = UUID.Parse (query [i + 1]);
+                landData.LocalID = int.Parse (query [i + 2]);
 
                 // be aware of culture differences here...
-                var posX = (float)Convert.ToDecimal (Query[i + 3], Culture.NumberFormatInfo);
-                var posY = (float)Convert.ToDecimal (Query[i + 4], Culture.NumberFormatInfo);
-                var posZ = (float)Convert.ToDecimal (Query[i + 5], Culture.NumberFormatInfo);
+                var posX = (float)Convert.ToDecimal (query [i + 3], Culture.NumberFormatInfo);
+                var posY = (float)Convert.ToDecimal (query [i + 4], Culture.NumberFormatInfo);
+                var posZ = (float)Convert.ToDecimal (query [i + 5], Culture.NumberFormatInfo);
                 landData.UserLocation = new Vector3 (posX, posY, posZ);
+
 
                 // UserLocation =
                 //     new Vector3(float.Parse(Query[i + 3]), float.Parse(Query[i + 4]), float.Parse(Query[i + 5])),
-                landData.Name = Query[i + 6];
-                landData.Description = Query[i + 7];
-                landData.Flags = uint.Parse(Query[i + 8]);
-                landData.Dwell = int.Parse(Query[i + 9]);
+                landData.Name = query [i + 6];
+                landData.Description = query [i + 7];
+                landData.Flags = uint.Parse (query [i + 8]);
+                landData.Dwell = int.Parse (query [i + 9]);
                 //landData.InfoUUID = UUID.Parse(Query[i + 10]);
-                landData.SalePrice = int.Parse(Query[i + 12]);
-                landData.AuctionID = uint.Parse(Query[i + 13]);
-                landData.Area = int.Parse(Query[i + 14]);
-                landData.Maturity = int.Parse(Query[i + 16]);
-                landData.OwnerID = UUID.Parse(Query[i + 17]);
-                landData.GroupID = UUID.Parse(Query[i + 18]);
-                landData.SnapshotID = UUID.Parse(Query[i + 20]);
-                     
-                try
-                {
-                    landData.Bitmap = OSDParser.DeserializeLLSDXml(Query[i + 21]);
-                }
-                catch
-                {
+                landData.SalePrice = int.Parse (query [i + 12]);
+                landData.AuctionID = uint.Parse (query [i + 13]);
+                landData.Area = int.Parse (query [i + 14]);
+                landData.Maturity = int.Parse (query [i + 16]);
+                landData.OwnerID = UUID.Parse (query [i + 17]);
+                landData.GroupID = UUID.Parse (query [i + 18]);
+                landData.SnapshotID = UUID.Parse (query [i + 20]);
+
+                try {
+                    landData.Bitmap = OSDParser.DeserializeLLSDXml (query [i + 21]);
+                } catch {
                 }
 
                 // set some flags
-                if (uint.Parse (Query [i + 11]) != 0)
-                    landData.Flags |= (uint) ParcelFlags.ForSale;
-                
-                if (uint.Parse (Query [i + 19]) != 0)
-                    landData.Flags |= (uint) ParcelFlags.ShowDirectory;
+                if (uint.Parse (query [i + 11]) != 0)
+                    landData.Flags |= (uint)ParcelFlags.ForSale;
 
-                landData.Category = (string.IsNullOrEmpty(Query[i + 22]))
+                if (uint.Parse (query [i + 19]) != 0)
+                    landData.Flags |= (uint)ParcelFlags.ShowDirectory;
+
+                landData.Category = (string.IsNullOrEmpty (query [i + 22]))
                                         ? ParcelCategory.None
-                                        : (ParcelCategory) int.Parse(Query[i + 22]);
-                landData.ScopeID = UUID.Parse(Query[i + 23]);
+                                        : (ParcelCategory)int.Parse (query [i + 22]);
+                landData.ScopeID = UUID.Parse (query [i + 23]);
 
-                Lands.Add(landData);
+                // additional stuff 20190225 -greythane-
+                var laposX = (float)Convert.ToDecimal (query [i + 24], Culture.NumberFormatInfo);
+                var laposY = (float)Convert.ToDecimal (query [i + 25], Culture.NumberFormatInfo);
+                var laposZ = (float)Convert.ToDecimal (query [i + 26], Culture.NumberFormatInfo);
+                landData.UserLookAt = new Vector3 (laposX, laposY, laposZ);
+
+                landData.LandingType = (byte)int.Parse (query [i + 27]);
+
+                lands.Add (landData);
             }
-            return Lands;
+
+            return lands;
         }
 
         /// <summary>
@@ -224,38 +231,39 @@ namespace WhiteCore.Services.DataService
         /// </summary>
         /// <param name="globalID"></param>
         /// <returns></returns>
-        [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
-        public LandData GetParcelInfo(UUID globalID)
+        [CanBeReflected (ThreatLevel = ThreatLevel.Low)]
+        public LandData GetParcelInfo (UUID globalID)
         {
             if (m_doRemoteOnly) {
                 object remoteValue = DoRemote (globalID);
                 return remoteValue != null ? (LandData)remoteValue : null;
             }
 
-            QueryFilter filter = new QueryFilter();
-            filter.andFilters["ParcelID"] = globalID;
-            List<string> Query = GD.Query(new[] { "*" }, m_SearchParcelTable, filter, null, null, null);
-            //Cant find it, return
-            if (Query.Count == 0)
-            {
-                //Try fake parcel ID for compatibility reasons, 
+            QueryFilter filter = new QueryFilter ();
+            filter.andFilters ["ParcelID"] = globalID;
+            List<string> query = genData.Query (new [] { "*" }, m_SearchParcelTable, filter, null, null, null);
+
+            // Cant find it, return
+            if (query.Count == 0) {
+                // Try fake parcel ID for compatibility reasons, 
                 // given that they were saved into the database with 
                 // classifieds and picks (plus it's not hard to keep this here).
                 ulong RegionHandle = 0;
                 uint X, Y, Z;
-                Util.ParseFakeParcelID(globalID, out RegionHandle, out X, out Y, out Z);
+                Util.ParseFakeParcelID (globalID, out RegionHandle, out X, out Y, out Z);
 
                 int regX, regY;
-                Util.UlongToInts(RegionHandle, out regX, out regY);
+                Util.UlongToInts (RegionHandle, out regX, out regY);
 
-                GridRegion r = m_registry.RequestModuleInterface<IGridService>().GetRegionByPosition(null, regX, regY);
+                GridRegion r = m_registry.RequestModuleInterface<IGridService> ().GetRegionByPosition (null, regX, regY);
                 return r == null ? null : GetParcelInfo (r.RegionID, (int)X, (int)Y);
             }
 
             LandData parcelLandData = null;
-            List<LandData> Lands = Query2LandData(Query);
-            if (parcelLandData == null && Lands.Count != 0)
-                parcelLandData = Lands[0];
+            List<LandData> lands = Query2LandData (query);
+            if (parcelLandData == null && lands.Count != 0)
+                parcelLandData = lands [0];
+            
             return parcelLandData;
         }
 
@@ -266,70 +274,65 @@ namespace WhiteCore.Services.DataService
         /// <param name="x"></param>
         /// <param name="y"></param>
         /// <returns></returns>
-        [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
-        public LandData GetParcelInfo(UUID regionID, int x, int y)
+        [CanBeReflected (ThreatLevel = ThreatLevel.Low)]
+        public LandData GetParcelInfo (UUID regionID, int x, int y)
         {
             if (m_doRemoteOnly) {
                 object remoteValue = DoRemote (regionID, x, y);
                 return remoteValue != null ? (LandData)remoteValue : null;
             }
 
-            QueryFilter filter = new QueryFilter();
-            filter.andFilters["RegionID"] = regionID;
-            List<string> query = GD.Query(new[] { "*" }, m_SearchParcelTable, filter, null, null, null);
+            QueryFilter filter = new QueryFilter ();
+            filter.andFilters ["RegionID"] = regionID;
+            List<string> query = genData.Query (new [] { "*" }, m_SearchParcelTable, filter, null, null, null);
             //Cant find it, return
             if (query.Count == 0)
                 return null;
 
             LandData landData = null;
-            List<LandData> lands = Query2LandData(query);
+            List<LandData> lands = Query2LandData (query);
 
-            GridRegion r = m_registry.RequestModuleInterface<IGridService>().GetRegionByUUID(null, regionID);
+            GridRegion r = m_registry.RequestModuleInterface<IGridService> ().GetRegionByUUID (null, regionID);
             if (r == null)
                 return null;
-            
-            bool[,] tempConvertMap = new bool[r.RegionSizeX / 4, r.RegionSizeX / 4];
-            tempConvertMap.Initialize();
 
-            foreach (LandData land in lands.Where(land => land.Bitmap != null))
-            {
-                ConvertBytesToLandBitmap(ref tempConvertMap, land.Bitmap, r.RegionSizeX);
-                if (tempConvertMap[x / 4, y / 4])
-                {
+            bool [,] tempConvertMap = new bool [r.RegionSizeX / 4, r.RegionSizeX / 4];
+            tempConvertMap.Initialize ();
+
+            foreach (LandData land in lands.Where (land => land.Bitmap != null)) {
+                ConvertBytesToLandBitmap (ref tempConvertMap, land.Bitmap, r.RegionSizeX);
+                if (tempConvertMap [x / 4, y / 4]) {
                     landData = land;
                     break;
                 }
             }
             if (landData == null && lands.Count != 0)
-                landData = lands[0];
-            
+                landData = lands [0];
+
             return landData;
         }
 
-        [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
-        public LandData GetParcelInfo(UUID RegionID, string ParcelName)
+        [CanBeReflected (ThreatLevel = ThreatLevel.Low)]
+        public LandData GetParcelInfo (UUID regionID, string parcelName)
         {
             if (m_doRemoteOnly) {
-                object remoteValue = DoRemote (RegionID, ParcelName);
+                object remoteValue = DoRemote (regionID, parcelName);
                 return remoteValue != null ? (LandData)remoteValue : null;
             }
 
-            IRegionData regiondata = Framework.Utilities.DataManager.RequestPlugin<IRegionData>();
-            if (regiondata != null)
-            {
-                GridRegion region = regiondata.Get(RegionID, null);
-                if (region != null)
-                {
+            IRegionData regiondata = Framework.Utilities.DataManager.RequestPlugin<IRegionData> ();
+            if (regiondata != null) {
+                GridRegion region = regiondata.Get (regionID, null);
+                if (region != null) {
                     UUID parcelInfoID = UUID.Zero;
-                    QueryFilter filter = new QueryFilter();
-                    filter.andFilters["RegionID"] = RegionID;
-                    filter.andFilters["Name"] = ParcelName;
+                    QueryFilter filter = new QueryFilter ();
+                    filter.andFilters ["RegionID"] = regionID;
+                    filter.andFilters ["Name"] = parcelName;
 
-                    List<string> query = GD.Query(new[] { "ParcelID" }, m_SearchParcelTable, filter, null, 0, 1);
+                    List<string> query = genData.Query (new [] { "ParcelID" }, m_SearchParcelTable, filter, null, 0, 1);
 
-                    if (query.Count >= 1 && UUID.TryParse(query[0], out parcelInfoID))
-                    {
-                        return GetParcelInfo(parcelInfoID);
+                    if (query.Count >= 1 && UUID.TryParse (query [0], out parcelInfoID)) {
+                        return GetParcelInfo (parcelInfoID);
                     }
                 }
             }
@@ -340,164 +343,157 @@ namespace WhiteCore.Services.DataService
         /// <summary>
         ///     Gets all parcels owned by the given user
         /// </summary>
-        /// <param name="OwnerID"></param>
+        /// <param name="ownerID"></param>
         /// <returns></returns>
-        [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
-        public List<ExtendedLandData> GetParcelByOwner(UUID OwnerID)
+        [CanBeReflected (ThreatLevel = ThreatLevel.Low)]
+        public List<ExtendedLandData> GetParcelByOwner (UUID ownerID)
         {
             if (m_doRemoteOnly) {
-                object remoteValue = DoRemote (OwnerID);
+                object remoteValue = DoRemote (ownerID);
                 return remoteValue != null ? (List<ExtendedLandData>)remoteValue : new List<ExtendedLandData> ();
             }
 
-            //NOTE: this does check for group deeded land as well, so this can check for that as well
-            QueryFilter filter = new QueryFilter();
-            filter.andFilters["OwnerID"] = OwnerID;
+            // NOTE: this does check for group deeded land as well, so this can check for that as well
+            QueryFilter filter = new QueryFilter ();
+            filter.andFilters ["OwnerID"] = ownerID;
 
             Dictionary<string, bool> sort = new Dictionary<string, bool> (1);
             sort ["ParcelID"] = false;        // descending order
 
-            List<string> Query = GD.Query(new[] { "*" }, m_SearchParcelTable, filter, sort, null, null);
+            List<string> query = genData.Query (new [] { "*" }, m_SearchParcelTable, filter, sort, null, null);
 
-            return (Query.Count != 0) ? LandDataToExtendedLandData(Query2LandData(Query)) : new List<ExtendedLandData> ();
+            return (query.Count != 0) ? LandDataToExtendedLandData (Query2LandData (query)) : new List<ExtendedLandData> ();
         }
 
-        List<ExtendedLandData> LandDataToExtendedLandData(List<LandData> data)
+        List<ExtendedLandData> LandDataToExtendedLandData (List<LandData> data)
         {
             return (from land in data
-                    let region = m_registry.RequestModuleInterface<IGridService>().GetRegionByUUID(null, land.RegionID)
+                    let region = m_registry.RequestModuleInterface<IGridService> ().GetRegionByUUID (null, land.RegionID)
                     where region != null
-                    select new ExtendedLandData
-                               {
-                                   LandData = land,
-                                   RegionType = region.RegionType,
-                                   RegionTerrain = region.RegionTerrain,
-                                   RegionArea = region.RegionArea,
-                                   RegionName = region.RegionName,
-                                   GlobalPosX = region.RegionLocX + land.UserLocation.X,
-                                   GlobalPosY = region.RegionLocY + land.UserLocation.Y
-                               }).ToList();
+                    select new ExtendedLandData {
+                        LandData = land,
+                        RegionType = region.RegionType,
+                        RegionTerrain = region.RegionTerrain,
+                        RegionArea = region.RegionArea,
+                        RegionName = region.RegionName,
+                        GlobalPosX = region.RegionLocX + land.UserLocation.X,
+                        GlobalPosY = region.RegionLocY + land.UserLocation.Y
+                    }).ToList ();
         }
 
-        static QueryFilter GetParcelsByRegionWhereClause(UUID RegionID, UUID owner, ParcelFlags flags,
-                                                                 ParcelCategory category)
+        static QueryFilter GetParcelsByRegionWhereClause (UUID regionID, UUID owner, ParcelFlags flags,
+                                                         ParcelCategory category)
         {
-            QueryFilter filter = new QueryFilter();
-            filter.andFilters["RegionID"] = RegionID;
+            QueryFilter filter = new QueryFilter ();
+            filter.andFilters ["RegionID"] = regionID;
 
             if (owner != UUID.Zero)
-                filter.andFilters["OwnerID"] = owner;
+                filter.andFilters ["OwnerID"] = owner;
 
             if (flags != ParcelFlags.None)
-                filter.andBitfieldAndFilters["Flags"] = (uint) flags;
+                filter.andBitfieldAndFilters ["Flags"] = (uint)flags;
 
             if (category != ParcelCategory.Any)
-                filter.andFilters["Category"] = (int) category;
+                filter.andFilters ["Category"] = (int)category;
 
             return filter;
         }
 
-        [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
-        public List<LandData> GetParcelsByRegion(uint start, uint count, UUID RegionID, UUID owner, ParcelFlags flags,
-                                                 ParcelCategory category)
+        [CanBeReflected (ThreatLevel = ThreatLevel.Low)]
+        public List<LandData> GetParcelsByRegion (uint start, uint count, UUID regionID, UUID owner,
+                                                 ParcelFlags flags, ParcelCategory category)
         {
             List<LandData> resp = new List<LandData> (0);
             if (count == 0)
                 return resp;
 
             if (m_doRemoteOnly) {
-                object remoteValue = DoRemote (start, count, RegionID, owner, flags, category);
+                object remoteValue = DoRemote (start, count, regionID, owner, flags, category);
                 return remoteValue != null ? (List<LandData>)remoteValue : resp;
             }
 
-            IRegionData regiondata = Framework.Utilities.DataManager.RequestPlugin<IRegionData>();
-            if (regiondata != null)
-            {
-                GridRegion region = regiondata.Get(RegionID, null);
-                if (region != null)
-                {
-                    QueryFilter filter = GetParcelsByRegionWhereClause(RegionID, owner, flags, category);
-                    Dictionary<string, bool> sort = new Dictionary<string, bool>(1);
-                    sort["OwnerID"] = false;
-                    return Query2LandData(GD.Query(new[] { "*" }, m_SearchParcelTable, filter, sort, start, count));
+            IRegionData regiondata = Framework.Utilities.DataManager.RequestPlugin<IRegionData> ();
+            if (regiondata != null) {
+                GridRegion region = regiondata.Get (regionID, null);
+                if (region != null) {
+                    QueryFilter filter = GetParcelsByRegionWhereClause (regionID, owner, flags, category);
+                    Dictionary<string, bool> sort = new Dictionary<string, bool> (1);
+                    sort ["OwnerID"] = false;
+                    return Query2LandData (genData.Query (new [] { "*" }, m_SearchParcelTable, filter, sort, start, count));
                 }
             }
+
             return resp;
         }
 
-        [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
-        public uint GetNumberOfParcelsByRegion(UUID RegionID, UUID owner, ParcelFlags flags, ParcelCategory category)
+        [CanBeReflected (ThreatLevel = ThreatLevel.Low)]
+        public uint GetNumberOfParcelsByRegion (UUID RegionID, UUID owner, ParcelFlags flags, ParcelCategory category)
         {
             if (m_doRemoteOnly) {
                 object remoteValue = DoRemote (RegionID, owner, flags, category);
                 return remoteValue != null ? (uint)remoteValue : 0;
             }
 
-            IRegionData regiondata = Framework.Utilities.DataManager.RequestPlugin<IRegionData>();
-            if (regiondata != null)
-            {
-                GridRegion region = regiondata.Get(RegionID, null);
-                if (region != null)
-                {
-                    QueryFilter filter = GetParcelsByRegionWhereClause(RegionID, owner, flags, category);
-                    return uint.Parse(GD.Query(new[] { "COUNT(ParcelID)" }, m_SearchParcelTable, filter, null, null, null)[0]);
+            IRegionData regiondata = Framework.Utilities.DataManager.RequestPlugin<IRegionData> ();
+            if (regiondata != null) {
+                GridRegion region = regiondata.Get (RegionID, null);
+                if (region != null) {
+                    QueryFilter filter = GetParcelsByRegionWhereClause (RegionID, owner, flags, category);
+                    return uint.Parse (genData.Query (new [] { "COUNT(ParcelID)" }, m_SearchParcelTable, filter, null, null, null) [0]);
                 }
             }
+
             return 0;
         }
 
-        [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
-        public List<LandData> GetParcelsWithNameByRegion(uint start, uint count, UUID RegionID, string name)
+        [CanBeReflected (ThreatLevel = ThreatLevel.Low)]
+        public List<LandData> GetParcelsWithNameByRegion (uint start, uint count, UUID regionID, string name)
         {
             List<LandData> resp = new List<LandData> (0);
             if (count == 0)
                 return resp;
 
             if (m_doRemoteOnly) {
-                object remoteValue = DoRemote (start, count, RegionID, name);
+                object remoteValue = DoRemote (start, count, regionID, name);
                 return remoteValue != null ? (List<LandData>)remoteValue : resp;
             }
 
 
-            IRegionData regiondata = Framework.Utilities.DataManager.RequestPlugin<IRegionData>();
-            if (regiondata != null)
-            {
-                GridRegion region = regiondata.Get(RegionID, null);
-                if (region != null)
-                {
-                    QueryFilter filter = new QueryFilter();
-                    filter.andFilters["RegionID"] = RegionID;
-                    filter.andFilters["Name"] = name;
+            IRegionData regiondata = Framework.Utilities.DataManager.RequestPlugin<IRegionData> ();
+            if (regiondata != null) {
+                GridRegion region = regiondata.Get (regionID, null);
+                if (region != null) {
+                    QueryFilter filter = new QueryFilter ();
+                    filter.andFilters ["RegionID"] = regionID;
+                    filter.andFilters ["Name"] = name;
 
-                    Dictionary<string, bool> sort = new Dictionary<string, bool>(1);
-                    sort["OwnerID"] = false;
+                    Dictionary<string, bool> sort = new Dictionary<string, bool> (1);
+                    sort ["OwnerID"] = false;
 
-                    return Query2LandData(GD.Query(new[] { "*" }, m_SearchParcelTable, filter, sort, start, count));
+                    return Query2LandData (genData.Query (new [] { "*" }, m_SearchParcelTable, filter, sort, start, count));
                 }
             }
 
             return resp;
         }
 
-        [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
-        public uint GetNumberOfParcelsWithNameByRegion(UUID RegionID, string name)
+        [CanBeReflected (ThreatLevel = ThreatLevel.Low)]
+        public uint GetNumberOfParcelsWithNameByRegion (UUID regionID, string name)
         {
             if (m_doRemoteOnly) {
-                object remoteValue = DoRemote (RegionID, name);
+                object remoteValue = DoRemote (regionID, name);
                 return remoteValue != null ? (uint)remoteValue : 0;
             }
 
-            IRegionData regiondata = Framework.Utilities.DataManager.RequestPlugin<IRegionData>();
-            if (regiondata != null)
-            {
-                GridRegion region = regiondata.Get(RegionID, null);
-                if (region != null)
-                {
-                    QueryFilter filter = new QueryFilter();
-                    filter.andFilters["RegionID"] = RegionID;
-                    filter.andFilters["Name"] = name;
+            IRegionData regiondata = Framework.Utilities.DataManager.RequestPlugin<IRegionData> ();
+            if (regiondata != null) {
+                GridRegion region = regiondata.Get (regionID, null);
+                if (region != null) {
+                    QueryFilter filter = new QueryFilter ();
+                    filter.andFilters ["RegionID"] = regionID;
+                    filter.andFilters ["Name"] = name;
 
-                    return uint.Parse(GD.Query(new[] { "COUNT(ParcelID)" }, m_SearchParcelTable, filter, null, null, null)[0]);
+                    return uint.Parse (genData.Query (new [] { "COUNT(ParcelID)" }, m_SearchParcelTable, filter, null, null, null) [0]);
                 }
             }
             return 0;
@@ -508,40 +504,43 @@ namespace WhiteCore.Services.DataService
         /// </summary>
         /// <param name="queryText"></param>
         /// <param name="category"></param>
-        /// <param name="StartQuery"></param>
+        /// <param name="startQuery"></param>
         /// <param name="Flags"> </param>
         /// <param name="scopeID"> </param>
         /// <returns></returns>
-        [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
-        public List<DirPlacesReplyData> FindLand(string queryText, string category, int StartQuery, uint Flags,
+        [CanBeReflected (ThreatLevel = ThreatLevel.Low)]
+        public List<DirPlacesReplyData> FindLand (string queryText, string category, int startQuery, uint Flags,
                                                  UUID scopeID)
         {
             if (m_doRemoteOnly) {
-                object remoteValue = DoRemote (queryText, category, StartQuery, Flags, scopeID);
+                object remoteValue = DoRemote (queryText, category, startQuery, Flags, scopeID);
                 return remoteValue != null ? (List<DirPlacesReplyData>)remoteValue : new List<DirPlacesReplyData> ();
             }
 
-            QueryFilter filter = new QueryFilter();
-            Dictionary<string, bool> sort = new Dictionary<string, bool>();
+            QueryFilter filter = new QueryFilter ();
+            Dictionary<string, bool> sort = new Dictionary<string, bool> ();
 
-            //If they dwell sort flag is there, sort by dwell going down
-            if ((Flags & (uint) DirectoryManager.DirFindFlags.DwellSort) == (uint) DirectoryManager.DirFindFlags.DwellSort)
-                sort["Dwell"] = false;
+            // If they dwell sort flag is there, sort by dwell going down
+            if ((Flags & (uint)DirectoryManager.DirFindFlags.DwellSort) == (uint)DirectoryManager.DirFindFlags.DwellSort)
+                sort ["Dwell"] = false;
 
             if (scopeID != UUID.Zero)
-                filter.andFilters["ScopeID"] = scopeID;
+                filter.andFilters ["ScopeID"] = scopeID;
 
-            filter.orLikeFilters["Name"] = "%" + queryText + "%";
-            filter.orLikeFilters["Description"] = "%" + queryText + "%";
-            filter.andFilters["ShowInSearch"] = 1;
+            filter.orLikeFilters ["Name"] = "%" + queryText + "%";
+            filter.orLikeFilters ["Description"] = "%" + queryText + "%";
+            filter.andFilters ["ShowInSearch"] = 1;
+
             if (category != "-1")
-                filter.andFilters["Category"] = category;
-            if ((Flags & (uint) DirectoryManager.DirFindFlags.AreaSort) == (uint) DirectoryManager.DirFindFlags.AreaSort)
-                sort["Area"] = false;
-            if ((Flags & (uint) DirectoryManager.DirFindFlags.NameSort) == (uint) DirectoryManager.DirFindFlags.NameSort)
-                sort["Name"] = false;
+                filter.andFilters ["Category"] = category;
+            
+            if ((Flags & (uint)DirectoryManager.DirFindFlags.AreaSort) == (uint)DirectoryManager.DirFindFlags.AreaSort)
+                sort ["Area"] = false;
+            
+            if ((Flags & (uint)DirectoryManager.DirFindFlags.NameSort) == (uint)DirectoryManager.DirFindFlags.NameSort)
+                sort ["Name"] = false;
 
-            List<string> retVal = GD.Query(new[]
+            List<string> retVal = genData.Query (new []
                                                {
                                                    "ParcelID",
                                                    "Name",
@@ -549,31 +548,29 @@ namespace WhiteCore.Services.DataService
                                                    "Auction",
                                                    "Dwell",
                                                    "Flags"
-                                               }, m_SearchParcelTable, filter, sort, (uint)StartQuery, 50);
+                                               }, m_SearchParcelTable, filter, sort, (uint)startQuery, 50);
 
             if (retVal.Count == 0)
-                return new List<DirPlacesReplyData>();
+                return new List<DirPlacesReplyData> ();
 
-            List<DirPlacesReplyData> Data = new List<DirPlacesReplyData>();
-            for (int i = 0; i < retVal.Count; i += 6)
-            {
-                //Check to make sure we are sending the requested maturity levels
+            List<DirPlacesReplyData> data = new List<DirPlacesReplyData> ();
+            for (int i = 0; i < retVal.Count; i += 6) {
+                // Check to make sure we are sending the requested maturity levels
                 if (
-                    !((int.Parse(retVal[i + 5]) & (int) ParcelFlags.MaturePublish) == (int) ParcelFlags.MaturePublish &&
-                      ((Flags & (uint) DirectoryManager.DirFindFlags.IncludeMature)) == 0))
-                {
-                    Data.Add(new DirPlacesReplyData
-                                 {
-                                     parcelID = new UUID(retVal[i]),
-                                     name = retVal[i + 1],
-                                     forSale = int.Parse(retVal[i + 2]) == 1,
-                                     auction = retVal[i + 3] == "0", //Auction is stored as a 0 if there is no auction
-                                     dwell = float.Parse(retVal[i + 4])
-                                 });
+                    !((int.Parse (retVal [i + 5]) & (int)ParcelFlags.MaturePublish) == (int)ParcelFlags.MaturePublish &&
+                      ((Flags & (uint)DirectoryManager.DirFindFlags.IncludeMature)) == 0)) {
+                    
+                    data.Add (new DirPlacesReplyData {
+                        parcelID = new UUID (retVal [i]),
+                        name = retVal [i + 1],
+                        forSale = int.Parse (retVal [i + 2]) == 1,
+                        auction = retVal [i + 3] == "0",            // Auction is stored as a 0 if there is no auction
+                        dwell = float.Parse (retVal [i + 4])
+                    });
                 }
             }
 
-            return Data;
+            return data;
         }
 
         /// <summary>
@@ -582,41 +579,41 @@ namespace WhiteCore.Services.DataService
         /// <param name="searchType">2 = Auction only, 8 = For Sale - Mainland, 16 = For Sale - Estate, 4294967295 = All</param>
         /// <param name="price"></param>
         /// <param name="area"></param>
-        /// <param name="StartQuery"></param>
-        /// <param name="Flags"> </param>
+        /// <param name="startQuery"></param>
+        /// <param name="flags"> </param>
         /// <param name="scopeID"> </param>
         /// <returns></returns>
-        [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
-        public List<DirLandReplyData> FindLandForSale(string searchType, uint price, uint area, int StartQuery,
-                                                      uint Flags, UUID scopeID)
+        [CanBeReflected (ThreatLevel = ThreatLevel.Low)]
+        public List<DirLandReplyData> FindLandForSale (string searchType, uint price, uint area, int startQuery,
+                                                      uint flags, UUID scopeID)
         {
             if (m_doRemoteOnly) {
-                object remoteValue = DoRemote (searchType, price, area, StartQuery, Flags, scopeID);
+                object remoteValue = DoRemote (searchType, price, area, startQuery, flags, scopeID);
                 return remoteValue != null ? (List<DirLandReplyData>)remoteValue : new List<DirLandReplyData> ();
             }
 
-            QueryFilter filter = new QueryFilter();
+            QueryFilter filter = new QueryFilter ();
 
-            //Only parcels set for sale will be checked
-            filter.andFilters["ForSale"] = "1";
+            // Only parcels set for sale will be checked
+            filter.andFilters ["ForSale"] = "1";
             if (scopeID != UUID.Zero)
-                filter.andFilters["ScopeID"] = scopeID;
+                filter.andFilters ["ScopeID"] = scopeID;
 
-            //They requested a sale price check
-            if ((Flags & (uint) DirectoryManager.DirFindFlags.LimitByPrice) == (uint) DirectoryManager.DirFindFlags.LimitByPrice)
-                filter.andLessThanEqFilters["SalePrice"] = (int) price;
+            // They requested a sale price check
+            if ((flags & (uint)DirectoryManager.DirFindFlags.LimitByPrice) == (uint)DirectoryManager.DirFindFlags.LimitByPrice)
+                filter.andLessThanEqFilters ["SalePrice"] = (int)price;
 
-            //They requested a 
-            if ((Flags & (uint) DirectoryManager.DirFindFlags.LimitByArea) ==  (uint) DirectoryManager.DirFindFlags.LimitByArea)
-                filter.andGreaterThanEqFilters["Area"] = (int) area;
+            // They requested a 
+            if ((flags & (uint)DirectoryManager.DirFindFlags.LimitByArea) == (uint)DirectoryManager.DirFindFlags.LimitByArea)
+                filter.andGreaterThanEqFilters ["Area"] = (int)area;
 
-            Dictionary<string, bool> sort = new Dictionary<string, bool>();
-            if ((Flags & (uint) DirectoryManager.DirFindFlags.AreaSort) == (uint) DirectoryManager.DirFindFlags.AreaSort)
-                sort["Area"] = false;
-            if ((Flags & (uint) DirectoryManager.DirFindFlags.NameSort) == (uint) DirectoryManager.DirFindFlags.NameSort)
-                sort["Name"] = false;
+            Dictionary<string, bool> sort = new Dictionary<string, bool> ();
+            if ((flags & (uint)DirectoryManager.DirFindFlags.AreaSort) == (uint)DirectoryManager.DirFindFlags.AreaSort)
+                sort ["Area"] = false;
+            if ((flags & (uint)DirectoryManager.DirFindFlags.NameSort) == (uint)DirectoryManager.DirFindFlags.NameSort)
+                sort ["Name"] = false;
 
-            List<string> retVal = GD.Query(new[]
+            List<string> retVal = genData.Query (new []
                                                {
                                                    "ParcelID",
                                                    "Name",
@@ -624,43 +621,40 @@ namespace WhiteCore.Services.DataService
                                                    "SalePrice",
                                                    "Area",
                                                    "Flags"
-                                               }, m_SearchParcelTable, filter, sort, (uint)StartQuery, 50);
+                                               }, m_SearchParcelTable, filter, sort, (uint)startQuery, 50);
 
-            //if there are none, return
+            // if there are none, return
             if (retVal.Count == 0)
-                return new List<DirLandReplyData>();
+                return new List<DirLandReplyData> ();
 
-            List<DirLandReplyData> Data = new List<DirLandReplyData>();
-            for (int i = 0; i < retVal.Count; i += 6)
-            {
-                DirLandReplyData replyData = new DirLandReplyData
-                                                 {
-                                                     forSale = true,
-                                                     parcelID = new UUID(retVal[i]),
-                                                     name = retVal[i + 1],
-                                                     auction = (retVal[i + 2] != "0")
-                                                 };
-                //If its an auction and we didn't request to see auctions, skip to the next and continue
-                if ((Flags & (uint) DirectoryManager.SearchTypeFlags.Auction) ==
-                    (uint) DirectoryManager.SearchTypeFlags.Auction && !replyData.auction)
-                {
+            List<DirLandReplyData> data = new List<DirLandReplyData> ();
+            for (int i = 0; i < retVal.Count; i += 6) {
+                DirLandReplyData replyData = new DirLandReplyData {
+                    forSale = true,
+                    parcelID = new UUID (retVal [i]),
+                    name = retVal [i + 1],
+                    auction = (retVal [i + 2] != "0")
+                };
+                // If its an auction and we didn't request to see auctions, skip to the next and continue
+                if ((flags & (uint)DirectoryManager.SearchTypeFlags.Auction) ==
+                    (uint)DirectoryManager.SearchTypeFlags.Auction && !replyData.auction) {
                     continue;
                 }
 
-                replyData.salePrice = Convert.ToInt32(retVal[i + 3]);
-                replyData.actualArea = Convert.ToInt32(retVal[i + 4]);
+                replyData.salePrice = Convert.ToInt32 (retVal [i + 3]);
+                replyData.actualArea = Convert.ToInt32 (retVal [i + 4]);
 
-                //Check maturity levels depending on what flags the user has set
-                //0 flag is an override so that we can get all lands for sale, regardless of maturity
-                if (Flags == 0 ||
-                    !((int.Parse(retVal[i + 5]) & (int) ParcelFlags.MaturePublish) == (int) ParcelFlags.MaturePublish &&
-                      ((Flags & (uint) DirectoryManager.DirFindFlags.IncludeMature)) == 0))
-                {
-                    Data.Add(replyData);
+                // Check maturity levels depending on what flags the user has set
+                // 0 flag is an override so that we can get all lands for sale, regardless of maturity
+                if (flags == 0 ||
+                    !((int.Parse (retVal [i + 5]) & (int)ParcelFlags.MaturePublish) == (int)ParcelFlags.MaturePublish &&
+                      ((flags & (uint)DirectoryManager.DirFindFlags.IncludeMature)) == 0)) {
+                    
+                    data.Add (replyData);
                 }
             }
 
-            return Data;
+            return data;
         }
 
         /// <summary>
@@ -669,51 +663,51 @@ namespace WhiteCore.Services.DataService
         /// <param name="searchType">2 = Auction only, 8 = For Sale - Mainland, 16 = For Sale - Estate, 4294967295 = All</param>
         /// <param name="price"></param>
         /// <param name="area"></param>
-        /// <param name="StartQuery"></param>
-        /// <param name="Flags"> </param>
+        /// <param name="startQuery"></param>
+        /// <param name="flags"> </param>
         /// <param name="regionID"> </param>
         /// <returns></returns>
-        [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
-        public List<DirLandReplyData> FindLandForSaleInRegion(string searchType, uint price, uint area, int StartQuery,
-                                                              uint Flags, UUID regionID)
+        [CanBeReflected (ThreatLevel = ThreatLevel.Low)]
+        public List<DirLandReplyData> FindLandForSaleInRegion (string searchType, uint price, uint area, int startQuery,
+                                                               uint flags, UUID regionID)
         {
             if (m_doRemoteOnly) {
-                object remoteValue = DoRemote (searchType, price, area, StartQuery, Flags, regionID);
+                object remoteValue = DoRemote (searchType, price, area, startQuery, flags, regionID);
                 return remoteValue != null ? (List<DirLandReplyData>)remoteValue : new List<DirLandReplyData> ();
             }
 
-            QueryFilter filter = new QueryFilter();
+            QueryFilter filter = new QueryFilter ();
 
-            //Only parcels set for sale will be checked
-            filter.andFilters["ForSale"] = "1";
-            filter.andFilters["RegionID"] = regionID;
+            // Only parcels set for sale will be checked
+            filter.andFilters ["ForSale"] = "1";
+            filter.andFilters ["RegionID"] = regionID;
 
-            //They requested a sale price check
-            if ((Flags & (uint) DirectoryManager.DirFindFlags.LimitByPrice) ==
-                (uint) DirectoryManager.DirFindFlags.LimitByPrice)
-            {
-                filter.andLessThanEqFilters["SalePrice"] = (int) price;
+            // They requested a sale price check
+            if ((flags & (uint)DirectoryManager.DirFindFlags.LimitByPrice) ==
+                (uint)DirectoryManager.DirFindFlags.LimitByPrice) {
+                filter.andLessThanEqFilters ["SalePrice"] = (int)price;
             }
 
-            //They requested a 
-            if ((Flags & (uint) DirectoryManager.DirFindFlags.LimitByArea) ==
-                (uint) DirectoryManager.DirFindFlags.LimitByArea)
-            {
-                filter.andGreaterThanEqFilters["Area"] = (int) area;
+            // They requested a 
+            if ((flags & (uint)DirectoryManager.DirFindFlags.LimitByArea) ==
+                (uint)DirectoryManager.DirFindFlags.LimitByArea) {
+                filter.andGreaterThanEqFilters ["Area"] = (int)area;
             }
-            Dictionary<string, bool> sort = new Dictionary<string, bool>();
-            if ((Flags & (uint) DirectoryManager.DirFindFlags.AreaSort) == (uint) DirectoryManager.DirFindFlags.AreaSort)
-                sort["Area"] = false;
-            if ((Flags & (uint) DirectoryManager.DirFindFlags.NameSort) == (uint) DirectoryManager.DirFindFlags.NameSort)
-                sort["Name"] = false;
-            //if ((queryFlags & (uint)DirectoryManager.DirFindFlags.PerMeterSort) == (uint)DirectoryManager.DirFindFlags.PerMeterSort)
+            Dictionary<string, bool> sort = new Dictionary<string, bool> ();
+            if ((flags & (uint)DirectoryManager.DirFindFlags.AreaSort) == (uint)DirectoryManager.DirFindFlags.AreaSort)
+                sort ["Area"] = false;
+            
+            if ((flags & (uint)DirectoryManager.DirFindFlags.NameSort) == (uint)DirectoryManager.DirFindFlags.NameSort)
+                sort ["Name"] = false;
+            
+            // if ((queryFlags & (uint)DirectoryManager.DirFindFlags.PerMeterSort) == (uint)DirectoryManager.DirFindFlags.PerMeterSort)
             //    sort["Area"] = (queryFlags & (uint)DirectoryManager.DirFindFlags.SortAsc) == (uint)DirectoryManager.DirFindFlags.SortAsc);
-            if ((Flags & (uint) DirectoryManager.DirFindFlags.PricesSort) ==
-                (uint) DirectoryManager.DirFindFlags.PricesSort)
-                sort["SalePrice"] = (Flags & (uint) DirectoryManager.DirFindFlags.SortAsc) ==
-                                    (uint) DirectoryManager.DirFindFlags.SortAsc;
+            if ((flags & (uint)DirectoryManager.DirFindFlags.PricesSort) ==
+                (uint)DirectoryManager.DirFindFlags.PricesSort)
+                sort ["SalePrice"] = (flags & (uint)DirectoryManager.DirFindFlags.SortAsc) ==
+                                    (uint)DirectoryManager.DirFindFlags.SortAsc;
 
-            List<string> retVal = GD.Query(new[]
+            List<string> retVal = genData.Query (new []
                                                {
                                                    "ParcelID",
                                                    "Name",
@@ -721,43 +715,40 @@ namespace WhiteCore.Services.DataService
                                                    "SalePrice",
                                                    "Area",
                                                    "Flags"
-                                               }, m_SearchParcelTable, filter, sort, (uint)StartQuery, 50);
+                                               }, m_SearchParcelTable, filter, sort, (uint)startQuery, 50);
 
-            //if there are none, return
+            // if there are none, return
             if (retVal.Count == 0)
-                return new List<DirLandReplyData>();
+                return new List<DirLandReplyData> ();
 
-            List<DirLandReplyData> Data = new List<DirLandReplyData>();
-            for (int i = 0; i < retVal.Count; i += 6)
-            {
-                DirLandReplyData replyData = new DirLandReplyData
-                                                 {
-                                                     forSale = true,
-                                                     parcelID = new UUID(retVal[i]),
-                                                     name = retVal[i + 1],
-                                                     auction = (retVal[i + 2] != "0")
-                                                 };
-                //If its an auction and we didn't request to see auctions, skip to the next and continue
-                if ((Flags & (uint) DirectoryManager.SearchTypeFlags.Auction) ==
-                    (uint) DirectoryManager.SearchTypeFlags.Auction && !replyData.auction)
-                {
+            List<DirLandReplyData> data = new List<DirLandReplyData> ();
+            for (int i = 0; i < retVal.Count; i += 6) {
+                DirLandReplyData replyData = new DirLandReplyData {
+                    forSale = true,
+                    parcelID = new UUID (retVal [i]),
+                    name = retVal [i + 1],
+                    auction = (retVal [i + 2] != "0")
+                };
+                // If its an auction and we didn't request to see auctions, skip to the next and continue
+                if ((flags & (uint)DirectoryManager.SearchTypeFlags.Auction) ==
+                    (uint)DirectoryManager.SearchTypeFlags.Auction && !replyData.auction) {
                     continue;
                 }
 
-                replyData.salePrice = Convert.ToInt32(retVal[i + 3]);
-                replyData.actualArea = Convert.ToInt32(retVal[i + 4]);
+                replyData.salePrice = Convert.ToInt32 (retVal [i + 3]);
+                replyData.actualArea = Convert.ToInt32 (retVal [i + 4]);
 
-                //Check maturity levels depending on what flags the user has set
-                //0 flag is an override so that we can get all lands for sale, regardless of maturity
-                if (Flags == 0 ||
-                    !((int.Parse(retVal[i + 5]) & (int) ParcelFlags.MaturePublish) == (int) ParcelFlags.MaturePublish &&
-                      ((Flags & (uint) DirectoryManager.DirFindFlags.IncludeMature)) == 0))
-                {
-                    Data.Add(replyData);
+                // Check maturity levels depending on what flags the user has set
+                // 0 flag is an override so that we can get all lands for sale, regardless of maturity
+                if (flags == 0 ||
+                    !((int.Parse (retVal [i + 5]) & (int)ParcelFlags.MaturePublish) == (int)ParcelFlags.MaturePublish &&
+                      ((flags & (uint)DirectoryManager.DirFindFlags.IncludeMature)) == 0)) {
+                    
+                    data.Add (replyData);
                 }
             }
 
-            return Data;
+            return data;
         }
 
         /// <summary>
@@ -766,35 +757,32 @@ namespace WhiteCore.Services.DataService
         /// <param name="queryFlags"></param>
         /// <param name="scopeID"></param>
         /// <returns></returns>
-        [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
-        public List<DirPopularReplyData> FindPopularPlaces(uint queryFlags, UUID scopeID)
+        [CanBeReflected (ThreatLevel = ThreatLevel.Low)]
+        public List<DirPopularReplyData> FindPopularPlaces (uint queryFlags, UUID scopeID)
         {
             if (m_doRemoteOnly) {
                 object remoteValue = DoRemote (queryFlags, scopeID);
                 return remoteValue != null ? (List<DirPopularReplyData>)remoteValue : new List<DirPopularReplyData> ();
             }
 
-            QueryFilter filter = new QueryFilter();
-            Dictionary<string, bool> sort = new Dictionary<string, bool>();
+            QueryFilter filter = new QueryFilter ();
+            Dictionary<string, bool> sort = new Dictionary<string, bool> ();
 
-            if ((queryFlags & (uint) DirectoryManager.DirFindFlags.AreaSort) ==
-                (uint) DirectoryManager.DirFindFlags.AreaSort)
-                sort["Area"] = false;
-            else if ((queryFlags & (uint) DirectoryManager.DirFindFlags.NameSort) ==
-                     (uint) DirectoryManager.DirFindFlags.NameSort)
-                sort["Name"] = false;
-                //else if ((queryFlags & (uint)DirectoryManager.DirFindFlags.PerMeterSort) == (uint)DirectoryManager.DirFindFlags.PerMeterSort)
-                //    sort["Area"] = (queryFlags & (uint)DirectoryManager.DirFindFlags.SortAsc) == (uint)DirectoryManager.DirFindFlags.SortAsc);
-                //else if ((queryFlags & (uint)DirectoryManager.DirFindFlags.PricesSort) == (uint)DirectoryManager.DirFindFlags.PricesSort)
-                //    sort["SalePrice"] = (queryFlags & (uint)DirectoryManager.DirFindFlags.SortAsc) == (uint)DirectoryManager.DirFindFlags.SortAsc;
+            if ((queryFlags & (uint)DirectoryManager.DirFindFlags.AreaSort) == (uint)DirectoryManager.DirFindFlags.AreaSort)
+                sort ["Area"] = false;
+            else if ((queryFlags & (uint)DirectoryManager.DirFindFlags.NameSort) == (uint)DirectoryManager.DirFindFlags.NameSort)
+                sort ["Name"] = false;
+            // else if ((queryFlags & (uint)DirectoryManager.DirFindFlags.PerMeterSort) == (uint)DirectoryManager.DirFindFlags.PerMeterSort)
+            //    sort["Area"] = (queryFlags & (uint)DirectoryManager.DirFindFlags.SortAsc) == (uint)DirectoryManager.DirFindFlags.SortAsc);
+            // else if ((queryFlags & (uint)DirectoryManager.DirFindFlags.PricesSort) == (uint)DirectoryManager.DirFindFlags.PricesSort)
+            //    sort["SalePrice"] = (queryFlags & (uint)DirectoryManager.DirFindFlags.SortAsc) == (uint)DirectoryManager.DirFindFlags.SortAsc;
             else
-                sort["Dwell"] = false;
+                sort ["Dwell"] = false;
 
             if (scopeID != UUID.Zero)
-                filter.andFilters["ScopeID"] = scopeID;
-
-
-            List<string> retVal = GD.Query(new[]
+                filter.andFilters ["ScopeID"] = scopeID;
+            
+            List<string> retVal = genData.Query (new []
                                                {
                                                    "ParcelID",
                                                    "Name",
@@ -802,54 +790,47 @@ namespace WhiteCore.Services.DataService
                                                    "Flags"
                                                }, m_SearchParcelTable, filter, null, 0, 25);
 
-            //if there are none, return
+            // if there are none, return
             if (retVal.Count == 0)
-                return new List<DirPopularReplyData>();
+                return new List<DirPopularReplyData> ();
 
-            List<DirPopularReplyData> Data = new List<DirPopularReplyData>();
-            for (int i = 0; i < retVal.Count; i += 4)
-            {
-                //Check maturity levels depending on what flags the user has set
-                //0 flag is an override so that we can get all lands for sale, regardless of maturity
+            List<DirPopularReplyData> data = new List<DirPopularReplyData> ();
+            for (int i = 0; i < retVal.Count; i += 4) {
+                // Check maturity levels depending on what flags the user has set
+                // 0 flag is an override so that we can get all lands for sale, regardless of maturity
                 if (queryFlags == 0 ||
-                    !((int.Parse(retVal[i + 3]) & (int) ParcelFlags.MaturePublish) == (int) ParcelFlags.MaturePublish &&
-                      ((queryFlags & (uint) DirectoryManager.DirFindFlags.IncludeMature)) == 0))
-                    Data.Add(new DirPopularReplyData
-                                 {
-                                     ParcelID = new UUID(retVal[i]),
-                                     Name = retVal[i + 1],
-                                     Dwell = int.Parse(retVal[i + 2])
-                                 });
+                    !((int.Parse (retVal [i + 3]) & (int)ParcelFlags.MaturePublish) == (int)ParcelFlags.MaturePublish &&
+                      ((queryFlags & (uint)DirectoryManager.DirFindFlags.IncludeMature)) == 0))
+
+                    data.Add (new DirPopularReplyData {
+                        ParcelID = new UUID (retVal [i]),
+                        Name = retVal [i + 1],
+                        Dwell = int.Parse (retVal [i + 2])
+                    });
             }
 
-            return Data;
+            return data;
         }
 
-        void ConvertBytesToLandBitmap(ref bool[,] tempConvertMap, byte[] Bitmap, int sizeX)
+        void ConvertBytesToLandBitmap (ref bool [,] tempConvertMap, byte [] bitmap, int sizeX)
         {
-            try
-            {
+            try {
                 int x = 0, y = 0, i = 0;
                 int avg = (sizeX * sizeX / 128);
-                for (i = 0; i < avg; i++)
-                {
-                    byte tempByte = Bitmap[i];
+                for (i = 0; i < avg; i++) {
+                    byte tempByte = bitmap [i];
                     int bitNum = 0;
-                    for (bitNum = 0; bitNum < 8; bitNum++)
-                    {
-                        bool bit = Convert.ToBoolean(Convert.ToByte(tempByte >> bitNum) & 1);
-                        tempConvertMap[x, y] = bit;
+                    for (bitNum = 0; bitNum < 8; bitNum++) {
+                        bool bit = Convert.ToBoolean (Convert.ToByte (tempByte >> bitNum) & 1);
+                        tempConvertMap [x, y] = bit;
                         x++;
-                        if (x > (sizeX/4) - 1)
-                        {
+                        if (x > (sizeX / 4) - 1) {
                             x = 0;
                             y++;
                         }
                     }
                 }
-            }
-            catch
-            {
+            } catch {
             }
         }
 
@@ -863,59 +844,58 @@ namespace WhiteCore.Services.DataService
         /// <param name="queryText"></param>
         /// <param name="category"></param>
         /// <param name="queryFlags"></param>
-        /// <param name="StartQuery"></param>
+        /// <param name="startQuery"></param>
         /// <param name="scopeID"> </param>
         /// <returns></returns>
-        [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
-        public List<DirClassifiedReplyData> FindClassifieds(string queryText, string category, uint queryFlags,
-                                                            int StartQuery, UUID scopeID)
+        [CanBeReflected (ThreatLevel = ThreatLevel.Low)]
+        public List<DirClassifiedReplyData> FindClassifieds (string queryText, string category, uint queryFlags,
+                                                            int startQuery, UUID scopeID)
         {
             if (m_doRemoteOnly) {
-                object remoteValue = DoRemote (queryText, category, queryFlags, StartQuery, scopeID);
+                object remoteValue = DoRemote (queryText, category, queryFlags, startQuery, scopeID);
                 return remoteValue != null ? (List<DirClassifiedReplyData>)remoteValue : new List<DirClassifiedReplyData> ();
             }
 
-            QueryFilter filter = new QueryFilter();
+            QueryFilter filter = new QueryFilter ();
 
-            filter.andLikeFilters["Name"] = "%" + queryText + "%";
-            if (int.Parse(category) != (int) DirectoryManager.ClassifiedCategories.Any) //Check the category
-                filter.andFilters["Category"] = category;
+            filter.andLikeFilters ["Name"] = "%" + queryText + "%";
+            if (int.Parse (category) != (int)DirectoryManager.ClassifiedCategories.Any) //Check the category
+                filter.andFilters ["Category"] = category;
             if (scopeID != UUID.Zero)
-                filter.andFilters["ScopeID"] = scopeID;
+                filter.andFilters ["ScopeID"] = scopeID;
 
-            List<string> retVal = GD.Query(new[] {"*"}, m_userClassifiedsTable, filter, null, (uint) StartQuery, 50);
+            List<string> retVal = genData.Query (new [] { "*" }, m_userClassifiedsTable, filter, null, (uint)startQuery, 50);
             if (retVal.Count == 0)
-                return new List<DirClassifiedReplyData>();
+                return new List<DirClassifiedReplyData> ();
 
-            List<DirClassifiedReplyData> Data = new List<DirClassifiedReplyData>();
-            for (int i = 0; i < retVal.Count; i += 9)
-            {
-                //Pull the classified out of OSD
-                Classified classified = new Classified();
-                classified.FromOSD((OSDMap) OSDParser.DeserializeJson(retVal[i + 6]));
+            List<DirClassifiedReplyData> data = new List<DirClassifiedReplyData> ();
+            for (int i = 0; i < retVal.Count; i += 9) {
+                // Pull the classified out of OSD
+                Classified classified = new Classified ();
+                classified.FromOSD ((OSDMap)OSDParser.DeserializeJson (retVal [i + 6]));
 
-                DirClassifiedReplyData replyData = new DirClassifiedReplyData
-                                                       {
-                                                           classifiedFlags = classified.ClassifiedFlags,
-                                                           classifiedID = classified.ClassifiedUUID,
-                                                           creationDate = classified.CreationDate,
-                                                           expirationDate = classified.ExpirationDate,
-                                                           price = classified.PriceForListing,
-                                                           name = classified.Name
-                                                       };
-                //Check maturity levels
+                DirClassifiedReplyData replyData = new DirClassifiedReplyData {
+                    classifiedFlags = classified.ClassifiedFlags,
+                    classifiedID = classified.ClassifiedUUID,
+                    creationDate = classified.CreationDate,
+                    expirationDate = classified.ExpirationDate,
+                    price = classified.PriceForListing,
+                    name = classified.Name
+                };
+                // Check maturity levels
                 var maturityquery = queryFlags & 0x4C;      // strip everything except what we want
                 if (maturityquery == (uint)DirectoryManager.ClassifiedQueryFlags.All)
-                    Data.Add (replyData); 
+                    data.Add (replyData);
                 else {
-                    //var classifiedMaturity = replyData.classifiedFlags > 0 
+                    // var classifiedMaturity = replyData.classifiedFlags > 0 
                     //                                  ? replyData.classifiedFlags 
                     //                                  : (byte)DirectoryManager.ClassifiedQueryFlags.PG;
                     if ((maturityquery & replyData.classifiedFlags) != 0) // required rating  PG, Mature (Adult)
-                            Data.Add (replyData);
+                        data.Add (replyData);
                 }
             }
-            return Data;
+
+            return data;
         }
 
         /// <summary>
@@ -935,21 +915,21 @@ namespace WhiteCore.Services.DataService
 
             QueryFilter filter = new QueryFilter ();
 
-            //filter.andLikeFilters ["Name"] = "%" + queryText + "%";
-            if (category != (int)DirectoryManager.ClassifiedCategories.Any) //Check the category
-                filter.andFilters ["Category"] = category.ToString();
-            //if (scopeID != UUID.Zero)
+            // filter.andLikeFilters ["Name"] = "%" + queryText + "%";
+            if (category != (int)DirectoryManager.ClassifiedCategories.Any) // Check the category
+                filter.andFilters ["Category"] = category.ToString ();
+            // if (scopeID != UUID.Zero)
             //    filter.andFilters ["ScopeID"] = scopeID;
 
-            List<string> retVal = GD.Query (new [] { "*" }, m_userClassifiedsTable, filter, null, null, null);
+            List<string> retVal = genData.Query (new [] { "*" }, m_userClassifiedsTable, filter, null, null, null);
 
             if (retVal.Count != 0) {
                 for (int i = 0; i < retVal.Count; i += 9) {
                     Classified classified = new Classified ();
-                    //Pull the classified out of OSD
+                    // Pull the classified out of OSD
                     classified.FromOSD ((OSDMap)OSDParser.DeserializeJson (retVal [i + 6]));
 
-                    //Check maturity levels
+                    // Check maturity levels
                     if (classifiedFlags != (uint)DirectoryManager.ClassifiedQueryFlags.All) {
                         if ((classifiedFlags & classified.ClassifiedFlags) != 0) // required rating All, PG, Mature ( Adult )
                             classifieds.Add (classified);
@@ -958,6 +938,7 @@ namespace WhiteCore.Services.DataService
                         classifieds.Add (classified);
                 }
             }
+
             return classifieds;
         }
 
@@ -966,30 +947,30 @@ namespace WhiteCore.Services.DataService
         /// </summary>
         /// <param name="regionName"></param>
         /// <returns></returns>
-        [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
-        public List<Classified> GetClassifiedsInRegion(string regionName)
+        [CanBeReflected (ThreatLevel = ThreatLevel.Low)]
+        public List<Classified> GetClassifiedsInRegion (string regionName)
         {
             if (m_doRemoteOnly) {
                 object remoteValue = DoRemote (regionName);
                 return remoteValue != null ? (List<Classified>)remoteValue : new List<Classified> ();
             }
 
-            QueryFilter filter = new QueryFilter();
-            filter.andFilters["SimName"] = regionName;
-            List<string> retVal = GD.Query(new[] { "*" }, m_userClassifiedsTable, filter, null, null, null);
+            QueryFilter filter = new QueryFilter ();
+            filter.andFilters ["SimName"] = regionName;
+            List<string> retVal = genData.Query (new [] { "*" }, m_userClassifiedsTable, filter, null, null, null);
 
             if (retVal.Count == 0)
-                return new List<Classified>();
+                return new List<Classified> ();
 
-            List<Classified> Classifieds = new List<Classified>();
-            for (int i = 0; i < retVal.Count; i += 9)
-            {
-                Classified classified = new Classified();
-                //Pull the classified out of OSD
-                classified.FromOSD((OSDMap) OSDParser.DeserializeJson(retVal[i + 6]));
-                Classifieds.Add(classified);
+            List<Classified> classifieds = new List<Classified> ();
+            for (int i = 0; i < retVal.Count; i += 9) {
+                Classified classified = new Classified ();
+                // Pull the classified out of OSD
+                classified.FromOSD ((OSDMap)OSDParser.DeserializeJson (retVal [i + 6]));
+                classifieds.Add (classified);
             }
-            return Classifieds;
+
+            return classifieds;
         }
 
         /// <summary>
@@ -997,25 +978,26 @@ namespace WhiteCore.Services.DataService
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
-        public Classified GetClassifiedByID(UUID id)
+        [CanBeReflected (ThreatLevel = ThreatLevel.Low)]
+        public Classified GetClassifiedByID (UUID id)
         {
             if (m_doRemoteOnly) {
                 object remoteValue = DoRemote (id);
                 return remoteValue != null ? (Classified)remoteValue : new Classified ();
             }
 
-            QueryFilter filter = new QueryFilter();
-            Dictionary<string, object> where = new Dictionary<string, object>(1);
-            where.Add("ClassifiedUUID", id);
+            QueryFilter filter = new QueryFilter ();
+            Dictionary<string, object> where = new Dictionary<string, object> (1);
+            where.Add ("ClassifiedUUID", id);
             filter.andFilters = where;
 
-            List<string> retVal = GD.Query(new[] { "*" }, m_userClassifiedsTable, filter, null, null, null);
+            List<string> retVal = genData.Query (new [] { "*" }, m_userClassifiedsTable, filter, null, null, null);
 
             if ((retVal == null) || (retVal.Count == 0)) return null;
 
-            Classified classified = new Classified();
-            classified.FromOSD((OSDMap) OSDParser.DeserializeJson(retVal[6]));
+            Classified classified = new Classified ();
+            classified.FromOSD ((OSDMap)OSDParser.DeserializeJson (retVal [6]));
+
             return classified;
         }
 
@@ -1028,49 +1010,49 @@ namespace WhiteCore.Services.DataService
         /// </summary>
         /// <param name="queryText"></param>
         /// <param name="eventFlags"></param>
-        /// <param name="StartQuery"></param>
+        /// <param name="startQuery"></param>
         /// <param name="scopeID"> </param>
         /// <returns></returns>
-        [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
-        public List<DirEventsReplyData> FindEvents(string queryText, uint eventFlags, int StartQuery, UUID scopeID)
+        [CanBeReflected (ThreatLevel = ThreatLevel.Low)]
+        public List<DirEventsReplyData> FindEvents (string queryText, uint eventFlags, int startQuery, UUID scopeID)
         {
             if (m_doRemoteOnly) {
-                object remoteValue = DoRemote (queryText, eventFlags, StartQuery, scopeID);
+                object remoteValue = DoRemote (queryText, eventFlags, startQuery, scopeID);
                 return remoteValue != null ? (List<DirEventsReplyData>)remoteValue : new List<DirEventsReplyData> ();
             }
 
-            List<DirEventsReplyData> eventdata = new List<DirEventsReplyData>();
+            List<DirEventsReplyData> eventdata = new List<DirEventsReplyData> ();
 
-            QueryFilter filter = new QueryFilter();
+            QueryFilter filter = new QueryFilter ();
             var queryList = queryText.Split ('|');
 
-            string stringDay = queryList[0];
-            if (stringDay == "u") //"u" means search for events that are going on today
+            string stringDay = queryList [0];
+            if (stringDay == "u")               // "u" means search for events that are going on today
             {
-                filter.andGreaterThanEqFilters["UNIX_TIMESTAMP(date)"] = Util.ToUnixTime(DateTime.Today);
+                filter.andGreaterThanEqFilters ["UNIX_TIMESTAMP(date)"] = Util.ToUnixTime (DateTime.Today);
             } else {
-                //Pull the day out then and search for that many days in the future/past
-                int Day = int.Parse(stringDay);
-                DateTime SearchedDay = DateTime.Today.AddDays(Day);
-                //We only look at one day at a time
-                DateTime NextDay = SearchedDay.AddDays(1);
-                filter.andGreaterThanEqFilters["UNIX_TIMESTAMP(date)"] = Util.ToUnixTime(SearchedDay);
-                filter.andLessThanEqFilters["UNIX_TIMESTAMP(date)"] = Util.ToUnixTime(NextDay);
-                filter.andLessThanEqFilters["flags"] = (int) (eventFlags >> 24) & 0x7;
+                // Pull the day out then and search for that many days in the future/past
+                int Day = int.Parse (stringDay);
+                DateTime searchedDay = DateTime.Today.AddDays (Day);
+                // We only look at one day at a time
+                DateTime NextDay = searchedDay.AddDays (1);
+                filter.andGreaterThanEqFilters ["UNIX_TIMESTAMP(date)"] = Util.ToUnixTime (searchedDay);
+                filter.andLessThanEqFilters ["UNIX_TIMESTAMP(date)"] = Util.ToUnixTime (NextDay);
+                filter.andLessThanEqFilters ["flags"] = (int)(eventFlags >> 24) & 0x7;
             }
- 
+
             // do we have category?
-            if (queryList[1] != "0")
+            if (queryList [1] != "0")
                 filter.andLikeFilters ["category"] = queryList [1];
-            
+
             // do we have search parameters
             if (queryList.Length == 3)
-                filter.andLikeFilters["name"] = "%" + queryList[2] + "%";
-            //}
-            if (scopeID != UUID.Zero)
-                filter.andFilters["scopeID"] = scopeID;
+                filter.andLikeFilters ["name"] = "%" + queryList [2] + "%";
 
-            List<string> retVal = GD.Query(new[]
+            if (scopeID != UUID.Zero)
+                filter.andFilters ["scopeID"] = scopeID;
+
+            List<string> retVal = genData.Query (new []
                                                {
                                                    "EID",
                                                    "creator",
@@ -1078,7 +1060,7 @@ namespace WhiteCore.Services.DataService
                                                    "maturity",
                                                    "flags",
                                                    "name",
-                                               }, m_eventInfoTable, filter, null, (uint)StartQuery, 50);
+                                               }, m_eventInfoTable, filter, null, (uint)startQuery, 50);
 
             if (retVal.Count > 0) {
                 for (int i = 0; i < retVal.Count; i += 6) {
@@ -1090,18 +1072,18 @@ namespace WhiteCore.Services.DataService
                     DateTime date = DateTime.Parse (retVal [i + 2]);
                     replyData.date = date.ToString (new DateTimeFormatInfo ());
                     replyData.unixTime = (uint)Util.ToUnixTime (date);
-                    replyData.eventFlags = Convert.ToUInt32 (retVal [i + 3]) >> 1; // convert event maturity back to EventData.maturity 0,1,2
+                    replyData.eventFlags = Convert.ToUInt32 (retVal [i + 3]) >> 1;  // convert event maturity back to EventData.maturity 0,1,2
 
-                    //Check the maturity levels
-                    var maturity = Convert.ToByte (retVal [i + 3]); // db levels 1,2,4
-                    uint reqMaturityflags = (eventFlags >> 24) &  0x7;
-                   
-                    if ( (maturity & reqMaturityflags) > 0) 
+                    // Check the maturity levels
+                    var maturity = Convert.ToByte (retVal [i + 3]);     // db levels 1,2,4
+                    uint reqMaturityflags = (eventFlags >> 24) & 0x7;
+
+                    if ((maturity & reqMaturityflags) > 0)
                         eventdata.Add (replyData);
                 }
 
             } else
-                eventdata.Add( new DirEventsReplyData ());
+                eventdata.Add (new DirEventsReplyData ());
 
             return eventdata;
         }
@@ -1148,51 +1130,49 @@ namespace WhiteCore.Services.DataService
             // maturity level
             filter.andLessThanEqFilters ["maturity"] = maturityLevel;
 
-            if (category != (int)DirectoryManager.EventCategories.All) //Check the category
+            if (category != (int)DirectoryManager.EventCategories.All)  // Check the category
                 filter.andFilters ["category"] = category.ToString ();
 
-            List<string> retVal = GD.Query (new [] { "*" }, m_eventInfoTable, filter, null, null, null);
+            List<string> retVal = genData.Query (new [] { "*" }, m_eventInfoTable, filter, null, null, null);
 
             if (retVal.Count > 0) {
                 List<EventData> allEvents = Query2EventData (retVal);
 
                 // Check the maturity levels PG = 1, M = 2, A = 4
                 foreach (EventData evnt in allEvents) {
-                    if ((maturityLevel & evnt.maturity) != 0) // required rating PG, Mature, Adult
+                    if ((maturityLevel & evnt.maturity) != 0)   // required rating PG, Mature, Adult
                         retEvents.Add (evnt);
                 }
             }
 
             return retEvents;
         }
-       
+
         /// <summary>
         ///     Retrieves all events in the given region by their maturity level
         /// </summary>
         /// <param name="regionName"></param>
         /// <param name="maturity">Uses DirectoryManager.EventFlags to determine the maturity requested</param>
         /// <returns></returns>
-        [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
-        public List<DirEventsReplyData> FindAllEventsInRegion(string regionName, int maturity)
+        [CanBeReflected (ThreatLevel = ThreatLevel.Low)]
+        public List<DirEventsReplyData> FindAllEventsInRegion (string regionName, int maturity)
         {
             if (m_doRemoteOnly) {
                 object remoteValue = DoRemote (regionName, maturity);
                 return remoteValue != null ? (List<DirEventsReplyData>)remoteValue : new List<DirEventsReplyData> ();
             }
 
-            List<DirEventsReplyData> Data = new List<DirEventsReplyData>();
+            List<DirEventsReplyData> Data = new List<DirEventsReplyData> ();
 
-            IRegionData regiondata = Framework.Utilities.DataManager.RequestPlugin<IRegionData>();
-            if (regiondata != null)
-            {
-                List<GridRegion> regions = regiondata.Get(regionName, null, null, null);
-                if (regions != null && regions.Count >= 1)
-                {
-                    QueryFilter filter = new QueryFilter();
-                    filter.andFilters["region"] = regions[0].RegionID.ToString();
-                    filter.andFilters["maturity"] = maturity;
+            IRegionData regiondata = Framework.Utilities.DataManager.RequestPlugin<IRegionData> ();
+            if (regiondata != null) {
+                List<GridRegion> regions = regiondata.GetList (regionName, null, null, null);
+                if (regions.Count > 0) {
+                    QueryFilter filter = new QueryFilter ();
+                    filter.andFilters ["region"] = regions [0].RegionID.ToString ();
+                    filter.andFilters ["maturity"] = maturity;
 
-                    List<string> retVal = GD.Query(new[]
+                    List<string> retVal = genData.Query (new []
                                                        {
                                                            "EID",
                                                            "creator",
@@ -1202,23 +1182,20 @@ namespace WhiteCore.Services.DataService
                                                            "name"
                                                        }, m_eventInfoTable, filter, null, null, null);
 
-                    if (retVal.Count > 0)
-                    {
-                        for (int i = 0; i < retVal.Count; i += 6)
-                        {
-                            DirEventsReplyData replyData = new DirEventsReplyData
-                                                               {
-                                                                   eventID = Convert.ToUInt32(retVal[i]),
-                                                                   ownerID = new UUID(retVal[i + 1]),
-                                                                   name = retVal[i + 5],
-                                                               };
-                            DateTime date = DateTime.Parse(retVal[i + 2]);
-                            replyData.date = date.ToString(new DateTimeFormatInfo());
-                            replyData.unixTime = (uint) Util.ToUnixTime(date);
+                    if (retVal.Count > 0) {
+                        for (int i = 0; i < retVal.Count; i += 6) {
+                            DirEventsReplyData replyData = new DirEventsReplyData {
+                                eventID = Convert.ToUInt32 (retVal [i]),
+                                ownerID = new UUID (retVal [i + 1]),
+                                name = retVal [i + 5],
+                            };
+                            DateTime date = DateTime.Parse (retVal [i + 2]);
+                            replyData.date = date.ToString (new DateTimeFormatInfo ());
+                            replyData.unixTime = (uint)Util.ToUnixTime (date);
                             //replyData.eventFlags = Convert.ToUInt32(retVal[i + 4]);
                             replyData.eventFlags = Convert.ToUInt32 (retVal [i + 3]) >> 1;   // maturity level
 
-                            Data.Add(replyData);
+                            Data.Add (replyData);
                         }
                     }
                 }
@@ -1227,80 +1204,79 @@ namespace WhiteCore.Services.DataService
             return Data;
         }
 
-        static List<EventData> Query2EventData(List<string> RetVal)
+        static List<EventData> Query2EventData (List<string> retVal)
         {
-            List<EventData> Events = new List<EventData>();
-            IRegionData regiondata = Framework.Utilities.DataManager.RequestPlugin<IRegionData>();
-            if (RetVal.Count%16 != 0 || regiondata == null)
-            {
-                return Events;
+            List<EventData> events = new List<EventData> ();
+            IRegionData regiondata = Framework.Utilities.DataManager.RequestPlugin<IRegionData> ();
+            if (retVal.Count % 16 != 0 || regiondata == null) {
+                return events;
             }
 
-            for (int i = 0; i < RetVal.Count; i += 16)
-            {
-                EventData data = new EventData();
+            for (int i = 0; i < retVal.Count; i += 16) {
+                EventData data = new EventData ();
 
-                GridRegion region = regiondata.Get(UUID.Parse(RetVal[2]), null);
-                if (region == null)
-                {
+                GridRegion region = regiondata.Get (UUID.Parse (retVal [2]), null);
+                if (region == null) {
                     continue;
                 }
+
                 data.simName = region.RegionName;
 
-                data.eventID = Convert.ToUInt32(RetVal[i]);
-                data.creator = RetVal[i + 1];
-                data.regionId = RetVal [1 + 2];
-                data.parcelId = RetVal [i + 3];
+                data.eventID = Convert.ToUInt32 (retVal [i]);
+                data.creator = retVal [i + 1];
+                data.regionId = retVal [1 + 2];
+                data.parcelId = retVal [i + 3];
 
                 //Parse the time out for the viewer
-                DateTime date = DateTime.Parse (RetVal [i + 4]);
-                data.date = date.ToString(new DateTimeFormatInfo());
-                data.dateUTC = (uint) Util.ToUnixTime(date);
+                DateTime date = DateTime.Parse (retVal [i + 4]);
+                data.date = date.ToString (new DateTimeFormatInfo ());
+                data.dateUTC = (uint)Util.ToUnixTime (date);
 
-                data.cover = data.amount = Convert.ToUInt32(RetVal[i + 5]);
-                data.maturity = Convert.ToInt32(RetVal[i + 6]);
-                data.eventFlags = Convert.ToUInt32(RetVal[i + 7]);
-                data.duration = Convert.ToUInt32(RetVal[i + 8]);
+                data.cover = data.amount = Convert.ToUInt32 (retVal [i + 5]);
+                data.maturity = Convert.ToInt32 (retVal [i + 6]);
+                data.eventFlags = Convert.ToUInt32 (retVal [i + 7]);
+                data.duration = Convert.ToUInt32 (retVal [i + 8]);
 
                 // be aware of culture differences here...
-                var posX = (float)Convert.ToDecimal (RetVal[i + 9], Culture.NumberFormatInfo);
-                var posY = (float)Convert.ToDecimal (RetVal[1 + 10], Culture.NumberFormatInfo);
-                var posZ = (float)Convert.ToDecimal (RetVal[i + 11], Culture.NumberFormatInfo);
+                var posX = (float)Convert.ToDecimal (retVal [i + 9], Culture.NumberFormatInfo);
+                var posY = (float)Convert.ToDecimal (retVal [1 + 10], Culture.NumberFormatInfo);
+                var posZ = (float)Convert.ToDecimal (retVal [i + 11], Culture.NumberFormatInfo);
                 data.regionPos = new Vector3 (posX, posY, posZ);
 
-                data.globalPos = new Vector3(
+                data.globalPos = new Vector3 (
                     region.RegionLocX + data.regionPos.X,
                     region.RegionLocY + data.regionPos.Y,
                     region.RegionLocZ + data.regionPos.Z
                     );
 
-                data.name = RetVal[i + 12];
-                data.description = RetVal[i + 13];
-                data.category = RetVal[i + 14];
+                data.name = retVal [i + 12];
+                data.description = retVal [i + 13];
+                data.category = retVal [i + 14];
 
-                Events.Add(data);
+                events.Add (data);
             }
 
-            return Events;
+            return events;
         }
 
         /// <summary>
         ///     Gets more info about the event by the events unique event ID
         /// </summary>
-        /// <param name="EventID"></param>
+        /// <param name="eventID"></param>
         /// <returns></returns>
-        [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
-        public EventData GetEventInfo(uint EventID)
+        [CanBeReflected (ThreatLevel = ThreatLevel.Low)]
+        public EventData GetEventInfo (uint eventID)
         {
             if (m_doRemoteOnly) {
-                object remoteValue = DoRemote (EventID);
+                object remoteValue = DoRemote (eventID);
                 return remoteValue != null ? (EventData)remoteValue : new EventData ();
             }
 
-            QueryFilter filter = new QueryFilter();
-            filter.andFilters["EID"] = EventID;
-            List<string> RetVal = GD.Query(new[] { "*" }, m_eventInfoTable, filter, null, null, null);
-            return (RetVal.Count == 0) ? null : Query2EventData(RetVal)[0];
+            QueryFilter filter = new QueryFilter ();
+            filter.andFilters ["EID"] = eventID;
+            List<string> retVal = genData.Query (new [] { "*" }, m_eventInfoTable, filter, null, null, null);
+
+            return (retVal.Count == 0) ? null : Query2EventData (retVal) [0];
         }
 
         /// <summary>
@@ -1319,8 +1295,8 @@ namespace WhiteCore.Services.DataService
         /// <param name="name">Name.</param>
         /// <param name="description">Description.</param>
         /// <param name="category">Category.</param>
-        [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
-        public EventData CreateEvent(UUID creator, UUID regionID, UUID parcelID, DateTime date, uint cover,
+        [CanBeReflected (ThreatLevel = ThreatLevel.Low)]
+        public EventData CreateEvent (UUID creator, UUID regionID, UUID parcelID, DateTime date, uint cover,
                                      EventFlags maturity, uint flags, uint duration, Vector3 localPos, string name,
                                      string description, string category)
         {
@@ -1330,27 +1306,27 @@ namespace WhiteCore.Services.DataService
                 return remoteValue != null ? (EventData)remoteValue : null;
             }
 
-            IRegionData regiondata = Framework.Utilities.DataManager.RequestPlugin<IRegionData>();
+            IRegionData regiondata = Framework.Utilities.DataManager.RequestPlugin<IRegionData> ();
             if (regiondata == null)
                 return null;
 
-            GridRegion region = regiondata.Get(regionID, null);
+            GridRegion region = regiondata.Get (regionID, null);
             if (region == null)
                 return null;
 
             // create the event
             EventData eventData = new EventData ();
             eventData.eventID = GetMaxEventID () + 1;
-            eventData.creator = creator.ToString();
+            eventData.creator = creator.ToString ();
             eventData.simName = region.RegionName;
-            eventData.date = date.ToString(new DateTimeFormatInfo());
-            eventData.dateUTC = (uint) Util.ToUnixTime(date);
+            eventData.date = date.ToString (new DateTimeFormatInfo ());
+            eventData.dateUTC = (uint)Util.ToUnixTime (date);
             eventData.amount = cover;
             eventData.cover = cover;
-            eventData.maturity = (int) maturity;
-            eventData.eventFlags = flags | (uint) maturity;
+            eventData.maturity = (int)maturity;
+            eventData.eventFlags = flags | (uint)maturity;
             eventData.duration = duration;
-            eventData.globalPos = new Vector3(
+            eventData.globalPos = new Vector3 (
                 region.RegionLocX + localPos.X,
                 region.RegionLocY + localPos.Y,
                 region.RegionLocZ + localPos.Z);
@@ -1358,27 +1334,27 @@ namespace WhiteCore.Services.DataService
             eventData.name = name;
             eventData.description = description;
             eventData.category = category;
-            eventData.regionId = regionID.ToString();
-            eventData.parcelId = parcelID.ToString();
+            eventData.regionId = regionID.ToString ();
+            eventData.parcelId = parcelID.ToString ();
 
-            Dictionary<string, object> row = new Dictionary<string, object>(15);
-            row["EID"] = eventData.eventID;
-            row["creator"] = creator.ToString();
-            row["region"] = regionID.ToString();
-            row["parcel"] = parcelID.ToString();
-            row["date"] = date.ToString("s");       
-            row["cover"] = eventData.cover;
-            row["maturity"] = Util.ConvertEventMaturityToDBMaturity (maturity);      // PG = 1, M == 2, A == 4
-            row["flags"] = flags;                   // region maturity flags
-            row["duration"] = duration;
-            row["localPosX"] = localPos.X;
-            row["localPosY"] = localPos.Y;
-            row["localPosZ"] = localPos.Z;
-            row["name"] = name;
-            row["description"] = description;
-            row["category"] = category;
+            Dictionary<string, object> row = new Dictionary<string, object> (15);
+            row ["EID"] = eventData.eventID;
+            row ["creator"] = creator.ToString ();
+            row ["region"] = regionID.ToString ();
+            row ["parcel"] = parcelID.ToString ();
+            row ["date"] = date.ToString ("s");
+            row ["cover"] = eventData.cover;
+            row ["maturity"] = Util.ConvertEventMaturityToDBMaturity (maturity);      // PG = 1, M == 2, A == 4
+            row ["flags"] = flags;                   // region maturity flags
+            row ["duration"] = duration;
+            row ["localPosX"] = localPos.X;
+            row ["localPosY"] = localPos.Y;
+            row ["localPosZ"] = localPos.Z;
+            row ["name"] = name;
+            row ["description"] = description;
+            row ["category"] = category;
 
-            GD.Insert(m_eventInfoTable, row);
+            genData.Insert (m_eventInfoTable, row);
 
             return eventData;
         }
@@ -1395,17 +1371,17 @@ namespace WhiteCore.Services.DataService
             // delete this event it it exists 
             QueryFilter filter = new QueryFilter ();
             filter.andFilters ["EID"] = eventData.eventID;
-            GD.Delete (m_eventInfoTable, filter);
+            genData.Delete (m_eventInfoTable, filter);
 
             // add the event 
             Dictionary<string, object> row = new Dictionary<string, object> (15);
-            row ["EID"] = GetMaxEventID () + 1; 
+            row ["EID"] = GetMaxEventID () + 1;
             row ["creator"] = eventData.creator;
             row ["region"] = eventData.regionId;
             row ["parcel"] = eventData.parcelId;
-            row ["date"] = eventData.date;                    
+            row ["date"] = eventData.date;
             row ["cover"] = eventData.cover;
-            row ["maturity"] = Util.ConvertEventMaturityToDBMaturity ((EventFlags) eventData.maturity);      // PG = 1, M == 2, A == 4
+            row ["maturity"] = Util.ConvertEventMaturityToDBMaturity ((EventFlags)eventData.maturity);      // PG = 1, M == 2, A == 4
             row ["flags"] = eventData.eventFlags;             // region maturity flags
             row ["duration"] = eventData.duration;
             row ["localPosX"] = eventData.regionPos.X;
@@ -1416,7 +1392,7 @@ namespace WhiteCore.Services.DataService
             row ["category"] = eventData.category;
 
             try {
-                GD.Insert (m_eventInfoTable, row);
+                genData.Insert (m_eventInfoTable, row);
             } catch {
                 return false;
             }
@@ -1438,7 +1414,7 @@ namespace WhiteCore.Services.DataService
             filter.andFilters ["EID"] = eventId;
 
             try {
-                GD.Delete (m_eventInfoTable, filter);
+                genData.Delete (m_eventInfoTable, filter);
             } catch {
                 return false;
             }
@@ -1448,81 +1424,72 @@ namespace WhiteCore.Services.DataService
         }
 
         // WebUI and API calls
-        public List<EventData> GetEvents(uint start, uint count, Dictionary<string, bool> sort,
+        public List<EventData> GetEvents (uint start, uint count, Dictionary<string, bool> sort,
                                          Dictionary<string, object> filter)
         {
             return (count == 0)
-                       ? new List<EventData>(0)
-                       : Query2EventData(GD.Query(new[] { "*" }, m_eventInfoTable, new QueryFilter
-                                                                               {
-                                                                                   andFilters = filter
-                                                                               }, sort, start, count));
+                       ? new List<EventData> (0)
+                       : Query2EventData (genData.Query (new [] { "*" }, m_eventInfoTable, 
+                                                    new QueryFilter {andFilters = filter}, sort, start, count));
         }
 
-        public uint GetNumberOfEvents(Dictionary<string, object> filter)
+        public uint GetNumberOfEvents (Dictionary<string, object> filter)
         {
-            return uint.Parse(GD.Query(new[]
-                                           {
-                                               "COUNT(EID)"
-                                           }, m_eventInfoTable, new QueryFilter
-                                                              {
-                                                                  andFilters = filter
-                                                              }, null, null, null)[0]);
+            return uint.Parse (genData.Query (new []{"COUNT(EID)"},
+                                         m_eventInfoTable,
+                                         new QueryFilter {andFilters = filter}, null, null, null) [0]);
         }
 
-        public uint GetMaxEventID()
+        public uint GetMaxEventID ()
         {
-            if (GetNumberOfEvents(new Dictionary<string, object>(0)) == 0)
-            {
+            if (GetNumberOfEvents (new Dictionary<string, object> (0)) == 0) {
                 return 0;
             }
-            return uint.Parse(GD.Query(new[] { "MAX(EID)" }, m_eventInfoTable, null, null, null, null)[0]);
+            return uint.Parse (genData.Query (new [] { "MAX(EID)" }, m_eventInfoTable, null, null, null, null) [0]);
         }
 
-        [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
-        public void AddEventNofication(UUID user, uint EventID)
+        [CanBeReflected (ThreatLevel = ThreatLevel.Low)]
+        public void AddEventNofication (UUID user, uint EventID)
         {
-            if (m_doRemoteOnly)
-            {
-                DoRemotePost(user, EventID);
+            if (m_doRemoteOnly) {
+                DoRemotePost (user, EventID);
                 return;
             }
 
-            GD.Insert(m_eventNotificationTable, new object[2] { user.ToString(), EventID });
+            genData.Insert (m_eventNotificationTable, new object [2] { user.ToString (), EventID });
         }
 
-        [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
-        public void RemoveEventNofication(UUID user, uint EventID)
+        [CanBeReflected (ThreatLevel = ThreatLevel.Low)]
+        public void RemoveEventNofication (UUID user, uint eventID)
         {
-            if (m_doRemoteOnly)
-            {
-                DoRemotePost(user, EventID);
+            if (m_doRemoteOnly) {
+                DoRemotePost (user, eventID);
                 return;
             }
 
-            QueryFilter filter = new QueryFilter();
-            filter.andFilters.Add("UserID", user.ToString());
-            filter.andFilters.Add("EventID", EventID);
-            GD.Delete(m_eventNotificationTable, filter);
+            QueryFilter filter = new QueryFilter ();
+            filter.andFilters.Add ("UserID", user.ToString ());
+            filter.andFilters.Add ("EventID", eventID);
+            genData.Delete (m_eventNotificationTable, filter);
         }
 
-        [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
-        public List<EventData> GetEventNotifications(UUID user)
+        [CanBeReflected (ThreatLevel = ThreatLevel.Low)]
+        public List<EventData> GetEventNotifications (UUID user)
         {
             if (m_doRemoteOnly) {
                 object remoteValue = DoRemote (user);
                 return remoteValue != null ? (List<EventData>)remoteValue : new List<EventData> ();
             }
 
-            QueryFilter filter = new QueryFilter();
-            filter.andFilters.Add("UserID", user.ToString());
-            List<string> data = GD.Query(new string[1] { "EventID" }, m_eventNotificationTable, filter, null, null, null);
-            List<EventData> events = new List<EventData>();
+            QueryFilter filter = new QueryFilter ();
+            filter.andFilters.Add ("UserID", user.ToString ());
+            List<string> data = genData.Query (new string [1] { "EventID" }, m_eventNotificationTable, filter, null, null, null);
+            List<EventData> events = new List<EventData> ();
             if (data.Count == 0)
                 return events;
 
             foreach (string eventID in data)
-                events.Add(GetEventInfo(uint.Parse(eventID)));
+                events.Add (GetEventInfo (uint.Parse (eventID)));
 
             return events;
         }

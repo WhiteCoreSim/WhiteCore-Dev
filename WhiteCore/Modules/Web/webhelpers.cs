@@ -268,6 +268,14 @@ namespace WhiteCore.Modules.Web
 
             // build timeframes
             var timeframes = new List<Dictionary<string, object>> ();
+            timeframes.Add(new Dictionary<string, object> {
+                {"Value", translator.GetTranslatedString("Next7Days")},
+                {"Index","168"},
+                {"selected", timeframe == 168 ? "selected" : "" } });
+            timeframes.Add(new Dictionary<string, object> {
+                {"Value", translator.GetTranslatedString("Next3Days")},
+                {"Index","72"},
+                {"selected", timeframe == 72 ? "selected" : "" } });
             timeframes.Add (new Dictionary<string, object> {
                 {"Value", translator.GetTranslatedString("Next24Hours")},
                 {"Index","24"},
@@ -912,7 +920,7 @@ namespace WhiteCore.Modules.Web
                 EstateSettings ES = estateConnector.GetEstateIDSettings (estateID);
 
                 if (ES != null) {
-                    UserAccount EstateOwner = accountService.GetUserAccount (null, ES.EstateOwner);
+                    UserAccount estateOwner = accountService.GetUserAccount (null, ES.EstateOwner);
 
                     var selected = "";
                     if (selEstate > -1)
@@ -920,7 +928,7 @@ namespace WhiteCore.Modules.Web
                             selected = "selected";
 
                     estateList.Add (new Dictionary<string, object> {
-                        {"Value", ES.EstateName + " (" + EstateOwner.Name + ")"},
+                        {"Value", ES.EstateName + " (" + estateOwner.Name + ")"},
                         {"Index", estateID},
                         {"selected", selected}
                     });
@@ -1074,9 +1082,9 @@ namespace WhiteCore.Modules.Web
             var userList = new List<Dictionary<string, object>> ();
             var accountService = registry.RequestModuleInterface<IUserAccountService> ();
 
-            var users = accountService.GetUserAccounts (null, "*");
+            var userAccts = accountService.GetUserAccounts (null, "*");
 
-            foreach (var user in users) {
+            foreach (var user in userAccts) {
                 var selected = "";
 
                 if (userID == user.PrincipalID)

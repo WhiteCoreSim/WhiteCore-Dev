@@ -389,14 +389,13 @@ namespace WhiteCore.Services.SQLServices.AssetService
             else {
                 var accountService = m_registry.RequestModuleInterface<IUserAccountService> ();
                 if (accountService != null) {
-                    UserAccount account = null;
                     try {
-                        account = accountService.GetUserAccount (null, asset.CreatorID);
+                        UserAccount userAcct = accountService.GetUserAccount (null, asset.CreatorID);
+                        if (userAcct.Valid)
+                            creatorName = userAcct.Name;
                     } catch (Exception e) {
                         MainConsole.Instance.Info ("Exception during retrieval of asset creator account\n" + e);
                     }
-                    if (account != null)
-                        creatorName = account.Name;
                 }
             }
 

@@ -46,7 +46,7 @@ using WhiteCore.Framework.Utilities;
 
 namespace WhiteCore.BotManager
 {
-    
+
     #region Enums
     public enum BotState
     {
@@ -72,48 +72,43 @@ namespace WhiteCore.BotManager
         Bot m_bot;
         bool m_hasStoppedMoving;
 
-        public BotAvatarController(IScenePresence presence, Bot bot)
-        {
+        public BotAvatarController(IScenePresence presence, Bot bot) {
             m_scenePresence = presence;
             m_bot = bot;
             if (presence.ControllingClient is BotClientAPI)
                 (presence.ControllingClient as BotClientAPI).Initialize(this);
         }
 
-        public void SetDrawDistance(float draw)
-        {
+        public void SetDrawDistance(float draw) {
             m_scenePresence.DrawDistance = draw;
         }
 
-        public void SetSpeedModifier(float speed)
-        {
+        public void SetSpeedModifier(float speed) {
             if (speed > 4)
                 speed = 4;
             m_scenePresence.SpeedModifier = speed;
         }
 
-        public Vector3 AbsolutePosition
-        {
+        public Vector3 AbsolutePosition {
             get { return m_scenePresence.AbsolutePosition; }
         }
 
         // Makes the bot stop walk/fly to the specified destination
-        public void StopMoving(bool fly, bool clearPath)
-        {
+        public void StopMoving(bool fly, bool clearPath) {
             if (m_hasStoppedMoving)
                 return;
             m_hasStoppedMoving = true;
             m_bot.State = BotState.Idle;
 
-            //Clear out any nodes
+            // Clear out any nodes
             if (clearPath)
                 m_bot.m_nodeGraph.Clear();
 
-            //Send the stop message
-            m_bot.m_movementFlag = (uint) AgentManager.ControlFlags.NONE;
+            // Send the stop message
+            m_bot.m_movementFlag = (uint)AgentManager.ControlFlags.NONE;
 
             if (fly)
-                m_bot.m_movementFlag |= (uint) AgentManager.ControlFlags.AGENT_CONTROL_FLY;
+                m_bot.m_movementFlag |= (uint)AgentManager.ControlFlags.AGENT_CONTROL_FLY;
 
             OnBotAgentUpdate(Vector3.Zero, m_bot.m_movementFlag, m_bot.m_bodyDirection, false);
             m_scenePresence.CollisionPlane = Vector4.UnitW;
@@ -122,95 +117,79 @@ namespace WhiteCore.BotManager
                 m_scenePresence.PhysicsActor.ForceSetVelocity(Vector3.Zero);
         }
 
-        public bool CanMove
-        {
+        public bool CanMove {
             get { return m_scenePresence.AllowMovement && !m_scenePresence.Frozen && !m_scenePresence.FallenStandUp; }
         }
 
-        public IScene GetScene()
-        {
+        public IScene GetScene() {
             return m_scenePresence.Scene;
         }
 
-        public bool ForceFly
-        {
+        public bool ForceFly {
             get { return m_scenePresence.ForceFly; }
             set { m_scenePresence.ForceFly = value; }
         }
 
-        public bool SetAlwaysRun
-        {
+        public bool SetAlwaysRun {
             get { return m_scenePresence.SetAlwaysRun; }
             set { m_scenePresence.SetAlwaysRun = value; }
         }
 
-        public void Teleport(Vector3 pos)
-        {
+        public void Teleport(Vector3 pos) {
             m_scenePresence.Teleport(pos);
         }
 
-        public PhysicsActor PhysicsActor
-        {
+        public PhysicsActor PhysicsActor {
             get { return m_scenePresence.PhysicsActor; }
         }
 
-        public void StandUp()
-        {
+        public void StandUp() {
             m_scenePresence.StandUp();
         }
 
-        public void UpdateMovementAnimations(bool p)
-        {
+        public void UpdateMovementAnimations(bool p) {
             m_scenePresence.Animator.UpdateMovementAnimations(p);
         }
 
-        public void OnBotAgentUpdate(Vector3 toward, uint controlFlag, Quaternion bodyRotation)
-        {
+        public void OnBotAgentUpdate(Vector3 toward, uint controlFlag, Quaternion bodyRotation) {
             OnBotAgentUpdate(toward, controlFlag, bodyRotation, true);
         }
 
-        public void OnBotAgentUpdate(Vector3 toward, uint controlFlag, Quaternion bodyRotation, bool isMoving)
-        {
-            if (isMoving)
-                m_hasStoppedMoving = false;
+        public void OnBotAgentUpdate(Vector3 toward, uint controlFlag, Quaternion bodyRotation, bool isMoving) {
+            m_hasStoppedMoving &= !isMoving;
 
-            AgentUpdateArgs pack = new AgentUpdateArgs {ControlFlags = controlFlag, BodyRotation = bodyRotation};
+            AgentUpdateArgs pack = new AgentUpdateArgs { ControlFlags = controlFlag, BodyRotation = bodyRotation };
             m_scenePresence.ControllingClient.ForceSendOnAgentUpdate(m_scenePresence.ControllingClient, pack);
         }
 
-        public UUID UUID
-        {
+        public UUID UUID {
             get { return m_scenePresence.UUID; }
         }
 
         #region Chat interface
 
-        public void SendChatMessage(int sayType, string message, int channel)
-        {
+        public void SendChatMessage(int sayType, string message, int channel) {
             if (m_scenePresence == null || m_scenePresence.Scene == null)
                 return;
             OSChatMessage args = new OSChatMessage
-                                     {
-                                         Message = message,
-                                         Channel = channel,
-                                         From = m_scenePresence.Name,
-                                         SenderUUID = m_scenePresence.UUID,
-                                         Position = m_scenePresence.AbsolutePosition,
-                                         Sender = m_scenePresence.ControllingClient,
-                                         Type = (ChatTypeEnum) sayType,
-                                         Scene = m_scenePresence.Scene
-                                     };
+            {
+                Message = message,
+                Channel = channel,
+                From = m_scenePresence.Name,
+                SenderUUID = m_scenePresence.UUID,
+                Position = m_scenePresence.AbsolutePosition,
+                Sender = m_scenePresence.ControllingClient,
+                Type = (ChatTypeEnum)sayType,
+                Scene = m_scenePresence.Scene
+            };
 
             m_scenePresence.ControllingClient.OnForceChatFromViewer(m_scenePresence.ControllingClient, args);
         }
 
-        public void SendInstantMessage(GridInstantMessage im)
-        {
+        public void SendInstantMessage(GridInstantMessage im) {
             if (im.Dialog == (byte)InstantMessageDialog.GodLikeRequestTeleport ||
-                im.Dialog == (byte)InstantMessageDialog.RequestTeleport)
-            {
-                if (m_bot.AvatarCreatorID == im.FromAgentID || m_scenePresence.Scene.Permissions.IsGod(im.FromAgentID))
-                {
+                im.Dialog == (byte)InstantMessageDialog.RequestTeleport) {
+                if (m_bot.AvatarCreatorID == im.FromAgentID || m_scenePresence.Scene.Permissions.IsGod(im.FromAgentID)) {
                     ulong handle = 0;
                     uint x = 128;
                     uint y = 128;
@@ -219,26 +198,22 @@ namespace WhiteCore.BotManager
                     Util.ParseFakeParcelID(im.SessionID, out handle, out x, out y, out z);
                     m_scenePresence.Teleport(new Vector3(x, y, z));
                 }
-            }
-            else
+            } else
                 m_scenePresence.ControllingClient.IncomingInstantMessage(im);
         }
 
-        public void Close()
-        {
+        public void Close() {
             m_scenePresence.ControllingClient.Close(false);
         }
 
         #endregion
 
-        public string Name
-        {
+        public string Name {
             get { return m_scenePresence.Name; }
         }
 
 
-        public void Jump()
-        {
+        public void Jump() {
             m_bot.WalkTo(m_scenePresence.AbsolutePosition + new Vector3(0, 0, 2));
         }
     }
@@ -249,7 +224,7 @@ namespace WhiteCore.BotManager
     {
         #region Declares
         static readonly object _lock = new object();
-        readonly float EPSILON = (float) Constants.FloatDifference;
+        readonly float EPSILON = (float)Constants.FloatDifference;
 
         IBotController m_controller;
 
@@ -261,8 +236,7 @@ namespace WhiteCore.BotManager
         public Quaternion m_bodyDirection = Quaternion.Identity;
 
 
-        public IBotController Controller
-        {
+        public IBotController Controller {
             get { return m_controller; }
         }
 
@@ -280,13 +254,10 @@ namespace WhiteCore.BotManager
         public BotState m_currentState = BotState.Idle;
         public BotState m_previousState = BotState.Idle;
 
-        public BotState State
-        {
+        public BotState State {
             get { return m_currentState; }
-            set
-            {
-                if (m_currentState != value)
-                {
+            set {
+                if (m_currentState != value) {
                     m_previousState = m_currentState;
                     m_currentState = value;
                     EventManager.FireGenericEventHandler("ChangedState", null);
@@ -298,14 +269,12 @@ namespace WhiteCore.BotManager
 
         #region Jump Settings
 
-        public bool AllowJump
-        {
+        public bool AllowJump {
             get { return m_allowJump; }
             set { m_allowJump = value; }
         }
 
-        public bool UseJumpDecisionTree
-        {
+        public bool UseJumpDecisionTree {
             get { return m_UseJumpDecisionTree; }
             set { m_UseJumpDecisionTree = value; }
         }
@@ -319,8 +288,7 @@ namespace WhiteCore.BotManager
 
         UUID m_avatarCreatorID = UUID.Zero;
 
-        public UUID AvatarCreatorID
-        {
+        public UUID AvatarCreatorID {
             get { return m_avatarCreatorID; }
         }
 
@@ -332,8 +300,7 @@ namespace WhiteCore.BotManager
 
         float m_RexCharacterSpeedMod = 1.0f;
 
-        public float RexCharacterSpeedMod
-        {
+        public float RexCharacterSpeedMod {
             get { return m_RexCharacterSpeedMod; }
             set { m_RexCharacterSpeedMod = value; }
         }
@@ -344,8 +311,7 @@ namespace WhiteCore.BotManager
 
         #region Initialize/Close
 
-        public void Initialize(IScenePresence presence, UUID creatorID)
-        {
+        public void Initialize(IScenePresence presence, UUID creatorID) {
             m_controller = new BotAvatarController(presence, this);
             m_controller.SetDrawDistance(1024f);
             m_avatarCreatorID = creatorID;
@@ -354,8 +320,7 @@ namespace WhiteCore.BotManager
             m_frames.Start();
         }
 
-        public void Initialize(ISceneEntity entity)
-        {
+        public void Initialize(ISceneEntity entity) {
             m_controller = new BotPrimController(entity, this);
             m_avatarCreatorID = entity.OwnerID;
             m_frames = new Timer(10);
@@ -363,8 +328,7 @@ namespace WhiteCore.BotManager
             m_frames.Start();
         }
 
-        public void Close(bool forceKill)
-        {
+        public void Close(bool forceKill) {
             m_controller.Close();
             // Pull Client out of Region
             m_controller = null;
@@ -376,8 +340,7 @@ namespace WhiteCore.BotManager
 
         #region SetPath
 
-        public void SetPath(List<Vector3> positions, List<TravelMode> modes, int flags)
-        {
+        public void SetPath(List<Vector3> positions, List<TravelMode> modes, int flags) {
             m_nodeGraph.Clear();
             const int BOT_FOLLOW_FLAG_INDEFINITELY = 1;
             const int BOT_FOLLOW_FLAG_FORCEDIRECTPATH = 4;
@@ -392,8 +355,7 @@ namespace WhiteCore.BotManager
 
         #region Set Av Speed
 
-        public void SetMovementSpeedMod(float speed)
-        {
+        public void SetMovementSpeedMod(float speed) {
             m_controller.SetSpeedModifier(speed);
         }
 
@@ -402,10 +364,8 @@ namespace WhiteCore.BotManager
         #region Move/Rotate the bot
 
         // Makes the bot walk to the specified destination
-        public void WalkTo(Vector3 destination)
-        {
-            if (!Util.IsZeroVector(destination - m_controller.AbsolutePosition))
-            {
+        public void WalkTo(Vector3 destination) {
+            if (!Util.IsZeroVector(destination - m_controller.AbsolutePosition)) {
                 walkTo(destination);
                 State = BotState.Walking;
                 lastFlying = false;
@@ -413,56 +373,48 @@ namespace WhiteCore.BotManager
         }
 
         // Makes the bot fly to the specified destination
-        public void FlyTo(Vector3 destination)
-        {
-            if (!Util.IsZeroVector(destination - m_controller.AbsolutePosition))
-            {
+        public void FlyTo(Vector3 destination) {
+            if (!Util.IsZeroVector(destination - m_controller.AbsolutePosition)) {
                 flyTo(destination);
                 State = BotState.Flying;
                 lastFlying = true;
-            }
-            else
-            {
-                m_movementFlag = (uint) AgentManager.ControlFlags.AGENT_CONTROL_AT_POS;
+            } else {
+                m_movementFlag = (uint)AgentManager.ControlFlags.AGENT_CONTROL_AT_POS;
 
                 m_controller.OnBotAgentUpdate(Vector3.Zero, m_movementFlag, m_bodyDirection);
-                m_movementFlag = (uint) AgentManager.ControlFlags.NONE;
+                m_movementFlag = (uint)AgentManager.ControlFlags.NONE;
             }
         }
 
-        void RotateTo(Vector3 destination)
-        {
+        void RotateTo(Vector3 destination) {
             Vector3 bot_forward = new Vector3(1, 0, 0);
-            if (destination - m_controller.AbsolutePosition != Vector3.Zero)
-            {
+            if (destination - m_controller.AbsolutePosition != Vector3.Zero) {
                 Vector3 bot_toward = Util.GetNormalizedVector(destination - m_controller.AbsolutePosition);
                 Quaternion rot_result = llRotBetween(bot_forward, bot_toward);
                 m_bodyDirection = rot_result;
             }
-            m_movementFlag = (uint) AgentManager.ControlFlags.AGENT_CONTROL_AT_POS;
+            m_movementFlag = (uint)AgentManager.ControlFlags.AGENT_CONTROL_AT_POS;
 
             m_controller.OnBotAgentUpdate(Vector3.Zero, m_movementFlag, m_bodyDirection);
-            m_movementFlag = (uint) AgentManager.ControlFlags.NONE;
+            m_movementFlag = (uint)AgentManager.ControlFlags.NONE;
         }
 
         #region rotation helper functions
 
-        Vector3 llRot2Fwd(Quaternion r)
-        {
-            return (new Vector3(1, 0, 0)*r);
+        Vector3 llRot2Fwd(Quaternion r) {
+            return (new Vector3(1, 0, 0) * r);
         }
 
-        Quaternion llRotBetween(Vector3 a, Vector3 b)
-        {
-            //A and B should both be normalized
+        Quaternion llRotBetween(Vector3 a, Vector3 b) {
+            // A and B should both be normalized
             double dotProduct = Vector3.Dot(a, b);
             Vector3 crossProduct = Vector3.Cross(a, b);
-            double magProduct = Vector3.Distance(Vector3.Zero, a)*Vector3.Distance(Vector3.Zero, b);
-            double angle = Math.Acos(dotProduct/magProduct);
+            double magProduct = Vector3.Distance(Vector3.Zero, a) * Vector3.Distance(Vector3.Zero, b);
+            double angle = Math.Acos(dotProduct / magProduct);
             Vector3 axis = Vector3.Normalize(crossProduct);
-            float s = (float) Math.Sin(angle/2);
+            float s = (float)Math.Sin(angle / 2);
 
-            return new Quaternion(axis.X*s, axis.Y*s, axis.Z*s, (float) Math.Cos(angle/2));
+            return new Quaternion(axis.X * s, axis.Y * s, axis.Z * s, (float)Math.Cos(angle / 2));
         }
 
         #endregion
@@ -473,84 +425,68 @@ namespace WhiteCore.BotManager
         ///     Does the actual movement of the bot
         /// </summary>
         /// <param name="pos"></param>
-        void walkTo(Vector3 pos)
-        {
+        void walkTo(Vector3 pos) {
             Vector3 bot_forward = new Vector3(2, 0, 0);
             Vector3 bot_toward = Vector3.Zero;
-            if (pos - m_controller.AbsolutePosition != Vector3.Zero)
-            {
-                try
-                {
+            if (pos - m_controller.AbsolutePosition != Vector3.Zero) {
+                try {
                     bot_toward = Util.GetNormalizedVector(pos - m_controller.AbsolutePosition);
                     Quaternion rot_result = llRotBetween(bot_forward, bot_toward);
                     m_bodyDirection = rot_result;
-                }
-                catch (ArgumentException)
-                {
+                } catch (ArgumentException) {
                 }
             }
-            m_movementFlag = (uint) AgentManager.ControlFlags.AGENT_CONTROL_AT_POS;
+            m_movementFlag = (uint)AgentManager.ControlFlags.AGENT_CONTROL_AT_POS;
 
             if (m_controller.CanMove)
                 m_controller.OnBotAgentUpdate(bot_toward, m_movementFlag, m_bodyDirection);
             else
-                m_controller.OnBotAgentUpdate(Vector3.Zero, (uint) AgentManager.ControlFlags.AGENT_CONTROL_STOP,
+                m_controller.OnBotAgentUpdate(Vector3.Zero, (uint)AgentManager.ControlFlags.AGENT_CONTROL_STOP,
                                               Quaternion.Identity);
 
-            m_movementFlag = (uint) AgentManager.ControlFlags.NONE;
+            m_movementFlag = (uint)AgentManager.ControlFlags.NONE;
         }
 
         /// <summary>
         ///     Does the actual movement of the bot
         /// </summary>
         /// <param name="pos"></param>
-        void flyTo(Vector3 pos)
-        {
+        void flyTo(Vector3 pos) {
             Vector3 bot_forward = new Vector3(1, 0, 0), bot_toward = Vector3.Zero;
-            if (pos - m_controller.AbsolutePosition != Vector3.Zero)
-            {
-                try
-                {
+            if (pos - m_controller.AbsolutePosition != Vector3.Zero) {
+                try {
                     bot_toward = Util.GetNormalizedVector(pos - m_controller.AbsolutePosition);
                     Quaternion rot_result = llRotBetween(bot_forward, bot_toward);
                     m_bodyDirection = rot_result;
-                }
-                catch (ArgumentException)
-                {
+                } catch (ArgumentException) {
                 }
             }
 
-            m_movementFlag = (uint) AgentManager.ControlFlags.AGENT_CONTROL_FLY;
+            m_movementFlag = (uint)AgentManager.ControlFlags.AGENT_CONTROL_FLY;
 
             Vector3 diffPos = pos - m_controller.AbsolutePosition;
-            if (Math.Abs(diffPos.X) > 1.5 || Math.Abs(diffPos.Y) > 1.5)
-            {
-                m_movementFlag |= (uint) AgentManager.ControlFlags.AGENT_CONTROL_AT_POS;
+            if (Math.Abs(diffPos.X) > 1.5 || Math.Abs(diffPos.Y) > 1.5) {
+                m_movementFlag |= (uint)AgentManager.ControlFlags.AGENT_CONTROL_AT_POS;
             }
 
-            if (m_controller.AbsolutePosition.Z < pos.Z - 1)
-            {
-                m_movementFlag |= (uint) AgentManager.ControlFlags.AGENT_CONTROL_UP_POS;
-            }
-            else if (m_controller.AbsolutePosition.Z > pos.Z + 1)
-            {
-                m_movementFlag |= (uint) AgentManager.ControlFlags.AGENT_CONTROL_UP_NEG;
+            if (m_controller.AbsolutePosition.Z < pos.Z - 1) {
+                m_movementFlag |= (uint)AgentManager.ControlFlags.AGENT_CONTROL_UP_POS;
+            } else if (m_controller.AbsolutePosition.Z > pos.Z + 1) {
+                m_movementFlag |= (uint)AgentManager.ControlFlags.AGENT_CONTROL_UP_NEG;
             }
 
-            if (bot_forward.X > 0)
-            {
+            if (bot_forward.X > 0) {
                 m_movementFlag |= (uint)AgentManager.ControlFlags.AGENT_CONTROL_TURN_LEFT;
                 m_movementFlag |= (uint)AgentManager.ControlFlags.AGENT_CONTROL_YAW_POS;
             }
-            if (bot_forward.X < 0)
-            {
+            if (bot_forward.X < 0) {
                 m_movementFlag |= (uint)AgentManager.ControlFlags.AGENT_CONTROL_TURN_RIGHT;
                 m_movementFlag |= (uint)AgentManager.ControlFlags.AGENT_CONTROL_YAW_NEG;
             }
 
             if (m_controller.CanMove)
                 m_controller.OnBotAgentUpdate(bot_toward, m_movementFlag, m_bodyDirection);
-            m_movementFlag = (uint) AgentManager.ControlFlags.AGENT_CONTROL_FLY;
+            m_movementFlag = (uint)AgentManager.ControlFlags.AGENT_CONTROL_FLY;
         }
 
         #region Jump Decision Tree
@@ -561,22 +497,18 @@ namespace WhiteCore.BotManager
         /// <param name="start"></param>
         /// <param name="end"></param>
         /// <returns></returns>
-        bool JumpDecisionTree(Vector3 start, Vector3 end)
-        {
+        bool JumpDecisionTree(Vector3 start, Vector3 end) {
             //Cast a ray in the direction that we are going
             List<ISceneChildEntity> entities = llCastRay(start, end);
-            foreach (ISceneChildEntity entity in entities)
-            {
-                if (!entity.IsAttachment)
-                {
+            foreach (ISceneChildEntity entity in entities) {
+                if (!entity.IsAttachment) {
                     if (entity.Scale.Z > m_controller.PhysicsActor.Size.Z) return true;
                 }
             }
             return false;
         }
 
-        public List<ISceneChildEntity> llCastRay(Vector3 start, Vector3 end)
-        {
+        public List<ISceneChildEntity> llCastRay(Vector3 start, Vector3 end) {
             Vector3 dir = new Vector3((end - start).X, (end - start).Y, (end - start).Z);
             Vector3 startvector = new Vector3(start.X, start.Y, start.Z);
             Vector3 endvector = new Vector3(end.X, end.Y, end.Z);
@@ -589,11 +521,9 @@ namespace WhiteCore.BotManager
             double distance = Util.GetDistanceTo(startvector, endvector);
             if (distance < 0.001)
                 distance = 0.001;
-            foreach (ContactResult result in results)
-            {
+            foreach (ContactResult result in results) {
                 ISceneChildEntity child = m_controller.GetScene().GetSceneObjectPart(result.ConsumerID);
-                if (!entities.Contains(child))
-                {
+                if (!entities.Contains(child)) {
                     entities.Add(child);
                 }
             }
@@ -611,8 +541,7 @@ namespace WhiteCore.BotManager
         /// <summary>
         ///     Blocks walking and sets to only flying
         /// </summary>
-        public void DisableWalk()
-        {
+        public void DisableWalk() {
             ShouldFly = true;
             m_controller.ForceFly = true;
             m_closeToPoint = 1.5f;
@@ -621,8 +550,7 @@ namespace WhiteCore.BotManager
         /// <summary>
         ///     Allows for flying and walking
         /// </summary>
-        public void EnableWalk()
-        {
+        public void EnableWalk() {
             ShouldFly = false;
             m_controller.ForceFly = false;
             m_closeToPoint = 1;
@@ -632,8 +560,7 @@ namespace WhiteCore.BotManager
 
         #region Timers
 
-        void frame_Elapsed(object sender, ElapsedEventArgs e)
-        {
+        void frame_Elapsed(object sender, ElapsedEventArgs e) {
             m_frames.Stop();
             if (m_controller == null)
                 return;
@@ -641,7 +568,7 @@ namespace WhiteCore.BotManager
             m_frame++;
             GetNextDestination();
 
-            if (m_frame%10 == 0) //Only every 10 frames
+            if (m_frame % 10 == 0)    // Only every 10 frames
             {
                 m_frame = 0;
                 Update();
@@ -655,19 +582,17 @@ namespace WhiteCore.BotManager
 
         public bool ForceCloseToPoint = false;
 
-        public void GetNextDestination()
-        {
-            //Fire the move event
+        public void GetNextDestination() {
+            // Fire the move event
             EventManager.FireGenericEventHandler("Move", null);
 
             if (m_controller == null || m_controller.PhysicsActor == null)
                 return;
-            if (m_paused)
-            {
+            if (m_paused) {
                 m_controller.StopMoving(lastFlying, false);
                 return;
             }
-                
+
             Vector3 pos;
             TravelMode state;
             bool teleport;
@@ -676,10 +601,8 @@ namespace WhiteCore.BotManager
                                      ? 1.5f
                                      : 1.0f;
             if (m_nodeGraph.GetNextPosition(m_controller.AbsolutePosition, m_closeToPoint, 60, out pos, out state,
-                                            out teleport))
-            {
-                switch (state)
-                {
+                                            out teleport)) {
+                switch (state) {
                     case TravelMode.Fly:
                         FlyTo(pos);
                         break;
@@ -698,19 +621,20 @@ namespace WhiteCore.BotManager
                     case TravelMode.TriggerHereEvent:
                         EventManager.FireGenericEventHandler("HereEvent", null);
                         break;
+                    case TravelMode.Wait:
+                        break;
+                    default:    // TravelMode.None:
+                        break;
                 }
-            }
-            else
+            } else
                 m_controller.StopMoving(lastFlying, true);
         }
 
-        public void PauseMovement()
-        {
+        public void PauseMovement() {
             m_paused = true;
         }
 
-        public void ResumeMovement()
-        {
+        public void ResumeMovement() {
             m_paused = false;
         }
 
@@ -718,11 +642,10 @@ namespace WhiteCore.BotManager
 
         #region Update Event
 
-        public void Update()
-        {
+        public void Update() {
             if (m_paused)
                 return;
-            //Tell any interested modules that we are ready to go
+            // Tell any interested modules that we are ready to go
             EventManager.FireGenericEventHandler("Update", null);
         }
 
@@ -730,24 +653,23 @@ namespace WhiteCore.BotManager
 
         #region FindPath
 
-        public List<Vector3> InnerFindPath(int[,] map, int startX, int startY, int finishX, int finishY)
-        {
+        public List<Vector3> InnerFindPath(int[,] map, int startX, int startY, int finishX, int finishY) {
             StartPath.Map = map;
-            StartPath.XLimit = (int) Math.Sqrt(map.Length);
-            StartPath.YLimit = (int) Math.Sqrt(map.Length);
-            //ShowMap ("", null);
+            StartPath.XLimit = (int)Math.Sqrt(map.Length);
+            StartPath.YLimit = (int)Math.Sqrt(map.Length);
+            // ShowMap ("", null);
             List<string> points = StartPath.Path(startX, startY, finishX, finishY, 0, 0, 0);
 
             List<Vector3> waypoints = new List<Vector3>();
-            if (points.Contains("no_path"))
-            {
+            if (points.Contains("no_path")) {
                 MainConsole.Instance.Warn("I'm sorry I could not find a solution to that path. Teleporting instead");
                 return waypoints;
             }
 
             waypoints.AddRange(from s in points
                                select s.Split(',')
-                               into Vector where Vector.Length == 3
+                               into Vector
+                               where Vector.Length == 3
                                select
                                    new Vector3(float.Parse(Vector[0]), float.Parse(Vector[1]), float.Parse(Vector[2])));
             return waypoints;
@@ -771,20 +693,17 @@ namespace WhiteCore.BotManager
         int jumpTry;
         bool m_lostAvatar;
 
-        public float StartFollowDistance
-        {
+        public float StartFollowDistance {
             get { return m_StartFollowDistance; }
             set { m_StartFollowDistance = value; }
         }
 
-        public float StopFollowDistance
-        {
+        public float StopFollowDistance {
             get { return m_StopFollowDistance; }
             set { m_StopFollowDistance = value; }
         }
 
-        public float FollowLoseAvatarDistance
-        {
+        public float FollowLoseAvatarDistance {
             get { return m_followLoseAvatarDistance; }
             set { m_followLoseAvatarDistance = value; }
         }
@@ -794,22 +713,19 @@ namespace WhiteCore.BotManager
         #region Interface members
 
         public void FollowAvatar(string avatarName, float startFollowDistance, float stopFollowDistance,
-                                 Vector3 offsetFromUser, bool requireLOS)
-        {
+                                 Vector3 offsetFromUser, bool requireLOS) {
             m_controller.GetScene().TryGetAvatarByName(avatarName, out FollowSP);
-            if (FollowSP == null)
-            {
-                //Try by UUID then
-                try
-                {
+            if (FollowSP == null) {
+                // Try by UUID then
+                try {
                     m_controller.GetScene().TryGetScenePresence(UUID.Parse(avatarName), out FollowSP);
-                }
-                catch
-                {
+                } catch {
+                    MainConsole.Instance.Warn("Exception getting scene presence of avatar " + avatarName + " for bot " + m_controller.Name +
+                           " to follow");
+
                 }
             }
-            if (FollowSP == null || FollowSP.IsChildAgent)
-            {
+            if (FollowSP == null || FollowSP.IsChildAgent) {
                 MainConsole.Instance.Warn("Could not find avatar " + avatarName + " for bot " + m_controller.Name +
                                           " to follow");
                 return;
@@ -820,17 +736,16 @@ namespace WhiteCore.BotManager
             FollowOffset = offsetFromUser;
             EventManager.RegisterEventHandler("Update", FollowingUpdate);
             EventManager.RegisterEventHandler("Move", FollowingMove);
-            m_controller.StandUp(); //Can't follow if sitting
+            m_controller.StandUp();     // Can't follow if sitting
             StartFollowDistance = startFollowDistance;
             StopFollowDistance = stopFollowDistance;
         }
 
-        public void StopFollowAvatar()
-        {
+        public void StopFollowAvatar() {
             EventManager.UnregisterEventHandler("Update", FollowingUpdate);
             if (FollowSP != null)
                 FollowSP.PhysicsActor.OnRequestTerseUpdate -= EventManager_OnClientMovement;
-            FollowSP = null; //null out everything
+            FollowSP = null;            // null out everything
             FollowUUID = UUID.Zero;
         }
 
@@ -838,31 +753,28 @@ namespace WhiteCore.BotManager
 
         #region Following Update Event
 
-        object FollowingUpdate(string functionName, object param)
-        {
-            //Update, time to check where we should be going
+        object FollowingUpdate(string functionName, object param) {
+            // Update, time to check where we should be going
             FollowDecision();
             return null;
         }
 
-        object FollowingMove(string functionName, object param)
-        {
+        object FollowingMove(string functionName, object param) {
             if (FollowSP == null)
                 return null;
-            //Check to see whether we are close to our avatar, and fire the event if needed
+            // Check to see whether we are close to our avatar, and fire the event if needed
             Vector3 targetPos = FollowSP.AbsolutePosition + FollowOffset;
             Vector3 currentPos2 = m_controller.AbsolutePosition;
             double distance = Util.GetDistanceTo(targetPos, currentPos2);
             float closeToPoint = m_toAvatar ? StartFollowDistance : StopFollowDistance;
-            //Fix how we are running
+            // Fix how we are running
             m_controller.SetAlwaysRun = FollowSP.SetAlwaysRun;
-            if (distance < closeToPoint)
-            {
-                //Fire our event once
-                if (!m_toAvatar) //Changed
+            if (distance < closeToPoint) {
+                // Fire our event once
+                if (!m_toAvatar)    // Changed
                 {
                     EventManager.FireGenericEventHandler("ToAvatar", null);
-                    //Fix the animation
+                    // Fix the animation
                     m_controller.UpdateMovementAnimations(false);
                 }
                 m_toAvatar = true;
@@ -870,22 +782,18 @@ namespace WhiteCore.BotManager
                 m_controller.StopMoving(fly, true);
                 return null;
             }
-            if (distance > m_followLoseAvatarDistance)
-            {
-                //Lost the avatar, fire the event
-                if (!m_lostAvatar)
-                {
+            if (distance > m_followLoseAvatarDistance) {
+                // Lost the avatar, fire the event
+                if (!m_lostAvatar) {
                     EventManager.FireGenericEventHandler("LostAvatar", null);
-                    //We stopped, fix the animation
+                    // We stopped, fix the animation
                     m_controller.UpdateMovementAnimations(false);
                 }
                 m_lostAvatar = true;
                 m_paused = true;
-            }
-            else if (m_lostAvatar)
-            {
+            } else if (m_lostAvatar) {
                 m_lostAvatar = false;
-                m_paused = false; //Fixed pause status, avatar entered our range again
+                m_paused = false;   // Fixed pause status, avatar entered our range again
             }
             m_toAvatar = false;
             return null;
@@ -895,12 +803,11 @@ namespace WhiteCore.BotManager
 
         #region Following Decision
 
-        void FollowDecision()
-        {
+        void FollowDecision() {
             // FOLLOW an avatar - this is looking for an avatar UUID so wont follow a prim here  - yet
-            //Call this each iteration so that if the avatar leaves, we don't get stuck following a null person
+            // Call this each iteration so that if the avatar leaves, we don't get stuck following a null person
             FollowSP = m_controller.GetScene().GetScenePresence(FollowUUID);
-            //If its still null, the person doesn't exist, cancel the follow and return
+            // If its still null, the person doesn't exist, cancel the follow and return
             if (FollowSP == null)
                 return;
 
@@ -912,45 +819,39 @@ namespace WhiteCore.BotManager
             List<ISceneChildEntity> raycastEntities = llCastRay(m_controller.AbsolutePosition,
                                                                 FollowSP.AbsolutePosition);
             float closeToPoint = m_toAvatar ? StartFollowDistance : StopFollowDistance;
-            if (FollowRequiresLOS && raycastEntities.Count > 0)
-            {
-                //Lost the avatar, fire the event
-                if (!m_lostAvatar)
-                {
+            if (FollowRequiresLOS && raycastEntities.Count > 0) {
+                // Lost the avatar, fire the event
+                if (!m_lostAvatar) {
                     EventManager.FireGenericEventHandler("LostAvatar", null);
-                    //We stopped, fix the animation
+                    // We stopped, fix the animation
                     m_controller.UpdateMovementAnimations(false);
                 }
                 m_lostAvatar = true;
                 m_paused = true;
                 return;
             }
-            if (distance > 10) //Greater than 10 meters, give up
+            if (distance > 10)  // Greater than 10 meters, give up
             {
-                //Try direct then, since it is way out of range
+                //  Try direct then, since it is way out of range
                 DirectFollowing();
-            }
-            else if (distance < closeToPoint && raycastEntities.Count == 0)
-                //If the raycastEntities isn't zero, there is something between us and the avatar, don't stop on the other side of walls, etc
-            {
-                //We're here!
-                //If we were having to fly to here, stop flying
-                if (jumpTry > 0)
-                {
+            } else if (distance < closeToPoint && raycastEntities.Count == 0)
+              //  If the raycastEntities isn't zero, there is something between us and the avatar, don't stop on the other side of walls, etc
+              {
+                //  We're here!
+                //  If we were having to fly to here, stop flying
+                if (jumpTry > 0) {
                     m_controller.PhysicsActor.Flying = false;
                     walkTo(m_controller.AbsolutePosition);
-                    //Fix the animation from flying > walking
+                    // Fix the animation from flying > walking
                     m_controller.UpdateMovementAnimations(false);
                 }
                 jumpTry = 0;
-            }
-            else
-            {
+            } else {
                 if (raycastEntities.Count == 0)
-                    //Nothing between us and the target, go for it!
+                    //  Nothing between us and the target, go for it!
                     DirectFollowing();
                 else
-                    //if (!BestFitPathFollowing (raycastEntities))//If this doesn't work, try significant positions
+                    //  if (!BestFitPathFollowing (raycastEntities))//If this doesn't work, try significant positions
                     SignificantPositionFollowing();
             }
             ClearOutInSignificantPositions(false);
@@ -960,55 +861,40 @@ namespace WhiteCore.BotManager
 
         #region Direct Following code
 
-        void DirectFollowing()
-        {
+        void DirectFollowing() {
             if (m_controller == null)
                 return;
             Vector3 diffAbsPos = (FollowSP.AbsolutePosition + FollowOffset) - m_controller.AbsolutePosition;
             Vector3 targetPos = FollowSP.AbsolutePosition + FollowOffset;
             Vector3 ourPos = m_controller.AbsolutePosition;
             bool fly = FollowSP.PhysicsActor == null ? ShouldFly : FollowSP.PhysicsActor.Flying;
-            if (!fly && (diffAbsPos.Z > 0.25 || jumpTry > 5))
-            {
-                if (jumpTry > 5 || diffAbsPos.Z > 3)
-                {
+            if (!fly && (diffAbsPos.Z > 0.25 || jumpTry > 5)) {
+                if (jumpTry > 5 || diffAbsPos.Z > 3) {
                     if (jumpTry <= 5)
                         jumpTry = 6;
                     fly = true;
-                }
-                else
-                {
-                    if (!m_allowJump)
-                    {
+                } else {
+                    if (!m_allowJump) {
                         jumpTry--;
                         targetPos.Z = ourPos.Z + 0.15f;
-                    }
-                    else if (m_UseJumpDecisionTree)
-                    {
-                        if (!JumpDecisionTree(m_controller.AbsolutePosition, targetPos))
-                        {
+                    } else if (m_UseJumpDecisionTree) {
+                        if (!JumpDecisionTree(m_controller.AbsolutePosition, targetPos)) {
                             jumpTry--;
                             targetPos.Z = ourPos.Z + 0.15f;
-                        }
-                        else
-                        {
+                        } else {
                             if (jumpTry < 0)
                                 jumpTry = 0;
                             jumpTry++;
                         }
-                    }
-                    else
+                    } else
                         jumpTry--;
                 }
-            }
-            else if (!fly)
-            {
-                if (diffAbsPos.Z < -3)
-                {
-                    //We should fly down to the avatar, rather than fall
-                    //We also know that because this is the old, we have no entities in our way
-                    //(unless this is > 10m, but that case is messed up anyway, needs dealt with later)
-                    //so we can assume that it is safe to fly
+            } else if (!fly) {
+                if (diffAbsPos.Z < -3) {
+                    // We should fly down to the avatar, rather than fall
+                    // We also know that because this is the old, we have no entities in our way
+                    // (unless this is > 10m, but that case is messed up anyway, needs dealt with later)
+                    // so we can assume that it is safe to fly
                     fly = true;
                 }
                 jumpTry--;
@@ -1021,20 +907,14 @@ namespace WhiteCore.BotManager
 
         #region BestFitPath Following code
 
-        void ShowMap(string mod, string[] cmd)
-        {
-            int sqrt = (int) Math.Sqrt(map.Length);
-            for (int x = sqrt - 1; x > -1; x--)
-            {
+        void ShowMap(string mod, string[] cmd) {
+            int sqrt = (int)Math.Sqrt(map.Length);
+            for (int x = sqrt - 1; x > -1; x--) {
                 string line = "";
-                for (int y = sqrt - 1; y > -1; y--)
-                {
-                    if (x == 11*resolution && y == 11*resolution)
-                    {
+                for (int y = sqrt - 1; y > -1; y--) {
+                    if (x == 11 * resolution && y == 11 * resolution) {
                         line += "XX" + ",";
-                    }
-                    else
-                    {
+                    } else {
                         if (map[x, y].ToString().Length < 2)
                             line += " " + map[x, y] + ",";
                         else
@@ -1054,131 +934,106 @@ namespace WhiteCore.BotManager
         Vector3 m_lastPos = Vector3.Zero;
         bool m_toAvatar;
 
-        bool BestFitPathFollowing(List<ISceneChildEntity> raycastEntities)
-        {
+        bool BestFitPathFollowing(List<ISceneChildEntity> raycastEntities) {
             Vector3 targetPos = FollowSP.AbsolutePosition + FollowOffset;
             Vector3 currentPos2 = m_controller.AbsolutePosition;
 
             ISceneEntity[] entities = new ISceneEntity[raycastEntities.Count];
             int ii = 0;
-            foreach (ISceneChildEntity child in raycastEntities)
-            {
+            foreach (ISceneChildEntity child in raycastEntities) {
                 entities[ii] = child.ParentEntity;
                 ii++;
             }
 
-            map = new int[22*resolution,22*resolution]; //10 * resolution squares in each direction from our pos
-            //We are in the center (11, 11) and our target is somewhere else
-            int targetX = 11*resolution, targetY = 11*resolution;
-            //Find where our target is on the map
+            map = new int[22 * resolution, 22 * resolution];     // 10 * resolution squares in each direction from our pos
+            // We are in the center (11, 11) and our target is somewhere else
+            int targetX = 11 * resolution, targetY = 11 * resolution;
+            // Find where our target is on the map
             FindTargets(currentPos2, targetPos, ref targetX, ref targetY);
-            //ISceneEntity[] entities = m_scenePresence.Scene.Entities.GetEntities (currentPos, 30);
+            // ISceneEntity[] entities = m_scenePresence.Scene.Entities.GetEntities (currentPos, 30);
 
             //Add all the entities to the map
-            foreach (ISceneEntity entity in entities)
-            {
-                //if (entity.AbsolutePosition.Z < m_scenePresence.AbsolutePosition.Z + m_scenePresence.PhysicsActor.Size.Z / 2 + m_scenePresence.Velocity.Z / 2 &&
-                //    entity.AbsolutePosition.Z > m_scenePresence.AbsolutePosition.Z - m_scenePresence.PhysicsActor.Size.Z / 2 + m_scenePresence.Velocity.Z / 2)
+            foreach (ISceneEntity entity in entities) {
+                // if (entity.AbsolutePosition.Z < m_scenePresence.AbsolutePosition.Z + m_scenePresence.PhysicsActor.Size.Z / 2 + m_scenePresence.Velocity.Z / 2 &&
+                //     entity.AbsolutePosition.Z > m_scenePresence.AbsolutePosition.Z - m_scenePresence.PhysicsActor.Size.Z / 2 + m_scenePresence.Velocity.Z / 2)
                 {
-                    int entitybaseX = (11*resolution);
-                    int entitybaseY = (11*resolution);
-                    //Find the bottom left corner, and then build outwards from it
-                    FindTargets(currentPos2, entity.AbsolutePosition - (entity.OOBsize/2), ref entitybaseX,
+                    int entitybaseX = (11 * resolution);
+                    int entitybaseY = (11 * resolution);
+                    // Find the bottom left corner, and then build outwards from it
+                    FindTargets(currentPos2, entity.AbsolutePosition - (entity.OOBsize / 2), ref entitybaseX,
                                 ref entitybaseY);
-                    for (int x = (int) -(0.5*resolution);
-                         x < entity.OOBsize.X*2*resolution + ((int) (0.5*resolution));
-                         x++)
-                    {
-                        for (int y = (int) -(0.5*resolution);
-                             y < entity.OOBsize.Y*2*resolution + ((int) (0.5*resolution));
-                             y++)
-                        {
+                    for (int x = (int)-(0.5 * resolution);
+                         x < entity.OOBsize.X * 2 * resolution + ((int)(0.5 * resolution));
+                         x++) {
+                        for (int y = (int)-(0.5 * resolution);
+                             y < entity.OOBsize.Y * 2 * resolution + ((int)(0.5 * resolution));
+                             y++) {
                             if (entitybaseX + x > 0 && entitybaseY + y > 0 &&
-                                entitybaseX + x < (22*resolution) && entitybaseY + y < (22*resolution))
-                                if (x < 0 || y < 0 || x > (entity.OOBsize.X*2)*resolution ||
-                                    y > (entity.OOBsize.Y*2)*resolution)
-                                    map[entitybaseX + x, entitybaseY + y] = 3; //Its a side hit, lock it down a bit
+                                entitybaseX + x < (22 * resolution) && entitybaseY + y < (22 * resolution))
+                                if (x < 0 || y < 0 || x > (entity.OOBsize.X * 2) * resolution ||
+                                    y > (entity.OOBsize.Y * 2) * resolution)
+                                    map[entitybaseX + x, entitybaseY + y] = 3;      // Its a side hit, lock it down a bit
                                 else
-                                    map[entitybaseX + x, entitybaseY + y] = -1; //Its a hit, lock it down
+                                    map[entitybaseX + x, entitybaseY + y] = -1;     // Its a hit, lock it down
                         }
                     }
                 }
             }
 
-            for (int x = 0; x < (22*resolution); x++)
-            {
-                for (int y = 0; y < (22*resolution); y++)
-                {
+            for (int x = 0; x < (22 * resolution); x++) {
+                for (int y = 0; y < (22 * resolution); y++) {
                     if (x == targetX && y == targetY)
                         map[x, y] = 1;
-                    else if (x == 11*resolution && y == 11*resolution)
+                    else if (x == 11 * resolution && y == 11 * resolution)
                         map[x, y] = 1;
                     else if (map[x, y] == 0)
                         map[x, y] = 1;
                 }
             }
 
-            //ShowMap ("", null);
-            List<Vector3> path = InnerFindPath(map, (11*resolution), (11*resolution), targetX, targetY);
+            // ShowMap ("", null);
+            List<Vector3> path = InnerFindPath(map, (11 * resolution), (11 * resolution), targetX, targetY);
 
             int i = 0;
             Vector3 nextPos = ConvertPathToPos(raycastEntities.ToArray(), entities, currentPos2, path, ref i);
             Vector3 diffAbsPos = nextPos - targetPos;
-            if (nextPos != Vector3.Zero)
-            {
+            if (nextPos != Vector3.Zero) {
                 m_nodeGraph.Clear();
-            }
-            else
-            {
-                //Try another way
+            } else {
+                // Try another way
                 return false;
             }
             bool fly = FollowSP.PhysicsActor == null ? ShouldFly : FollowSP.PhysicsActor.Flying;
-            while (nextPos != Vector3.Zero)
-            {
-                if (!fly && (diffAbsPos.Z < -0.25 || jumpTry > 5))
-                {
-                    if (jumpTry > 5 || diffAbsPos.Z < -3)
-                    {
+            while (nextPos != Vector3.Zero) {
+                if (!fly && (diffAbsPos.Z < -0.25 || jumpTry > 5)) {
+                    if (jumpTry > 5 || diffAbsPos.Z < -3) {
                         if (jumpTry <= 5)
                             jumpTry = 6;
                         fly = true;
-                    }
-                    else
-                    {
-                        if (!m_allowJump)
-                        {
+                    } else {
+                        if (!m_allowJump) {
                             jumpTry--;
                             targetPos.Z = nextPos.Z + 0.15f;
-                        }
-                        else if (m_UseJumpDecisionTree)
-                        {
-                            if (!JumpDecisionTree(m_controller.AbsolutePosition, targetPos))
-                            {
+                        } else if (m_UseJumpDecisionTree) {
+                            if (!JumpDecisionTree(m_controller.AbsolutePosition, targetPos)) {
                                 jumpTry--;
                                 targetPos.Z = nextPos.Z + 0.15f;
-                            }
-                            else
-                            {
+                            } else {
                                 if (jumpTry < 0)
                                     jumpTry = 0;
                                 jumpTry++;
                             }
-                        }
-                        else
+                        } else
                             jumpTry--;
                     }
-                }
-                else if (!fly)
-                {
-                    if (diffAbsPos.Z > 3)
-                    {
-                        //We should fly down to the avatar, rather than fall
+                } else if (!fly) {
+                    if (diffAbsPos.Z > 3) {
+                        // We should fly down to the avatar, rather than fall
                         fly = true;
                     }
                     jumpTry--;
                 }
-                nextPos.Z = targetPos.Z; //Fix the Z coordinate
+                nextPos.Z = targetPos.Z;    // Fix the Z coordinate
 
                 m_nodeGraph.Add(nextPos, fly ? TravelMode.Fly : TravelMode.Walk);
                 i++;
@@ -1188,104 +1043,88 @@ namespace WhiteCore.BotManager
         }
 
         Vector3 ConvertPathToPos(ISceneChildEntity[] raycastEntities, ISceneEntity[] entites,
-                                         Vector3 originalPos, List<Vector3> path, ref int i)
-        {
-            start:
+                                         Vector3 originalPos, List<Vector3> path, ref int i) {
+        start:
             if (i == path.Count)
                 return Vector3.Zero;
-            if (Math.Abs (path [i].X - (11 * resolution)) < EPSILON && Math.Abs (path [i].Y - (11 * resolution)) < EPSILON)
-            {
+            if (Math.Abs(path[i].X - (11 * resolution)) < EPSILON && Math.Abs(path[i].Y - (11 * resolution)) < EPSILON) {
                 i++;
                 goto start;
             }
             Vector3 pos = path[i];
             Vector3 newPos = originalPos -
-                             new Vector3(((11*resolution) - pos.X)/resolution, ((11*resolution) - pos.Y)/resolution, 0);
+                             new Vector3(((11 * resolution) - pos.X) / resolution, ((11 * resolution) - pos.Y) / resolution, 0);
 
-            if (i < 2)
-            {
+            if (i < 2) {
                 if (m_lastPos.ApproxEquals(newPos, 1))
                     failedToMove++;
-                else if (failedToMove < 2)
-                {
+                else if (failedToMove < 2) {
                     m_lastPos = newPos;
                     failedToMove = 0;
-                }
-                else
-                {
-                    if (sincefailedToMove == 5)
-                    {
+                } else {
+                    if (sincefailedToMove == 5) {
                         sincefailedToMove = 0;
                         failedToMove = 1;
-                    }
-                    else if (!m_lastPos.ApproxEquals(newPos, 2))
+                    } else if (!m_lastPos.ApproxEquals(newPos, 2))
                         sincefailedToMove++;
                 }
             }
-            if (failedToMove > 1)
-            {
+            if (failedToMove > 1) {
                 return Vector3.Zero;
-                //CleanUpPos (raycastEntities, entities, ref newPos);
+                // CleanUpPos (raycastEntities, entities, ref newPos);
             }
             return newPos;
         }
 
-        void CleanUpPos(ISceneChildEntity[] raycastEntities, ISceneEntity[] entites, ref Vector3 pos)
-        {
+        void CleanUpPos(ISceneChildEntity[] raycastEntities, ISceneEntity[] entites, ref Vector3 pos) {
             List<ISceneChildEntity> childEntities = llCastRay(m_controller.AbsolutePosition, pos);
-            childEntities.AddRange(raycastEntities); //Add all of the ones that are in between us and the avatar as well
+            childEntities.AddRange(raycastEntities);    // Add all of the ones that are in between us and the avatar as well
             int restartNum = 0;
-            restart:
+        restart:
             bool needsRestart = false;
-            foreach (ISceneChildEntity entity in childEntities)
-            {
+            foreach (ISceneChildEntity entity in childEntities) {
                 if (entity.AbsolutePosition.Z < m_controller.AbsolutePosition.Z + 2 &&
-                    entity.AbsolutePosition.Z > m_controller.AbsolutePosition.Z - 2)
-                {
-                    //If this position is inside an entity + its size + avatar size, move it out!
-                    float sizeXPlus = (entity.AbsolutePosition.X + (entity.Scale.X/2) +
-                                       (m_controller.PhysicsActor.Size.X/2));
-                    float sizeXNeg = (entity.AbsolutePosition.X - (entity.Scale.X/2) -
-                                      (m_controller.PhysicsActor.Size.X/2));
-                    float sizeYPlus = (entity.AbsolutePosition.Y + (entity.Scale.Y/2) +
-                                       (m_controller.PhysicsActor.Size.Y/2));
-                    float sizeYNeg = (entity.AbsolutePosition.Y - (entity.Scale.Y/2) -
-                                      (m_controller.PhysicsActor.Size.Y/2));
+                    entity.AbsolutePosition.Z > m_controller.AbsolutePosition.Z - 2) {
+                    // If this position is inside an entity + its size + avatar size, move it out!
+                    float sizeXPlus = (entity.AbsolutePosition.X + (entity.Scale.X / 2) +
+                                       (m_controller.PhysicsActor.Size.X / 2));
+                    float sizeXNeg = (entity.AbsolutePosition.X - (entity.Scale.X / 2) -
+                                      (m_controller.PhysicsActor.Size.X / 2));
+                    float sizeYPlus = (entity.AbsolutePosition.Y + (entity.Scale.Y / 2) +
+                                       (m_controller.PhysicsActor.Size.Y / 2));
+                    float sizeYNeg = (entity.AbsolutePosition.Y - (entity.Scale.Y / 2) -
+                                      (m_controller.PhysicsActor.Size.Y / 2));
 
-                    if (pos.X < sizeXPlus && pos.X > sizeXNeg)
-                    {
+                    if (pos.X < sizeXPlus && pos.X > sizeXNeg) {
                         if (pos.X < entity.AbsolutePosition.X)
-                            pos.X = sizeXNeg - (m_controller.PhysicsActor.Size.X/2);
+                            pos.X = sizeXNeg - (m_controller.PhysicsActor.Size.X / 2);
                         else
-                            pos.X = sizeXPlus + (m_controller.PhysicsActor.Size.X/2);
+                            pos.X = sizeXPlus + (m_controller.PhysicsActor.Size.X / 2);
                         needsRestart = true;
                     }
-                    if (pos.Y < sizeYPlus && pos.Y > sizeYNeg)
-                    {
+                    if (pos.Y < sizeYPlus && pos.Y > sizeYNeg) {
                         if (pos.Y < entity.AbsolutePosition.Y)
-                            pos.Y = sizeYNeg - (m_controller.PhysicsActor.Size.Y/2);
+                            pos.Y = sizeYNeg - (m_controller.PhysicsActor.Size.Y / 2);
                         else
-                            pos.Y = sizeYPlus + (m_controller.PhysicsActor.Size.Y/2);
+                            pos.Y = sizeYPlus + (m_controller.PhysicsActor.Size.Y / 2);
                         needsRestart = true;
                     }
                 }
             }
-            //If we changed something, we need to recheck the pos...
-            if (needsRestart && restartNum < 3)
-            {
+            // If we changed something, we need to recheck the pos...
+            if (needsRestart && restartNum < 3) {
                 restartNum++;
                 goto restart;
             }
         }
 
-        void FindTargets(Vector3 currentPosition, Vector3 targetPos, ref int targetX, ref int targetY)
-        {
-            //we're at pos 11, 11, so we have to add/subtract from there
+        void FindTargets(Vector3 currentPosition, Vector3 targetPos, ref int targetX, ref int targetY) {
+            // we're at pos 11, 11, so we have to add/subtract from there
             float xDiff = (targetPos.X - currentPosition.X);
             float yDiff = (targetPos.Y - currentPosition.Y);
 
-            targetX += (int) (xDiff*resolution);
-            targetY += (int) (yDiff*resolution);
+            targetX += (int)(xDiff * resolution);
+            targetY += (int)(yDiff * resolution);
         }
 
         #endregion
@@ -1295,46 +1134,38 @@ namespace WhiteCore.BotManager
         List<Vector3> m_significantAvatarPositions = new List<Vector3>();
         int currentPos;
 
-        void EventManager_OnClientMovement()
-        {
+        void EventManager_OnClientMovement() {
             if (FollowSP != null)
                 lock (_lock)
                     m_significantAvatarPositions.Add(FollowSP.AbsolutePosition);
         }
 
-        void ClearOutInSignificantPositions(bool checkPositions)
-        {
+        void ClearOutInSignificantPositions(bool checkPositions) {
             int closestPosition = 0;
             double closestDistance = 0;
             Vector3[] sigPos;
 
-            lock (_lock)
-            {
+            lock (_lock) {
                 sigPos = new Vector3[m_significantAvatarPositions.Count];
                 m_significantAvatarPositions.CopyTo(sigPos);
             }
 
-            for (int i = 0; i < sigPos.Length; i++)
-            {
+            for (int i = 0; i < sigPos.Length; i++) {
                 double val = Util.GetDistanceTo(m_controller.AbsolutePosition, sigPos[i]);
-                if (Math.Abs (closestDistance) < EPSILON || closestDistance > val)
-                {
+                if (Math.Abs(closestDistance) < EPSILON || closestDistance > val) {
                     closestDistance = val;
                     closestPosition = i;
                 }
             }
-            if (currentPos > closestPosition)
-            {
+            if (currentPos > closestPosition) {
                 currentPos = closestPosition + 2;
-                //Going backwards? We must have no idea where we are
-            }
-            else //Going forwards in the line, all good
+                // Going backwards? We must have no idea where we are
+            } else    // Going forwards in the line, all good
                 currentPos = closestPosition + 2;
 
-            //Remove all insignificant
+            // Remove all insignificant
             List<Vector3> vectors = new List<Vector3>();
-            for (int i = sigPos.Length - 50; i < sigPos.Length; i++)
-            {
+            for (int i = sigPos.Length - 50; i < sigPos.Length; i++) {
                 if (i < 0)
                     continue;
                 vectors.Add(sigPos[i]);
@@ -1342,56 +1173,40 @@ namespace WhiteCore.BotManager
             m_significantAvatarPositions = vectors;
         }
 
-        void SignificantPositionFollowing()
-        {
-            //Do this first
+        void SignificantPositionFollowing() {
+            // Do this first
             ClearOutInSignificantPositions(true);
 
             bool fly = FollowSP.PhysicsActor == null ? ShouldFly : FollowSP.PhysicsActor.Flying;
-            if (m_significantAvatarPositions.Count > 0 && currentPos + 1 < m_significantAvatarPositions.Count)
-            {
+            if (m_significantAvatarPositions.Count > 0 && currentPos + 1 < m_significantAvatarPositions.Count) {
                 m_nodeGraph.Clear();
 
                 Vector3 targetPos = m_significantAvatarPositions[currentPos + 1];
                 Vector3 diffAbsPos = targetPos - m_controller.AbsolutePosition;
-                if (!fly && (diffAbsPos.Z < -0.25 || jumpTry > 5))
-                {
-                    if (jumpTry > 5 || diffAbsPos.Z < -3)
-                    {
+                if (!fly && (diffAbsPos.Z < -0.25 || jumpTry > 5)) {
+                    if (jumpTry > 5 || diffAbsPos.Z < -3) {
                         if (jumpTry <= 5)
                             jumpTry = 6;
                         fly = true;
-                    }
-                    else
-                    {
-                        if (!m_allowJump)
-                        {
+                    } else {
+                        if (!m_allowJump) {
                             jumpTry--;
                             targetPos.Z = m_controller.AbsolutePosition.Z + 0.15f;
-                        }
-                        else if (m_UseJumpDecisionTree)
-                        {
-                            if (!JumpDecisionTree(m_controller.AbsolutePosition, targetPos))
-                            {
+                        } else if (m_UseJumpDecisionTree) {
+                            if (!JumpDecisionTree(m_controller.AbsolutePosition, targetPos)) {
                                 jumpTry--;
                                 targetPos.Z = m_controller.AbsolutePosition.Z + 0.15f;
-                            }
-                            else
-                            {
+                            } else {
                                 if (jumpTry < 0)
                                     jumpTry = 0;
                                 jumpTry++;
                             }
-                        }
-                        else
+                        } else
                             jumpTry--;
                     }
-                }
-                else if (!fly)
-                {
-                    if (diffAbsPos.Z > 3)
-                    {
-                        //We should fly down to the avatar, rather than fall
+                } else if (!fly) {
+                    if (diffAbsPos.Z > 3) {
+                        // We should fly down to the avatar, rather than fall
                         fly = true;
                     }
                     jumpTry--;
@@ -1411,16 +1226,14 @@ namespace WhiteCore.BotManager
 
         readonly Dictionary<UUID, float> m_followDistance = new Dictionary<UUID, float>();
 
-        public void AddDistanceEvent(UUID avatarID, float distance, FollowingEvent ev)
-        {
+        public void AddDistanceEvent(UUID avatarID, float distance, FollowingEvent ev) {
             m_followDistanceEvents[avatarID] = ev;
             m_followDistance[avatarID] = distance;
             if (m_followDistanceEvents.Count == 1) //Only the first time
                 EventManager.RegisterEventHandler("Update", DistanceFollowUpdate);
         }
 
-        public void RemoveDistanceEvent(UUID avatarID)
-        {
+        public void RemoveDistanceEvent(UUID avatarID) {
             m_followDistanceEvents.Remove(avatarID);
             m_followDistance.Remove(avatarID);
             if (m_followDistanceEvents.Count == 0) //Only the first time
@@ -1434,8 +1247,7 @@ namespace WhiteCore.BotManager
             public FollowingEvent Event;
         }
 
-        public object DistanceFollowUpdate(string funct, object param)
-        {
+        public object DistanceFollowUpdate(string funct, object param) {
             List<FollowingEventHolder> events = (from kvp in m_followDistance
                                                  let sp = m_controller.GetScene().GetScenePresence(kvp.Key)
                                                  where sp != null
@@ -1443,13 +1255,12 @@ namespace WhiteCore.BotManager
                                                      Util.DistanceLessThan(sp.AbsolutePosition,
                                                                            m_controller.AbsolutePosition, kvp.Value)
                                                  select new FollowingEventHolder
-                                                            {
-                                                                Event = m_followDistanceEvents[kvp.Key],
-                                                                AvID = kvp.Key,
-                                                                BotID = m_controller.UUID
-                                                            }).ToList();
-            foreach (FollowingEventHolder h in events)
-            {
+                                                 {
+                                                     Event = m_followDistanceEvents[kvp.Key],
+                                                     AvID = kvp.Key,
+                                                     BotID = m_controller.UUID
+                                                 }).ToList();
+            foreach (FollowingEventHolder h in events) {
                 h.Event(h.AvID, h.BotID);
             }
             return null;
@@ -1459,24 +1270,21 @@ namespace WhiteCore.BotManager
         readonly Dictionary<UUID, FollowingEvent> m_LineOfSightEvents = new Dictionary<UUID, FollowingEvent>();
         readonly Dictionary<UUID, float> m_LineOfSight = new Dictionary<UUID, float>();
 
-        public void AddLineOfSightEvent(UUID avatarID, float distance, FollowingEvent ev)
-        {
+        public void AddLineOfSightEvent(UUID avatarID, float distance, FollowingEvent ev) {
             m_LineOfSightEvents[avatarID] = ev;
             m_LineOfSight[avatarID] = distance;
-            if (m_followDistanceEvents.Count == 1) //Only the first time
+            if (m_followDistanceEvents.Count == 1)      // Only the first time
                 EventManager.RegisterEventHandler("Update", LineOfSightUpdate);
         }
 
-        public void RemoveLineOfSightEvent(UUID avatarID)
-        {
+        public void RemoveLineOfSightEvent(UUID avatarID) {
             m_LineOfSightEvents.Remove(avatarID);
             m_LineOfSight.Remove(avatarID);
-            if (m_followDistanceEvents.Count == 0) //Only the first time
+            if (m_followDistanceEvents.Count == 0)      // Only the first time
                 EventManager.UnregisterEventHandler("Update", LineOfSightUpdate);
         }
 
-        public object LineOfSightUpdate(string funct, object param)
-        {
+        public object LineOfSightUpdate(string funct, object param) {
             List<FollowingEventHolder> events = (from kvp in m_LineOfSight
                                                  let sp = m_controller.GetScene().GetScenePresence(kvp.Key)
                                                  where sp != null
@@ -1487,13 +1295,12 @@ namespace WhiteCore.BotManager
                                                      m_controller.AbsolutePosition.ApproxEquals(sp.AbsolutePosition,
                                                                                                 m_LineOfSight[kvp.Key])
                                                  select new FollowingEventHolder
-                                                            {
-                                                                Event = m_LineOfSightEvents[kvp.Key],
-                                                                AvID = kvp.Key,
-                                                                BotID = m_controller.UUID
-                                                            }).ToList();
-            foreach (FollowingEventHolder h in events)
-            {
+                                                 {
+                                                     Event = m_LineOfSightEvents[kvp.Key],
+                                                     AvID = kvp.Key,
+                                                     BotID = m_controller.UUID
+                                                 }).ToList();
+            foreach (FollowingEventHolder h in events) {
                 h.Event(h.AvID, h.BotID);
             }
             return null;
@@ -1503,20 +1310,17 @@ namespace WhiteCore.BotManager
 
         #region Chat
 
-        public void SendChatMessage(int sayType, string message, int channel)
-        {
+        public void SendChatMessage(int sayType, string message, int channel) {
             m_controller.SendChatMessage(sayType, message, channel);
         }
 
-        public void SendInstantMessage(GridInstantMessage gridInstantMessage)
-        {
+        public void SendInstantMessage(GridInstantMessage gridInstantMessage) {
             m_controller.SendInstantMessage(gridInstantMessage);
         }
 
         #endregion
 
-        public void Dispose()
-        {
+        public void Dispose() {
             if (m_frames != null)
                 m_frames.Close();
         }
@@ -1537,8 +1341,7 @@ namespace WhiteCore.BotManager
         public List<UUID> AllScopeIDs { get; set; }
 
         // creates new bot on the default location
-        public BotClientAPI(IScene scene, AgentCircuitData data)
-        {
+        public BotClientAPI(IScene scene, AgentCircuitData data) {
             RegisterInterfaces();
 
             m_circuitData = data;
@@ -1550,40 +1353,34 @@ namespace WhiteCore.BotManager
             UniqueId++;
         }
 
-        public void Initialize(BotAvatarController controller)
-        {
+        public void Initialize(BotAvatarController controller) {
             m_controller = controller;
         }
 
-        public readonly Vector3 DEFAULT_START_POSITION = new Vector3(128, 128, 128);
+        Vector3 m_startposition = new Vector3(128, 128, 128);   // probably not settable but you never know :)
 
-        public Vector3 StartPos
-        {
-            get { return DEFAULT_START_POSITION; }
-            set { }
+        public Vector3 StartPos {
+            get { return m_startposition; }
+            set { m_startposition = value; }
         }
 
-        public UUID AgentId
-        {
+        public UUID AgentId {
             get { return m_myID; }
         }
 
         uint m_circuitCode;
 
-        public uint CircuitCode
-        {
+        public uint CircuitCode {
             get { return m_circuitCode; }
             set { m_circuitCode = value; }
         }
 
-        public String Name
-        {
+        public string Name {
             get;
             set;
         }
 
-        public IScene Scene
-        {
+        public IScene Scene {
             get { return m_scene; }
         }
 
@@ -1593,33 +1390,26 @@ namespace WhiteCore.BotManager
 
         readonly Dictionary<Type, object> m_clientInterfaces = new Dictionary<Type, object>();
 
-        public T Get<T>()
-        {
-            return (T) m_clientInterfaces[typeof (T)];
+        public T Get<T>() {
+            return (T)m_clientInterfaces[typeof(T)];
         }
 
-        public bool TryGet<T>(out T iface)
-        {
-            if (m_clientInterfaces.ContainsKey(typeof (T)))
-            {
-                iface = (T) m_clientInterfaces[typeof (T)];
+        public bool TryGet<T>(out T iface) {
+            if (m_clientInterfaces.ContainsKey(typeof(T))) {
+                iface = (T)m_clientInterfaces[typeof(T)];
                 return true;
             }
             iface = default(T);
             return false;
         }
 
-        void RegisterInterfaces()
-        {
+        void RegisterInterfaces() {
         }
 
-        void RegisterInterface<T>(T iface)
-        {
-            lock (_lock)
-            {
-                if (!m_clientInterfaces.ContainsKey(typeof (T)))
-                {
-                    m_clientInterfaces.Add(typeof (T), iface);
+        void RegisterInterface<T>(T iface) {
+            lock (_lock) {
+                if (!m_clientInterfaces.ContainsKey(typeof(T))) {
+                    m_clientInterfaces.Add(typeof(T), iface);
                 }
             }
         }
@@ -1884,14 +1674,11 @@ namespace WhiteCore.BotManager
 
 #pragma warning restore 67
 
-        public void QueueDelayedUpdate(PriorityQueueItem<EntityUpdate, double> it)
-        {
+        public void QueueDelayedUpdate(PriorityQueueItem<EntityUpdate, double> it) {
         }
 
-        public void SendRegionHandshake(RegionInfo regionInfo, RegionHandshakeArgs args)
-        {
-            if (OnRegionHandShakeReply != null)
-            {
+        public void SendRegionHandshake(RegionInfo regionInfo, RegionHandshakeArgs args) {
+            if (OnRegionHandShakeReply != null) {
                 OnRegionHandShakeReply(this);
             }
         }
@@ -1899,80 +1686,66 @@ namespace WhiteCore.BotManager
         #endregion
 
         #region IClientAPI Members
+        bool m_dummy = true;    // Ingored - Only to keep code checks happy
 
         public UUID SessionId { get; set; }
 
-        public UUID SecureSessionId
-        {
+        public UUID SecureSessionId {
             get { return UUID.Zero; }
         }
 
-        public UUID ActiveGroupId
-        {
+        public UUID ActiveGroupId {
             get { return UUID.Zero; }
         }
 
-        public string ActiveGroupName
-        {
+        public string ActiveGroupName {
             get { return ""; }
         }
 
-        public ulong ActiveGroupPowers
-        {
+        public ulong ActiveGroupPowers {
             get { return 0; }
         }
 
-        public IPAddress EndPoint
-        {
+        public IPAddress EndPoint {
             get { return null; }
         }
 
-        public int NextAnimationSequenceNumber
-        {
+        public int NextAnimationSequenceNumber {
             get { return 0; }
         }
 
-        public bool IsActive
-        {
+        public bool IsActive {
             get { return true; }
-            set { }
+            set { m_dummy = value; }
         }
 
-        public bool IsLoggingOut
-        {
+        public bool IsLoggingOut {
             get { return false; }
-            set { }
+            set { m_dummy = value; }
         }
 
-        public bool SendLogoutPacketWhenClosing
-        {
-            set { }
+        public bool SendLogoutPacketWhenClosing {
+            get; set;
         }
 
-        public IPEndPoint RemoteEndPoint
-        {
-            get { return new IPEndPoint(IPAddress.Loopback, (ushort) m_circuitCode); }
+        public IPEndPoint RemoteEndPoint {
+            get { return new IPEndPoint(IPAddress.Loopback, (ushort)m_circuitCode); }
         }
 
-        public void SetDebugPacketLevel(int newDebug)
-        {
+        public void SetDebugPacketLevel(int newDebug) {
         }
 
-        public void SetDebugPacketName(string packetName, bool remove)
-        {
+        public void SetDebugPacketName(string packetName, bool remove) {
         }
 
-        public void ProcessInPacket(Packet newPack)
-        {
+        public void ProcessInPacket(Packet newPack) {
         }
 
-        public void Stop()
-        {
+        public void Stop() {
             Close(true);
         }
 
-        public void Close(bool p)
-        {
+        public void Close(bool p) {
             //raise event on the packet server to Shutdown the circuit
             if (OnLogout != null)
                 OnLogout(this);
@@ -1980,24 +1753,19 @@ namespace WhiteCore.BotManager
                 OnConnectionClosed(this);
         }
 
-        public void ForceSendOnAgentUpdate(IClientAPI client, AgentUpdateArgs args)
-        {
+        public void ForceSendOnAgentUpdate(IClientAPI client, AgentUpdateArgs args) {
             OnAgentUpdate(client, args);
         }
 
-        public void OnForceChatFromViewer(IClientAPI sender, OSChatMessage e)
-        {
+        public void OnForceChatFromViewer(IClientAPI sender, OSChatMessage e) {
             OnChatFromClient(sender, e);
         }
 
-        public void IncomingInstantMessage(GridInstantMessage im)
-        {
+        public void IncomingInstantMessage(GridInstantMessage im) {
             PreSendImprovedInstantMessage handlerPreSendInstantMessage = OnPreSendInstantMessage;
-            if (handlerPreSendInstantMessage != null)
-            {
+            if (handlerPreSendInstantMessage != null) {
                 if (handlerPreSendInstantMessage.GetInvocationList().Cast<PreSendImprovedInstantMessage>().Any(
-                    d => d(this, im)))
-                {
+                    d => d(this, im))) {
                     return; //handled
                 }
             }
@@ -2006,181 +1774,139 @@ namespace WhiteCore.BotManager
                 handlerInstantMessage(this, im);
         }
 
-        public void SendInstantMessage(GridInstantMessage im)
-        {
+        public void SendInstantMessage(GridInstantMessage im) {
             // TODO:  Sort this out - greythane- 20160406
             //This will cause a stack overflow, as it will loop back to trying to send the IM out again
             //m_controller.SendInstantMessage(im);
         }
 
-        public void Kick(string message)
-        {
+        public void Kick(string message) {
             Close(true);
         }
 
-        public void SendWearables(AvatarWearable[] wearables, int serial)
-        {
+        public void SendWearables(AvatarWearable[] wearables, int serial) {
         }
 
-        public void SendAgentCachedTexture(List<CachedAgentArgs> args)
-        {
+        public void SendAgentCachedTexture(List<CachedAgentArgs> args) {
         }
 
-        public void SendAppearance(AvatarAppearance app)
-        {
+        public void SendAppearance(AvatarAppearance app) {
         }
 
-        public void SendStartPingCheck(byte seq)
-        {
+        public void SendStartPingCheck(byte seq) {
         }
 
-        public void SendKillObject(ulong regionHandle, IEntity[] entities)
-        {
+        public void SendKillObject(ulong regionHandle, IEntity[] entities) {
         }
 
-        public void SendKillObject(ulong regionHandle, uint[] entities)
-        {
+        public void SendKillObject(ulong regionHandle, uint[] entities) {
         }
 
-        public void SendAnimations(AnimationGroup animations)
-        {
+        public void SendAnimations(AnimationGroup animations) {
         }
 
         public void SendChatMessage(string message, byte type, Vector3 fromPos, string fromName, UUID fromAgentID,
-                                    byte source, byte audible)
-        {
+                                    byte source, byte audible) {
         }
 
-        public void SendGenericMessage(string method, List<string> message)
-        {
+        public void SendGenericMessage(string method, List<string> message) {
         }
 
-        public void SendGenericMessage(string method, List<byte[]> message)
-        {
+        public void SendGenericMessage(string method, List<byte[]> message) {
         }
 
-        public void SendLayerData(short[] map)
-        {
+        public void SendLayerData(short[] map) {
         }
 
-        public void SendLayerData(int px, int py, short[] map)
-        {
+        public void SendLayerData(int px, int py, short[] map) {
         }
 
-        public void SendLayerData(int[] x, int[] y, short[] map, TerrainPatch.LayerType type)
-        {
+        public void SendLayerData(int[] x, int[] y, short[] map, TerrainPatch.LayerType type) {
         }
 
-        public void SendWindData(Vector2[] windSpeeds)
-        {
+        public void SendWindData(Vector2[] windSpeeds) {
         }
 
-        public void SendCloudData(float[] cloudCover)
-        {
+        public void SendCloudData(float[] cloudCover) {
         }
 
-        public void MoveAgentIntoRegion(RegionInfo regInfo, Vector3 pos, Vector3 look)
-        {
+        public void MoveAgentIntoRegion(RegionInfo regInfo, Vector3 pos, Vector3 look) {
         }
 
-        public AgentCircuitData RequestClientInfo()
-        {
+        public AgentCircuitData RequestClientInfo() {
             return m_circuitData;
         }
 
-        public void SendMapBlock(List<MapBlockData> mapBlocks, uint flag)
-        {
+        public void SendMapBlock(List<MapBlockData> mapBlocks, uint flag) {
         }
 
-        public void SendLocalTeleport(Vector3 position, Vector3 lookAt, uint flags)
-        {
+        public void SendLocalTeleport(Vector3 position, Vector3 lookAt, uint flags) {
         }
 
         public void SendRegionTeleport(ulong regionHandle, byte simAccess, IPEndPoint regionExternalEndPoint,
-                                       uint locationID, uint flags, string capsURL)
-        {
+                                       uint locationID, uint flags, string capsURL) {
         }
 
-        public void SendTeleportFailed(string reason)
-        {
+        public void SendTeleportFailed(string reason) {
         }
 
-        public void SendTeleportStart(uint flags)
-        {
+        public void SendTeleportStart(uint flags) {
         }
 
-        public void SendTeleportProgress(uint flags, string message)
-        {
+        public void SendTeleportProgress(uint flags, string message) {
         }
 
-        public void SendMoneyBalance(UUID transaction, bool success, byte[] description, int balance)
-        {
+        public void SendMoneyBalance(UUID transaction, bool success, byte[] description, int balance) {
         }
 
-        public void SendPayPrice(UUID objectID, int[] payPrice)
-        {
+        public void SendPayPrice(UUID objectID, int[] payPrice) {
         }
 
-        public void SendCoarseLocationUpdate(List<UUID> users, List<Vector3> coarseLocations)
-        {
+        public void SendCoarseLocationUpdate(List<UUID> users, List<Vector3> coarseLocations) {
         }
 
-        public void SetChildAgentThrottle(byte[] throttle)
-        {
+        public void SetChildAgentThrottle(byte[] throttle) {
         }
 
-        public void SendAvatarDataImmediate(IEntity avatar)
-        {
+        public void SendAvatarDataImmediate(IEntity avatar) {
         }
 
-        public void SendAvatarUpdate(IEnumerable<EntityUpdate> updates)
-        {
+        public void SendAvatarUpdate(IEnumerable<EntityUpdate> updates) {
         }
 
-        public void SendPrimUpdate(IEnumerable<EntityUpdate> updates)
-        {
+        public void SendPrimUpdate(IEnumerable<EntityUpdate> updates) {
         }
 
         public void SendInventoryFolderDetails(UUID ownerID, UUID folderID, List<InventoryItemBase> items,
                                                List<InventoryFolderBase> folders, int version, bool fetchFolders,
-                                               bool fetchItems)
-        {
+                                               bool fetchItems) {
         }
 
-        public void SendInventoryItemDetails(UUID ownerID, InventoryItemBase item)
-        {
+        public void SendInventoryItemDetails(UUID ownerID, InventoryItemBase item) {
         }
 
-        public void SendInventoryItemCreateUpdate(InventoryItemBase item, uint callbackId)
-        {
+        public void SendInventoryItemCreateUpdate(InventoryItemBase item, uint callbackId) {
         }
 
-        public void SendRemoveInventoryItem(UUID itemID)
-        {
+        public void SendRemoveInventoryItem(UUID itemID) {
         }
 
-        public void SendTakeControls(int controls, bool passToAgent, bool takeControls)
-        {
+        public void SendTakeControls(int controls, bool passToAgent, bool takeControls) {
         }
 
-        public void SendTaskInventory(UUID taskID, short serial, byte[] fileName)
-        {
+        public void SendTaskInventory(UUID taskID, short serial, byte[] fileName) {
         }
 
-        public void SendBulkUpdateInventory(InventoryItemBase node)
-        {
+        public void SendBulkUpdateInventory(InventoryItemBase node) {
         }
 
-        public void SendBulkUpdateInventory(InventoryFolderBase node)
-        {
+        public void SendBulkUpdateInventory(InventoryFolderBase node) {
         }
 
-        public void SendXferPacket(ulong xferID, uint packet, byte[] data)
-        {
+        public void SendXferPacket(ulong xferID, uint packet, byte[] data) {
         }
 
-        public void SendAbortXferPacket(ulong xferID)
-        {
+        public void SendAbortXferPacket(ulong xferID, int result) {
         }
 
         public void SendEconomyData(float energyEfficiency, int objectCapacity, int objectCount, int priceEnergyUnit,
@@ -2188,464 +1914,359 @@ namespace WhiteCore.BotManager
                                     float priceObjectScaleFactor, int priceParcelClaim, float priceParcelClaimFactor,
                                     int priceParcelRent, int pricePublicObjectDecay, int pricePublicObjectDelete,
                                     int priceRentLight, int priceUpload, int teleportMinPrice,
-                                    float teleportPriceExponent)
-        {
+                                    float teleportPriceExponent) {
         }
 
-        public void SendAvatarPickerReply(AvatarPickerReplyAgentDataArgs agentData, List<AvatarPickerReplyDataArgs> data)
-        {
+        public void SendAvatarPickerReply(AvatarPickerReplyAgentDataArgs agentData, List<AvatarPickerReplyDataArgs> data) {
         }
 
         public void SendAgentDataUpdate(UUID agentid, UUID activegroupid, string name,
-                                        ulong grouppowers, string groupname, string grouptitle)
-        {
+                                        ulong grouppowers, string groupname, string grouptitle) {
         }
 
-        public void SendPreLoadSound(UUID objectID, UUID ownerID, UUID soundID)
-        {
+        public void SendPreLoadSound(UUID objectID, UUID ownerID, UUID soundID) {
         }
 
-        public void SendPlayAttachedSound(UUID soundID, UUID objectID, UUID ownerID, float gain, byte flags)
-        {
+        public void SendPlayAttachedSound(UUID soundID, UUID objectID, UUID ownerID, float gain, byte flags) {
         }
 
         public void SendTriggeredSound(UUID soundID, UUID ownerID, UUID objectID, UUID parentID, ulong handle,
-                                       Vector3 position, float gain)
-        {
+                                       Vector3 position, float gain) {
         }
 
-        public void SendAttachedSoundGainChange(UUID objectID, float gain)
-        {
+        public void SendAttachedSoundGainChange(UUID objectID, float gain) {
         }
 
-        public void SendNameReply(UUID profileId, string name)
-        {
+        public void SendNameReply(UUID profileId, string name) {
         }
 
-        public void SendAlertMessage(string message)
-        {
+        public void SendAlertMessage(string message) {
         }
 
-        public void SendAgentAlertMessage(string message, bool modal)
-        {
+        public void SendAgentAlertMessage(string message, bool modal) {
         }
 
         public void SendLoadURL(string objectname, UUID objectID, UUID ownerID, bool groupOwned, string message,
-                                string url)
-        {
+                                string url) {
         }
 
         public void SendDialog(string objectname, UUID objectID, UUID ownerID, string ownerFirstName,
-                               string ownerLastName, string msg, UUID textureID, int ch, string[] buttonlabels)
-        {
+                               string ownerLastName, string msg, UUID textureID, int ch, string[] buttonlabels) {
         }
 
         public void SendSunPos(Vector3 sunPos, Vector3 sunVel, ulong currentTime, uint secondsPerSunCycle,
-                               uint secondsPerYear, float orbitalPosition)
-        {
+                               uint secondsPerYear, float orbitalPosition) {
         }
 
-        public void SendViewerEffect(ViewerEffectPacket.EffectBlock[] effectBlocks)
-        {
+        public void SendViewerEffect(ViewerEffectPacket.EffectBlock[] effectBlocks) {
         }
 
-        public UUID GetDefaultAnimation(string name)
-        {
+        public UUID GetDefaultAnimation(string name) {
             return UUID.Zero;
         }
 
         public void SendAvatarProperties(UUID avatarID, string aboutText, string bornOn, byte[] charterMember,
                                          string flAbout, uint flags, UUID flImageID, UUID imageID, string profileURL,
-                                         UUID partnerID)
-        {
+                                         UUID partnerID) {
         }
 
-        public void SendScriptQuestion(UUID taskID, string taskName, string ownerName, UUID itemID, int question)
-        {
+        public void SendScriptQuestion(UUID taskID, string taskName, string ownerName, UUID itemID, int question) {
         }
 
-        public void SendHealth(float health)
-        {
+        public void SendHealth(float health) {
         }
 
-        public void SendEstateList(UUID invoice, int code, List<UUID> data, uint estateID)
-        {
+        public void SendEstateList(UUID invoice, int code, List<UUID> data, uint estateID) {
         }
 
-        public void SendBannedUserList(UUID invoice, List<EstateBan> banlist, uint estateID)
-        {
+        public void SendBannedUserList(UUID invoice, List<EstateBan> banlist, uint estateID) {
         }
 
-        public void SendRegionInfoToEstateMenu(RegionInfoForEstateMenuArgs args)
-        {
+        public void SendRegionInfoToEstateMenu(RegionInfoForEstateMenuArgs args) {
         }
 
-        public void SendEstateCovenantInformation(UUID covenant, int covenantLastUpdated)
-        {
+        public void SendEstateCovenantInformation(UUID covenant, int covenantLastUpdated) {
         }
 
         public void SendDetailedEstateData(UUID invoice, string estateName, uint estateID, uint parentEstate,
                                            uint estateFlags, uint sunPosition, UUID covenant, int covenantLastUpdated,
-                                           string abuseEmail, UUID estateOwner)
-        {
+                                           string abuseEmail, UUID estateOwner) {
         }
 
         public void SendLandProperties(int sequenceId, bool snapSelection, int requestResult, LandData landData,
                                        float simObjectBonusFactor, int parcelObjectCapacity, int simObjectCapacity,
-                                       uint regionFlags)
-        {
+                                       uint regionFlags) {
         }
 
-        public void SendLandAccessListData(List<UUID> avatars, uint accessFlag, int localLandID)
-        {
+        public void SendLandAccessListData(List<UUID> avatars, uint accessFlag, int localLandID) {
         }
 
-        public void SendForceClientSelectObjects(List<uint> objectIDs)
-        {
+        public void SendForceClientSelectObjects(List<uint> objectIDs) {
         }
 
-        public void SendCameraConstraint(Vector4 constraintPlane)
-        {
+        public void SendCameraConstraint(Vector4 constraintPlane) {
         }
 
-        public void SendLandObjectOwners(List<LandObjectOwners> objOwners)
-        {
+        public void SendLandObjectOwners(List<LandObjectOwners> objOwners) {
         }
 
-        public void SendLandParcelOverlay(byte[] data, int sequenceId)
-        {
+        public void SendLandParcelOverlay(byte[] data, int sequenceId) {
         }
 
-        public void SendParcelMediaCommand(uint flags, ParcelMediaCommandEnum command, float time)
-        {
+        public void SendParcelMediaCommand(uint flags, ParcelMediaCommandEnum command, float time) {
         }
 
         public void SendParcelMediaUpdate(string mediaUrl, UUID mediaTextureID, byte autoScale, string mediaType,
-                                          string mediaDesc, int mediaWidth, int mediaHeight, byte mediaLoop)
-        {
+                                          string mediaDesc, int mediaWidth, int mediaHeight, byte mediaLoop) {
         }
 
-        public void SendAssetUploadCompleteMessage(sbyte assetType, bool success, UUID assetFullID)
-        {
+        public void SendAssetUploadCompleteMessage(sbyte assetType, bool success, UUID assetFullID) {
         }
 
-        public void SendConfirmXfer(ulong xferID, uint packetID)
-        {
+        public void SendConfirmXfer(ulong xferID, uint packetID) {
         }
 
-        public void SendXferRequest(ulong xferID, short assetType, UUID vFileID, byte filePath, byte[] fileName)
-        {
+        public void SendXferRequest(ulong xferID, short assetType, UUID vFileID, byte filePath, byte[] fileName) {
         }
 
-        public void SendInitiateDownload(string simFileName, string clientFileName)
-        {
+        public void SendInitiateDownload(string simFileName, string clientFileName) {
         }
 
         public void SendImageFirstPart(ushort numParts, UUID imageUUID, uint imageSize, byte[] imageData,
-                                       byte imageCodec)
-        {
+                                       byte imageCodec) {
         }
 
-        public void SendImageNextPart(ushort partNumber, UUID imageUuid, byte[] imageData)
-        {
+        public void SendImageNextPart(ushort partNumber, UUID imageUuid, byte[] imageData) {
         }
 
-        public void SendImageNotFound(UUID imageid)
-        {
+        public void SendImageNotFound(UUID imageid) {
         }
 
-        public void SendSimStats(SimStats stats)
-        {
+        public void SendSimStats(SimStats stats) {
         }
 
         public void SendObjectPropertiesFamilyData(uint requestFlags, UUID objectUUID, UUID ownerID, UUID groupID,
                                                    uint baseMask, uint ownerMask, uint groupMask, uint everyoneMask,
                                                    uint nextOwnerMask, int ownershipCost, byte saleType, int salePrice,
                                                    uint category, UUID lastOwnerID, string objectName,
-                                                   string description)
-        {
+                                                   string description) {
         }
 
-        public void SendObjectPropertiesReply(List<IEntity> part)
-        {
+        public void SendObjectPropertiesReply(List<IEntity> part) {
         }
 
-        public void SendAgentOffline(UUID[] agentIDs)
-        {
+        public void SendAgentOffline(UUID[] agentIDs) {
         }
 
-        public void SendAgentOnline(UUID[] agentIDs)
-        {
+        public void SendAgentOnline(UUID[] agentIDs) {
         }
 
         public void SendSitResponse(UUID targetID, Vector3 offsetPos, Quaternion sitOrientation, bool autopilot,
-                                    Vector3 cameraAtOffset, Vector3 cameraEyeOffset, bool forceMouseLook)
-        {
+                                    Vector3 cameraAtOffset, Vector3 cameraEyeOffset, bool forceMouseLook) {
         }
 
-        public void SendAdminResponse(UUID token, uint adminLevel)
-        {
+        public void SendAdminResponse(UUID token, uint adminLevel) {
         }
 
-        public void SendGroupMembership(GroupMembershipData[] groupMembership)
-        {
+        public void SendGroupMembership(GroupMembershipData[] groupMembership) {
         }
 
-        public void SendGroupNameReply(UUID groupLLUID, string groupName)
-        {
+        public void SendGroupNameReply(UUID groupLLUID, string groupName) {
         }
 
-        public void SendJoinGroupReply(UUID groupID, bool success)
-        {
+        public void SendJoinGroupReply(UUID groupID, bool success) {
         }
 
-        public void SendEjectGroupMemberReply(UUID agentID, UUID groupID, bool success)
-        {
+        public void SendEjectGroupMemberReply(UUID agentID, UUID groupID, bool success) {
         }
 
-        public void SendLeaveGroupReply(UUID groupID, bool success)
-        {
+        public void SendLeaveGroupReply(UUID groupID, bool success) {
         }
 
-        public void SendCreateGroupReply(UUID groupID, bool success, string message)
-        {
+        public void SendCreateGroupReply(UUID groupID, bool success, string message) {
         }
 
-        public void SendLandStatReply(uint reportType, uint requestFlags, uint resultCount, LandStatReportItem[] lsrpia)
-        {
+        public void SendLandStatReply(uint reportType, uint requestFlags, uint resultCount, LandStatReportItem[] lsrpia) {
         }
 
-        public void SendScriptRunningReply(UUID objectID, UUID itemID, bool running)
-        {
+        public void SendScriptRunningReply(UUID objectID, UUID itemID, bool running) {
         }
 
-        public void SendAsset(AssetRequestToClient req)
-        {
+        public void SendAsset(AssetRequestToClient req) {
         }
 
-        public byte[] GetThrottlesPacked(float multiplier)
-        {
+        public byte[] GetThrottlesPacked(float multiplier) {
             return new byte[0];
         }
 
-        public void SendBlueBoxMessage(UUID fromAvatarID, string fromAvatarName, string message)
-        {
+        public void SendBlueBoxMessage(UUID fromAvatarID, string fromAvatarName, string message) {
         }
 
-        public void SendLogoutPacket()
-        {
+        public void SendLogoutPacket() {
         }
 
-        public EndPoint GetClientEP()
-        {
+        public EndPoint GetClientEP() {
             return null;
         }
 
-        public void SendSetFollowCamProperties(UUID objectID, SortedDictionary<int, float> parameters)
-        {
+        public void SendSetFollowCamProperties(UUID objectID, SortedDictionary<int, float> parameters) {
         }
 
-        public void SendClearFollowCamProperties(UUID objectID)
-        {
+        public void SendClearFollowCamProperties(UUID objectID) {
         }
 
-        public void SendRegionHandle(UUID regoinID, ulong handle)
-        {
+        public void SendRegionHandle(UUID regoinID, ulong handle) {
         }
 
-        public void SendParcelInfo(LandData land, UUID parcelID, uint x, uint y, string simName)
-        {
+        public void SendParcelInfo(LandData land, UUID parcelID, uint x, uint y, string simName) {
         }
 
-        public void SendScriptTeleportRequest(string objName, string simName, Vector3 pos, Vector3 lookAt)
-        {
+        public void SendScriptTeleportRequest(string objName, string simName, Vector3 pos, Vector3 lookAt) {
         }
 
-        public void SendDirPlacesReply(UUID queryID, DirPlacesReplyData[] data)
-        {
+        public void SendDirPlacesReply(UUID queryID, DirPlacesReplyData[] data) {
         }
 
-        public void SendDirPeopleReply(UUID queryID, DirPeopleReplyData[] data)
-        {
+        public void SendDirPeopleReply(UUID queryID, DirPeopleReplyData[] data) {
         }
 
-        public void SendDirEventsReply(UUID queryID, DirEventsReplyData[] data)
-        {
+        public void SendDirEventsReply(UUID queryID, DirEventsReplyData[] data) {
         }
 
-        public void SendDirGroupsReply(UUID queryID, DirGroupsReplyData[] data)
-        {
+        public void SendDirGroupsReply(UUID queryID, DirGroupsReplyData[] data) {
         }
 
-        public void SendDirClassifiedReply(UUID queryID, DirClassifiedReplyData[] data)
-        {
+        public void SendDirClassifiedReply(UUID queryID, DirClassifiedReplyData[] data) {
         }
 
-        public void SendDirLandReply(UUID queryID, DirLandReplyData[] data)
-        {
+        public void SendDirLandReply(UUID queryID, DirLandReplyData[] data) {
         }
 
-        public void SendDirPopularReply(UUID queryID, DirPopularReplyData[] data)
-        {
+        public void SendDirPopularReply(UUID queryID, DirPopularReplyData[] data) {
         }
 
-        public void SendEventInfoReply(EventData info)
-        {
+        public void SendEventInfoReply(EventData info) {
         }
 
-        public void SendMapItemReply(mapItemReply[] replies, uint mapitemtype, uint flags)
-        {
+        public void SendMapItemReply(mapItemReply[] replies, uint mapitemtype, uint flags) {
         }
 
-        public void SendAvatarGroupsReply(UUID avatarID, GroupMembershipData[] data)
-        {
+        public void SendAvatarGroupsReply(UUID avatarID, GroupMembershipData[] data) {
         }
 
-        public void SendOfferCallingCard(UUID srcID, UUID transactionID)
-        {
+        public void SendOfferCallingCard(UUID srcID, UUID transactionID) {
         }
 
-        public void SendAcceptCallingCard(UUID transactionID)
-        {
+        public void SendAcceptCallingCard(UUID transactionID) {
         }
 
-        public void SendDeclineCallingCard(UUID transactionID)
-        {
+        public void SendDeclineCallingCard(UUID transactionID) {
         }
 
-        public void SendTerminateFriend(UUID exFriendID)
-        {
+        public void SendTerminateFriend(UUID exFriendID) {
         }
 
-        public void SendAvatarClassifiedReply(UUID targetID, UUID[] classifiedID, string[] name)
-        {
+        public void SendAvatarClassifiedReply(UUID targetID, UUID[] classifiedID, string[] name) {
         }
 
         public void SendClassifiedInfoReply(UUID classifiedID, UUID creatorID, uint creationDate, uint expirationDate,
                                             uint category, string name, string description, UUID parcelID,
                                             uint parentEstate, UUID snapshotID, string simName, Vector3 globalPos,
-                                            string parcelName, byte classifiedFlags, int price)
-        {
+                                            string parcelName, byte classifiedFlags, int price) {
         }
 
-        public void SendAgentDropGroup(UUID groupID)
-        {
+        public void SendAgentDropGroup(UUID groupID) {
         }
 
-        public void SendAvatarNotesReply(UUID targetID, string text)
-        {
+        public void SendAvatarNotesReply(UUID targetID, string text) {
         }
 
-        public void SendAvatarPicksReply(UUID targetID, Dictionary<UUID, string> picks)
-        {
+        public void SendAvatarPicksReply(UUID targetID, Dictionary<UUID, string> picks) {
         }
 
         public void SendPickInfoReply(UUID pickID, UUID creatorID, bool topPick, UUID parcelID, string name, string desc,
                                       UUID snapshotID, string user, string originalName, string simName,
-                                      Vector3 posGlobal, int sortOrder, bool enabled)
-        {
+                                      Vector3 posGlobal, int sortOrder, bool enabled) {
         }
 
-        public void SendAvatarClassifiedReply(UUID targetID, Dictionary<UUID, string> classifieds)
-        {
+        public void SendAvatarClassifiedReply(UUID targetID, Dictionary<UUID, string> classifieds) {
         }
 
-        public void SendParcelDwellReply(int localID, UUID parcelID, float dwell)
-        {
+        public void SendParcelDwellReply(int localID, UUID parcelID, float dwell) {
         }
 
-        public void SendUserInfoReply(bool imViaEmail, bool visible, string email)
-        {
+        public void SendUserInfoReply(bool imViaEmail, bool visible, string email) {
         }
 
-        public void SendUseCachedMuteList()
-        {
+        public void SendUseCachedMuteList() {
         }
 
-        public void SendMuteListUpdate(string filename)
-        {
+        public void SendMuteListUpdate(string filename) {
         }
 
-        public void SendGroupActiveProposals(UUID groupID, UUID transactionID, GroupActiveProposals[] proposals)
-        {
+        public void SendGroupActiveProposals(UUID groupID, UUID transactionID, GroupActiveProposals[] proposals) {
         }
 
         public void SendGroupVoteHistory(UUID groupID, UUID transactionID, GroupVoteHistory vote,
-                                         GroupVoteHistoryItem[] items)
-        {
+                                         GroupVoteHistoryItem[] items) {
         }
 
-        public bool AddGenericPacketHandler(string methodName, GenericMessage handler)
-        {
+        public bool AddGenericPacketHandler(string methodName, GenericMessage handler) {
             return true;
         }
 
-        public bool RemoveGenericPacketHandler(string methodName)
-        {
+        public bool RemoveGenericPacketHandler(string methodName) {
             return true;
         }
 
-        public void SendRebakeAvatarTextures(UUID textureID)
-        {
+        public void SendRebakeAvatarTextures(UUID textureID) {
         }
 
         public void SendAvatarInterestsReply(UUID avatarID, uint wantMask, string wantText, uint skillsMask,
-                                             string skillsText, string languages)
-        {
+                                             string skillsText, string languages) {
         }
 
         public void SendGroupAccountingDetails(IClientAPI sender, UUID groupID, UUID transactionID, UUID sessionID,
                                                int amt, int currentInterval, int interval, string startDate,
-                                               GroupAccountHistory[] history)
-        {
+                                               GroupAccountHistory[] history) {
         }
 
         public void SendGroupAccountingSummary(IClientAPI sender, UUID groupID, UUID requestID, int moneyAmt,
                                                int totalTier,
                                                int usedTier, string startDate, int currentInterval, int intervalLength,
                                                string taxDate, string lastTaxDate, int parcelDirectoryFee,
-                                               int landTaxFee, int groupTaxFee, int objectTaxFee)
-        {
+                                               int landTaxFee, int groupTaxFee, int objectTaxFee) {
         }
 
         public void SendGroupTransactionsSummaryDetails(IClientAPI sender, UUID groupID, UUID transactionID,
                                                         UUID sessionID, int currentInterval, int intervalDays,
-                                                        string startingDate, GroupAccountHistory[] history)
-        {
+                                                        string startingDate, GroupAccountHistory[] history) {
         }
 
-        public void SendChangeUserRights(UUID agentID, UUID friendID, int rights)
-        {
+        public void SendChangeUserRights(UUID agentID, UUID friendID, int rights) {
         }
 
         public void SendTextBoxRequest(string message, int chatChannel, string objectname, string ownerFirstName,
-                                       string ownerLastName, UUID ownerID, UUID objectId)
-        {
+                                       string ownerLastName, UUID ownerID, UUID objectId) {
         }
 
-        public void SendPlacesQuery(ExtendedLandData[] landData, UUID queryID, UUID transactionID)
-        {
+        public void SendPlacesQuery(ExtendedLandData[] landData, UUID queryID, UUID transactionID) {
         }
 
-        public void FireUpdateParcel(LandUpdateArgs args, int localID)
-        {
+        public void FireUpdateParcel(LandUpdateArgs args, int localID) {
         }
 
         public void SendTelehubInfo(Vector3 telehubPos, Quaternion telehubRot, List<Vector3> spawnPoint, UUID objectID,
-                                    string nameT)
-        {
+                                    string nameT) {
         }
 
-        public void StopFlying(IEntity presence)
-        {
+        public void StopFlying(IEntity presence) {
         }
 
-        public void Reset()
-        {
+        public void Reset() {
         }
 
-        public void HandleChatFromClient(OSChatMessage args)
-        {
+        public void HandleChatFromClient(OSChatMessage args) {
         }
 
         #endregion

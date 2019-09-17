@@ -56,6 +56,7 @@ namespace WhiteCore.Services.GenericServices.CapsService
             IConfig externalConfig = config.Configs ["ExternalCaps"];
             if (externalConfig == null)
                 return;
+            
             m_allowedCapsModules = Util.ConvertToList (externalConfig.GetString ("CapsHandlers"), true);
             
             ISyncMessageRecievedService service = registry.RequestModuleInterface<ISyncMessageRecievedService> ();
@@ -75,6 +76,7 @@ namespace WhiteCore.Services.GenericServices.CapsService
         {
             if (m_registry == null)
                 return new OSDMap ();
+            
             OSDMap resp = new OSDMap ();
             if (m_registry.RequestModuleInterface<IGridServerInfoService> () != null)
             {
@@ -87,15 +89,15 @@ namespace WhiteCore.Services.GenericServices.CapsService
                 List<ManualResetEvent> events = new List<ManualResetEvent> ();
                 foreach (string uri in m_servers.Where((u)=>(!u.Contains(MainServer.Instance.Port.ToString()))))
                 {
-                    ManualResetEvent even = new ManualResetEvent (false);
+                    ManualResetEvent resetEvent = new ManualResetEvent (false);
                     m_syncPoster.Get (uri, req, (r) => {
                         if (r == null)
                             return;
                         foreach (KeyValuePair<string, OSD> kvp in r)
                             resp.Add (kvp.Key, kvp.Value);
-                        even.Set ();
+                        resetEvent.Set ();
                     });
-                    events.Add (even);
+                    events.Add (resetEvent);
                 }
                 if (events.Count > 0)
                     ManualResetEvent.WaitAll (events.ToArray ());
@@ -118,10 +120,10 @@ namespace WhiteCore.Services.GenericServices.CapsService
             foreach (string uri in m_servers)
                 m_syncPoster.Post (uri, req);
 
-            foreach (var h in GetHandlers(agentID, region.RegionID))
+            foreach (var hndlr in GetHandlers(agentID, region.RegionID))
             {
-                if (m_allowedCapsModules.Contains (h.Name))
-                    h.IncomingCapsDestruction ();
+                if (m_allowedCapsModules.Contains (hndlr.Name))
+                    hndlr.IncomingCapsDestruction ();
             }
         }
 
@@ -130,7 +132,8 @@ namespace WhiteCore.Services.GenericServices.CapsService
             string method = message ["Method"];
             if (method != "GetCaps" && method != "RemoveCaps")
                 return null;
-            UUID AgentID = message ["AgentID"];
+            
+            UUID agentID = message ["AgentID"];
             GridRegion region = new GridRegion ();
             region.FromOSD ((OSDMap)message ["Region"]);
 
@@ -138,14 +141,14 @@ namespace WhiteCore.Services.GenericServices.CapsService
             switch (method)
             {
             case "GetCaps":
-                foreach (var h in GetHandlers(AgentID, region.RegionID))
+                foreach (var h in GetHandlers(agentID, region.RegionID))
                 {
                     if (m_allowedCapsModules.Contains (h.Name))
-                        h.IncomingCapsRequest (AgentID, region, m_registry.RequestModuleInterface<ISimulationBase> (), ref map);
+                        h.IncomingCapsRequest (agentID, region, m_registry.RequestModuleInterface<ISimulationBase> (), ref map);
                 }
                 return map;
             case "RemoveCaps":
-                foreach (var h in GetHandlers(AgentID, region.RegionID))
+                foreach (var h in GetHandlers(agentID, region.RegionID))
                 {
                     if (m_allowedCapsModules.Contains (h.Name))
                         h.IncomingCapsDestruction ();
@@ -162,7 +165,7 @@ namespace WhiteCore.Services.GenericServices.CapsService
                 List<IExternalCapsRequestHandler> caps;
                 if (!m_caps.TryGetValue (agentID ^ regionID, out caps))
                 {
-                    caps = WhiteCore.Framework.ModuleLoader.WhiteCoreModuleLoader.PickupModules<IExternalCapsRequestHandler> ();
+                    caps = Framework.ModuleLoader.WhiteCoreModuleLoader.PickupModules<IExternalCapsRequestHandler> ();
                     m_caps.Add (agentID ^ regionID, caps);
                 }
                 return caps;

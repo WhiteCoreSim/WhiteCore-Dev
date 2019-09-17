@@ -651,19 +651,20 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
             d.BodySetRotation(Body, ref mymat);
 
             // recompute full object inertia if needed
-            if (childrenPrim.Count > 0)
-            {
-                d.Matrix3 mat = new d.Matrix3();
-                d.Quaternion quat = new d.Quaternion();
-                d.Mass tmpdmass = new d.Mass {};
-                Vector3 rcm;
-
-                rcm.X = _position.X + objdmass.c.X;
-                rcm.Y = _position.Y + objdmass.c.Y;
-                rcm.Z = _position.Z + objdmass.c.Z;
-
-                lock (childrenPrim)
+            lock (childrenPrim)
+            { 
+                if (childrenPrim.Count > 0)
                 {
+                    d.Matrix3 mat = new d.Matrix3();
+                    d.Quaternion quat = new d.Quaternion();
+                    d.Mass tmpdmass = new d.Mass {};
+                    Vector3 rcm;
+
+                    rcm.X = _position.X + objdmass.c.X;
+                    rcm.Y = _position.Y + objdmass.c.Y;
+                    rcm.Z = _position.Z + objdmass.c.Z;
+
+
                     foreach (ODEPrim prm in childrenPrim)
                     {
                         if (prm.prim_geom == IntPtr.Zero)
@@ -975,8 +976,10 @@ namespace WhiteCore.Physics.OpenDynamicsEngine
         void ChildDelink(ODEPrim odePrim)
         {
             // Okay, we have a delinked child.. destroy all body and remake
-            if (odePrim != this && !childrenPrim.Contains(odePrim))
-                return;
+            lock(childrenPrim) {
+                if (odePrim != this && !childrenPrim.Contains (odePrim))
+                    return;
+            }
 
             DestroyBody();
 

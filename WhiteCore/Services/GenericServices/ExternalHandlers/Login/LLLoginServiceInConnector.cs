@@ -42,8 +42,8 @@ namespace WhiteCore.Services
 {
     public class LLLoginServiceInConnector : IService
     {
-        private ILoginService m_loginService;
-        private bool m_Proxy;
+        ILoginService m_loginService;
+        bool m_Proxy;
 
         public string Name
         {
@@ -65,7 +65,7 @@ namespace WhiteCore.Services
             IHttpServer server =
                 registry.RequestModuleInterface<ISimulationBase>().GetHttpServer(
                     (uint) handlerConfig.GetInt("LLLoginHandlerPort"));
-            MainConsole.Instance.Debug("[LLLOGIN IN CONNECTOR]: Starting...");
+            MainConsole.Instance.Debug("[LLLogin connector]: Starting...");
             ReadLocalServiceFromConfig(config);
             m_loginService = registry.RequestModuleInterface<ILoginService>();
 
@@ -78,16 +78,16 @@ namespace WhiteCore.Services
 
         #endregion
 
-        private void ReadLocalServiceFromConfig(IConfigSource config)
+        void ReadLocalServiceFromConfig(IConfigSource config)
         {
             IConfig serverConfig = config.Configs["LoginService"];
             if (serverConfig == null)
-                throw new Exception(String.Format("No section LoginService in config file"));
+                throw new Exception(string.Format("No section LoginService in config file"));
 
             m_Proxy = serverConfig.GetBoolean("HasProxy", false);
         }
 
-        private void InitializeHandlers(IHttpServer server)
+        void InitializeHandlers(IHttpServer server)
         {
             server.AddXmlRPCHandler("login_to_simulator", HandleXMLRPCLogin);
             server.AddXmlRPCHandler("/", HandleXMLRPCLogin);
@@ -99,10 +99,10 @@ namespace WhiteCore.Services
             Hashtable requestData = (Hashtable) request.Params[0];
             if (m_Proxy && request.Params[3] != null)
             {
-                IPEndPoint ep = NetworkUtils.GetClientIPFromXFF((string) request.Params[3]);
-                if (ep != null)
+                IPEndPoint endPoint = NetworkUtils.GetClientIPFromXFF((string) request.Params[3]);
+                if (endPoint != null)
                     // Bang!
-                    remoteClient = ep;
+                    remoteClient = endPoint;
             }
 
             if (requestData != null)
@@ -130,7 +130,7 @@ namespace WhiteCore.Services
                     if (requestData.Contains("version") && requestData["version"] != null)
                         clientVersion = requestData["version"].ToString();
 
-                    //MAC BANNING START
+                    // MAC BANNING START
                     string mac = (string) requestData["mac"];
                     if (mac == "")
                         return FailedXMLRPCResponse("Bad Viewer Connection.");
@@ -147,7 +147,6 @@ namespace WhiteCore.Services
                         id0 = requestData["id0"].ToString();
 
                     LoginResponse reply = null;
-
 
                     string loginName = (name == "" || name == null) ? first + " " + last : name;
                     reply = m_loginService.Login(UUID.Zero, loginName, "UserAccount", passwd, startLocation,
@@ -175,10 +174,10 @@ namespace WhiteCore.Services
                     string first = requestData["first"].ToString();
                     string last = requestData["last"].ToString();
                     string passwd = requestData["passwd"].ToString();
-                    int level = Int32.Parse(requestData["level"].ToString());
+                    int level = int.Parse(requestData["level"].ToString());
 
-                    MainConsole.Instance.InfoFormat("[LOGIN]: XMLRPC Set Level to {2} Requested by {0} {1}", first, last,
-                                                    level);
+                    MainConsole.Instance.InfoFormat("[XML Login]: XMLRPC Set Level to {2} Requested by {0} {1}",
+                                                    first, last, level);
 
                     Hashtable reply = m_loginService.SetLevel(first, last, passwd, level, remoteClient);
 
@@ -196,7 +195,7 @@ namespace WhiteCore.Services
             return failResponse;
         }
 
-        private XmlRpcResponse FailedXMLRPCResponse()
+        XmlRpcResponse FailedXMLRPCResponse()
         {
             Hashtable hash = new Hashtable();
             hash["reason"] = "key";
@@ -208,7 +207,7 @@ namespace WhiteCore.Services
             return response;
         }
 
-        private XmlRpcResponse FailedXMLRPCResponse(string message)
+        XmlRpcResponse FailedXMLRPCResponse(string message)
         {
             Hashtable hash = new Hashtable();
             hash["reason"] = "key";

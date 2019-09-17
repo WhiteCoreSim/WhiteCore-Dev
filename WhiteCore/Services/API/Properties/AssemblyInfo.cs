@@ -34,7 +34,7 @@ using System.Runtime.InteropServices;
 
 [assembly: AssemblyCompany("WhiteCore Development Team")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCopyright("Copyright © 2014-2016")]
+[assembly: AssemblyCopyright("Copyright © 2014-2018")]
 [assembly: AssemblyCulture("")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyTitle("WhiteCore.Services.API")]

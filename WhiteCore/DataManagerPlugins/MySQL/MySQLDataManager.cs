@@ -178,11 +178,11 @@ namespace WhiteCore.DataManager.MySQL
             {
                 using (reader = Query(query, new Dictionary<string, object>()))
                 {
-                    while (reader.Read())
-                    {
-                        for (int i = 0; i < reader.FieldCount; i++)
-                        {
-                            retVal.Add(reader.GetString(i));
+                    if (reader != null) {
+                        while (reader.Read ()) {
+                            for (int i = 0; i < reader.FieldCount; i++) {
+                                retVal.Add (reader.GetString (i));
+                            }
                         }
                     }
                     return retVal;
@@ -191,7 +191,7 @@ namespace WhiteCore.DataManager.MySQL
             catch (Exception e)
             {
                 MainConsole.Instance.Error("[MySQL]: QueryFullData(" + query + "), " + e);
-                return null;
+                return new List<string>();
             }
         }
 
@@ -264,12 +264,12 @@ namespace WhiteCore.DataManager.MySQL
             {
                 using (reader = Query(query, ps))
                 {
-                    while (reader.Read())
-                    {
-                        for (i = 0; i < reader.FieldCount; i++)
-                        {
-                            Type r = reader[i].GetType();
-                            retVal.Add(r == typeof (DBNull) ? null : reader.GetString(i));
+                    if (reader != null) {
+                        while (reader.Read ()) {
+                            for (i = 0; i < reader.FieldCount; i++) {
+                                Type r = reader [i].GetType ();
+                                retVal.Add (r == typeof (DBNull) ? null : reader.GetString (i));
+                            }
                         }
                     }
                     return retVal;
@@ -316,15 +316,14 @@ namespace WhiteCore.DataManager.MySQL
 
             try
             {
-                using (reader = Query(query, ps))
-                {
-                    while (reader.Read())
-                    {
-                        for (i = 0; i < reader.FieldCount; i++)
-                        {
-                            Type r = reader[i].GetType();
-                            AddValueToList(ref retVal, reader.GetName(i),
-                                           r == typeof (DBNull) ? null : reader[i].ToString());
+                using (reader = Query (query, ps)) {
+                    if (reader != null) {
+                        while (reader.Read ()) {
+                            for (i = 0; i < reader.FieldCount; i++) {
+                                Type r = reader [i].GetType ();
+                                AddValueToList (ref retVal, reader.GetName (i),
+                                               r == typeof (DBNull) ? null : reader [i].ToString ());
+                            }
                         }
                     }
                     return retVal;
@@ -333,7 +332,7 @@ namespace WhiteCore.DataManager.MySQL
             catch (Exception e)
             {
                 MainConsole.Instance.Error("[MySQL]: QueryNames(" + query + "), " + e);
-                return null;
+                return new Dictionary<string, List<string>>();
             }
         }
 
@@ -565,8 +564,10 @@ namespace WhiteCore.DataManager.MySQL
 
         public override bool DeleteByTime(string table, string key)
         {
+            // the only call here is to delete any "tokens.validity < now. i.e. expired tokens 
+            // validity is a unix_timestamp saved as an int
             QueryFilter filter = new QueryFilter();
-            filter.andLessThanEqFilters["(UNIX_TIMESTAMP(`" + key.Replace("`", "") + "`) - UNIX_TIMESTAMP())"] = 0;
+            filter.andLessThanEqFilters["(`" + key.Replace("`", "") + "` - UNIX_TIMESTAMP())"] = 0;
 
             return Delete(table, filter);
         }
@@ -1023,11 +1024,11 @@ namespace WhiteCore.DataManager.MySQL
             {
                 using (reader = Query("show tables", new Dictionary<string, object>()))
                 {
-                    while (reader.Read())
-                    {
-                        for (int i = 0; i < reader.FieldCount; i++)
-                        {
-                            retVal.Add(reader.GetString(i).ToLower());
+                    if (reader != null) {
+                        while (reader.Read ()) {
+                            for (int i = 0; i < reader.FieldCount; i++) {
+                                retVal.Add (reader.GetString (i).ToLower ());
+                            }
                         }
                     }
                 }
@@ -1047,25 +1048,25 @@ namespace WhiteCore.DataManager.MySQL
             try
             {
                 rdr = Query(string.Format("desc {0}", tableName), new Dictionary<string, object>());
-                while (rdr.Read())
-                {
-                    var name = rdr["Field"];
-                    //var pk = rdr["Key"];
-                    var type = rdr["Type"];
-                    //var extra = rdr["Extra"];
-                    object defaultValue = rdr["Default"];
+                if (rdr != null) {
+                    while (rdr.Read ()) {
+                        var name = rdr ["Field"];
+                        //var pk = rdr["Key"];
+                        var type = rdr ["Type"];
+                        //var extra = rdr["Extra"];
+                        object defaultValue = rdr ["Default"];
 
-                    ColumnTypeDef typeDef = ConvertTypeToColumnType(type.ToString());
-                    typeDef.isNull = rdr["Null"].ToString() == "YES";
-                    typeDef.auto_increment = rdr ["Extra"].ToString ().IndexOf ("auto_increment", StringComparison.Ordinal) >= 0;
-                    typeDef.defaultValue = defaultValue is DBNull
-                                               ? null
-                                               : defaultValue.ToString ();
-                    defs.Add(new ColumnDefinition
-                                 {
-                                     Name = name.ToString(),
-                                     Type = typeDef,
-                                 });
+                        ColumnTypeDef typeDef = ConvertTypeToColumnType (type.ToString ());
+                        typeDef.isNull = rdr ["Null"].ToString () == "YES";
+                        typeDef.auto_increment = rdr ["Extra"].ToString ().IndexOf ("auto_increment", StringComparison.Ordinal) >= 0;
+                        typeDef.defaultValue = defaultValue is DBNull
+                                                   ? null
+                                                   : defaultValue.ToString ();
+                        defs.Add (new ColumnDefinition {
+                            Name = name.ToString (),
+                            Type = typeDef,
+                        });
+                    }
                 }
             }
             catch (Exception e)
@@ -1102,18 +1103,18 @@ namespace WhiteCore.DataManager.MySQL
             try
             {
                 rdr = Query(string.Format("SHOW INDEX IN {0}", tableName), new Dictionary<string, object>());
-                while (rdr.Read())
-                {
-                    string name = rdr["Column_name"].ToString();
-                    bool unique = uint.Parse(rdr["Non_unique"].ToString()) == 0;
-                    string index = rdr["Key_name"].ToString();
-                    uint sequence = uint.Parse(rdr["Seq_in_index"].ToString());
-                    if (!indexLookup.ContainsKey(index))
-                    {
-                        indexLookup[index] = new Dictionary<uint, string>();
+                if (rdr != null) {
+                    while (rdr.Read ()) {
+                        string name = rdr ["Column_name"].ToString ();
+                        bool unique = uint.Parse (rdr ["Non_unique"].ToString ()) == 0;
+                        string index = rdr ["Key_name"].ToString ();
+                        uint sequence = uint.Parse (rdr ["Seq_in_index"].ToString ());
+                        if (!indexLookup.ContainsKey (index)) {
+                            indexLookup [index] = new Dictionary<uint, string> ();
+                        }
+                        indexIsUnique [index] = unique;
+                        indexLookup [index] [sequence - 1] = name;
                     }
-                    indexIsUnique[index] = unique;
-                    indexLookup[index][sequence - 1] = name;
                 }
             }
             catch (Exception e)

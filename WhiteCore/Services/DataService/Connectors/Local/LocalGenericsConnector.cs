@@ -48,23 +48,23 @@ namespace WhiteCore.Services.DataService
     /// </summary>
     public class LocalGenericsConnector : IGenericsConnector
     {
-        IGenericData GD;
+        IGenericData genData;
 
         #region IGenericsConnector Members
 
-        public void Initialize(IGenericData GenericData, IConfigSource source, IRegistryCore simBase,
+        public void Initialize(IGenericData genericData, IConfigSource source, IRegistryCore simBase,
                                string defaultConnectionString)
         {
             if (source.Configs["WhiteCoreConnectors"].GetString("GenericsConnector", "LocalConnector") == "LocalConnector")
             {
-                GD = GenericData;
+                genData = genericData;
 
                 if (source.Configs[Name] != null)
                     defaultConnectionString = source.Configs[Name].GetString("ConnectionString", defaultConnectionString);
 
-                if (GD != null)
+                if (genData != null)
                 {
-                    GD.ConnectToDatabase (defaultConnectionString, "Generics",
+                    genData.ConnectToDatabase (defaultConnectionString, "Generics",
                         source.Configs ["WhiteCoreConnectors"].GetBoolean ("ValidateTables", true));
 
                     Framework.Utilities.DataManager.RegisterPlugin (this);
@@ -81,79 +81,79 @@ namespace WhiteCore.Services.DataService
         ///     Gets a Generic type as set by the ownerID, Type, and Key
         /// </summary>
         /// <typeparam name="T">return value of type IDataTransferable</typeparam>
-        /// <param name="OwnerID"></param>
-        /// <param name="Type"></param>
-        /// <param name="Key"></param>
+        /// <param name="ownerID"></param>
+        /// <param name="type"></param>
+        /// <param name="key"></param>
         /// <returns></returns>
-        public T GetGeneric<T>(UUID OwnerID, string Type, string Key) where T : IDataTransferable
+        public T GetGeneric<T>(UUID ownerID, string type, string key) where T : IDataTransferable
         {
-            return GenericUtils.GetGeneric<T>(OwnerID, Type, Key, GD);
+            return GenericUtils.GetGeneric<T>(ownerID, type, key, genData);
         }
 
         /// <summary>
         ///     Gets a list of generic T's from the database
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="OwnerID"></param>
-        /// <param name="Type"></param>
+        /// <param name="ownerID"></param>
+        /// <param name="type"></param>
         /// <returns></returns>
-        public List<T> GetGenerics<T>(UUID OwnerID, string Type) where T : IDataTransferable
+        public List<T> GetGenerics<T>(UUID ownerID, string type) where T : IDataTransferable
         {
-            return GenericUtils.GetGenerics<T>(OwnerID, Type, GD);
+            return GenericUtils.GetGenerics<T>(ownerID, type, genData);
         }
 
         /// <summary>
         ///     Gets the number of list of generic T's from the database
         /// </summary>
-        /// <param name="OwnerID"></param>
-        /// <param name="Type"></param>
+        /// <param name="ownerID"></param>
+        /// <param name="type"></param>
         /// <returns></returns>
-        public int GetGenericCount(UUID OwnerID, string Type)
+        public int GetGenericCount(UUID ownerID, string type)
         {
-            return GenericUtils.GetGenericCount(OwnerID, Type, GD);
+            return GenericUtils.GetGenericCount(ownerID, type, genData);
         }
 
         /// <summary>
         ///     Adds a generic IDataTransferable into the database
         /// </summary>
-        /// <param name="AgentID"></param>
-        /// <param name="Type"></param>
-        /// <param name="Key"></param>
-        /// <param name="Value"></param>
-        public void AddGeneric(UUID AgentID, string Type, string Key, OSDMap Value)
+        /// <param name="agentID"></param>
+        /// <param name="type"></param>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        public void AddGeneric(UUID agentID, string type, string key, OSDMap value)
         {
-            GenericUtils.AddGeneric(AgentID, Type, Key, Value, GD);
+            GenericUtils.AddGeneric(agentID, type, key, value, genData);
         }
 
         /// <summary>
         ///     Removes a generic IDataTransferable from the database
         /// </summary>
-        /// <param name="AgentID"></param>
-        /// <param name="Type"></param>
-        /// <param name="Key"></param>
-        public void RemoveGeneric(UUID AgentID, string Type, string Key)
+        /// <param name="agentID"></param>
+        /// <param name="type"></param>
+        /// <param name="key"></param>
+        public void RemoveGeneric(UUID agentID, string type, string key)
         {
-            GenericUtils.RemoveGenericByKeyAndType(AgentID, Type, Key, GD);
+            GenericUtils.RemoveGenericByKeyAndType(agentID, type, key, genData);
         }
 
         /// <summary>
         ///     Removes a generic IDataTransferable from the database
         /// </summary>
-        /// <param name="AgentID"></param>
-        /// <param name="Type"></param>
-        public void RemoveGeneric(UUID AgentID, string Type)
+        /// <param name="agentID"></param>
+        /// <param name="type"></param>
+        public void RemoveGeneric(UUID agentID, string type)
         {
-            GenericUtils.RemoveGenericByType(AgentID, Type, GD);
+            GenericUtils.RemoveGenericByType(agentID, type, genData);
         }
 
-        public List<UUID> GetOwnersByGeneric(string Type, string Key)
+        public List<UUID> GetOwnersByGeneric(string type, string key)
         {
-            return GenericUtils.GetOwnersByGeneric(GD, Type, Key);
+            return GenericUtils.GetOwnersByGeneric(type, key, genData);
         }
 
-        public List<UUID> GetOwnersByGeneric(string Type, string Key, OSDMap value)
+        public List<UUID> GetOwnersByGeneric(string type, string key, OSDMap value)
         {
-            return GenericUtils.GetOwnersByGeneric(GD, Type, Key, value);
+            return GenericUtils.GetOwnersByGeneric(type, key, value, genData);
         }
 
         #endregion

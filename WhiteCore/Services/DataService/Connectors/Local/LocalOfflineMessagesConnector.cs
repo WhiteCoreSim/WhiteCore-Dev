@@ -38,36 +38,35 @@ namespace WhiteCore.Services.DataService
 {
     public class LocalOfflineMessagesConnector : ConnectorBase, IOfflineMessagesConnector
     {
-        IGenericData GD;
+        IGenericData genData;
         int m_maxOfflineMessages = 20;
 
         #region IOfflineMessagesConnector Members
 
-        public void Initialize(IGenericData GenericData, IConfigSource source, IRegistryCore simBase,
+        public void Initialize (IGenericData genericData, IConfigSource source, IRegistryCore simBase,
                                string defaultConnectionString)
         {
-            GD = GenericData;
+            genData = genericData;
 
-            if (source.Configs[Name] != null)
-                defaultConnectionString = source.Configs[Name].GetString("ConnectionString", defaultConnectionString);
+            if (source.Configs [Name] != null)
+                defaultConnectionString = source.Configs [Name].GetString ("ConnectionString", defaultConnectionString);
 
-            if (GD != null)
-                GD.ConnectToDatabase(defaultConnectionString, "Generics",
-                                     source.Configs["WhiteCoreConnectors"].GetBoolean("ValidateTables", true));
+            if (genData != null)
+                genData.ConnectToDatabase (defaultConnectionString, "Generics",
+                                     source.Configs ["WhiteCoreConnectors"].GetBoolean ("ValidateTables", true));
 
-            Framework.Utilities.DataManager.RegisterPlugin(Name + "Local", this);
+            Framework.Utilities.DataManager.RegisterPlugin (Name + "Local", this);
 
-            m_maxOfflineMessages = source.Configs["WhiteCoreConnectors"].GetInt("MaxOfflineMessages", m_maxOfflineMessages);
-            if (source.Configs["WhiteCoreConnectors"].GetString("OfflineMessagesConnector", "LocalConnector") ==
-                "LocalConnector")
-            {
-                Framework.Utilities.DataManager.RegisterPlugin(this);
+            m_maxOfflineMessages = source.Configs ["WhiteCoreConnectors"].GetInt ("MaxOfflineMessages", m_maxOfflineMessages);
+            if (source.Configs ["WhiteCoreConnectors"].GetString ("OfflineMessagesConnector", "LocalConnector") ==
+                "LocalConnector") {
+                Framework.Utilities.DataManager.RegisterPlugin (this);
             }
-            Init(simBase, Name);
+
+            Init (simBase, Name);
         }
 
-        public string Name
-        {
+        public string Name {
             get { return "IOfflineMessagesConnector"; }
         }
 
@@ -76,29 +75,31 @@ namespace WhiteCore.Services.DataService
         /// </summary>
         /// <param name="agentID"></param>
         /// <returns></returns>
-        [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
-        public List<GridInstantMessage> GetOfflineMessages(UUID agentID)
+        [CanBeReflected (ThreatLevel = ThreatLevel.Low)]
+        public List<GridInstantMessage> GetOfflineMessages (UUID agentID)
         {
             if (m_doRemoteOnly) {
                 object remoteValue = DoRemote (agentID);
                 return remoteValue != null ? (List<GridInstantMessage>)remoteValue : new List<GridInstantMessage> ();
             }
 
-            //Get all the messages
-            List<GridInstantMessage> Messages = GenericUtils.GetGenerics<GridInstantMessage>(agentID, "OfflineMessages",GD);
-            Messages.AddRange(GenericUtils.GetGenerics<GridInstantMessage>(agentID, "GroupOfflineMessages", GD));
-            //Clear them out now that we have them
-            GenericUtils.RemoveGenericByType(agentID, "OfflineMessages", GD);
-            GenericUtils.RemoveGenericByType(agentID, "GroupOfflineMessages", GD);
-            return Messages;
+            // Get all the messages
+            List<GridInstantMessage> messages = GenericUtils.GetGenerics<GridInstantMessage> (agentID, "OfflineMessages", genData);
+            messages.AddRange (GenericUtils.GetGenerics<GridInstantMessage> (agentID, "GroupOfflineMessages", genData));
+
+            // Clear them out now that we have them
+            GenericUtils.RemoveGenericByType (agentID, "OfflineMessages", genData);
+            GenericUtils.RemoveGenericByType (agentID, "GroupOfflineMessages", genData);
+
+            return messages;
         }
 
         /// <summary>
         ///     Adds a new offline message for the user.
         /// </summary>
         /// <param name="message"></param>
-        [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
-        public bool AddOfflineMessage(GridInstantMessage message)
+        [CanBeReflected (ThreatLevel = ThreatLevel.Low)]
+        public bool AddOfflineMessage (GridInstantMessage message)
         {
             if (m_doRemoteOnly) {
                 object remoteValue = DoRemote (message);
@@ -106,10 +107,9 @@ namespace WhiteCore.Services.DataService
             }
 
             if (m_maxOfflineMessages <= 0 ||
-                GenericUtils.GetGenericCount(message.ToAgentID, "OfflineMessages", GD) < m_maxOfflineMessages)
-            {
-                GenericUtils.AddGeneric(message.ToAgentID, "OfflineMessages", UUID.Random().ToString(),
-                                        message.ToOSD(), GD);
+                GenericUtils.GetGenericCount (message.ToAgentID, "OfflineMessages", genData) < m_maxOfflineMessages) {
+                GenericUtils.AddGeneric (message.ToAgentID, "OfflineMessages", UUID.Random ().ToString (),
+                                        message.ToOSD (), genData);
                 return true;
             }
             return false;
@@ -117,7 +117,7 @@ namespace WhiteCore.Services.DataService
 
         #endregion
 
-        public void Dispose()
+        public void Dispose ()
         {
         }
     }

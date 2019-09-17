@@ -25,11 +25,11 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using WhiteCore.Framework.ConsoleFramework;
-using WhiteCore.Region;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using WhiteCore.Framework.ConsoleFramework;
+using WhiteCore.Region;
 
 namespace WhiteCore.Modules
 {
@@ -75,7 +75,7 @@ namespace WhiteCore.Modules
             }
             catch (Exception ex)
             {
-                MainConsole.Instance.Warn("[ProtobufRegionLoader]: Failed to load backup: " + ex.ToString());
+                MainConsole.Instance.Warn("[ProtobufRegionLoader]: Failed to load backup: " + ex);
                 return null;
             }
         }
@@ -86,11 +86,11 @@ namespace WhiteCore.Modules
             try
             {
                 stream = File.OpenWrite(file);
-                ProtoBuf.Serializer.Serialize<RegionData>(stream, regiondata);
+                ProtoBuf.Serializer.Serialize (stream, regiondata);
             }
             catch (Exception ex)
             {
-                MainConsole.Instance.Warn("[ProtobufRegionLoader]: Failed to save backup: " + ex.ToString());
+                MainConsole.Instance.Warn("[ProtobufRegionLoader]: Failed to save backup: " + ex);
                 return false;
             }
             finally

@@ -113,7 +113,7 @@ namespace WhiteCore.Modules.Web
             // get admin users
             var adminUsers = accountService.GetUserAccounts (null, Constants.USER_GOD_CUSTOMER_SERVICE, 0);
             var adminUsersList = new List<Dictionary<string, object>> ();
-            if (adminUsers != null)
+            if (adminUsers.Count > 0)
             {
 
                 foreach (var user in adminUsers)

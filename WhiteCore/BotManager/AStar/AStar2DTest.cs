@@ -51,16 +51,14 @@ namespace WhiteCore.BotManager.AStar
         /// <summary>
         ///     The X-coordinate of the node
         /// </summary>
-        public int X
-        {
+        public int X {
             get { return FX; }
         }
 
         /// <summary>
         ///     The Y-coordinate of the node
         /// </summary>
-        public int Y
-        {
+        public int Y {
             get { return FY; }
         }
 
@@ -77,8 +75,7 @@ namespace WhiteCore.BotManager.AStar
         /// <param name="aX">X-coordinate</param>
         /// <param name="aY">Y-coordinate</param>
         public AStarNode2D(AStarNode aParent, AStarNode aGoalNode, double aCost, int aX, int aY)
-            : base(aParent, aGoalNode, aCost)
-        {
+            : base(aParent, aGoalNode, aCost) {
             FX = aX;
             FY = aY;
         }
@@ -93,16 +90,13 @@ namespace WhiteCore.BotManager.AStar
         /// <param name="aSuccessors">List of successors</param>
         /// <param name="aX">X-coordinate</param>
         /// <param name="aY">Y-coordinate</param>
-        void AddSuccessor(ArrayList aSuccessors, int aX, int aY)
-        {
+        void AddSuccessor(ArrayList aSuccessors, int aX, int aY) {
             int CurrentCost = StartPath.GetMap(aX, aY);
-            if (CurrentCost == -1)
-            {
+            if (CurrentCost == -1) {
                 return;
             }
             AStarNode2D NewNode = new AStarNode2D(this, GoalNode, Cost + CurrentCost, aX, aY);
-            if (NewNode.IsSameState(Parent))
-            {
+            if (NewNode.IsSameState(Parent)) {
                 return;
             }
             aSuccessors.Add(NewNode);
@@ -117,25 +111,21 @@ namespace WhiteCore.BotManager.AStar
         /// </summary>
         /// <param name="aNode">AStarNode to compare the current node to</param>
         /// <returns>Returns true if they are the same state</returns>
-        public override bool IsSameState(AStarNode aNode)
-        {
-            if (aNode == null)
-            {
+        public override bool IsSameState(AStarNode aNode) {
+            if (aNode == null) {
                 return false;
             }
-            return ((((AStarNode2D) aNode).X == FX) &&
-                    (((AStarNode2D) aNode).Y == FY));
+            return ((((AStarNode2D)aNode).X == FX) &&
+                    (((AStarNode2D)aNode).Y == FY));
         }
 
         /// <summary>
         ///     Calculates the estimated cost for the remaining trip to the goal.
         /// </summary>
-        public override void Calculate()
-        {
-            if (GoalNode != null)
-            {
-                double xd = Math.Abs(FX - ((AStarNode2D) GoalNode).X);
-                double yd = Math.Abs(FY - ((AStarNode2D) GoalNode).Y);
+        public override void Calculate() {
+            if (GoalNode != null) {
+                double xd = Math.Abs(FX - ((AStarNode2D)GoalNode).X);
+                double yd = Math.Abs(FY - ((AStarNode2D)GoalNode).Y);
 
                 // "Euclidean distance" - Used when search can move at any angle.
                 //GoalEstimate = Math.Sqrt((xd * xd) + (yd * yd));//was using this one
@@ -146,9 +136,7 @@ namespace WhiteCore.BotManager.AStar
 
                 // "Diagonal Distance" - Used when the search can move in 8 directions.
                 //GoalEstimate = Math.Max(Math.Abs(xd), Math.Abs(yd));
-            }
-            else
-            {
+            } else {
                 GoalEstimate = 0;
             }
         }
@@ -157,8 +145,7 @@ namespace WhiteCore.BotManager.AStar
         ///     Gets all successors nodes from the current node and adds them to the successor list
         /// </summary>
         /// <param name="aSuccessors">List in which the successors will be added</param>
-        public override void GetSuccessors(ArrayList aSuccessors)
-        {
+        public override void GetSuccessors(ArrayList aSuccessors) {
             aSuccessors.Clear();
             AddSuccessor(aSuccessors, FX - 1, FY);
             AddSuccessor(aSuccessors, FX - 1, FY - 1);
@@ -173,8 +160,7 @@ namespace WhiteCore.BotManager.AStar
         /// <summary>
         ///     Prints information about the current node
         /// </summary>
-        public int[] PrintNodeInfo()
-        {
+        public int[] PrintNodeInfo() {
             int[] returnWaypoint = new int[2];
             returnWaypoint[0] = X;
             returnWaypoint[1] = Y;
@@ -198,8 +184,7 @@ namespace WhiteCore.BotManager.AStar
         ///     Entry and Exit from BotMe is StartPath.Path
         ///     CurrentMap is the map read from the file in ReadMap
         /// </summary>
-        public static int[,] Map
-        {
+        public static int[,] Map {
             get { return CurrentMap; }
             set { CurrentMap = value; }
         }
@@ -207,14 +192,12 @@ namespace WhiteCore.BotManager.AStar
         /// <summary>
         ///     XL/YL comes from the map maker description - BotMe /gm ---> ReadMap sets this
         /// </summary>
-        public static int XL
-        {
+        public static int XL {
             get { return XLimit - 1; }
             set { XLimit = value; }
         }
 
-        public static int YL
-        {
+        public static int YL {
             get { return YLimit - 1; }
             set { YLimit = value; }
         }
@@ -230,8 +213,7 @@ namespace WhiteCore.BotManager.AStar
         /// <param name="x">X-coordinate</param>
         /// <param name="y">Y-coordinate</param>
         /// <returns>Returns movement cost at the specified point in the map</returns>
-        public static int GetMap(int x, int y)
-        {
+        public static int GetMap(int x, int y) {
             if ((x < 0) || (x > XL))
                 return (-1);
             if ((y < 0) || (y > YL))
@@ -255,27 +237,22 @@ namespace WhiteCore.BotManager.AStar
         ///     as well as print the map out in a console if we use console apps.
         /// </summary>
         [STAThread]
-        public static int[,] ReadMap(string map, int mapx, int mapy)
-        {
+        public static int[,] ReadMap(string map, int mapx, int mapy) {
             // This works because each character is internally represented by a number. 
             // The characters '0' to '9' are represented by consecutive numbers, so finding 
             // the difference between the characters '0' and '2' results in the number 2.if char = 2 or whatever.
-            int[,] mapArray = new int[mapx,mapy];
+            int[,] mapArray = new int[mapx, mapy];
             XLimit = mapx;
             YLimit = mapy;
 
-            try
-            {
+            try {
                 string[] lines = map.Split('\n');
-                for (int lineNum = 0; lineNum < lines.Length; lineNum++)
-                {
+                for (int lineNum = 0; lineNum < lines.Length; lineNum++) {
                     string line = lines[lineNum];
                     char[] each = line.ToCharArray();
-                    for (int i = 0; i < each.Length; i++)
-                    {
+                    for (int i = 0; i < each.Length; i++) {
                         int fooBar = each[i] - '0';
-                        if (fooBar == 5)
-                        {
+                        if (fooBar == 5) {
                             fooBar = -1;
                         }
                         mapArray[i, lineNum] = fooBar;
@@ -283,21 +260,18 @@ namespace WhiteCore.BotManager.AStar
                 }
                 CurrentMap = mapArray;
                 return mapArray;
-            }
-            catch
-            {
+            } catch {
                 mapArray[0, 0] = -99;
                 return mapArray;
             }
         }
 
-        public static List<string> Path(int startx, int starty, int endx, int endy, int endz, int csx, int csy)
-        {
+        public static List<string> Path(int startx, int starty, int endx, int endy, int endz, int csx, int csy) {
             // Here is where we come in from BotMe with our start and end points from the world
             AStar astar = new AStar();
 
             AStarNode2D GoalNode = new AStarNode2D(null, null, 0, endx, endy);
-            AStarNode2D StartNode = new AStarNode2D(null, GoalNode, 0, startx, starty) {GoalNode = GoalNode};
+            AStarNode2D StartNode = new AStarNode2D(null, GoalNode, 0, startx, starty) { GoalNode = GoalNode };
 
             // Prepare the final List that will become the waypoints for him to leaf through
             List<string> botPoint = new List<string>();
@@ -308,8 +282,7 @@ namespace WhiteCore.BotManager.AStar
 
             // First check if the path was possible
             bool pathDone = astar.PathPossible;
-            if (!pathDone)
-            {
+            if (!pathDone) {
                 //Use botPoint List as a flag to break out of this. Return to Botme
                 botPoint.Add("no_path");
                 return botPoint;
@@ -329,9 +302,8 @@ namespace WhiteCore.BotManager.AStar
 
             // This gets the solution from Astar.cs and runs it through PrintInfo which has the xyz of each path node - our Node solution
             ArrayList Nodes = new ArrayList(astar.Solution);
-            foreach (AStarNode nn in Nodes)
-            {
-                AStarNode2D n = (AStarNode2D) nn;
+            foreach (AStarNode nn in Nodes) {
+                AStarNode2D n = (AStarNode2D)nn;
                 // Return x and y from printinfo
                 int[] XYreturn = new int[2];
                 XYreturn = n.PrintNodeInfo();
@@ -345,8 +317,7 @@ namespace WhiteCore.BotManager.AStar
                 // To detect scene changes.
                 slope = CalcSlope(Y2, Y1, X2, X1);
 
-                if (lastSlope != slope)
-                {
+                if (lastSlope != slope) {
                     // Build the list of waypoints only where changes of slope occur
                     xtemp = X1 + csx; //conerStone x and y from our map to get these into sim coordinates
                     ytemp = Y1 + csy;
@@ -368,16 +339,14 @@ namespace WhiteCore.BotManager.AStar
             return botPoint;
         }
 
-        public static int CalcSlope(int y2, int y1, int x2, int x1)
-        {
+        public static int CalcSlope(int y2, int y1, int x2, int x1) {
             // The 88 and 99 numbers above are flags to keep from dividing by zero and to know if we are on the first step
             // I was trying to not set a point 1 step from the start if it was not a change in slope.
             int deltaX = x2 - x1;
-            if (deltaX == 0)
-            {
+            if (deltaX == 0) {
                 return 88;
             }
-            return (y2 - y1)/(x2 - x1);
+            return (y2 - y1) / (x2 - x1);
         }
 
         #endregion

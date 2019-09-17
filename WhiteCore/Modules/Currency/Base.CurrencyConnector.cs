@@ -93,6 +93,8 @@ namespace WhiteCore.Modules.Currency
             Framework.Utilities.DataManager.RegisterPlugin(Name, this);
 
             m_config = new BaseCurrencyConfig(config);
+            m_userInfoService = m_registry.RequestModuleInterface<IAgentInfoService>();
+            m_userAccountService = m_registry.RequestModuleInterface<IUserAccountService> ();
 
             Init(m_registry, Name, "", "/currency/", "CurrencyServerURI");
 
@@ -105,9 +107,10 @@ namespace WhiteCore.Modules.Currency
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
         public BaseCurrencyConfig GetConfig()
         {
-            object remoteValue = DoRemoteByURL("CurrencyServerURI");
-            if (remoteValue != null || m_doRemoteOnly)
-                return (BaseCurrencyConfig) remoteValue;
+            if (m_doRemoteOnly) {
+                object remoteValue = DoRemoteByURL ("CurrencyServerURI");
+                return (remoteValue != null) ? (BaseCurrencyConfig)remoteValue : new BaseCurrencyConfig ();
+            }
 
             return m_config;
         }
@@ -117,9 +120,10 @@ namespace WhiteCore.Modules.Currency
         [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
         public GroupBalance GetGroupBalance(UUID groupID)
         {
-            object remoteValue = DoRemoteByURL("CurrencyServerURI", groupID);
-            if (remoteValue != null || m_doRemoteOnly)
-                return (GroupBalance) remoteValue;
+            if (m_doRemoteOnly) {
+                object remoteValue = DoRemoteByURL ("CurrencyServerURI", groupID);
+                return (remoteValue != null) ? (GroupBalance)remoteValue : new GroupBalance ();
+            }
 
             GroupBalance gb = new GroupBalance {
                 GroupFee = 0,
@@ -127,7 +131,7 @@ namespace WhiteCore.Modules.Currency
                 ObjectFee = 0,
                 ParcelDirectoryFee = 0,
                 TotalTierCredits = 0,
-                TotalTierDebit = 0,
+                TotalTierDebits = 0,
                 Balance = 0,
                 StartingDate = DateTime.UtcNow
             };
@@ -151,9 +155,10 @@ namespace WhiteCore.Modules.Currency
             int currentInterval, int intervalDays)
         {
             //return new List<GroupAccountHistory>();
-            object remoteValue = DoRemoteByURL("CurrencyServerURI", groupID, fromAgentID, currentInterval, intervalDays);
-            if (remoteValue != null || m_doRemoteOnly)
-                return (List<GroupAccountHistory>) remoteValue;
+            if (m_doRemoteOnly) {
+                object remoteValue = DoRemoteByURL ("CurrencyServerURI", groupID, fromAgentID, currentInterval, intervalDays);
+                return (remoteValue != null) ? (List<GroupAccountHistory>)remoteValue : new List<GroupAccountHistory> ();
+            }
 
             QueryFilter filter = new QueryFilter();
 
@@ -182,40 +187,44 @@ namespace WhiteCore.Modules.Currency
         }
 
         public bool GroupCurrencyTransfer(UUID groupID, UUID userId, bool payUser, string toObjectName, UUID fromObjectID,
-            string fromObjectName, int amount, string description, TransactionType type, UUID transactionID)
+                                          string fromObjectName, int amount, string description, TransactionType transType, UUID transactionID)
         {
+            // Groups (legacy) should not receive stipends
+            if (transType == TransactionType.StipendPayment) 
+                return false;
+
             GroupBalance gb = new GroupBalance {
                 StartingDate = DateTime.UtcNow
             };
 
-            // Not sure if a group will receive a system payment but..
-            UserCurrency fromCurrency = userId == UUID.Zero ? null : GetUserCurrency(userId);
+            // Not sure if a group will receive a system payment (UUID = Zero) but..
+            UserCurrency fromuserCurrency = userId == UUID.Zero ? null : GetUserCurrency(userId);
 
-            // Groups (legacy) should not receive stipends
-            if (type == TransactionType.StipendPayment) 
-                return false;
-
-            if (fromCurrency != null)
+            if (fromuserCurrency != null)
             {
                 // Normal users cannot have a credit balance.. check to see whether they have enough money
-                if ((int)fromCurrency.Amount - amount < 0)
+                if ((int)fromuserCurrency.Amount - amount < 0)
                     return false; // Not enough money
             }
 
-            // is thiis a payment to the group or to the user?
-            if (payUser)
+            // is this a payment from a user to the group or from the group to the user?
+            if (payUser) {
+                gb.TotalTierDebits += amount;          // not sure if this the correct place yet? Total of group payments
                 amount = -1 * amount;
+            }
+            else
+                gb.TotalTierCredits += amount;        // .. total of group receipts
 
-            uint fromBalance = 0;
-            if (fromCurrency != null) {
+            uint userBalance = 0;
+            if (fromuserCurrency != null) {
                 // user payment
-                fromCurrency.Amount -= (uint)amount;
-                UserCurrencyUpdate (fromCurrency, true);
-                fromBalance = fromCurrency.Amount;
+                fromuserCurrency.Amount -= (uint)amount;
+                UserCurrencyUpdate (fromuserCurrency, true);
+                userBalance = fromuserCurrency.Amount;
             }
 
             // track specific group fees
-            switch (type)
+            switch (transType)
             {
             case TransactionType.GroupJoin:
                 gb.GroupFee += amount;
@@ -228,25 +237,15 @@ namespace WhiteCore.Modules.Currency
                 break;
             }
 
-            if (payUser)
-                gb.TotalTierDebit -= amount;          // not sure if this the correct place yet? Are these currency or land credits?
-            else
-                gb.TotalTierCredits += amount;        // .. or this?
 
             // update the group balance
             gb.Balance += amount;                
             GroupCurrencyUpdate(groupID, gb, true);
 
-            //Must send out notifications to the users involved so that they get the updates
-            if (m_userInfoService == null)
-            {
-                m_userInfoService = m_registry.RequestModuleInterface<IAgentInfoService>();
-                m_userAccountService = m_registry.RequestModuleInterface<IUserAccountService> ();
-            }
-            if (m_userInfoService != null)
-            {
-                UserInfo agentInfo = userId == UUID.Zero ? null : m_userInfoService.GetUserInfo(userId.ToString());
-                UserAccount agentAccount = m_userAccountService.GetUserAccount(null, userId);
+            // Must send out notifications to the users involved so that they get the updates
+            if (m_userInfoService != null) {
+                UserInfo agentInfo = userId == UUID.Zero ? null : m_userInfoService.GetUserInfo (userId.ToString ());
+                UserAccount agentAccount = m_userAccountService.GetUserAccount (null, userId);
                 var groupService = Framework.Utilities.DataManager.RequestPlugin<IGroupsServiceConnector> ();
                 var groupInfo = groupService.GetGroupRecord (userId, groupID, null);
                 var groupName = "Unknown";
@@ -254,29 +253,48 @@ namespace WhiteCore.Modules.Currency
                 if (groupInfo != null)
                     groupName = groupInfo.GroupName;
 
+                // record the group transaction
                 if (m_config.SaveTransactionLogs)
-                    AddGroupTransactionRecord(
-                        (transactionID == UUID.Zero ? UUID.Random() : transactionID), 
+                    AddGroupTransactionRecord (
+                        (transactionID == UUID.Zero ? UUID.Random () : transactionID),
                         description,
                         groupID,
-                        groupName, 
+                        groupName,
                         userId,
-                        (agentAccount == null ? "System" : agentAccount.Name),
+                        (agentAccount.Valid ? agentAccount.Name : "System"),
                         amount,
-                        type,
+                        transType,
                         gb.TotalTierCredits,        // assume this it the 'total credit for the group but it may be land tier credit??
-                        (int) fromBalance,          // this will be zero if this isa system <> group transaction
+                        (int)userBalance,          // this will be zero if this isa system <> group transaction
                         toObjectName,
                         fromObjectName,
                         (agentInfo == null ? UUID.Zero : agentInfo.CurrentRegionID)
                     );
 
-                if (agentInfo != null && agentInfo.IsOnline)
-                {
-                    SendUpdateMoneyBalanceToClient(userId, transactionID, agentInfo.CurrentRegionURI, fromBalance,
-                    "You paid " + groupName + " " +InWorldCurrency + amount);
+                var paidToMsg = "";
+                var paidFromMsg = "";
+                var paidDesc = (description == "" ? "" : " for " + description);
+
+                if (amount > 0) {
+                    paidToMsg =
+                        (groupInfo == null ? " received " : groupName + " paid you ") + InWorldCurrency + amount + paidDesc;
+                    paidFromMsg = "You paid " +
+                        (groupInfo == null ? "" : groupName + " ") + InWorldCurrency + amount + paidDesc;
+                }
+
+                if (agentInfo != null) {
+                    if (payUser) {
+                        if (agentInfo.IsOnline) {
+                            SendUpdateMoneyBalanceToClient (userId, transactionID, agentInfo.CurrentRegionURI, userBalance, paidToMsg);
+                        }
+                    } else {
+                        if (fromObjectID != UUID.Zero) {
+                            SendUpdateMoneyBalanceToClient (fromObjectID, transactionID, agentInfo.CurrentRegionURI, (uint)amount, paidFromMsg);
+                        }
+                    }
                 }
             }
+
             return true;
         }
 
@@ -609,11 +627,6 @@ namespace WhiteCore.Modules.Currency
             UserCurrencyUpdate(toCurrency, true);
 
             //Must send out notifications to the users involved so that they get the updates
-            if (m_userInfoService == null)
-            {
-                m_userInfoService = m_registry.RequestModuleInterface<IAgentInfoService>();
-                m_userAccountService = m_registry.RequestModuleInterface<IUserAccountService> ();
-            }
             if (m_userInfoService != null)
             {
                 UserInfo toUserInfo = m_userInfoService.GetUserInfo(toID.ToString());
@@ -631,8 +644,8 @@ namespace WhiteCore.Modules.Currency
                         type,
                         toCurrency.Amount, 
                         (fromCurrency == null ? 0 : fromCurrency.Amount),
-                        (toAccount == null ? "System" : toAccount.Name), 
-                        (fromAccount == null ? "System" : fromAccount.Name),
+                        (toAccount.Valid ? toAccount.Name : "System"), 
+                        (fromAccount.Valid ? fromAccount.Name : "System"),
                         toObjectName,
                         fromObjectName,
                         (fromUserInfo == null ? UUID.Zero : fromUserInfo.CurrentRegionID)
@@ -644,10 +657,10 @@ namespace WhiteCore.Modules.Currency
 
                 if (amount > 0) {
                     paidFromMsg = 
-                        (fromAccount == null ? " received " : fromAccount.Name + " paid you ") +
+                        (fromAccount.Valid ? (fromAccount.Name + " paid you ") : " received ") +
                         InWorldCurrency + amount + paidDesc;
                     paidToMsg = "You paid " +
-                        (toAccount == null ? "" : toAccount.Name + " ") +
+                        (toAccount.Valid ? toAccount.Name + " " : "") +
                         InWorldCurrency + amount + paidDesc;
                 }
 
@@ -655,7 +668,7 @@ namespace WhiteCore.Modules.Currency
                 {
                     if (toUserInfo != null && toUserInfo.IsOnline)
                         SendUpdateMoneyBalanceToClient(toID, transactionID, toUserInfo.CurrentRegionURI, toCurrency.Amount, 
-                                                       toAccount == null ? "" : (toAccount.Name + " paid you ") +
+                                                       toAccount.Valid ? (toAccount.Name + " paid you ") : "" +
                                                        InWorldCurrency + amount + paidDesc);
                 } else
                 {
@@ -780,8 +793,8 @@ namespace WhiteCore.Modules.Currency
         void UserCurrencyCreate(UUID agentId)
         {
 			// Check if this agent has a user account, if not assume its a bot and exit
-			UserAccount account = m_registry.RequestModuleInterface<IUserAccountService>().GetUserAccount(new List<UUID> { UUID.Zero }, agentId);
-            if (account != null)
+            UserAccount userAcct = m_registry.RequestModuleInterface<IUserAccountService>().GetUserAccount(new List<UUID> { UUID.Zero }, agentId);
+            if (userAcct.Valid)
             {
                 GD.Insert(_REALM, new object[] {agentId.ToString(), 0, 0, 0, 0, 0});
             }
@@ -815,7 +828,7 @@ namespace WhiteCore.Modules.Currency
             int.TryParse (queryResults [4], out gb.ObjectFee);
             int.TryParse (queryResults [5], out gb.ParcelDirectoryFee);
             int.TryParse (queryResults [6], out gb.TotalTierCredits);
-            int.TryParse (queryResults [7], out gb.TotalTierDebit);
+            int.TryParse (queryResults [7], out gb.TotalTierDebits);
 
             gb.StartingDate = DateTime.UtcNow;
 
@@ -875,7 +888,7 @@ namespace WhiteCore.Modules.Currency
                     { "ObjectFee", gb.ObjectFee },
                     { "ParcelDirectoryFee", gb.ParcelDirectoryFee },
                     { "TotalTierCredits", gb.TotalTierCredits },
-                    { "TotalTierDebit", gb.TotalTierDebit },
+                    { "TotalTierDebits", gb.TotalTierDebits },
                     { "Balance", gb.Balance }
                 },
                     null,
@@ -891,7 +904,7 @@ namespace WhiteCore.Modules.Currency
                 GD.Update (_GROUPREALM,
                     new Dictionary<string, object> {
                     { "TotalTierCredits", gb.TotalTierCredits },
-                    { "TotalTierDebit", gb.TotalTierDebit }
+                    { "TotalTierDebits", gb.TotalTierDebits }
                 },
                     null,
                     new QueryFilter {

@@ -5,8 +5,8 @@ branches:
 install:
 - git submodule update --init --recursive
 build_script:
-- Prebuild.exe /target vs2010 /targetframework v4_5 /conditionals ISWIN;NET_4_5
-- msbuild WhiteCore.sln /p:Configuration=Debug  /p:DefineConstants="ISWIN;NET_4_5"
+- Prebuild.exe /target vs2015 /targetframework v4_6 /conditionals ISWIN;NET_4_6
+- msbuild WhiteCore.sln /p:Configuration=Debug  /p:DefineConstants="ISWIN;NET_4_6"
 artifacts:
 - path: WhiteCoreSim\bin
   name: WhiteCore

@@ -126,8 +126,8 @@ namespace WhiteCore.Modules.InventoryAccess
         void ClientRezRestoreToWorld (IClientAPI remoteClient, UUID itemID, UUID groupID)
         {
             // Restore object to previous location
-            var userInfo = m_scene.UserAccountService.GetUserAccount (null, remoteClient.AgentId);
-            if (userInfo != null) {
+            var userAcct = m_scene.UserAccountService.GetUserAccount (null, remoteClient.AgentId);
+            if (userAcct.Valid) {
                 InventoryItemBase item = m_scene.InventoryService.GetItem (remoteClient.AgentId, itemID);
 
                 if (item != null) {

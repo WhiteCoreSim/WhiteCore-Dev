@@ -96,7 +96,7 @@ namespace WhiteCore.Simulation.Base
         Remove
     }
 
-    public class IniMigrator
+    public static class IniMigrator
     {
         public static void UpdateIniFile (string fileName, string handler, string [] names, string [] values,
                                          MigratorAction [] actions)

@@ -103,8 +103,9 @@ namespace WhiteCore.Modules.Ban
     {
         #region Declares
 
+        readonly IPresenceInfo presenceInfo;
+
         AllowLevel GrieferAllowLevel = AllowLevel.AllowCleanOnly;
-        IPresenceInfo presenceInfo;
         IUserAccountService m_accountService;
         List<string> m_bannedViewers = new List<string> ();
         List<string> m_allowedViewers = new List<string> ();
@@ -279,12 +280,12 @@ namespace WhiteCore.Modules.Ban
         protected void UserInfo (IScene scene, string [] cmdparams)
         {
             string name = MainConsole.Instance.Prompt ("Name: ");
-            UserAccount account = m_accountService.GetUserAccount (null, name);
-            if (account == null) {
+            UserAccount userAcct = m_accountService.GetUserAccount (null, name);
+            if (!userAcct.Valid) {
                 MainConsole.Instance.Warn ("Cannot find user.");
                 return;
             }
-            UUID AgentID = account.PrincipalID;
+            UUID AgentID = userAcct.PrincipalID;
             PresenceInfo info = GetInformation (AgentID);
             if (info == null) {
                 MainConsole.Instance.Warn ("Cannot find user.");
@@ -296,13 +297,13 @@ namespace WhiteCore.Modules.Ban
         protected void BlockUser (IScene scene, string [] cmdparams)
         {
             string name = MainConsole.Instance.Prompt ("Name: ");
-            UserAccount account = m_accountService.GetUserAccount (null, name);
-            if (account == null) {
+            UserAccount userAcct = m_accountService.GetUserAccount (null, name);
+            if (!userAcct.Valid) {
                 MainConsole.Instance.Warn ("Cannot find user.");
                 return;
             }
 
-            UUID agentID = account.PrincipalID;
+            UUID agentID = userAcct.PrincipalID;
             PresenceInfo info = GetInformation (agentID);
             if (info == null) {
                 MainConsole.Instance.Warn ("Cannot find user.");
@@ -332,13 +333,13 @@ namespace WhiteCore.Modules.Ban
         protected void UnBlockUser (IScene scene, string [] cmdparams)
         {
             string name = MainConsole.Instance.Prompt ("Name: ");
-            UserAccount account = m_accountService.GetUserAccount (null, name);
-            if (account == null) {
+            UserAccount userAcct = m_accountService.GetUserAccount (null, name);
+            if (!userAcct.Valid) {
                 MainConsole.Instance.Warn ("Cannot find user.");
                 return;
             }
 
-            UUID agentID = account.PrincipalID;
+            UUID agentID = userAcct.PrincipalID;
             PresenceInfo info = GetInformation (agentID);
             if (info == null) {
                 MainConsole.Instance.Warn ("Cannot find user.");
@@ -362,12 +363,12 @@ namespace WhiteCore.Modules.Ban
         protected void SetUserInfo (IScene scene, string [] cmdparams)
         {
             string name = MainConsole.Instance.Prompt ("Name: ");
-            UserAccount account = m_accountService.GetUserAccount (null, name);
-            if (account == null) {
+            UserAccount userAcct = m_accountService.GetUserAccount (null, name);
+            if (!userAcct.Valid) {
                 MainConsole.Instance.Warn ("Cannot find user.");
                 return;
             }
-            UUID agentID = account.PrincipalID;
+            UUID agentID = userAcct.PrincipalID;
             PresenceInfo info = GetInformation (agentID);
             if (info == null) {
                 MainConsole.Instance.Warn ("Cannot find user.");
@@ -388,9 +389,9 @@ namespace WhiteCore.Modules.Ban
 
         void DisplayUserInfo (PresenceInfo info)
         {
-            UserAccount account = m_accountService.GetUserAccount (null, info.AgentID);
-            if (account != null)
-                MainConsole.Instance.Info ("User Info for " + account.Name);
+            UserAccount userAcct = m_accountService.GetUserAccount (null, info.AgentID);
+            if (userAcct.Valid)
+                MainConsole.Instance.Info ("User Info for " + userAcct.Name);
             else
                 MainConsole.Instance.Info ("User Info for " + info.AgentID);
             MainConsole.Instance.Info ("   AgentID: " + info.AgentID);
@@ -404,9 +405,9 @@ namespace WhiteCore.Modules.Ban
             if (info.KnownAlts.Count > 0) {
                 MainConsole.Instance.Info ("   Known Alt Accounts: ");
                 foreach (var acc in info.KnownAlts) {
-                    account = m_accountService.GetUserAccount (null, UUID.Parse (acc));
-                    if (account != null)
-                        MainConsole.Instance.Info ("   " + account.Name);
+                    userAcct = m_accountService.GetUserAccount (null, UUID.Parse (acc));
+                    if (userAcct.Valid)
+                        MainConsole.Instance.Info ("   " + userAcct.Name);
                     else
                         MainConsole.Instance.Info ("   " + acc);
                 }

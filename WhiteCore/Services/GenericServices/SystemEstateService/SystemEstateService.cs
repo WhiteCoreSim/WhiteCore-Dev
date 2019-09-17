@@ -98,14 +98,8 @@ namespace WhiteCore.Services.GenericServices.SystemEstateService
             m_accountService = m_registry.RequestModuleInterface<IUserAccountService> ();
             m_estateConnector = Framework.Utilities.DataManager.RequestPlugin<IEstateConnector> ();
 
-            // these are only valid if we are local
+            // only valid if we are local
             if (m_accountService.IsLocalConnector) {
-                // check and/or create default system estates
-                CheckSystemEstateInfo (Constants.SystemEstateID, systemEstateName, (UUID)Constants.RealEstateOwnerUUID);
-                CheckSystemEstateInfo (Constants.MainlandEstateID, mainlandEstateName, (UUID)Constants.GovernorUUID);
-
-                CheckGridOwnerEstate ();
-
                 AddCommands ();
             }
 
@@ -184,6 +178,15 @@ namespace WhiteCore.Services.GenericServices.SystemEstateService
         #region systemEstate
 
         /// <summary>
+        /// Checks for valid system estates for RealEstate and Governor
+        /// </summary>
+        public void CheckSystemEstates ()
+        {
+            CheckSystemEstateInfo (Constants.SystemEstateID, systemEstateName, (UUID)Constants.RealEstateOwnerUUID);
+            CheckSystemEstateInfo (Constants.MainlandEstateID, mainlandEstateName, (UUID)Constants.GovernorUUID);
+        }
+
+        /// <summary>
         /// Checks for a valid system estate. Adds or corrects if required
         /// </summary>
         /// <param name="estateID">Estate I.</param>
@@ -199,10 +202,9 @@ namespace WhiteCore.Services.GenericServices.SystemEstateService
                 return;
 
             ISystemAccountService sysAccounts = m_registry.RequestModuleInterface<ISystemAccountService> ();
-            EstateSettings ES;
 
             // check for existing estate name in case of estate ID change
-            ES = m_estateConnector.GetEstateSettings (estateName);
+            EstateSettings ES = m_estateConnector.GetEstateSettings (estateName);
             if (ES != null) {
                 // ensure correct ID
                 if (ES.EstateID != estateID)
@@ -220,7 +222,6 @@ namespace WhiteCore.Services.GenericServices.SystemEstateService
                         sysAccounts.GetSystemEstateOwnerName (estateID));
                 }
 
-
                 // in case of configuration changes
                 if (ES.EstateName != estateName) {
                     ES.EstateName = estateName;
@@ -228,24 +229,30 @@ namespace WhiteCore.Services.GenericServices.SystemEstateService
                     MainConsole.Instance.Info ("[EstateService]: The system Estate name has been updated to " + estateName);
                 }
 
+                // coverity flagged a resource leak here previously
+                ES = null;
                 return;
             }
 
             // Create a new estate
+            // coverity should flag a leak here for ES if ES.EstateID == 0
+            // ES = null;
 
-            ES = new EstateSettings ();
-            ES.EstateName = estateName;
-            ES.EstateOwner = ownerUUID;
+            var newES = new EstateSettings ();
+            newES.EstateName = estateName;
+            newES.EstateOwner = ownerUUID;
 
-            ES.EstateID = (uint)m_estateConnector.CreateNewEstate (ES);
-            if (ES.EstateID == 0) {
-                MainConsole.Instance.Warn ("There was an error in creating the system estate: " + ES.EstateName);
+            newES.EstateID = (uint)m_estateConnector.CreateNewEstate (newES);
+            if (newES.EstateID == 0) {
+                MainConsole.Instance.Warn ("There was an error in creating the system estate: " + newES.EstateName);
                 //EstateName holds the error. See LocalEstateConnector for more info.
 
             } else {
                 MainConsole.Instance.InfoFormat ("[EstateService]: The estate '{0}' owned by '{1}' has been created.",
-                    ES.EstateName, sysAccounts.GetSystemEstateOwnerName (estateID));
+                    newES.EstateName, sysAccounts.GetSystemEstateOwnerName (estateID));
             }
+
+            // coverity should flag this as a resource leak as newES is not released - to be removed when verified :)
         }
 
         /// <summary>
@@ -280,7 +287,7 @@ namespace WhiteCore.Services.GenericServices.SystemEstateService
         /// <summary>
         /// Checks for the grid owner estate on initial startup.
         /// </summary>
-        void CheckGridOwnerEstate ()
+        public void CheckGridOwnerEstate ()
         {
             // these should have already been checked but just make sure...
             if (m_estateConnector == null)
@@ -304,14 +311,16 @@ namespace WhiteCore.Services.GenericServices.SystemEstateService
             var userAccts = accountService.GetUserAccounts(null, "*");
             UUID gridOwnerId = UUID.Zero;
             foreach (var acct in userAccts) {
-                if (!Utilities.IsSystemUser (acct.PrincipalID))
+                if (acct.Valid && !Utilities.IsSystemUser (acct.PrincipalID))
                     gridOwnerId = acct.PrincipalID;                 // we should have only one non system user
             }
             var gridOwnerAcct = accountService.GetUserAccount (null, gridOwnerId);
             MainConsole.Instance.InfoFormat("[EstateService]: The estate for '{0}' needs to be created.", gridOwnerAcct.Name);
 
             // get estate name
-            var estateName = MainConsole.Instance.Prompt ("Estate name", "Owner's Estate");
+            MainConsole.Instance.CleanInfo ("");
+            MainConsole.Instance.WarnFormat ("Please enter the name for {0}'s estate", gridOwnerAcct.Name);
+            var estateName = MainConsole.Instance.Prompt (gridOwnerAcct.Name + "'s estate name", "Owner's Estate");
             if (estateName == "")
                 estateName = "Owner's Estate";
 
@@ -343,7 +352,7 @@ namespace WhiteCore.Services.GenericServices.SystemEstateService
             IEstateConnector estateConnector = Framework.Utilities.DataManager.RequestPlugin<IEstateConnector> ();
 
             var regions = gridService.GetRegionsByName (null, "", null, null);
-            if (regions == null || regions.Count < 1)
+            if (regions.Count == 0)
                 return;
 
             int updated = 0;
@@ -400,19 +409,18 @@ namespace WhiteCore.Services.GenericServices.SystemEstateService
             }
 
             // check the System estate owner details
-            UserAccount uinfo;
-            uinfo = m_accountService.GetUserAccount (null, UUID.Parse (Constants.RealEstateOwnerUUID));
-            if (uinfo == null) {
+            UserAccount userAcct = m_accountService.GetUserAccount (null, UUID.Parse (Constants.RealEstateOwnerUUID));
+            if (!userAcct.Valid) {
                 MainConsole.Instance.Warn ("[EstateService]: The system estate user does not exist yet!");
                 MainConsole.Instance.Warn ("[EstateService]: This account will be created automatically");
             }
 
-            if ((uinfo != null) && (uinfo.Name != sysAccounts.SystemEstateOwnerName)) {
+            if ((userAcct.Valid) && (userAcct.Name != sysAccounts.SystemEstateOwnerName)) {
                 //string[] name = uinfo.Name.Split (' ');
                 //uinfo.FirstName = name [0];
                 //uinfo.LastName = name [1];
-                uinfo.Name = sysAccounts.SystemEstateOwnerName;
-                m_accountService.StoreUserAccount (uinfo);
+                userAcct.Name = sysAccounts.SystemEstateOwnerName;
+                m_accountService.StoreUserAccount (userAcct);
                 update = true;
             }
 
@@ -459,8 +467,8 @@ namespace WhiteCore.Services.GenericServices.SystemEstateService
 
 
             // check to make sure the user exists
-            UserAccount account = accountService.GetUserAccount (null, estateOwner);
-            if (account == null) {
+            UserAccount userAcct = accountService.GetUserAccount (null, estateOwner);
+            if (!userAcct.Valid) {
                 MainConsole.Instance.WarnFormat ("[User account service]: The user, '{0}' was not found!", estateOwner);
 
                 // temporary fix until remote user creation can be implemented
@@ -475,9 +483,9 @@ namespace WhiteCore.Services.GenericServices.SystemEstateService
 
                     accountService.CreateUser (estateOwner, Util.Md5Hash (password), email);
                     // CreateUser will tell us success or problem
-                    account = accountService.GetUserAccount (null, estateOwner);
+                    userAcct = accountService.GetUserAccount (null, estateOwner);
 
-                    if (account == null) {
+                    if (!userAcct.Valid) {
                         MainConsole.Instance.ErrorFormat (
                             "[EstateService]: Unable to store account details.\n   If this simulator is connected to a grid, create the estate owner account first at the grid level.");
                         return;
@@ -491,7 +499,7 @@ namespace WhiteCore.Services.GenericServices.SystemEstateService
             }
 
             // check for bogies...
-            if (Utilities.IsSystemUser (account.PrincipalID)) {
+            if (Utilities.IsSystemUser (userAcct.PrincipalID)) {
                 MainConsole.Instance.Info ("[EstateService]: Tsk, tsk.  System users should not be used as estate managers!");
                 return;
             }
@@ -500,7 +508,7 @@ namespace WhiteCore.Services.GenericServices.SystemEstateService
             // Create a new estate
             var ES = new EstateSettings ();
             ES.EstateName = estateName;
-            ES.EstateOwner = account.PrincipalID;
+            ES.EstateOwner = userAcct.PrincipalID;
 
             ES.EstateID = (uint)estateConnector.CreateNewEstate (ES);
             if (ES.EstateID == 0) {
@@ -592,7 +600,7 @@ namespace WhiteCore.Services.GenericServices.SystemEstateService
                 var newOwner = "Unknown";
                 UUID estateOwnerID = ES.EstateOwner;
                 ownerAccount = accountService.GetUserAccount (null, estateOwnerID);
-                if (ownerAccount != null)
+                if (ownerAccount.Valid)
                     newOwner = ownerAccount.Name;
                 estateOwner = MainConsole.Instance.Prompt ("New owner for this estate", newOwner);
             } else {
@@ -603,7 +611,7 @@ namespace WhiteCore.Services.GenericServices.SystemEstateService
 
             // check to make sure the user exists
             ownerAccount = accountService.GetUserAccount (null, estateOwner);
-            if (ownerAccount == null) {
+            if (!ownerAccount.Valid) {
                 MainConsole.Instance.WarnFormat ("[User Account Service]: The user, '{0}' was not found!", estateOwner);
                 return;
             }
@@ -802,6 +810,9 @@ namespace WhiteCore.Services.GenericServices.SystemEstateService
                         regionName, sysEstateInfo.SystemEstateName);
                     UpdateConsoleRegionEstate (regionName, ES);
                 }
+
+            // coverity flagged a resource leak here previously
+            ES = null;
 
         }
 

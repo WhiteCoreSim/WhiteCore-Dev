@@ -849,6 +849,12 @@ msgstr "News Manager"
 msgid "NewsTitleText"
 msgstr "News Title"
 
+msgid "Next3Days"
+msgstr "Next 3 Days"
+
+msgid "Next7Days"
+msgstr "Next 7 Days"
+
 msgid "Next10Hours"
 msgstr "Next 10 hours"
 

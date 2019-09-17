@@ -55,11 +55,9 @@ namespace WhiteCore.BotManager.AStar
         /// <summary>
         ///     The estimated cost to the goal from here.
         /// </summary>
-        public double GoalEstimate
-        {
+        public double GoalEstimate {
             set { FGoalEstimate = value; }
-            get
-            {
+            get {
                 Calculate();
                 return (FGoalEstimate);
             }
@@ -68,18 +66,15 @@ namespace WhiteCore.BotManager.AStar
         /// <summary>
         ///     The cost plus the estimated cost to the goal from here.
         /// </summary>
-        public double TotalCost
-        {
+        public double TotalCost {
             get { return (Cost + GoalEstimate); }
         }
 
         /// <summary>
         ///     The goal node.
         /// </summary>
-        public AStarNode GoalNode
-        {
-            set
-            {
+        public AStarNode GoalNode {
+            set {
                 FGoalNode = value;
                 Calculate();
             }
@@ -96,8 +91,7 @@ namespace WhiteCore.BotManager.AStar
         /// <param name="aParent">The node's parent</param>
         /// <param name="aGoalNode">The goal node</param>
         /// <param name="aCost">The accumulative cost until now</param>
-        public AStarNode(AStarNode aParent, AStarNode aGoalNode, double aCost)
-        {
+        public AStarNode(AStarNode aParent, AStarNode aGoalNode, double aCost) {
             Parent = aParent;
             Cost = aCost;
             GoalNode = aGoalNode;
@@ -111,8 +105,7 @@ namespace WhiteCore.BotManager.AStar
         ///     Determines whether the current node is the goal.
         /// </summary>
         /// <returns>Returns true if current node is the goal</returns>
-        public bool IsGoal()
-        {
+        public bool IsGoal() {
             return IsSameState(FGoalNode);
         }
 
@@ -125,16 +118,14 @@ namespace WhiteCore.BotManager.AStar
         /// </summary>
         /// <param name="aNode">AStarNode to compare the current node to</param>
         /// <returns>Returns true if they are the same state</returns>
-        public virtual bool IsSameState(AStarNode aNode)
-        {
+        public virtual bool IsSameState(AStarNode aNode) {
             return false;
         }
 
         /// <summary>
         ///     Calculates the estimated cost for the remaining trip to the goal.
         /// </summary>
-        public virtual void Calculate()
-        {
+        public virtual void Calculate() {
             FGoalEstimate = 0.0f;
         }
 
@@ -142,21 +133,18 @@ namespace WhiteCore.BotManager.AStar
         ///     Gets all successors nodes from the current node and adds them to the successor list
         /// </summary>
         /// <param name="aSuccessors">List in which the successors will be added</param>
-        public virtual void GetSuccessors(ArrayList aSuccessors)
-        {
+        public virtual void GetSuccessors(ArrayList aSuccessors) {
         }
 
         #endregion
 
         #region Overridden Methods
 
-        public override bool Equals(object obj)
-        {
-            return IsSameState((AStarNode) obj);
+        public override bool Equals(object obj) {
+            return IsSameState((AStarNode)obj);
         }
 
-        public override int GetHashCode()
-        {
+        public override int GetHashCode() {
             return base.GetHashCode();
         }
 
@@ -164,9 +152,8 @@ namespace WhiteCore.BotManager.AStar
 
         #region IComparable Members
 
-        public int CompareTo(object obj)
-        {
-            return (-TotalCost.CompareTo(((AStarNode) obj).TotalCost));
+        public int CompareTo(object obj) {
+            return (-TotalCost.CompareTo(((AStarNode)obj).TotalCost));
         }
 
         #endregion
@@ -196,13 +183,11 @@ namespace WhiteCore.BotManager.AStar
         /// <summary>
         ///     Holds the solution after path finding is done. <see>FindPath()</see>
         /// </summary>
-        public ArrayList Solution
-        {
+        public ArrayList Solution {
             get { return FSolution; }
         }
 
-        public bool PathPossible
-        {
+        public bool PathPossible {
             get { return m_pathPossible; }
         }
 
@@ -210,8 +195,7 @@ namespace WhiteCore.BotManager.AStar
 
         #region Constructors
 
-        public AStar()
-        {
+        public AStar() {
             FOpenList = new Heap();
             FClosedList = new Heap();
             FSuccessors = new ArrayList();
@@ -226,11 +210,9 @@ namespace WhiteCore.BotManager.AStar
         ///     Prints all the nodes in a list
         /// </summary>
         /// <param name="aNodeList">List to print</param>
-        void PrintNodeList(object aNodeList)
-        {
+        void PrintNodeList(object aNodeList) {
             Console.WriteLine("Node list:");
-            foreach (AStarNode n in (aNodeList as IEnumerable))
-            {
+            foreach (AStarNode n in (aNodeList as IEnumerable)) {
                 //n.PrintNodeInfo();
             }
             Console.WriteLine("=====");
@@ -245,23 +227,19 @@ namespace WhiteCore.BotManager.AStar
         /// </summary>
         /// <param name="aStartNode">Start node</param>
         /// <param name="aGoalNode">Goal node</param>
-        public void FindPath(AStarNode aStartNode, AStarNode aGoalNode)
-        {
+        public void FindPath(AStarNode aStartNode, AStarNode aGoalNode) {
             FStartNode = aStartNode;
             FGoalNode = aGoalNode;
 
             FOpenList.Add(FStartNode);
             int i = 0;
-            while (FOpenList.Count > 0 && i < 2000)
-            {
+            while (FOpenList.Count > 0 && i < 2000) {
                 // Get the node with the lowest TotalCost
-                AStarNode NodeCurrent = (AStarNode) FOpenList.Pop();
+                AStarNode NodeCurrent = (AStarNode)FOpenList.Pop();
 
                 // If the node is the goal copy the path to the solution array
-                if (NodeCurrent.IsGoal())
-                {
-                    while (NodeCurrent != null)
-                    {
+                if (NodeCurrent.IsGoal()) {
+                    while (NodeCurrent != null) {
                         FSolution.Insert(0, NodeCurrent);
                         NodeCurrent = NodeCurrent.Parent;
                     }
@@ -270,13 +248,12 @@ namespace WhiteCore.BotManager.AStar
 
                 // Get successors to the current node
                 NodeCurrent.GetSuccessors(FSuccessors);
-                foreach (AStarNode NodeSuccessor in FSuccessors)
-                {
+                foreach (AStarNode NodeSuccessor in FSuccessors) {
                     // Test if the current successor node is on the open list, if it is and
                     // the TotalCost is higher, we will throw away the current successor.
                     AStarNode NodeOpen = null;
                     if (FOpenList.Contains(NodeSuccessor))
-                        NodeOpen = (AStarNode) FOpenList[FOpenList.IndexOf(NodeSuccessor)];
+                        NodeOpen = (AStarNode)FOpenList[FOpenList.IndexOf(NodeSuccessor)];
                     if ((NodeOpen != null) && (NodeSuccessor.TotalCost > NodeOpen.TotalCost))
                         continue;
 
@@ -284,7 +261,7 @@ namespace WhiteCore.BotManager.AStar
                     // the TotalCost is higher, we will throw away the current successor.
                     AStarNode NodeClosed = null;
                     if (FClosedList.Contains(NodeSuccessor))
-                        NodeClosed = (AStarNode) FClosedList[FClosedList.IndexOf(NodeSuccessor)];
+                        NodeClosed = (AStarNode)FClosedList[FClosedList.IndexOf(NodeSuccessor)];
                     if ((NodeClosed != null) && (NodeSuccessor.TotalCost > NodeClosed.TotalCost))
                         continue;
 
@@ -302,8 +279,7 @@ namespace WhiteCore.BotManager.AStar
                 i++;
             }
 
-            if (i == 2000)
-            {
+            if (i == 2000) {
                 m_pathPossible = false;
             }
         }

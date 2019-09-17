@@ -596,9 +596,8 @@ namespace WhiteCore.FileBasedServices.AssetService
                 var accountService = m_registry.RequestModuleInterface<IUserAccountService> ();
                 if (accountService != null)
                 {
-                    var account = accountService.GetUserAccount (null, asset.CreatorID);
-                    if (account != null)
-                        creatorName = account.Name;
+                    var userAcct = accountService.GetUserAccount (null, asset.CreatorID);
+                    creatorName = userAcct.Name;
                 }
             }
 

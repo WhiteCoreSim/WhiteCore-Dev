@@ -294,7 +294,7 @@ namespace WhiteCore.Framework.ConsoleFramework
 
         void t_Elapsed (object sender, ElapsedEventArgs e)
         {
-            //Tell the GUI that we are still here and it needs to keep checking
+            // Tell the GUI that we are still here and it needs to keep checking
             Console.Write ((char)0);
         }
 

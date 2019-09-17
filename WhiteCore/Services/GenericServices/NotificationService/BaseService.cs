@@ -56,8 +56,8 @@ namespace WhiteCore.Services
 
         void SetUpConsole (IConfigSource config, ISimulationBase simbase)
         {
-            List<ICommandConsole> Plugins = WhiteCoreModuleLoader.PickupModules<ICommandConsole> ();
-            foreach (ICommandConsole plugin in Plugins) {
+            List<ICommandConsole> plugins = WhiteCoreModuleLoader.PickupModules<ICommandConsole> ();
+            foreach (ICommandConsole plugin in plugins) {
                 plugin.Initialize (config, simbase);
             }
 

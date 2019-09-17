@@ -109,7 +109,7 @@ namespace WhiteCore.Modules.Avatar.Groups
                     List<GroupAccountHistory> history = moneyModule.GetGroupTransactions (groupID, agentID, currentInterval,
                                                            intervalDays);
 
-                    //We don't want payments, we only want stipends which we sent to users
+                    // We don't want payments, we only want stipends which we sent to users
                     history = (
                         from h in history
                         where h.Stipend
@@ -126,6 +126,7 @@ namespace WhiteCore.Modules.Avatar.Groups
                         intervalDays,
                         Util.BuildYMDDateString (groupBalance.StartingDate.AddDays (-currentInterval * intervalDays)),
                         history.ToArray ());
+                    groupBalance = null;
                 } else
                     client.SendGroupAccountingDetails (client, groupID, transactionID, sessionID, 0, currentInterval,
                         intervalDays,
@@ -194,7 +195,7 @@ namespace WhiteCore.Modules.Avatar.Groups
                         groupID,
                         requestID,
                         groupBalance.Balance,
-                        groupBalance.TotalTierDebit,
+                        groupBalance.TotalTierDebits,
                         groupBalance.TotalTierCredits,
                         Util.BuildYMDDateString (groupBalance.StartingDate.AddDays (-currentInterval * intervalDays)),
                         currentInterval,

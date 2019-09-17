@@ -78,8 +78,8 @@ namespace WhiteCore.Modules.Web
                 if (estate != null) {
                     vars.Add ("OwnerUUID", estate.EstateOwner);
                     var estateOwnerAccount = webInterface.Registry.RequestModuleInterface<IUserAccountService> ().
-                    GetUserAccount (null, estate.EstateOwner);
-                    vars.Add ("OwnerName", estateOwnerAccount == null ? "No account found" : estateOwnerAccount.Name);
+                                                GetUserAccount (null, estate.EstateOwner);
+                    vars.Add ("OwnerName", estateOwnerAccount.Valid ? estateOwnerAccount.Name : "No account found");
                 } else {
                     vars.Add ("OwnerUUID", "Unknown");
                     vars.Add ("OwnerName", "Unknown");
@@ -104,17 +104,18 @@ namespace WhiteCore.Modules.Web
                 IUserAccountService userService = webInterface.Registry.RequestModuleInterface<IUserAccountService> ();
                 if (agentInfoService != null) {
                     List<UserInfo> usersInRegion = agentInfoService.GetUserInfos (region.RegionID);
-                    vars.Add ("NumberOfUsersInRegion", usersInRegion != null ? usersInRegion.Count : 0);
+                    vars.Add ("NumberOfUsersInRegion", usersInRegion.Count);
+
                     List<Dictionary<string, object>> users = new List<Dictionary<string, object>> ();
                     if (userService != null) {
                         foreach (var client in usersInRegion) {
-                            UserAccount account = userService.GetUserAccount (null, (UUID)client.UserID);
-                            if (account == null)
+                            UserAccount userAcct = userService.GetUserAccount (null, (UUID)client.UserID);
+                            if (!userAcct.Valid)    // ?? maybe we should just show as 'Unknown' -greythane- 20190730
                                 continue;
                             Dictionary<string, object> user = new Dictionary<string, object> ();
                             user.Add ("UserNameText", translator.GetTranslatedString ("UserNameText"));
                             user.Add ("UserUUID", client.UserID);
-                            user.Add ("UserName", account.Name);
+                            user.Add ("UserName", userAcct.Name);
                             users.Add (user);
                         }
                     }
@@ -141,11 +142,11 @@ namespace WhiteCore.Modules.Web
                             webInterface.Registry.RequestModuleInterface<IUserAccountService>();
                         if (accountService != null)
                         {
-                            var account = accountService.GetUserAccount(null, p.OwnerID);
-                            if (account == null)
+                            var ownerAcct = accountService.GetUserAccount(null, p.OwnerID);
+                            if (!ownerAcct.Valid)
                                 parcel.Add("ParcelOwnerName", translator.GetTranslatedString("NoAccountFound"));
                             else
-                                parcel.Add("ParcelOwnerName", account.Name);
+                                parcel.Add("ParcelOwnerName", ownerAcct.Name);
                         }
                         parcels.Add(parcel);
                     }
@@ -157,8 +158,7 @@ namespace WhiteCore.Modules.Web
                     else
                         vars.Add ("NumberOfParcelsInRegion", 0);
                 }
-                IWebHttpTextureService webTextureService = webInterface.Registry.
-                    RequestModuleInterface<IWebHttpTextureService> ();
+                IWebHttpTextureService webTextureService = webInterface.Registry.RequestModuleInterface<IWebHttpTextureService> ();
                 var regionMapURL = "../images/icons/no_terrain.jpg";
 
                 if (webTextureService != null && region.TerrainMapImage != UUID.Zero)

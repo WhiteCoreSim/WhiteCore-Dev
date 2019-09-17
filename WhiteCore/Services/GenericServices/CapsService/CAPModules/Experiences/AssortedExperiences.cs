@@ -83,7 +83,7 @@ namespace WhiteCore.Services
         }
         
         public byte[] ExperiencePreferences (string path, Stream request, OSHttpRequest httpRequest,
-                                      OSHttpResponse httpResponse)
+                                             OSHttpResponse httpResponse)
         {
         	MainConsole.Instance.DebugFormat("[ExperiencePreferences] Call = {0}", httpRequest);
             var expPref = new OSDMap();
@@ -92,7 +92,7 @@ namespace WhiteCore.Services
         }
         
         public byte[] FindExperienceByName (string path, Stream request, OSHttpRequest httpRequest,
-                                      OSHttpResponse httpResponse)
+                                            OSHttpResponse httpResponse)
         {
         	MainConsole.Instance.DebugFormat("[ExperiencePreferences] Call = {0}", httpRequest);
             var experience = new OSDMap();
@@ -110,7 +110,7 @@ namespace WhiteCore.Services
         }
         
         public byte[] GetExperienceInfo (string path, Stream request, OSHttpRequest httpRequest,
-                                      OSHttpResponse httpResponse)
+                                         OSHttpResponse httpResponse)
         {
         	MainConsole.Instance.DebugFormat("[GetExperienceInfo] Call = {0}", httpRequest);
             var expInfo = new OSDMap();
@@ -119,7 +119,7 @@ namespace WhiteCore.Services
         }
         
         public byte[] GetAdminExperiences (string path, Stream request, OSHttpRequest httpRequest,
-                                      OSHttpResponse httpResponse)
+                                           OSHttpResponse httpResponse)
         {
         	MainConsole.Instance.DebugFormat("[GetAdminExperiences] Call = {0}", httpRequest);
             var adminExp = new OSDMap();
@@ -128,7 +128,7 @@ namespace WhiteCore.Services
         }
         
         public byte[] GetCreatorExperiences (string path, Stream request, OSHttpRequest httpRequest,
-                                      OSHttpResponse httpResponse)
+                                             OSHttpResponse httpResponse)
         {
         	MainConsole.Instance.DebugFormat("[GetCreatorExperiences] Call = {0}", httpRequest);
             var creatorExp = new OSDMap();
@@ -137,7 +137,7 @@ namespace WhiteCore.Services
         }
         
         public byte[] UpdateExperience (string path, Stream request, OSHttpRequest httpRequest,
-                                      OSHttpResponse httpResponse)
+                                        OSHttpResponse httpResponse)
         {
         	MainConsole.Instance.DebugFormat("[UpdateExperience] Call = {0}", httpRequest);
             var updateExp = new OSDMap();
@@ -146,7 +146,7 @@ namespace WhiteCore.Services
         }
         
         public byte[] IsExperienceAdmin (string path, Stream request, OSHttpRequest httpRequest,
-                                      OSHttpResponse httpResponse)
+                                         OSHttpResponse httpResponse)
         {
         	MainConsole.Instance.DebugFormat("[IsExperienceAdmin] Call = {0}", httpRequest);
             var adminExp = new OSDMap();
@@ -155,7 +155,7 @@ namespace WhiteCore.Services
         }
         
         public byte[] IsExperienceContributor (string path, Stream request, OSHttpRequest httpRequest,
-                                      OSHttpResponse httpResponse)
+                                               OSHttpResponse httpResponse)
         {
         	MainConsole.Instance.DebugFormat("[IsExperienceContributor] Call = {0}", httpRequest);
             var contribExp = new OSDMap();

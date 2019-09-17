@@ -26,12 +26,12 @@
  */
 
 
+using System.Collections.Generic;
+using System.Linq;
+using Nini.Config;
 using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.Servers;
 using WhiteCore.Framework.Services;
-using Nini.Config;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace WhiteCore.Services
 {
@@ -86,8 +86,8 @@ namespace WhiteCore.Services
             if (autoConfig == null)
                 return;
 
-            //Get the urls from the config
-            foreach (string key in m_config.Configs["Configuration"].GetKeys().Where((k) => k.EndsWith("URI")))
+            // Get the urls from the config
+            foreach (string key in m_config.Configs["Configuration"].GetKeys().Where((k) => k.EndsWith ("URI", System.StringComparison.Ordinal)))
                 m_urls[key] = m_config.Configs["Configuration"].GetString(key).Replace("ServersHostname", MainServer.Instance.HostName);
         }
 
@@ -99,7 +99,7 @@ namespace WhiteCore.Services
             if (handlerConfig.GetString("ConfigurationHandler", "") != Name)
                 return;
 
-            //Register us
+            // Register us
             registry.RegisterModuleInterface<IConfigurationService>(this);
 
             FindConfiguration(m_config.Configs["Configuration"]);

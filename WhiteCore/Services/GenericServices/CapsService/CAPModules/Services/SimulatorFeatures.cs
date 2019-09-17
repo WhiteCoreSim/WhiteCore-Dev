@@ -94,7 +94,7 @@ namespace WhiteCore.Services
             // some additional features
             data ["god_names"] = GodNames (httpRequest);
 
-            //Send back data
+            // Send back data
             return OSDParser.SerializeLLSDXmlBytes (data);
         }
 
@@ -106,9 +106,9 @@ namespace WhiteCore.Services
                 return;
 
             IUserAccountService userService = m_service.Registry.RequestModuleInterface<IUserAccountService> ();
-            var gods = userService.GetUserAccounts (null, "*");
-            if (gods != null) {
-                foreach (UserAccount user in gods)
+            var godAccts = userService.GetUserAccounts (null, "*");
+            if (godAccts.Count > 0) {
+                foreach (UserAccount user in godAccts)
                     if (user.UserLevel >= Constants.USER_GOD_LIASON) {
                         m_lastNames.Add (user.LastName);
                         m_fullNames.Add (user.Name);
@@ -118,7 +118,6 @@ namespace WhiteCore.Services
 
         OSDMap GodNames (OSHttpRequest httpRequest)
         {
-
 
             OSDMap namesmap = new OSDMap ();
             if (httpRequest.Query.ContainsKey ("god_names")) {

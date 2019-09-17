@@ -1361,7 +1361,7 @@ namespace WhiteCore.Framework.PresenceInfo
 
         void SendXferPacket(ulong xferID, uint packet, byte[] data);
 
-        void SendAbortXferPacket(ulong xferID);
+        void SendAbortXferPacket(ulong xferID, int result);
 
         void SendEconomyData(float EnergyEfficiency, int ObjectCapacity, int ObjectCount, int PriceEnergyUnit,
                              int PriceGroupCreate, int PriceObjectClaim, float PriceObjectRent,

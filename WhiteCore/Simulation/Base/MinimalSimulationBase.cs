@@ -268,7 +268,13 @@ namespace WhiteCore.Simulation.Base
         /// </summary>
         public virtual void Startup()
         {
-            PrintFileToConsole (Path.Combine(DefaultDataPath, "../Config/startuplogo.txt"));
+            bool isWhiteCoreExe = AppDomain.CurrentDomain.FriendlyName == "WhiteCore.exe" ||
+			            			  AppDomain.CurrentDomain.FriendlyName == "WhiteCore.vshost.exe";
+            string configrun = BaseApplication.CheckConfigStamp (isWhiteCoreExe);
+            if (configrun != "")
+                MainConsole.Instance.Info ("Using the configuration of " + configrun);
+
+            PrintStartupLogo ();
 
             MainConsole.Instance.InfoFormat ("[Mini WhiteCore-Sim]: Starting Mini WhiteCore-Sim ({0})...",
                                              (IntPtr.Size == 4 ? "x86" : "x64"));
@@ -317,15 +323,21 @@ namespace WhiteCore.Simulation.Base
             {
                 hostName = m_config.Configs ["Network"].GetString ("HostName", "0.0.0.0");
 
+                // special case for 'localhost'.. try for an external network address then
+                if ((hostName.ToLower() == "localip"))
+                {
+                    MainConsole.Instance.Info ("[Network]: Retrieving the local system IP address");
+                    hostName = Utilities.GetLocalIp ();
+                }
+
                 if ((hostName == "") || (hostName == "0.0.0.0"))
                 {
                     MainConsole.Instance.Info ("[Network]: Retrieving the external IP address");
                     hostName = "http" + (useHTTPS ? "s" : "") + "://" + Utilities.GetExternalIp ();
                 }
             
-                //Clean it up a bit
-                if (hostName.StartsWith ("http://", StringComparison.OrdinalIgnoreCase) || hostName.StartsWith ("https://", StringComparison.OrdinalIgnoreCase))
-                    hostName = hostName.Replace ("https://", "").Replace ("http://", "");
+                // Clean it up a bit
+                hostName = hostName.Replace ("https://", "").Replace ("http://", "");
                 if (hostName.EndsWith ("/", StringComparison.Ordinal))
                     hostName = hostName.Remove (hostName.Length - 1, 1);
                 
@@ -414,15 +426,38 @@ namespace WhiteCore.Simulation.Base
         /// <param name="fileName">name of file to use as input to the console</param>
         void PrintFileToConsole(string fileName)
         {
-            if (File.Exists(fileName))
-            {
-                StreamReader readFile = File.OpenText(fileName);
-                string currentLine;
-                while ((currentLine = readFile.ReadLine()) != null)
-                {
-                    MainConsole.Instance.CleanInfo(currentLine);
+            if (File.Exists(fileName)) {
+                using (StreamReader readFile = File.OpenText(fileName)) {
+                    string currentLine;
+                    while ((currentLine = readFile.ReadLine()) != null) {
+                        MainConsole.Instance.CleanInfo(currentLine);
+                    }
                 }
             }
+        }
+
+        void PrintStartupLogo ()
+        {
+            Console.ForegroundColor = ConsoleColor.White;
+
+            var startuplogo = "../Config/Templates/startuplogo.txt";
+            if (File.Exists (startuplogo)) {
+                PrintFileToConsole (Path.Combine (m_defaultDataPath, startuplogo));
+            } else {
+
+                // default logo
+                Console.ForegroundColor = ConsoleColor.White;
+                Console.WriteLine (@" __    __ _     _ _         ___");
+                Console.WriteLine (@"/ / /\ \ \ |__ (_) |_ ___  / __\___  _ __ ___");
+                Console.WriteLine (@"\ \/  \/ / '_ \| | __/ _ \/ /  / _ \| '__/ _ \");
+                Console.WriteLine (@" \  /\  /| | | | | ||  __/ /__| (_) | | |  __/");
+                Console.WriteLine (@"  \/  \/ |_| |_|_|\__\___\____/\___/|_|  \___|");
+                Console.WriteLine (@"                                              ");
+                Console.WriteLine (@"==============================================");
+                Console.WriteLine (@"                                              ");
+                Console.ResetColor ();
+            }
+            Console.ResetColor ();
         }
 
         /// <summary>
@@ -583,7 +618,7 @@ namespace WhiteCore.Simulation.Base
 
         public virtual void HandleShowInfo(IScene scene, string[] cmd)
         {
-            PrintFileToConsole (Path.Combine (m_defaultDataPath, "../Config/startuplogo.txt"));
+            PrintStartupLogo ();
 
             MainConsole.Instance.Info("Version: " + m_version);
             MainConsole.Instance.Info("Startup directory: " + Environment.CurrentDirectory);
@@ -614,7 +649,8 @@ namespace WhiteCore.Simulation.Base
                 }
                 catch
                 {
-                    //It doesn't matter, just shut down
+                    MainConsole.Instance.Debug("Exception whilst running shutdown commands");
+                    // It doesn't matter, just shut down
                 }
                 try
                 {
@@ -623,6 +659,7 @@ namespace WhiteCore.Simulation.Base
                 }
                 catch
                 {
+                    MainConsole.Instance.Debug("Exception whilst closing modules");
                     //Just shut down already
                 }
                 try
@@ -632,6 +669,7 @@ namespace WhiteCore.Simulation.Base
                 }
                 catch
                 {
+                    MainConsole.Instance.Debug("Exception whilst closing thread pool");
                     //Just shut down already
                 }
                 try
@@ -644,6 +682,7 @@ namespace WhiteCore.Simulation.Base
                 }
                 catch
                 {
+                    MainConsole.Instance.Debug("Exception whilst stopping http server");
                     //Again, just shut down
                 }
 
@@ -658,6 +697,7 @@ namespace WhiteCore.Simulation.Base
             }
             catch
             {
+                MainConsole.Instance.Debug("Exception whilst closing down");
             }
         }
 
@@ -699,6 +739,7 @@ namespace WhiteCore.Simulation.Base
                 }
                 catch (Exception)
                 {
+                    MainConsole.Instance.Debug("Exception whilst removing PID file");
                 }
             }
         }

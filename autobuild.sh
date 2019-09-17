@@ -3,6 +3,8 @@
 #
 # March 2016
 # Rowan Deppeler <greythane@gmail.com>
+#
+# Updated Dec 2018 to use NET 4.6 framework and msbuild (included in Mono V5+)
 
 ARCH="x64"
 CONFIG="Debug"
@@ -37,7 +39,7 @@ if [ $# -gt 0 ]; then
     read -p "Configuration? (Release, Debug) [$CONFIG]: " conf
     if [[ $conf == "Release" ]]; then CONFIG="Release"; fi
     if [[ $conf == "release" ]]; then CONFIG="Release"; fi
-	
+
 	bld="No"
 	if [[ $BUILD == true ]]; then bld="Yes"; fi
 
@@ -87,24 +89,24 @@ fi
 # Configuring WhiteCore-Sim
 if ! ${VERSIONONLY:=true}; then
   echo "Configuring WhiteCore-Sim $ARCH $CONFIG build"
-  mono ./Prebuild.exe /target vs2010 /targetframework v4_5 /conditionals "LINUX;NET_4_5"
+  mono ./Prebuild.exe /target vs2015 /targetframework v4_6 /conditionals "LINUX"
 fi
 
 # Update version info
-if [ -d ".git" ]; then 
-  git log --pretty=format:"WhiteCore 0.9.4 (%cd.%h)" --date=short -n 1 > WhiteCoreSim/bin/.version; 
+if [ -d ".git" ]; then
+  git log --pretty=format:"WhiteCore 0.9.5 Dev (%cd.%h)" --date=short -n 1 > WhiteCoreSim/bin/.version;
   echo "Version info updated"
 fi
 
 # Build WhiteCore-Sim
 if $BUILD ; then
   echo Building WhiteCore-Sim
-  xbuild WhiteCore.sln /property:Configuration="$CONFIG" /property:Platform="$ARCH"
+  msbuild WhiteCore.sln /property:Configuration="$CONFIG" /property:Platform="$ARCH"
   echo Finished Building WhiteCore
   echo Thank you for choosing WhiteCore-Sim
   echo Please report any errors to our Github Issue Tracker https://github.com/WhiteCoreSim/WhiteCore-Dev/issues
 else
   echo "WhiteCore-Sim has been configured to compile with $ARCH $CONFIG options"
-  echo "To manually build, enter 'xbuild WhiteCore.sln' at the command prompt"
+  echo "To manually build, enter 'msbuild WhiteCore.sln' at the command prompt"
 
 fi

@@ -52,7 +52,7 @@ namespace WhiteCore.Services
 
         public string Authenticate (UUID principalID, string authType, string password, int lifetime)
         {
-            //Return automatically if we do not auth users
+            // Return automatically if we do not auth users
             if (!m_authenticateUsers) {
                 return GetToken (principalID, lifetime);
             }
@@ -68,7 +68,7 @@ namespace WhiteCore.Services
             } else {
                 if (authType != "UserAccount") {
                     if (data.PasswordHash == password) {
-                        //Really should be moved out in the future
+                        // Really should be moved out in the future
                         if (authType == "WebLoginKey") {
                             Remove (principalID, authType); //Only allow it to be used once
                         }

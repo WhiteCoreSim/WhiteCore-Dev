@@ -1267,8 +1267,7 @@ namespace WhiteCore.Modules
             } else {
                 //Make sure the region port is set
                 if (_regionData.RegionInfo.RegionPort == 0) {
-                    _regionData.RegionInfo.RegionPort = int.Parse (MainConsole.Instance.Prompt ("Region Port: ",
-                        (9000).ToString ()));
+                    _regionData.RegionInfo.RegionPort = int.Parse (MainConsole.Instance.Prompt ("Region Port: ", (9000).ToString ()));
                 }
                 // increase capacity if needed - 2016-11-03
                 UpdateRegionCapacity ();

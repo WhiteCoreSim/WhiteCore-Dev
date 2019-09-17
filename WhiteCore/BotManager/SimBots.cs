@@ -43,34 +43,28 @@ namespace WhiteCore.BotManager
         ///     This returns the x and y to Bot(Me) and then he passes them on to Astar and builds a list of waypoints to
         ///     Reach the goal.
         /// </summary>
-        public static double DistTarget
-        {
+        public static double DistTarget {
             get { return target; }
             set { target = value; }
         }
 
-        public static int[] CheckMap(int[,] currentMap, int xsize, int ysize, int botx, int boty, int type)
-        {
+        public static int[] CheckMap(int[,] currentMap, int xsize, int ysize, int botx, int boty, int type) {
             // This searches the current map for the number of his needs
             // It grabs the closest one and then returns it to Bot(me) so he can path to it
             // Hunger = 6   Comfort = 7   Fun = 8  Personal = 9     5 is reserved for walls
             target = 500;
-            int i = 0;
-            int j = 0;
+            int i;
+            int j;
             int[] itemLoc = new int[2];
 
-            for (j = 0; j < ysize; j++)
-            {
-                for (i = 0; i < xsize; i++)
-                {
+            for (j = 0; j < ysize; j++) {
+                for (i = 0; i < xsize; i++) {
                     int fooBar = currentMap[i, j];
-                    if (fooBar == type)
-                    {
+                    if (fooBar == type) {
                         double distx = botx - i;
                         double disty = boty - j;
-                        double goalDist = Math.Sqrt((distx*distx) + (disty*disty));
-                        if (goalDist < DistTarget)
-                        {
+                        double goalDist = Math.Sqrt((distx * distx) + (disty * disty));
+                        if (goalDist < DistTarget) {
                             target = goalDist;
                             itemLoc[0] = i;
                             itemLoc[1] = j;

@@ -1055,17 +1055,17 @@ namespace WhiteCore.Framework.Utilities
 
         public static string configDir ()
         {
-            return ".";
+            return Constants.DEFAULT_CONFIG_DIR;
         }
 
         public static string dataDir ()
         {
-            return ".";
+            return Constants.DEFAULT_DATA_DIR;
         }
 
         public static string logDir ()
         {
-            return ".";
+            return MainConsole.Instance.LogPath;
         }
 
         // From: http://coercedcode.blogspot.com/2008/03/c-generate-unique-filenames-within.html

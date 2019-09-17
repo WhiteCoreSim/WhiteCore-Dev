@@ -38,33 +38,32 @@ namespace WhiteCore.Services.DataService
 {
     public class LocalRegionConnector : ConnectorBase, IRegionConnector
     {
-        IGenericData GD;
+        IGenericData genData;
 
         #region IRegionConnector Members
 
-        public void Initialize(IGenericData GenericData, IConfigSource source, IRegistryCore simBase,
+        public void Initialize (IGenericData genericData, IConfigSource source, IRegistryCore simBase,
                                string defaultConnectionString)
         {
-            GD = GenericData;
+            genData = genericData;
 
-            if (source.Configs[Name] != null)
-                defaultConnectionString = source.Configs[Name].GetString("ConnectionString", defaultConnectionString);
+            if (source.Configs [Name] != null)
+                defaultConnectionString = source.Configs [Name].GetString ("ConnectionString", defaultConnectionString);
 
-            if (GD != null)
-                GD.ConnectToDatabase(defaultConnectionString, "Region",
-                                     source.Configs["WhiteCoreConnectors"].GetBoolean("ValidateTables", true));
+            if (genData != null)
+                genData.ConnectToDatabase (defaultConnectionString, "Region",
+                                     source.Configs ["WhiteCoreConnectors"].GetBoolean ("ValidateTables", true));
 
-            Framework.Utilities.DataManager.RegisterPlugin(Name + "Local", this);
+            Framework.Utilities.DataManager.RegisterPlugin (Name + "Local", this);
 
-            if (source.Configs["WhiteCoreConnectors"].GetString("RegionConnector", "LocalConnector") == "LocalConnector")
-            {
-                Framework.Utilities.DataManager.RegisterPlugin(this);
+            if (source.Configs ["WhiteCoreConnectors"].GetString ("RegionConnector", "LocalConnector") == "LocalConnector") {
+                Framework.Utilities.DataManager.RegisterPlugin (this);
             }
-            Init(simBase, Name);
+
+            Init (simBase, Name);
         }
 
-        public string Name
-        {
+        public string Name {
             get { return "IRegionConnector"; }
         }
 
@@ -73,38 +72,35 @@ namespace WhiteCore.Services.DataService
         /// </summary>
         /// <param name="telehub"></param>
         /// <param name="regionhandle"> </param>
-        [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
-        public void AddTelehub(Telehub telehub, ulong regionhandle)
+        [CanBeReflected (ThreatLevel = ThreatLevel.Low)]
+        public void AddTelehub (Telehub telehub, ulong regionhandle)
         {
             if (m_doRemoteOnly) {
                 DoRemote (telehub, regionhandle);
                 return;
             }
 
-            //Look for a telehub first.
-            if (FindTelehub(new UUID(telehub.RegionID), 0) != null)
-            {
-                Dictionary<string, object> values = new Dictionary<string, object>();
-                values["TelehubLocX"] = telehub.TelehubLocX;
-                values["TelehubLocY"] = telehub.TelehubLocY;
-                values["TelehubLocZ"] = telehub.TelehubLocZ;
-                values["TelehubRotX"] = telehub.TelehubRotX;
-                values["TelehubRotY"] = telehub.TelehubRotY;
-                values["TelehubRotZ"] = telehub.TelehubRotZ;
-                values["Spawns"] = telehub.BuildFromList(telehub.SpawnPos);
-                values["ObjectUUID"] = telehub.ObjectUUID;
-                values["Name"] = telehub.Name;
+            // Look for a telehub first.
+            if (FindTelehub (new UUID (telehub.RegionID), 0) != null) {
+                Dictionary<string, object> values = new Dictionary<string, object> ();
+                values ["TelehubLocX"] = telehub.TelehubLocX;
+                values ["TelehubLocY"] = telehub.TelehubLocY;
+                values ["TelehubLocZ"] = telehub.TelehubLocZ;
+                values ["TelehubRotX"] = telehub.TelehubRotX;
+                values ["TelehubRotY"] = telehub.TelehubRotY;
+                values ["TelehubRotZ"] = telehub.TelehubRotZ;
+                values ["Spawns"] = telehub.BuildFromList (telehub.SpawnPos);
+                values ["ObjectUUID"] = telehub.ObjectUUID;
+                values ["Name"] = telehub.Name;
 
-                QueryFilter filter = new QueryFilter();
-                filter.andFilters["RegionID"] = telehub.RegionID;
+                QueryFilter filter = new QueryFilter ();
+                filter.andFilters ["RegionID"] = telehub.RegionID;
 
-                //Found one, time to update it.
-                GD.Update("telehubs", values, null, filter, null, null);
-            }
-            else
-            {
-                //Make a new one
-                GD.Insert("telehubs", new object[]
+                // Found one, time to update it.
+                genData.Update ("telehubs", values, null, filter, null, null);
+            } else {
+                // Make a new one
+                genData.Insert ("telehubs", new object []
                                           {
                                               telehub.RegionID,
                                               telehub.RegionLocX,
@@ -127,8 +123,8 @@ namespace WhiteCore.Services.DataService
         /// </summary>
         /// <param name="regionID"></param>
         /// <param name="regionHandle"> </param>
-        [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
-        public void RemoveTelehub(UUID regionID, ulong regionHandle)
+        [CanBeReflected (ThreatLevel = ThreatLevel.Low)]
+        public void RemoveTelehub (UUID regionID, ulong regionHandle)
         {
             if (m_doRemoteOnly) {
                 DoRemote (regionID, regionHandle);
@@ -137,11 +133,11 @@ namespace WhiteCore.Services.DataService
 
             //Look for a telehub first.
             // Why? ~ SignpostMarv
-            if (FindTelehub(regionID, 0) != null)
-            {
-                QueryFilter filter = new QueryFilter();
-                filter.andFilters["RegionID"] = regionID;
-                GD.Delete("telehubs", filter);
+            if (FindTelehub (regionID, 0) != null) {
+                QueryFilter filter = new QueryFilter ();
+                filter.andFilters ["RegionID"] = regionID;
+
+                genData.Delete ("telehubs", filter);
             }
         }
 
@@ -151,17 +147,17 @@ namespace WhiteCore.Services.DataService
         /// <param name="regionID">Region ID</param>
         /// <param name="regionHandle"> </param>
         /// <returns></returns>
-        [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
-        public Telehub FindTelehub(UUID regionID, ulong regionHandle)
+        [CanBeReflected (ThreatLevel = ThreatLevel.Low)]
+        public Telehub FindTelehub (UUID regionID, ulong regionHandle)
         {
             if (m_doRemoteOnly) {
                 object remoteValue = DoRemote (regionID, regionHandle);
                 return remoteValue != null ? (Telehub)remoteValue : null;
             }
 
-            QueryFilter filter = new QueryFilter();
-            filter.andFilters["RegionID"] = regionID;
-            List<string> telehubposition = GD.Query(new[]
+            QueryFilter filter = new QueryFilter ();
+            filter.andFilters ["RegionID"] = regionID;
+            List<string> telehubposition = genData.Query (new []
                                                         {
                                                             "RegionLocX",
                                                             "RegionLocY",
@@ -176,29 +172,28 @@ namespace WhiteCore.Services.DataService
                                                             "Name"
                                                         }, "telehubs", filter, null, null, null);
 
-            //Not the right number of values, so its not there.
+            // Not the right number of values, so its not there.
             return (telehubposition == null || telehubposition.Count != 11)
                        ? null
-                       : new Telehub
-                             {
-                                 RegionID = regionID,
-                                 RegionLocX = float.Parse(telehubposition[0]),
-                                 RegionLocY = float.Parse(telehubposition[1]),
-                                 TelehubLocX = float.Parse(telehubposition[2]),
-                                 TelehubLocY = float.Parse(telehubposition[3]),
-                                 TelehubLocZ = float.Parse(telehubposition[4]),
-                                 TelehubRotX = float.Parse(telehubposition[5]),
-                                 TelehubRotY = float.Parse(telehubposition[6]),
-                                 TelehubRotZ = float.Parse(telehubposition[7]),
-                                 SpawnPos = Telehub.BuildToList(telehubposition[8]),
-                                 ObjectUUID = UUID.Parse(telehubposition[9]),
-                                 Name = telehubposition[10]
-                             };
+                       : new Telehub {
+                           RegionID = regionID,
+                           RegionLocX = float.Parse (telehubposition [0]),
+                           RegionLocY = float.Parse (telehubposition [1]),
+                           TelehubLocX = float.Parse (telehubposition [2]),
+                           TelehubLocY = float.Parse (telehubposition [3]),
+                           TelehubLocZ = float.Parse (telehubposition [4]),
+                           TelehubRotX = float.Parse (telehubposition [5]),
+                           TelehubRotY = float.Parse (telehubposition [6]),
+                           TelehubRotZ = float.Parse (telehubposition [7]),
+                           SpawnPos = Telehub.BuildToList (telehubposition [8]),
+                           ObjectUUID = UUID.Parse (telehubposition [9]),
+                           Name = telehubposition [10]
+                       };
         }
 
         #endregion
 
-        public void Dispose()
+        public void Dispose ()
         {
         }
     }

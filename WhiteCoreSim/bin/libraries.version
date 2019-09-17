@@ -15,7 +15,7 @@ GlynnTucker.Cache.dll                                           1.0.0.0         
 Google.ProtocolBuffers.dll                                      1.0.0.0                 10 Dec 2012
 MimeKit.dll                                                     2.0.1.0                 28 Jan 2018             WhiteCore
 MailKit.dll                                                     2.0.1.0                 28 Jan 2018             WhiteCore
-MySql.Data.dll                                                  6.9.9.0                  3 Jan 2017             MySQL
+MySql.Data.dll                                                  6.10.8.0                 7 Aug 2018             MySQL
 Nini.dll                                                        1.1.0.0                 10 Dec 2012
 OpenMetaverse.Rendering.Meshmerizer.dll                         0.9.4.6                  4 Jan 2017             LibOMV/WhiteCore
 OpenMetaverse.StructuredData.dll                                0.9.4.6                  4 Jan 2017             LibOMV/WhiteCore

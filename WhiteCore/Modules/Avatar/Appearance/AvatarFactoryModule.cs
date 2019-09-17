@@ -325,18 +325,20 @@ textures 1
         /// </summary>
         public void QueueAppearanceSend (UUID agentid)
         {
-            MainConsole.Instance.DebugFormat ("[AvatarFactory]: Queue appearance send for {0}", agentid);
+            if (MainConsole.Instance.Threshold <= Level.Debug)
+                MainConsole.Instance.DebugFormat ("[AvatarFactory]: Queue appearance send for {0}", GetAgentName(agentid));
 
             _sendQueue.Add (agentid);
         }
 
         public void QueueAppearanceSave (UUID agentid)
         {
-            MainConsole.Instance.DebugFormat ("[AvatarFactory]: Queue appearance save for {0}", agentid);
+            if (MainConsole.Instance.Threshold <= Level.Debug)
+                MainConsole.Instance.DebugFormat ("[AvatarFactory]: Queue appearance save for {0}", GetAgentName(agentid));
 
             IScenePresence sp = m_scene.GetScenePresence (agentid);
             if (sp == null) {
-                MainConsole.Instance.WarnFormat ("[AvatarFactory]: Agent {0} no longer in the scene", agentid);
+                MainConsole.Instance.WarnFormat ("[AvatarFactory]: Agent {0} no longer in the scene", GetAgentName(agentid));
                 return;
             }
             IAvatarAppearanceModule appearance = sp.RequestModuleInterface<IAvatarAppearanceModule> ();
@@ -345,11 +347,12 @@ textures 1
 
         public void QueueInitialAppearanceSend (UUID agentid)
         {
-            MainConsole.Instance.DebugFormat ("[AvatarFactory]: Queue initial appearance send for {0}", agentid);
+            if (MainConsole.Instance.Threshold <= Level.Debug)
+                MainConsole.Instance.DebugFormat ("[AvatarFactory]: Queue initial appearance send for {0}", GetAgentName(agentid));
 
             IScenePresence sp = m_scene.GetScenePresence (agentid);
             if (sp == null) {
-                MainConsole.Instance.WarnFormat ("[AvatarFactory]: Agent {0} no longer in the scene", agentid);
+                MainConsole.Instance.WarnFormat ("[AvatarFactory]: Agent {0} no longer in the scene", GetAgentName(agentid));
                 return;
             }
             IAvatarAppearanceModule appearance = sp.RequestModuleInterface<IAvatarAppearanceModule> ();
@@ -369,7 +372,7 @@ textures 1
             IScenePresence sp = m_scene.GetScenePresence (agentid);
             if (sp == null) {
                 MainConsole.Instance.WarnFormat (
-                    "[AvatarFactory]: Agent {0} no longer in the scene to send appearance for.", agentid);
+                    "[AvatarFactory]: Agent {0} no longer in the scene to send appearance for.", GetAgentName(agentid));
                 return;
             }
             IAvatarAppearanceModule appearance = sp.RequestModuleInterface<IAvatarAppearanceModule> ();
@@ -412,14 +415,16 @@ textures 1
         void HandleInitialAppearanceSend (UUID agentid, AvatarAppearance app)
         {
             IScenePresence sp = m_scene.GetScenePresence (agentid);
+            var agentName = GetAgentName (agentid);
+
             if (sp == null) {
                 MainConsole.Instance.WarnFormat (
-                    "[AvatarFactory]: Agent {0} no longer in the scene to send appearance for.", agentid);
+                    "[AvatarFactory]: Agent {0} no longer in the scene to send appearance for.", agentName);
                 return;
             }
             IAvatarAppearanceModule appearance = sp.RequestModuleInterface<IAvatarAppearanceModule> ();
 
-            MainConsole.Instance.InfoFormat ("[AvatarFactory]: Handle initial appearance send for {0}", agentid);
+            MainConsole.Instance.InfoFormat ("[AvatarFactory]: Handle initial appearance send for {0}", agentName);
 
             // This agent just became root. We are going to tell everyone about it.
             appearance.SendAvatarDataToAllAgents (true);
@@ -437,7 +442,7 @@ textures 1
             // again here... 
             appearance.SendAvatarDataToAllAgents (true);
 
-            //Tell us about everyone else as well now that we are here
+            // Tell us about everyone else as well now that we are here
             appearance.SendOtherAgentsAppearanceToMe ();
         }
 
@@ -453,11 +458,11 @@ textures 1
             IScenePresence sp = m_scene.GetScenePresence (client.AgentId);
             if (sp == null) {
                 MainConsole.Instance.WarnFormat ("[AvatarFactory]: SendWearables unable to find presence for {0}",
-                                                client.AgentId);
+                                                 GetAgentName(client.AgentId));
                 return;
             }
 
-            //Don't send the wearables immediately, make sure that everything is loaded first
+            // Don't send the wearables immediately, make sure that everything is loaded first
             QueueInitialAppearanceSend (client.AgentId);
         }
 
@@ -469,13 +474,14 @@ textures 1
         public void AvatarIsWearing (IClientAPI client, AvatarWearingArgs e)
         {
             IScenePresence sp = m_scene.GetScenePresence (client.AgentId);
+            var agentName = GetAgentName (client.AgentId);
             if (sp == null) {
                 MainConsole.Instance.WarnFormat ("[AvatarFactory]: AvatarIsWearing unable to find presence for {0}",
-                                                client.AgentId);
+                                                 agentName);
                 return;
             }
 
-            MainConsole.Instance.DebugFormat ("[AvatarFactory]: AvatarIsWearing called for {0}", client.AgentId);
+            MainConsole.Instance.DebugFormat ("[AvatarFactory]: AvatarIsWearing called for {0}", agentName);
 
             // operate on a copy of the appearance so we don't have to lock anything
             IAvatarAppearanceModule appearance = sp.RequestModuleInterface<IAvatarAppearanceModule> ();
@@ -502,7 +508,7 @@ textures 1
                             CreatorId = UUID.Zero.ToString (),
                             AssetID = module.DefaultUnderpants
                         };
-                        //Locked
+                        // Locked
                         client.SendInventoryItemCreateUpdate (item, 0);
                     } else if (wear.Type == 10 & wear.ItemID == UUID.Zero) {
                         NeedsRebake = true;
@@ -515,7 +521,7 @@ textures 1
                             Owner = client.AgentId,
                             CurrentPermissions = 0
                         };
-                        //Locked
+                        // Locked
                         if (m_underPantsUUID == UUID.Zero) {
                             m_underPantsUUID = UUID.Random ();
                             AssetBase asset = new AssetBase (m_underPantsUUID, "Default Underpants", AssetType.Clothing,
@@ -543,7 +549,7 @@ textures 1
                             CreatorId = UUID.Zero.ToString (),
                             AssetID = module.DefaultUndershirt
                         };
-                        //Locked
+                        // Locked
                         client.SendInventoryItemCreateUpdate (item, 0);
                     } else if (wear.Type == 11 & wear.ItemID == UUID.Zero) {
                         NeedsRebake = true;
@@ -651,7 +657,7 @@ textures 1
             //If the avatar changes appearance, then promptly logs out, this will break!
             IScenePresence sp = m_scene.GetScenePresence (agentid);
             if (sp == null || sp.IsChildAgent) {
-                MainConsole.Instance.WarnFormat ("[AvatarFactory]: Agent {0} no longer in the scene", agentid);
+                MainConsole.Instance.WarnFormat ("[AvatarFactory]: Agent {0} no longer in the scene", GetAgentName(agentid));
                 return;
             }
 
@@ -776,7 +782,7 @@ textures 1
             {
                 // only send update from root agents to other clients; children are only "listening posts"
                 if (m_sp.IsChildAgent) {
-                    MainConsole.Instance.Warn ("[Scene presence] attempt to send avatar data from a child agent");
+                    MainConsole.Instance.Warn ("[Scene presence] Attempt to send avatar data from a child agent");
                     return;
                 }
 
@@ -894,7 +900,7 @@ textures 1
             void CheckToMakeSureWearablesHaveBeenSent (object sender, ElapsedEventArgs e)
             {
                 // clear up the timer that fires this
-                checkTimer.Dispose ();  
+                checkTimer.Dispose ();
 
                 if (m_sp == null || m_sp.IsChildAgent)
                     return;
@@ -927,6 +933,17 @@ textures 1
             }
         }
 
+        #endregion
+
+        #region helpers
+        string GetAgentName (UUID agentId)
+        {
+            var agentAcct = m_scene.UserAccountService.GetUserAccount (null, agentId);
+            var agentName = (agentAcct != null) ? agentAcct.Name : agentId.ToString ();
+            agentAcct = null;
+
+            return agentName;
+        }
         #endregion
     }
 }

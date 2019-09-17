@@ -589,19 +589,23 @@ namespace WhiteCore.Modules.Groups
                     client.SendEjectGroupMemberReply (agentID, groupID, true);
                 } else {
                     regionInfo = m_scene.RegionInfo;
-                    UserAccount acc = m_scene.UserAccountService.GetUserAccount (regionInfo.AllScopeIDs, agentID);
-                    if (acc != null)
-                        agentName = acc.FirstName + " " + acc.LastName;
+                    UserAccount userAcct = m_scene.UserAccountService.GetUserAccount (regionInfo.AllScopeIDs, agentID);
+                    if (userAcct.Valid)
+                        agentName = userAcct.Name;
                     else
                         agentName = "Unknown member";
                 }
             }
 
-            GroupRecord groupInfo = m_groupData.GetGroupRecord (GetRequestingAgentID (remoteClient), groupID, null);
+            GroupRecord groupInfo = null;
+            if ( remoteClient != null)
+                groupInfo = m_groupData.GetGroupRecord (GetRequestingAgentID (remoteClient), groupID, null);
+            else
+                groupInfo = m_groupData.GetGroupRecord (agentID, groupID, null);
 
-            UserAccount account = m_scene.UserAccountService.GetUserAccount (regionInfo.AllScopeIDs, ejecteeID);
+            UserAccount ejectAcct = m_scene.UserAccountService.GetUserAccount (regionInfo.AllScopeIDs, ejecteeID);
 
-            if ((groupInfo == null) || (account == null))
+            if ((groupInfo == null) || (!ejectAcct.Valid))
                 return;
 
             // Send Message to avatar being ejected from the group
@@ -611,8 +615,7 @@ namespace WhiteCore.Modules.Groups
                 ToAgentID = ejecteeID,
                 Timestamp = 0,
                 FromAgentName = "System",
-                Message = string.Format ("You have been ejected from '{1}' by {0}.",
-                                                               agentName, groupInfo.GroupName),
+                Message = string.Format ("You have been ejected from '{1}' by {0}.", agentName, groupInfo.GroupName),
                 Dialog = 210,
                 FromGroup = false,
                 Offline = 0,
@@ -650,7 +653,7 @@ namespace WhiteCore.Modules.Groups
                     FromAgentName = "System",
                     FromGroup = true,
                     SessionID = groupID,
-                    Message = account.Name + " has been ejected from the group by " + remoteClient.Name + ".",
+                    Message = ejectAcct.Name + " has been ejected from the group by " + remoteClient.Name + ".",
                     Offline = 1,
                     RegionID = remoteClient.Scene.RegionInfo.RegionID,
                     Timestamp = (uint)Util.UnixTimeSinceEpoch (),
@@ -688,9 +691,9 @@ namespace WhiteCore.Modules.Groups
                     regionInfo = client.Scene.RegionInfo;   
                 } else {
                     regionInfo = m_scene.RegionInfo;
-                    UserAccount account = m_scene.UserAccountService.GetUserAccount (regionInfo.AllScopeIDs, agentID);
-                    if (account != null)
-                        agentName = account.FirstName + " " + account.LastName;
+                    UserAccount agentAcct = m_scene.UserAccountService.GetUserAccount (regionInfo.AllScopeIDs, agentID);
+                    if (agentAcct.Valid)
+                        agentName = agentAcct.Name;
                     else
                         agentName = "Unknown member";
                 }
@@ -1473,9 +1476,9 @@ namespace WhiteCore.Modules.Groups
                             allScopeIDs = remoteClient.AllScopeIDs;
                         else
                             allScopeIDs = new List<UUID> ();
-                        UserAccount account = m_scene.UserAccountService.GetUserAccount (allScopeIDs, inviteInfo.FromAgentName);
-                        if (account != null) {
-                            m_groupData.AddAgentToGroup (account.PrincipalID, inviteInfo.AgentID, inviteInfo.GroupID,
+                        UserAccount agentAcct = m_scene.UserAccountService.GetUserAccount (allScopeIDs, inviteInfo.FromAgentName);
+                        if (agentAcct.Valid) {
+                            m_groupData.AddAgentToGroup (agentAcct.PrincipalID, inviteInfo.AgentID, inviteInfo.GroupID,
                                                         inviteInfo.RoleID);
 
                             GridInstantMessage msg = new GridInstantMessage {
@@ -1667,11 +1670,10 @@ namespace WhiteCore.Modules.Groups
                     UserAccount targetUser =
                         m_scene.UserAccountService.GetUserAccount (remoteClient.Scene.RegionInfo.AllScopeIDs,
                                                                   member.AgentID);
-                    if (targetUser != null) {
+                    if (targetUser.Valid) {
                         MainConsole.Instance.DebugFormat (
                             "[Groups]: Prepping group notice {0} for agent: {1} who Accepts Notices ({2})",
-                            notice.noticeData.NoticeID, targetUser.FirstName + " " + targetUser.LastName,
-                            member.AcceptNotices);
+                            notice.noticeData.NoticeID, targetUser.Name, member.AcceptNotices);
                     } else {
                         MainConsole.Instance.DebugFormat (
                             "[Groups]: Prepping group notice {0} for agent: {1} who Accepts Notices ({2})",

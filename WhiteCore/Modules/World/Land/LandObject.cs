@@ -190,9 +190,15 @@ namespace WhiteCore.Modules.Land
                                        IClientAPI remote_client)
         {
             IEstateModule estateModule = m_scene.RequestModuleInterface<IEstateModule> ();
-            //TODO: This is ugly! FIX. 336723947 == AllowLandmark,AllowSetHome,PublicAllowed,AllowDirectTeleport,AllowParcelChanges,AllowVoice
-            ulong regionFlags =
-                336723974 & ~((uint)(OpenMetaverse.RegionFlags.AllowLandmark | OpenMetaverse.RegionFlags.AllowSetHome));
+
+            // default is to not allow setting of Landmarks or Home. These can be overridden by the estate settings
+            // 336723947 == AllowLandmark,AllowSetHome,PublicAllowed,AllowDirectTeleport,AllowParcelChanges,AllowVoice
+            // ulong regionFlags = 336723974 & ~((uint)(OpenMetaverse.RegionFlags.AllowLandmark | OpenMetaverse.RegionFlags.AllowSetHome));
+            ulong regionFlags = (uint)(OpenMetaverse.RegionFlags.PublicAllowed |
+                                       OpenMetaverse.RegionFlags.AllowDirectTeleport |
+                                       OpenMetaverse.RegionFlags.AllowParcelChanges |
+                                       OpenMetaverse.RegionFlags.AllowVoice);
+
             if (estateModule != null)
                 regionFlags = estateModule.GetRegionFlags ();
 
@@ -317,23 +323,20 @@ namespace WhiteCore.Modules.Land
 
                     }
 
-                    if (m_scene.Permissions.CanEditParcelProperties (remote_client.AgentId, this,
-                            GroupPowers.SetLandingPoint)) {
+                    if (m_scene.Permissions.CanEditParcelProperties (remote_client.AgentId, this, GroupPowers.SetLandingPoint)) {
                         LandData.LandingType = args.LandingType;
                         LandData.UserLocation = args.UserLocation;
                         LandData.UserLookAt = args.UserLookAt;
                     }
 
-                    if (m_scene.Permissions.CanEditParcelProperties (remote_client.AgentId, this,
-                            GroupPowers.LandChangeIdentity)) {
+                    if (m_scene.Permissions.CanEditParcelProperties (remote_client.AgentId, this, GroupPowers.LandChangeIdentity)) {
                         LandData.Description = args.Desc;
                         LandData.Name = args.Name;
                         LandData.SnapshotID = args.SnapshotID;
                         LandData.Private = args.Privacy;
                     }
 
-                    if (m_scene.Permissions.CanEditParcelProperties (remote_client.AgentId, this,
-                            GroupPowers.LandManagePasses)) {
+                    if (m_scene.Permissions.CanEditParcelProperties (remote_client.AgentId, this, GroupPowers.LandManagePasses)) {
                         LandData.PassHours = args.PassHours;
                         LandData.PassPrice = args.PassPrice;
                     }

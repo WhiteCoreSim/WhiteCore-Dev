@@ -1,0 +1,35 @@
+/* ==========================================================================
+World map
+========================================================================== */
+
+.mapapi-map-container {
+  width: 100%;
+  height: 550px;
+  border-radius: 10px 10px 10px 10px;
+  -moz-border-radius: 10px 10px 10px 10px;
+  -webkit-border-radius: 10px 10px 10px 10px;
+  border:4px solid #3b7971;
+}
+
+.mapapi-map-container .leaflet-container {
+  background-color: #1D475F; /* SL_OCEAN_COLOR */
+  clear:both;
+}
+
+div.mapregion {
+  border-radius: 10px 10px 10px 10px;
+  -moz-border-radius: 10px 10px 10px 10px;
+  -webkit-border-radius: 10px 10px 10px 10px;
+  border:4px solid #3b7971;
+}
+
+.leaflet-popup-content-wrapper, .leaflet-popup-tip {
+  background: #c8f5f0;
+}
+
+.btn-teleport {
+  display: block;
+  width: 92px;
+  height: 23px;
+  background: url("../map/teleport_btn.png") no-repeat left top;
+}

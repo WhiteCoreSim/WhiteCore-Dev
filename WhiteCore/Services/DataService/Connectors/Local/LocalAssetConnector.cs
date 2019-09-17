@@ -37,76 +37,72 @@ namespace WhiteCore.Services.DataService
 {
     public class LocalAssetConnector : ConnectorBase, IAssetConnector
     {
-        IGenericData GD;
+        IGenericData genData;
 
         #region IAssetConnector Members
 
-        public void Initialize(IGenericData GenericData, IConfigSource source, IRegistryCore simBase,
+        public void Initialize (IGenericData genericData, IConfigSource source, IRegistryCore simBase,
                                string defaultConnectionString)
         {
-            GD = GenericData;
+            genData = genericData;
 
-            if (source.Configs[Name] != null)
-                defaultConnectionString = source.Configs[Name].GetString("ConnectionString", defaultConnectionString);
+            if (source.Configs [Name] != null)
+                defaultConnectionString = source.Configs [Name].GetString ("ConnectionString", defaultConnectionString);
 
-            if (GD != null)
-                GD.ConnectToDatabase(defaultConnectionString, "Asset",
-                                     source.Configs["WhiteCoreConnectors"].GetBoolean("ValidateTables", true));
+            if (genData != null)
+                genData.ConnectToDatabase (defaultConnectionString, "Asset",
+                                     source.Configs ["WhiteCoreConnectors"].GetBoolean ("ValidateTables", true));
 
-            Framework.Utilities.DataManager.RegisterPlugin(Name + "Local", this);
+            Framework.Utilities.DataManager.RegisterPlugin (Name + "Local", this);
 
-            if (source.Configs["WhiteCoreConnectors"].GetString("AssetConnector", "LocalConnector") == "LocalConnector")
-            {
-                Framework.Utilities.DataManager.RegisterPlugin(this);
+            if (source.Configs ["WhiteCoreConnectors"].GetString ("AssetConnector", "LocalConnector") == "LocalConnector") {
+                Framework.Utilities.DataManager.RegisterPlugin (this);
             }
         }
 
-        public string Name
-        {
+        public string Name {
             get { return "IAssetConnector"; }
         }
 
-        [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
-        public void UpdateLSLData(string token, string key, string value)
+        [CanBeReflected (ThreatLevel = ThreatLevel.Low)]
+        public void UpdateLSLData (string token, string key, string value)
         {
             if (m_doRemoteOnly) {
                 DoRemote (token, key, value);
                 return;
             }
 
-            if (FindLSLData(token, key).Count == 0)
-            {
-                GD.Insert("lslgenericdata", new[] {token, key, value});
-            }
-            else
-            {
-                Dictionary<string, object> values = new Dictionary<string, object>(1);
-                values["ValueSetting"] = value;
+            if (FindLSLData (token, key).Count == 0) {
+                genData.Insert ("lslgenericdata", new [] { token, key, value });
+            } else {
+                Dictionary<string, object> values = new Dictionary<string, object> (1);
+                values ["ValueSetting"] = value;
 
-                QueryFilter filter = new QueryFilter();
-                filter.andFilters["KeySetting"] = key;
+                QueryFilter filter = new QueryFilter ();
+                filter.andFilters ["KeySetting"] = key;
 
-                GD.Update("lslgenericdata", values, null, filter, null, null);
+                genData.Update ("lslgenericdata", values, null, filter, null, null);
             }
         }
 
-        [CanBeReflected(ThreatLevel = ThreatLevel.Low)]
-        public List<string> FindLSLData(string token, string key)
+        [CanBeReflected (ThreatLevel = ThreatLevel.Low)]
+        public List<string> FindLSLData (string token, string key)
         {
             if (m_doRemoteOnly) {
                 object remoteValue = DoRemote (token, key);
                 return remoteValue != null ? (List<string>)remoteValue : new List<string> ();
             }
 
-            QueryFilter filter = new QueryFilter();
-            filter.andFilters["Token"] = token;
-            filter.andFilters["KeySetting"] = key;
-            return GD.Query(new string[1] {"*"}, "lslgenericdata", filter, null, null, null);
+            QueryFilter filter = new QueryFilter ();
+            filter.andFilters ["Token"] = token;
+            filter.andFilters ["KeySetting"] = key;
+
+            return genData.Query (new string [1] { "*" }, "lslgenericdata", filter, null, null, null);
         }
 
         #endregion
 
-        public void Dispose()
+        public void Dispose ()
         {
         }
     }

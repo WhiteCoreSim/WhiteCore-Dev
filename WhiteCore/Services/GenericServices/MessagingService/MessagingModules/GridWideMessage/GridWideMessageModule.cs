@@ -53,12 +53,12 @@ namespace WhiteCore.Services
 
         public void KickUser (UUID avatarID, string message)
         {
-            //Get required interfaces
+            // Get required interfaces
             IClientCapsService client = m_capsService.GetClientCapsService (avatarID);
             if (client != null) {
                 IRegionClientCapsService regionClient = client.GetRootCapsService ();
                 if (regionClient != null) {
-                    //Send the message to the client
+                    // Send the message to the client
                     m_messagePost.Get (regionClient.Region.ServerURI,
                                       BuildRequest ("KickUserMessage", message, regionClient.AgentID.ToString ()),
                                       (resp) => {
@@ -77,12 +77,12 @@ namespace WhiteCore.Services
 
         public void MessageUser (UUID avatarID, string message)
         {
-            //Get required interfaces
+            // Get required interfaces
             IClientCapsService client = m_capsService.GetClientCapsService (avatarID);
             if (client != null) {
                 IRegionClientCapsService regionClient = client.GetRootCapsService ();
                 if (regionClient != null) {
-                    //Send the message to the client
+                    // Send the message to the client
                     m_messagePost.Post (regionClient.Region.ServerURI,
                                        BuildRequest ("GridWideMessage", message, regionClient.AgentID.ToString ()));
                     MainConsole.Instance.Info ("Message sent to the user.");
@@ -94,10 +94,10 @@ namespace WhiteCore.Services
 
         public void SendAlert (string message)
         {
-            //Get required interfaces
+            // Get required interfaces
             List<IClientCapsService> clients = m_capsService.GetClientsCapsServices ();
 
-            //Go through all clients, and send the message async to all agents that are root
+            // Go through all clients, and send the message async to all agents that are root
             foreach (
                 IRegionClientCapsService regionClient in
                     from client in clients
@@ -106,7 +106,7 @@ namespace WhiteCore.Services
                     select regionClient)
             {
                 MainConsole.Instance.Debug ("[GridWideMessageModule]: Informed " + regionClient.ClientCaps.AccountInfo.Name);
-                //Send the message to the client
+                // Send the message to the client
                 m_messagePost.Post (regionClient.Region.ServerURI,
                                    BuildRequest ("GridWideMessage", message, regionClient.AgentID.ToString ()));
             }
@@ -155,7 +155,7 @@ namespace WhiteCore.Services
 
         public void FinishedStartup ()
         {
-            //Also look for incoming messages to display
+            // Also look for incoming messages to display
             m_messagePost = m_registry.RequestModuleInterface<ISyncMessagePosterService> ();
             m_capsService = m_registry.RequestModuleInterface<ICapsService> ();
             m_registry.RequestModuleInterface<ISyncMessageRecievedService> ().OnMessageReceived += OnMessageReceived;
@@ -172,56 +172,84 @@ namespace WhiteCore.Services
                 message = CombineParams (cmd, 3);
             else
                 message = MainConsole.Instance.Prompt ("Message to send?", "");
-            if (message == "")
+            
+            if (string.IsNullOrWhiteSpace(message))
                 return;
 
             SendAlert (message);
+            MainConsole.Instance.Info ("The alert has been sent.");
         }
 
         protected void SendGridMessage (IScene scene, string [] cmd)
         {
-            string user;
+            string username;
             string message;
 
-            if (cmd.Length >= 4)
-                user = CombineParams (cmd, 3, 5);
-            else
-                user = MainConsole.Instance.Prompt ("User name? (First Last)", "");
-            if (user == "")
+            if (cmd.Length >= 4) {
+                username = CombineParams (cmd, 3, 5);
+                if (username.EndsWith (" ", System.StringComparison.Ordinal))
+                    username = username.Remove (username.Length - 1);
+            } else
+                username = MainConsole.Instance.Prompt ("User name? (First Last)", "");
+
+            if (string.IsNullOrWhiteSpace (username)) {
+                MainConsole.Instance.Info ("Invalid user specified.");
                 return;
+            }
 
             if (cmd.Length > 5)
                 message = CombineParams (cmd, 5);
             else
                 message = MainConsole.Instance.Prompt ("Message to send?", "");
-            if (message == "")
-                return;
-
-
-            IUserAccountService userService = m_registry.RequestModuleInterface<IUserAccountService> ();
-            UserAccount account = userService.GetUserAccount (null, user.Split (' ') [0], user.Split (' ') [1]);
-            if (account == null) {
-                MainConsole.Instance.Info ("User does not exist.");
+            if (string.IsNullOrWhiteSpace (message)) {
+                MainConsole.Instance.Info ("Invalid message specified.");
                 return;
             }
-            MessageUser (account.PrincipalID, message);
+
+            IUserAccountService userService = m_registry.RequestModuleInterface<IUserAccountService> ();
+            UserAccount userAcct = userService.GetUserAccount (null, username);
+            if (userAcct.Valid) {
+                MessageUser (userAcct.PrincipalID, message);
+                 MainConsole.Instance.Info ("Message sent to " + username);
+            } else 
+                MainConsole.Instance.Info (username + " does not exist.");
         }
 
         protected void KickUserMessage (IScene scene, string [] cmd)
         {
-            //Combine the parameters and figure out the message
-            string user = CombineParams (cmd, 3, 5);
-            if (user.EndsWith (" ", System.StringComparison.Ordinal))
-                user = user.Remove (user.Length - 1);
-            string message = CombineParams (cmd, 5);
-            IUserAccountService userService = m_registry.RequestModuleInterface<IUserAccountService> ();
-            UserAccount account = userService.GetUserAccount (null, user);
-            if (account == null) {
-                MainConsole.Instance.Info ("User does not exist.");
+            // Combine the parameters and figure out the message
+            string username;
+            string message;
+
+            if (cmd.Length >= 4) {
+                username = CombineParams (cmd, 3, 5);
+                if (username.EndsWith (" ", System.StringComparison.Ordinal))
+                    username = username.Remove (username.Length - 1);
+            } else 
+                 username = MainConsole.Instance.Prompt ("User name? (First Last)", "");
+
+            if (string.IsNullOrWhiteSpace (username)) {
+                MainConsole.Instance.Info ("Invalid user specified.");
                 return;
             }
 
-            KickUser (account.PrincipalID, message);
+            IUserAccountService userService = m_registry.RequestModuleInterface<IUserAccountService> ();
+            UserAccount userAcct = userService.GetUserAccount (null, username);
+            if (!userAcct.Valid) {
+                MainConsole.Instance.Info (username + " does not exist.");
+                return;
+            }
+
+            if (cmd.Length > 5) 
+                message = CombineParams (cmd, 5);
+            else {
+                message = MainConsole.Instance.Prompt ("Message to send?", "");
+                if (string.IsNullOrWhiteSpace (message))
+                    message = "You have been ejected.";
+            }
+                
+            KickUser (userAcct.PrincipalID, message);
+            MainConsole.Instance.Info (username + " has been 'kicked'.");
         }
 
         string CombineParams (string [] commandParams, int pos)
@@ -262,11 +290,11 @@ namespace WhiteCore.Services
         protected OSDMap OnMessageReceived (OSDMap message)
         {
             if (message.ContainsKey ("Method") && message ["Method"] == "GridWideMessage") {
-                //We got a message, now display it
+                // We got a message, now display it
                 string user = message ["User"].AsString ();
                 string value = message ["Value"].AsString ();
 
-                //Get the Scene registry since IDialogModule is a region module, and isn't in the ISimulationBase registry
+                // Get the Scene registry since IDialogModule is a region module, and isn't in the ISimulationBase registry
                 ISceneManager manager = m_registry.RequestModuleInterface<ISceneManager> ();
                 if (manager != null) {
                     foreach (IScene scene in manager.Scenes) {
@@ -274,18 +302,18 @@ namespace WhiteCore.Services
                         if (scene.TryGetScenePresence (UUID.Parse (user), out sp) && !sp.IsChildAgent) {
                             IDialogModule dialogModule = scene.RequestModuleInterface<IDialogModule> ();
                             if (dialogModule != null) {
-                                //Send the message to the user now
+                                // Send the message to the user now
                                 dialogModule.SendAlertToUser (UUID.Parse (user), value);
                             }
                         }
                     }
                 }
             } else if (message.ContainsKey ("Method") && message ["Method"] == "KickUserMessage") {
-                //We got a message, now display it
+                // We got a message, now display it
                 string user = message ["User"].AsString ();
                 string value = message ["Value"].AsString ();
 
-                //Get the Scene registry since IDialogModule is a region module, and isn't in the ISimulationBase registry
+                // Get the Scene registry since IDialogModule is a region module, and isn't in the ISimulationBase registry
                 ISceneManager manager = m_registry.RequestModuleInterface<ISceneManager> ();
                 if (manager != null) {
                     foreach (IScene scene in manager.Scenes) {

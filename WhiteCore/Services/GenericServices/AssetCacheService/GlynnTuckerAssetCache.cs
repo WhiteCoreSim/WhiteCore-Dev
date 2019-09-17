@@ -63,13 +63,13 @@ namespace WhiteCore.Services
             if (moduleConfig != null)
             {
                 string name = moduleConfig.GetString("AssetCaching");
-                //MainConsole.Instance.DebugFormat("[ASSET CACHE] name = {0} (this module's name: {1}). Sync? ", name, Name, m_Cache.IsSynchronized);
+                // MainConsole.Instance.DebugFormat("[Asset cache] name = {0} (this module's name: {1}). Sync? ", name, Name, m_Cache.IsSynchronized);
 
                 if (name == Name)
                 {
                     m_Cache = new SimpleMemoryCache();
 
-                    MainConsole.Instance.Info("[ASSET CACHE]: GlynnTucker asset cache enabled");
+                    MainConsole.Instance.Info("[Asset cache]: GlynnTucker asset cache enabled");
 
                     // Instrumentation
                     IConfig cacheConfig = config.Configs["AssetCache"];
@@ -114,7 +114,7 @@ namespace WhiteCore.Services
 
         public AssetBase Get(string id, out bool found)
         {
-            Object asset = null;
+            object asset = null;
             m_Cache.TryGet(id, out asset);
             found = asset != null;
             Debug(asset);
@@ -130,7 +130,7 @@ namespace WhiteCore.Services
 
         public void Expire(string id)
         {
-            Object asset = null;
+            object asset = null;
             if (m_Cache.TryGet(id, out asset))
                 m_Cache.Remove(id);
         }
@@ -145,7 +145,7 @@ namespace WhiteCore.Services
             return m_Cache.Contains(id);
         }
 
-        private void Debug(Object asset)
+        void Debug(object asset)
         {
             // Temporary instrumentation to measure the hit/miss rate
             if (m_DebugRate > 0)
@@ -155,7 +155,7 @@ namespace WhiteCore.Services
                     ++m_Hits;
 
                 if ((m_Requests%m_DebugRate) == 0)
-                    MainConsole.Instance.DebugFormat("[ASSET CACHE]: Hit Rate {0} / {1} == {2}%", m_Hits, m_Requests,
+                    MainConsole.Instance.DebugFormat("[Asset cache]: Hit Rate {0} / {1} == {2}%", m_Hits, m_Requests,
                                                      (m_Hits/(float) m_Requests)*100.0f);
             }
             // End instrumentation

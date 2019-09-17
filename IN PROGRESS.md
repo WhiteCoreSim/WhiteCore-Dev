@@ -6,7 +6,7 @@
 * Redesign the WebUI to use the WebAPI
 
 #Scripting:
-----------
+--------
 * Upgrade DotNetEngine with latest OSSL / LSL / WhiteCore functions
 * Check if integrating the Halycon scriptengine Phlox (Apache 2 License by InWorldz) is possible
 
@@ -14,11 +14,11 @@
 --------
 * Continue upgrade of the Physics engines (Bullet and ODE)
 
-# Various:
+#Various:
 --------
 * Implement a basic Marketplace which uses the VMM and Dropboxes methods
-* Upgrade LibOMV to be able to use the Bento bones and other related pieces of code
+* Upgrade LibOMV to be able to use the Bento bones and other related pieces of code (#Bones are done now)
 
-#Wiki
-----
+#Wiki:
+--------
 * Update and fill the Wiki page with needed details (also point to the Documentation Repository)

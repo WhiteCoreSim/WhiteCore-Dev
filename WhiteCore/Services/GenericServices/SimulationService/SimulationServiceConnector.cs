@@ -137,7 +137,7 @@ namespace WhiteCore.Services
             if (!success) {
                 if (m_blackListedRegions.ContainsKey (destination.ServerURI)) {
                     if (m_blackListedRegions [destination.ServerURI] == 3) {
-                        //add it to the blacklist as the request completely failed 3 times
+                        // add it to the blacklist as the request completely failed 3 times
                         m_blackListedRegions [destination.ServerURI] = Util.EnvironmentTickCount () + 60 * 1000; //60 seconds
                     } else if (m_blackListedRegions [destination.ServerURI] == 0)
                         m_blackListedRegions [destination.ServerURI]++;
@@ -146,7 +146,7 @@ namespace WhiteCore.Services
                 return false;
             }
 
-            //Clear out the blacklist if it went through
+            // Clear out the blacklist if it went through
             m_blackListedRegions.Remove (destination.ServerURI);
 
             return result ["Success"].AsBoolean ();
@@ -155,11 +155,11 @@ namespace WhiteCore.Services
         public bool UpdateAgent (GridRegion destination, AgentPosition data)
         {
             if (m_blackListedRegions.ContainsKey (destination.ServerURI)) {
-                //Check against time
+                // Check against time
                 if (m_blackListedRegions [destination.ServerURI] > 3 &&
                     Util.EnvironmentTickCountSubtract (m_blackListedRegions [destination.ServerURI]) > 0) {
                     MainConsole.Instance.Warn ("[SimServiceConnector]: Blacklisted region " + destination.RegionName + " requested");
-                    //Still blacklisted
+                    // Still blacklisted
                     return false;
                 }
             }
@@ -179,7 +179,7 @@ namespace WhiteCore.Services
             if (!success) {
                 if (m_blackListedRegions.ContainsKey (destination.ServerURI)) {
                     if (m_blackListedRegions [destination.ServerURI] == 3) {
-                        //add it to the blacklist as the request completely failed 3 times
+                        // add it to the blacklist as the request completely failed 3 times
                         m_blackListedRegions [destination.ServerURI] = Util.EnvironmentTickCount () + 60 * 1000; //60 seconds
                     } else if (m_blackListedRegions [destination.ServerURI] == 0)
                         m_blackListedRegions [destination.ServerURI]++;
@@ -188,7 +188,7 @@ namespace WhiteCore.Services
                 return false;
             }
 
-            //Clear out the blacklist if it went through
+            // Clear out the blacklist if it went through
             m_blackListedRegions.Remove (destination.ServerURI);
 
             return result ["Success"].AsBoolean ();

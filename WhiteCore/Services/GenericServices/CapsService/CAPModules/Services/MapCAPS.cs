@@ -121,33 +121,33 @@ namespace WhiteCore.Services
                 }
             }
             foreach (MapBlockData block in m_mapLayer) {
-                //Add to the array
+                // Add to the array
                 mapBlocksData.Add (block.ToOSD ());
             }
             OSDMap response = MapLayerResponce (layerData, mapBlocksData, flags);
             return OSDParser.SerializeLLSDXmlBytes (response);
         }
 
-        protected MapBlockData MapBlockFromGridRegion (GridRegion r, int flag)
+        protected MapBlockData MapBlockFromGridRegion (GridRegion region, int flag)
         {
             MapBlockData block = new MapBlockData ();
-            if (r == null) {
+            if (region == null) {
                 block.Access = (byte)SimAccess.Down;
                 block.MapImageID = UUID.Zero;
                 return block;
             }
-            block.Access = r.Access;
+            block.Access = region.Access;
             if ((flag & 0xffff) == 0)
-                block.MapImageID = r.TerrainImage;
+                block.MapImageID = region.TerrainImage;
             if ((flag & 0xffff) == 1)
-                block.MapImageID = r.TerrainMapImage;
+                block.MapImageID = region.TerrainMapImage;
             if ((flag & 0xffff) == 2)
-                block.MapImageID = r.ParcelMapImage;
-            block.Name = r.RegionName;
-            block.X = (ushort)(r.RegionLocX / Constants.RegionSize);
-            block.Y = (ushort)(r.RegionLocY / Constants.RegionSize);
-            block.SizeX = (ushort)(r.RegionSizeX);
-            block.SizeY = (ushort)(r.RegionSizeY);
+                block.MapImageID = region.ParcelMapImage;
+            block.Name = region.RegionName;
+            block.X = (ushort)(region.RegionLocX / Constants.RegionSize);
+            block.Y = (ushort)(region.RegionLocY / Constants.RegionSize);
+            block.SizeX = (ushort)(region.RegionSizeX);
+            block.SizeY = (ushort)(region.RegionSizeY);
             return block;
         }
 

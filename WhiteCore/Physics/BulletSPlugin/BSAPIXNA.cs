@@ -2238,7 +2238,7 @@ namespace WhiteCore.Physics.BulletSPlugin
             int pVerticesCount)
         {
             String fileName = "objTest3.raw";
-            String completePath = System.IO.Path.Combine(Util.configDir(), fileName);
+            String completePath = System.IO.Path.Combine(Util.configDir(), fileName);   // TODO: change this to the evaluated config path
             StreamWriter sw = new StreamWriter(completePath);
             IndexedMesh mesh = new IndexedMesh();
 
@@ -2271,7 +2271,7 @@ namespace WhiteCore.Physics.BulletSPlugin
         public static void DumpRaw(int[] indices, float[] vertices, int pIndicesCount, int pVerticesCount)
         {
             String fileName = "objTest6.raw";
-            String completePath = System.IO.Path.Combine(Util.configDir(), fileName);
+            String completePath = System.IO.Path.Combine(Util.configDir(), fileName);  // TODO: change this to the evaluated config path
             StreamWriter sw = new StreamWriter(completePath);
             IndexedMesh mesh = new IndexedMesh();
 

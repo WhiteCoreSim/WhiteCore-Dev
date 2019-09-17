@@ -170,7 +170,7 @@ namespace WhiteCore.Services
 
         public virtual void SetLoggedIn (string userID, bool loggingIn, UUID enteringRegion, string enteringRegionURI)
         {
-            UserInfo userInfo = GetUserInfo (userID, false); //We are changing the status, so don't look
+            UserInfo userInfo = GetUserInfo (userID, false); // We are changing the status, so don't look
             if (userInfo == null) {
                 Save (new UserInfo {
                     IsOnline = loggingIn,
@@ -206,7 +206,7 @@ namespace WhiteCore.Services
 
         public void FireUserStatusChangeEvent (string userID, bool loggingIn, UUID enteringRegion)
         {
-            //Trigger an event so listeners know
+            // Trigger an event so listeners know
             m_registry.RequestModuleInterface<ISimulationBase> ().EventManager.FireGenericEventHandler (
                 "UserStatusChange", new object [] { userID, loggingIn, enteringRegion });
         }
@@ -222,6 +222,7 @@ namespace WhiteCore.Services
             if (changed)
                 m_registry.RequestModuleInterface<ISimulationBase> ().EventManager.FireGenericEventHandler (
                     "UserStatusChange", new object [] { userID, false, UUID.Zero });
+            
             return info;
         }
 

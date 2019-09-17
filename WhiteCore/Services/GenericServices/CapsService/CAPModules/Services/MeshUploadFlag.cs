@@ -74,14 +74,14 @@ namespace WhiteCore.Services
             data ["display_name_next_update"] = Utils.UnixTimeToDateTime (0);
             data ["legacy_first_name"] = m_service.ClientCaps.AccountInfo.FirstName;
             data ["legacy_last_name"] = m_service.ClientCaps.AccountInfo.LastName;
-            data ["mesh_upload_status"] = "valid"; // add if account has ability to upload mesh?
+            data ["mesh_upload_status"] = "valid";          // add if account has ability to upload mesh?
             bool isDisplayNameNDefault = (info.DisplayName == m_service.ClientCaps.AccountInfo.Name) ||
                                          (info.DisplayName ==
                                          m_service.ClientCaps.AccountInfo.FirstName + "." +
                                          m_service.ClientCaps.AccountInfo.LastName);
             data ["is_display_name_default"] = isDisplayNameNDefault;
 
-            //Send back data
+            // Send back data
             return OSDParser.SerializeLLSDXmlBytes (data);
         }
     }

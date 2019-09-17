@@ -38,7 +38,7 @@ namespace WhiteCore.Services.DataService
 {
     public class LocalUserAccountConnector : IUserAccountData
     {
-        IGenericData GD;
+        IGenericData m_GD;
         const string m_realm = "user_accounts";
 
         public string Realm {
@@ -47,21 +47,21 @@ namespace WhiteCore.Services.DataService
 
         #region IUserAccountData Members
 
-        public void Initialize (IGenericData GenericData, IConfigSource source, IRegistryCore simBase,
+        public void Initialize (IGenericData genericData, IConfigSource source, IRegistryCore simBase,
                                string defaultConnectionString)
         {
             if (source.Configs ["WhiteCoreConnectors"].GetString ("AbuseReportsConnector", "LocalConnector") != "LocalConnector")
                 return;
 
             // we are local
-            GD = GenericData;
+            m_GD = genericData;
 
             string connectionString = defaultConnectionString;
             if (source.Configs [Name] != null)
                 connectionString = source.Configs [Name].GetString ("ConnectionString", defaultConnectionString);
 
-            if (GD != null)
-                GD.ConnectToDatabase (connectionString, "UserAccounts",
+            if (m_GD != null)
+                m_GD.ConnectToDatabase (connectionString, "UserAccounts",
                                          source.Configs ["WhiteCoreConnectors"].GetBoolean ("ValidateTables", true));
 
             Framework.Utilities.DataManager.RegisterPlugin (this);
@@ -80,7 +80,7 @@ namespace WhiteCore.Services.DataService
                 where [fields [i]] = values [i];
             }
 
-            List<string> query = GD.Query (new []
+            List<string> query = m_GD.Query (new []
                                                {
                                                    "PrincipalID",
                                                    "ScopeID",
@@ -90,7 +90,7 @@ namespace WhiteCore.Services.DataService
                                                    "Created",
                                                    "UserLevel",
                                                    "UserFlags",
-                                                   "IFNULL(Name, " + GD.ConCat(new[] {"FirstName", "' '", "LastName"}) +
+                                                   "IFNULL(Name, " + m_GD.ConCat(new[] {"FirstName", "' '", "LastName"}) +
                                                    ") as Name"
                                                }, m_realm, new QueryFilter {andFilters = where}, null, null, null);
 
@@ -110,13 +110,13 @@ namespace WhiteCore.Services.DataService
             row ["UserFlags"] = data.UserFlags;
             row ["Name"] = data.Name;
 
-            return GD.Replace (m_realm, row);
+            return m_GD.Replace (m_realm, row);
         }
 
         public bool DeleteAccount (UUID userID, bool archiveInformation)
         {
             if (archiveInformation) {
-                return GD.Update (m_realm,
+                return m_GD.Update (m_realm,
                                   new Dictionary<string, object> { { "UserLevel", -2 } },
                                   null,
                                   new QueryFilter { andFilters = new Dictionary<string, object> { { "PrincipalID", userID } } },
@@ -125,7 +125,7 @@ namespace WhiteCore.Services.DataService
             QueryFilter filter = new QueryFilter ();
             filter.andFilters.Add ("PrincipalID", userID);
 
-            return GD.Delete (m_realm, filter);
+            return m_GD.Delete (m_realm, filter);
         }
 
         public UserAccount [] GetUsers (List<UUID> scopeIDs, string query)
@@ -169,7 +169,7 @@ namespace WhiteCore.Services.DataService
             sort ["FirstName"] = true;
             // these are in this order so results should be ordered by last name first, then first name
 
-            List<string> retVal = GD.Query (new []
+            List<string> retVal = m_GD.Query (new []
                                                {
                                                    "PrincipalID",
                                                    "ScopeID",
@@ -179,7 +179,7 @@ namespace WhiteCore.Services.DataService
                                                    "Created",
                                                    "UserLevel",
                                                    "UserFlags",
-                                                   "IFNULL(Name, " + GD.ConCat(new[] {"FirstName", "' '", "LastName"}) +
+                                                   "IFNULL(Name, " + m_GD.ConCat(new[] {"FirstName", "' '", "LastName"}) +
                                                    ") as Name"
                                                }, m_realm, filter, sort, start, count);
 
@@ -198,7 +198,7 @@ namespace WhiteCore.Services.DataService
             sort ["FirstName"] = true;
             // these are in this order so results should be ordered by last name first, then first name
 
-            List<string> retVal = GD.Query (new []
+            List<string> retVal = m_GD.Query (new []
                                                {
                                                    "PrincipalID",
                                                    "ScopeID",
@@ -208,7 +208,7 @@ namespace WhiteCore.Services.DataService
                                                    "Created",
                                                    "UserLevel",
                                                    "UserFlags",
-                                                   "IFNULL(Name, " + GD.ConCat(new[] {"FirstName", "' '", "LastName"}) +
+                                                   "IFNULL(Name, " + m_GD.ConCat(new[] {"FirstName", "' '", "LastName"}) +
                                                    ") as Name"
                                                }, m_realm, filter, sort, null, null);
 
@@ -217,7 +217,7 @@ namespace WhiteCore.Services.DataService
 
         public uint NumberOfUsers (List<UUID> scopeIDs, string query)
         {
-            return uint.Parse (GD.Query (new [] { "COUNT(*)" }, m_realm, GetUsersFilter (query), null, null, null) [0]);
+            return uint.Parse (m_GD.Query (new [] { "COUNT(*)" }, m_realm, GetUsersFilter (query), null, null, null) [0]);
         }
 
         #endregion
@@ -234,7 +234,7 @@ namespace WhiteCore.Services.DataService
                     PrincipalID = UUID.Parse (query [i + 0]),
                     ScopeID = UUID.Parse (query [i + 1])
                 };
-                //We keep these even though we don't always use them because we might need to create the "Name" from them
+                // We keep these even though we don't always use them because we might need to create the "Name" from them
                 string FirstName = query [i + 2];
                 string LastName = query [i + 3];
                 data.Email = query [i + 4];
@@ -244,8 +244,8 @@ namespace WhiteCore.Services.DataService
                 data.Name = query [i + 8];
                 if (string.IsNullOrEmpty (data.Name)) {
                     data.Name = FirstName + " " + LastName;
-                    //Save the change!
-                    Store (data);
+
+                    Store (data);       // Save the change!
                 }
                 list.Add (data);
             }

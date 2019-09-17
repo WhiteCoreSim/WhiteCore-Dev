@@ -247,7 +247,7 @@ namespace WhiteCore.Modules.Currency
             string identifer, bool chargeImmediately, bool runOnce)
         {
             var userService = m_registry.RequestModuleInterface<IUserAccountService> ();
-            var user = userService.GetUserAccount (null, agentID);
+            var userAcct = userService.GetUserAccount (null, agentID);
 
             if (moneyModule != null) {
                 if (chargeImmediately) {
@@ -260,12 +260,12 @@ namespace WhiteCore.Modules.Currency
                     );
                     if (!success) {
                         MainConsole.Instance.WarnFormat ("[Currency]: Unable to process {0} payment of {1}{2} from {3}",
-                             description, currencySymbol, amount, user.Name);
+                             description, currencySymbol, amount, userAcct.Name);
                         return false;
                     }
 
                     MainConsole.Instance.WarnFormat ("[Currency]: Payment for {0} of {1}{2} from {3} has been paid",
-                        description, currencySymbol, amount, user.Name);
+                        description, currencySymbol, amount, userAcct.Name);
 
                 }
 
@@ -293,7 +293,7 @@ namespace WhiteCore.Modules.Currency
                         scheduler.Save (item);
                     } else
                         MainConsole.Instance.WarnFormat ("[Currency]: Unable to add a new scheduled {0} payment of {1}{2} for {3}",
-                            description, currencySymbol, amount, user.Name);
+                            description, currencySymbol, amount, userAcct.Name);
                 }
             }
             return true;
@@ -356,7 +356,7 @@ namespace WhiteCore.Modules.Currency
                 }
 
                 var userService = m_registry.RequestModuleInterface<IUserAccountService> ();
-                var user = userService.GetUserAccount (null, agentID);
+                var userAcct = userService.GetUserAccount (null, agentID);
 
                 if (CheckWhetherUserShouldPay (agentID, description)) {
                     bool success = moneyModule.Transfer (
@@ -368,13 +368,13 @@ namespace WhiteCore.Modules.Currency
                     );
                     if (!success) {
                         MainConsole.Instance.WarnFormat ("[Currency]: Unable to process {0} payment of {1}{2} from {3}",
-                            description, currencySymbol, amount, user.Name);
+                            description, currencySymbol, amount, userAcct.Name);
                         if (OnUserDidNotPay != null)
                             OnUserDidNotPay (agentID, functionName.Replace ("ScheduledPayment ", ""), description);
                     }
 
                     MainConsole.Instance.InfoFormat ("[Currency]: Scheduled payment for {0} of {1}{2} from {3} has been paid",
-                        description, currencySymbol, amount, user.Name);
+                        description, currencySymbol, amount, userAcct.Name);
 
                     // check for a 'runOnce' charge
                     if ((schItem != null) && schItem.RunOnce)
@@ -661,19 +661,19 @@ namespace WhiteCore.Modules.Currency
             var rightNow = startTime.ToUniversalTime ();
             var userService = m_registry.RequestModuleInterface<IUserAccountService> ();
             var agentInfo = Framework.Utilities.DataManager.RequestPlugin<IAgentInfoConnector> ();
-            List<UserAccount> users;
+            List<UserAccount> userAccts;
             int payments = 0;
             int payValue = 0;
             bool xfrd;
 
-            users = userService.GetUserAccounts (new List<UUID> { UUID.Zero }, 0, stipendsPremiumOnly ? 600 : 0);
-            foreach (UserAccount user in users) {
-                if (Utilities.IsSystemUser (user.PrincipalID))
+            userAccts = userService.GetUserAccounts (new List<UUID> { UUID.Zero }, 0, stipendsPremiumOnly ? 600 : 0);
+            foreach (UserAccount userAcct in userAccts) {
+                if (Utilities.IsSystemUser (userAcct.PrincipalID))
                     continue;
 
                 if (!stipendsPremiumOnly && stipendsLoginRequired) {
                     bool status;
-                    UserInfo usrInfo = agentInfo.Get (user.PrincipalID.ToString (), true, out status);
+                    UserInfo usrInfo = agentInfo.Get (userAcct.PrincipalID.ToString (), true, out status);
                     if (usrInfo == null)
                         continue;
 
@@ -684,7 +684,7 @@ namespace WhiteCore.Modules.Currency
 
                 // pay them...
                 xfrd = moneyModule.Transfer (
-                    user.PrincipalID,
+                    userAcct.PrincipalID,
                     (UUID)Constants.BankerUUID,
                     stipendAmount,
                     stipendMessage,
@@ -694,7 +694,7 @@ namespace WhiteCore.Modules.Currency
                 // keep track
                 if (xfrd) {
                     MainConsole.Instance.InfoFormat ("[Currency]: Stipend Payment of {0}{1} for {2} processed.",
-                        currencySymbol, stipendAmount, user.Name);
+                        currencySymbol, stipendAmount, userAcct.Name);
                     payments++;
                     payValue += stipendAmount;
                 }
@@ -765,9 +765,9 @@ namespace WhiteCore.Modules.Currency
                 DateTime chargeTime = itemInfo ["StartTime"];
                 TransactionType transType = !itemInfo.ContainsKey ("Type") ? TransactionType.SystemGenerated : (TransactionType)itemInfo ["Type"].AsInteger ();
 
-                var user = userService.GetUserAccount (null, agentID);
+                var userAcct = userService.GetUserAccount (null, agentID);
 
-                paymentInfo = string.Format ("{0, -20}", user.Name);
+                paymentInfo = string.Format ("{0, -20}", userAcct.Name);
                 // paymentInfo += string.Format ("{0, -34}", description.Substring (0, 32));   
                 paymentInfo += string.Format ("{0, -30}", Utilities.TransactionTypeInfo (transType));
                 paymentInfo += string.Format ("{0, -10}", amount);
@@ -1013,9 +1013,9 @@ namespace WhiteCore.Modules.Currency
 
                         // keep track
                         if (xfrd) {
-                            var user = userService.GetUserAccount (null, memberID);
+                            var userAcct = userService.GetUserAccount (null, memberID);
                             MainConsole.Instance.InfoFormat ("[Currency]: Directory fee payment for {0} of {1}{2} from {3} processed.",
-                                groupName, currencySymbol, memberShare, user.Name);
+                                groupName, currencySymbol, memberShare, userAcct.Name);
 
                             grpMembersLiable++;
                             liablePayments += directoryFee;
@@ -1051,7 +1051,8 @@ namespace WhiteCore.Modules.Currency
             MainConsole.Instance.Warn ("[Currency]: Processing of Group dividends commenced");
 
             // * Group Disbursments
-            // - If there's money in the group it will have to be divided by the people that have the "Accountability" role task
+            // - If there's money in the group after any payments (parcel directory fees)it will have to be
+            //    divided by the people that have the "Accountability" role task
             // - Check how many users there are with that role task
             // - Divide the amount of money by the amount of users (make sure the amount is a whole number)
             // - Create Task for each user to be payed
@@ -1074,7 +1075,7 @@ namespace WhiteCore.Modules.Currency
                     var groupName = groupRec.GroupName;
 
                     grpBalance = moneyModule.GetGroupBalance (groupID);
-                    if (grpBalance.ParcelDirectoryFee <= 0)
+                    if (grpBalance.Balance <= 0)
                         continue;
 
                     // find how many members are accountable for fees and pay them dividends
@@ -1091,7 +1092,7 @@ namespace WhiteCore.Modules.Currency
                     if (payMembers.Count == 0)      // no one to pay??
                         continue;
 
-                    int dividend = grpBalance.ParcelDirectoryFee / payMembers.Count;    // this should be integer division so truncated (5 /4 = 1)
+                    int dividend = grpBalance.Balance / payMembers.Count;    // this should be integer division so truncated (5 /4 = 1)
                     if (dividend == 0)                                                  // insufficient funds < 1 per user
                         continue;
 
@@ -1109,9 +1110,9 @@ namespace WhiteCore.Modules.Currency
 
                         // keep track
                         if (xfrd) {
-                            var user = userService.GetUserAccount (null, memberID);
+                            var userAcct = userService.GetUserAccount (null, memberID);
                             MainConsole.Instance.InfoFormat ("[Currency]: Dividend payment from {0} of {1}{2} from {3} processed.",
-                                groupName, currencySymbol, dividend, user.Name);
+                                groupName, currencySymbol, dividend, userAcct.Name);
 
                             grpsPayments++;
                             grpDividends += dividend;

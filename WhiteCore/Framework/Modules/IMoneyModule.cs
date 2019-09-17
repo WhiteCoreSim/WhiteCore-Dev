@@ -75,7 +75,7 @@ namespace WhiteCore.Framework.Modules
             
     public class GroupBalance : IDataTransferable
     {
-        public int TotalTierDebit = 0;
+        public int TotalTierDebits = 0;
         public int TotalTierCredits = 0;
         public int ParcelDirectoryFee = 0;
         public int LandFee = 0;
@@ -86,7 +86,7 @@ namespace WhiteCore.Framework.Modules
 
         public override void FromOSD(OpenMetaverse.StructuredData.OSDMap map)
         {
-            TotalTierDebit = map["TotalTierDebit"];
+            TotalTierDebits = map["TotalTierDebits"];
             TotalTierCredits = map["TotalTierCredits"];
             ParcelDirectoryFee = map["ParcelDirectoryFee"];
             LandFee = map["LandFee"];
@@ -100,7 +100,7 @@ namespace WhiteCore.Framework.Modules
         {
             OpenMetaverse.StructuredData.OSDMap map = new OpenMetaverse.StructuredData.OSDMap();
 
-            map["TotalTierDebit"] = TotalTierDebit;
+            map["TotalTierDebits"] = TotalTierDebits;
             map["TotalTierCredits"] = TotalTierCredits;
             map["ParcelDirectoryFee"] = ParcelDirectoryFee;
             map["LandFee"] = LandFee;

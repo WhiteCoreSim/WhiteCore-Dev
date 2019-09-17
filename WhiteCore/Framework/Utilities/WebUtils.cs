@@ -24,13 +24,14 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+#define NET_HTTP    // Use the .NET http service - .Net version 4.5+ required
 
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-#if NET_4_5
+#if NET_HTTP
 using System.Net.Http;
 using System.Threading.Tasks;
 #else
@@ -47,7 +48,7 @@ namespace WhiteCore.Framework.Utilities
     {
         const int m_defaultTimeout = 10000;
 
-#if NET_4_5
+#if NET_HTTP
 
         /// <summary>
         ///     POST URL-encoded form data to a web service that returns LLSD or

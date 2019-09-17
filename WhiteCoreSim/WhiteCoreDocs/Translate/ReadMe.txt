@@ -42,8 +42,8 @@ Rebuild and you are ready to go with your new translation.
 Questions?
 ==========
 Checkout http://whitecore-sim.org, catch me on the '#whitecore-support' irc channel on freenode,
-or check into the Google+ group at https://plus.google.com/communitites/113034607546142208907
+or check into the MeWe community for WhiteCore https://mewe.com/group/5cb284545da1780ba88ca30d where a friendly group is happy to answer questions.
 
-January 2017
+April 2019
 Rowan
 <greythane@gmail.com>

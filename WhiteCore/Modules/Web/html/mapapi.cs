@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright (c) Contributors, http://whitecore-sim.org/, http://aurora-sim.org/
  * See CONTRIBUTORS.TXT for a full list of copyright holders.
  *
@@ -28,6 +28,7 @@
 using System.Collections.Generic;
 using WhiteCore.Framework.Servers.HttpServer.Implementation;
 using WhiteCore.Framework.Services;
+using WhiteCore.Framework.Utilities;
 
 namespace WhiteCore.Modules.Web
 {
@@ -62,11 +63,8 @@ namespace WhiteCore.Modules.Web
 
                 vars.Add ("WorldMapServiceURL", mapUrl.Remove (mapUrl.Length - 1));
                 vars.Add ("WorldMapAPIServiceURL", mapAPIUrl.Remove (mapAPIUrl.Length - 1));
+                vars.Add ("WorldRegionSize", Constants.RegionSize);
                 vars.Add ("MainServerURL", webInterface.GridURL);
-
-                //var settings = webInterface.GetWebUISettings ();
-                //vars.Add ("MapCenterX", settings.MapCenter.X);
-                //vars.Add ("MapCenterY", settings.MapCenter.Y);
 
             }
 

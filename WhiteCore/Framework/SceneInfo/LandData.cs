@@ -54,7 +54,7 @@ namespace WhiteCore.Framework.SceneInfo
         bool _firstParty = false;
         int _claimDate;
         int _claimPrice;
-        string _description = String.Empty;
+        string _description = string.Empty;
         int _dwell;
 
         uint _flags = (uint)ParcelFlags.AllowFly | (uint)ParcelFlags.AllowLandmark |
@@ -67,7 +67,7 @@ namespace WhiteCore.Framework.SceneInfo
         UUID _groupID = UUID.Zero;
         bool _isGroupOwned;
 
-        byte _landingType = 2;
+        byte _landingType = 2;      // direct teleport allowed
         int _localID;
         byte _mediaAutoScale;
         string _mediaDescription = "";
@@ -76,9 +76,9 @@ namespace WhiteCore.Framework.SceneInfo
         bool _mediaLoop;
         string _mediaType = "none/none";
 
-        string _mediaURL = String.Empty;
+        string _mediaURL = string.Empty;
         int _mediaWidth;
-        string _musicURL = String.Empty;
+        string _musicURL = string.Empty;
         string _name = "My Parcel";
         bool _obscureMedia;
         bool _obscureMusic;
@@ -326,6 +326,9 @@ namespace WhiteCore.Framework.SceneInfo
         /// <summary>
         ///     Determines if people are able to teleport where they please on the parcel or if they
         ///     get constrainted to a specific point on teleport within the parcel
+        ///     0 - Landing not allowed
+        ///     1 - Specific landing point set
+        ///     2 - No landing point set, direct teleports allowed
         /// </summary>
         [ProtoMember (23)]
         public byte LandingType

@@ -176,12 +176,13 @@ namespace WhiteCore.DataManager
                     {
                         if (GetColumnTypeStringSymbol(thisDef.Type) == GetColumnTypeStringSymbol(columnDefinition.Type))
                         {
-                            continue; //They are the same type, let them go on through
+                            continue; // They are the same type, let them go on through
                         }
 
                         MainConsole.Instance.Warn("Mismatched Column Type on " + tableName + "." + thisDef.Name +
                                                   ": " + GetColumnTypeStringSymbol(thisDef.Type) + ", " +
                                                   GetColumnTypeStringSymbol(columnDefinition.Type));
+                        return false;
                         
                     }
                     MainConsole.Instance.Warn("[DataMigrator]: Issue verifying table " + tableName + " column " +

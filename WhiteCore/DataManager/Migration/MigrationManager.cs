@@ -77,10 +77,10 @@ namespace WhiteCore.DataManager.Migration
             executed = false;
             Version currentVersion = genericData.GetWhiteCoreVersion(migratorName);
 
-            //if there is no WhiteCore version, this is likely an entirely new installation
+            // if there is no WhiteCore version, this is likely an entirely new installation
             if (currentVersion == null)
             {
-            	MainConsole.Instance.InfoFormat("[Migrator]: Clean installation for {0} found", migratorName);
+            	MainConsole.Instance.InfoFormat("[Migrator]: Clean installation of {0} required", migratorName);
             	Migrator defaultMigrator = GetHighestVersionMigratorThatCanProvideDefaultSetup();
                 currentVersion = defaultMigrator.Version;
                 Migrator startMigrator = GetMigratorAfterVersion(defaultMigrator.Version);

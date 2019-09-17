@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Copyright (c) Contributors, http://whitecore-sim.org/, http://aurora-sim.org
  * See CONTRIBUTORS.TXT for a full list of copyright holders.
  *
@@ -36,13 +36,13 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.Runtime
         public static readonly LSL_Types.LSLInteger TRUE = new LSL_Types.LSLInteger (1);
         public static readonly LSL_Types.LSLInteger FALSE = new LSL_Types.LSLInteger (0);
 
-        // Mathemetical constants
+        // Mathematical constants
         public static readonly LSL_Types.LSLFloat PI = 3.14159265;
         public static readonly LSL_Types.LSLFloat TWO_PI = 6.2831853;
-        public static readonly LSL_Types.LSLFloat PI_BY_TWO = 1.57079632;
+        public static readonly LSL_Types.LSLFloat PI_BY_TWO = 1.57079633;
         public static readonly LSL_Types.LSLFloat DEG_TO_RAD = 0.017453292;
-        public static readonly LSL_Types.LSLFloat RAD_TO_DEG = 57.295779;
-        public static readonly LSL_Types.LSLFloat SQRT2 = 1.4142135;
+        public static readonly LSL_Types.LSLFloat RAD_TO_DEG = 57.2957795;
+        public static readonly LSL_Types.LSLFloat SQRT2 = 1.41421356;
 
         public static readonly LSL_Types.LSLInteger STATUS_PHYSICS = 0x1;
         public static readonly LSL_Types.LSLInteger STATUS_ROTATE_X = 0x2;
@@ -58,8 +58,8 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.Runtime
 
         public static readonly LSL_Types.LSLInteger AGENT = 1;
         public static readonly LSL_Types.LSLInteger AGENT_BY_LEGACY_NAME = 1;
-        public static readonly LSL_Types.LSLInteger AGENT_BY_USERNAME = 0x10;
-        public static readonly LSL_Types.LSLInteger NPC = 0x20;
+        public static readonly LSL_Types.LSLInteger AGENT_BY_USERNAME = 16;
+        public static readonly LSL_Types.LSLInteger NPC = 32;
         public static readonly LSL_Types.LSLInteger ACTIVE = 2;
         public static readonly LSL_Types.LSLInteger PASSIVE = 4;
         public static readonly LSL_Types.LSLInteger SCRIPTED = 8;
@@ -89,8 +89,10 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.Runtime
         public static readonly LSL_Types.LSLInteger PERMISSION_CONTROL_CAMERA = 2048;
         public static readonly LSL_Types.LSLInteger PERMISSION_TELEPORT = 4096;
         public static readonly LSL_Types.LSLInteger PERMISSION_COMBAT = 8196;
+        public static readonly LSL_Types.LSLInteger PERMISSION_SILENT_ESTATE_MANAGEMENT = 16384; // 07-2018  llRequestPermissions
         public static readonly LSL_Types.LSLInteger PERMISSION_OVERRIDE_ANIMATIONS = 32768;
-
+        public static readonly LSL_Types.LSLInteger PERMISSION_RETURN_OBJECTS = 65536; // 07-2018 llRequestPermissions
+        
         public static readonly LSL_Types.LSLInteger AGENT_FLYING = 1;
         public static readonly LSL_Types.LSLInteger AGENT_ATTACHMENTS = 2;
         public static readonly LSL_Types.LSLInteger AGENT_SCRIPTED = 4;
@@ -104,6 +106,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.Runtime
         public static readonly LSL_Types.LSLInteger AGENT_CROUCHING = 1024;
         public static readonly LSL_Types.LSLInteger AGENT_BUSY = 2048;
         public static readonly LSL_Types.LSLInteger AGENT_ALWAYS_RUN = 4096;
+        public static readonly LSL_Types.LSLInteger AGENT_AUTOPILOT = 8192;
 
         //Particle Systems
         public static readonly LSL_Types.LSLInteger PSYS_PART_INTERP_COLOR_MASK = 1;
@@ -208,6 +211,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.Runtime
         public static readonly LSL_Types.LSLInteger VEHICLE_FLAG_NO_DEFLECTION = 16392;
         public static readonly LSL_Types.LSLInteger VEHICLE_FLAG_LOCK_ROTATION = 32784;
 
+        // Inventory
         public static readonly LSL_Types.LSLInteger INVENTORY_ALL = -1;
         public static readonly LSL_Types.LSLInteger INVENTORY_NONE = -1;
         public static readonly LSL_Types.LSLInteger INVENTORY_TEXTURE = 0;
@@ -221,6 +225,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.Runtime
         public static readonly LSL_Types.LSLInteger INVENTORY_ANIMATION = 20;
         public static readonly LSL_Types.LSLInteger INVENTORY_GESTURE = 21;
 
+        // Attachments
         public static readonly LSL_Types.LSLInteger ATTACH_CHEST = 1;
         public static readonly LSL_Types.LSLInteger ATTACH_HEAD = 2;
         public static readonly LSL_Types.LSLInteger ATTACH_LSHOULDER = 3;
@@ -262,24 +267,24 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.Runtime
         public static readonly LSL_Types.LSLInteger ATTACH_HUD_BOTTOM = 37;
         public static readonly LSL_Types.LSLInteger ATTACH_HUD_BOTTOM_RIGHT = 38;
         public static readonly LSL_Types.LSLInteger ATTACH_NECK = 39;
-        public static readonly LSL_Types.LSLInteger ATTACH_AVATAR_CENTER = 40;
-        // Project Bento Bones
-        public static readonly LSL_Types.LSLInteger ATTACH_LHAND_RING1 = 41;
-        public static readonly LSL_Types.LSLInteger ATTACH_RHAND_RING1 = 42;
-        public static readonly LSL_Types.LSLInteger ATTACH_TAIL_BASE = 43;
-        public static readonly LSL_Types.LSLInteger ATTACH_TAIL_TIP = 44;
-        public static readonly LSL_Types.LSLInteger ATTACH_LWING = 45;
-        public static readonly LSL_Types.LSLInteger ATTACH_RWING = 46;
-        public static readonly LSL_Types.LSLInteger ATTACH_FACE_JAW = 47;
-        public static readonly LSL_Types.LSLInteger ATTACH_FACE_LEAR = 48;
-        public static readonly LSL_Types.LSLInteger ATTACH_FACE_REAR = 49;
-        public static readonly LSL_Types.LSLInteger ATTACH_FACE_LEYE = 50;
-        public static readonly LSL_Types.LSLInteger ATTACH_FACE_REYE = 51;
-        public static readonly LSL_Types.LSLInteger ATTACH_FACE_TONGUE = 52;
-        public static readonly LSL_Types.LSLInteger ATTACH_GROIN = 53;
-        public static readonly LSL_Types.LSLInteger ATTACH_HIND_LFOOT = 54;
-        public static readonly LSL_Types.LSLInteger ATTACH_HIND_RFOOT = 55;        
+        public static readonly LSL_Types.LSLInteger ATTACH_AVATAR_CENTER = 40;        
+        public static readonly LSL_Types.LSLInteger ATTACH_LHAND_RING1 = 41; // Project Bento Bones
+        public static readonly LSL_Types.LSLInteger ATTACH_RHAND_RING1 = 42; // Project Bento Bones
+        public static readonly LSL_Types.LSLInteger ATTACH_TAIL_BASE = 43; // Project Bento Bones
+        public static readonly LSL_Types.LSLInteger ATTACH_TAIL_TIP = 44; // Project Bento Bones
+        public static readonly LSL_Types.LSLInteger ATTACH_LWING = 45; // Project Bento Bones
+        public static readonly LSL_Types.LSLInteger ATTACH_RWING = 46; // Project Bento Bones
+        public static readonly LSL_Types.LSLInteger ATTACH_FACE_JAW = 47; // Project Bento Bones
+        public static readonly LSL_Types.LSLInteger ATTACH_FACE_LEAR = 48; // Project Bento Bones
+        public static readonly LSL_Types.LSLInteger ATTACH_FACE_REAR = 49; // Project Bento Bones
+        public static readonly LSL_Types.LSLInteger ATTACH_FACE_LEYE = 50; // Project Bento Bones
+        public static readonly LSL_Types.LSLInteger ATTACH_FACE_REYE = 51; // Project Bento Bones
+        public static readonly LSL_Types.LSLInteger ATTACH_FACE_TONGUE = 52; // Project Bento Bones
+        public static readonly LSL_Types.LSLInteger ATTACH_GROIN = 53; // Project Bento Bones
+        public static readonly LSL_Types.LSLInteger ATTACH_HIND_LFOOT = 54; // Project Bento Bones
+        public static readonly LSL_Types.LSLInteger ATTACH_HIND_RFOOT = 55; // Project Bento Bones        
 
+        // Land
         public static readonly LSL_Types.LSLInteger LAND_LEVEL = 0;
         public static readonly LSL_Types.LSLInteger LAND_RAISE = 1;
         public static readonly LSL_Types.LSLInteger LAND_LOWER = 2;
@@ -393,6 +398,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.Runtime
         public static readonly LSL_Types.LSLInteger PRIM_OMEGA = 32;
         public static readonly LSL_Types.LSLInteger PRIM_POS_LOCAL = 33;
         public static readonly LSL_Types.LSLInteger PRIM_LINK_TARGET = 34;
+        public static readonly LSL_Types.LSLInteger PRIM_SLICE = 35; // 07-2018 Added constants
         public static readonly LSL_Types.LSLInteger PRIM_SPECULAR = 36;
         public static readonly LSL_Types.LSLInteger PRIM_NORMAL = 37;
         public static readonly LSL_Types.LSLInteger PRIM_ALPHA_MODE = 38;
@@ -413,11 +419,12 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.Runtime
         public static readonly LSL_Types.LSLInteger PRIM_PHYSICS_SHAPE_CONVEX = 2;
         public static readonly LSL_Types.LSLInteger PRIM_PHYSICS_SHAPE_TYPE = 30;
 
-        public static readonly LSL_Types.LSLInteger DENSITY = 0;
-        public static readonly LSL_Types.LSLInteger FRICTION = 1;
-        public static readonly LSL_Types.LSLInteger RESTITUTION = 2;
-        public static readonly LSL_Types.LSLInteger GRAVITY_MULTIPLIER = 3;
-
+        public static readonly LSL_Types.LSLInteger DENSITY = 1; // 07-2018 Changed values
+        public static readonly LSL_Types.LSLInteger FRICTION = 2; // 07-2018 Changed values
+        public static readonly LSL_Types.LSLInteger RESTITUTION = 4; // 07-2018 Changed values
+        public static readonly LSL_Types.LSLInteger GRAVITY_MULTIPLIER = 8; // 07-2018 Changed values
+        
+        // Primitive
         public static readonly LSL_Types.LSLInteger PRIM_TYPE_BOX = 0;
         public static readonly LSL_Types.LSLInteger PRIM_TYPE_CYLINDER = 1;
         public static readonly LSL_Types.LSLInteger PRIM_TYPE_PRISM = 2;
@@ -426,12 +433,14 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.Runtime
         public static readonly LSL_Types.LSLInteger PRIM_TYPE_TUBE = 5;
         public static readonly LSL_Types.LSLInteger PRIM_TYPE_RING = 6;
         public static readonly LSL_Types.LSLInteger PRIM_TYPE_SCULPT = 7;
-
+        
+        // Primitive Hole
         public static readonly LSL_Types.LSLInteger PRIM_HOLE_DEFAULT = 0;
         public static readonly LSL_Types.LSLInteger PRIM_HOLE_CIRCLE = 16;
         public static readonly LSL_Types.LSLInteger PRIM_HOLE_SQUARE = 32;
         public static readonly LSL_Types.LSLInteger PRIM_HOLE_TRIANGLE = 48;
 
+        // Primitive Material
         public static readonly LSL_Types.LSLInteger PRIM_MATERIAL_STONE = 0;
         public static readonly LSL_Types.LSLInteger PRIM_MATERIAL_METAL = 1;
         public static readonly LSL_Types.LSLInteger PRIM_MATERIAL_GLASS = 2;
@@ -464,13 +473,16 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.Runtime
         public static readonly LSL_Types.LSLInteger PRIM_BUMP_SUCTION = 16;
         public static readonly LSL_Types.LSLInteger PRIM_BUMP_WEAVE = 17;
 
+        // Sculpted Primitive
         public static readonly LSL_Types.LSLInteger PRIM_SCULPT_TYPE_SPHERE = 1;
         public static readonly LSL_Types.LSLInteger PRIM_SCULPT_TYPE_TORUS = 2;
         public static readonly LSL_Types.LSLInteger PRIM_SCULPT_TYPE_PLANE = 3;
         public static readonly LSL_Types.LSLInteger PRIM_SCULPT_TYPE_CYLINDER = 4;
-        //WhiteCore-Sim const only
         public static readonly LSL_Types.LSLInteger PRIM_SCULPT_TYPE_MESH = 5;
-        //???
+        // 07 - 2018 ~ Fly-Man-
+        // PRIM_SCULPT_TYPE_MASK can be used when parsing the output of llGetPrimitiveParams when dealing with sculpted prims (PRIM_TYPE_SCULPT) 
+        // to separate the sculpted type from the flags (PRIM_SCULPT_FLAG_INVERT and PRIM_SCULPT_FLAG_MIRROR) that can modify it.
+        public static readonly LSL_Types.LSLInteger PRIM_SCULPT_TYPE_MASK = 7; // 07-2018 Added constants
         public static readonly LSL_Types.LSLInteger PRIM_SCULPT_FLAG_INVERT = 64;
         public static readonly LSL_Types.LSLInteger PRIM_SCULPT_FLAG_MIRROR = 128;
 
@@ -480,12 +492,14 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.Runtime
         public static readonly LSL_Types.LSLInteger MASK_EVERYONE = 3;
         public static readonly LSL_Types.LSLInteger MASK_NEXT = 4;
 
+        // Permissions
         public static readonly LSL_Types.LSLInteger PERM_TRANSFER = 8192;
         public static readonly LSL_Types.LSLInteger PERM_MODIFY = 16384;
         public static readonly LSL_Types.LSLInteger PERM_COPY = 32768;
         public static readonly LSL_Types.LSLInteger PERM_MOVE = 524288;
         public static readonly LSL_Types.LSLInteger PERM_ALL = 2147483647;
 
+        // Parcel Media
         public static readonly LSL_Types.LSLInteger PARCEL_MEDIA_COMMAND_STOP = 0;
         public static readonly LSL_Types.LSLInteger PARCEL_MEDIA_COMMAND_PAUSE = 1;
         public static readonly LSL_Types.LSLInteger PARCEL_MEDIA_COMMAND_PLAY = 2;
@@ -555,15 +569,16 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.Runtime
         public static readonly LSL_Types.LSLInteger PARCEL_FLAG_ALLOW_GROUP_OBJECT_ENTRY = 0x10000000; // parcel allows with the same group to enter
 
         // Region Flags
-        public static readonly LSL_Types.LSLInteger REGION_FLAG_ALLOW_DAMAGE = 0x1; // region is entirely damage enabled
-        public static readonly LSL_Types.LSLInteger REGION_FLAG_FIXED_SUN = 0x10; // region has a fixed sun position
-        public static readonly LSL_Types.LSLInteger REGION_FLAG_BLOCK_TERRAFORM = 0x40; // region terraforming disabled
-        public static readonly LSL_Types.LSLInteger REGION_FLAG_SANDBOX = 0x100; // region is a sandbox
-        public static readonly LSL_Types.LSLInteger REGION_FLAG_DISABLE_COLLISIONS = 0x1000;  // region has disabled collisions
-        public static readonly LSL_Types.LSLInteger REGION_FLAG_DISABLE_PHYSICS = 0x4000; // region has disabled physics
-        public static readonly LSL_Types.LSLInteger REGION_FLAG_BLOCK_FLY = 0x80000; // region blocks flying
-        public static readonly LSL_Types.LSLInteger REGION_FLAG_ALLOW_DIRECT_TELEPORT = 0x100000; // region allows direct teleports
-        public static readonly LSL_Types.LSLInteger REGION_FLAG_RESTRICT_PUSHOBJECT = 0x400000; // region restricts llPushObject
+        public static readonly LSL_Types.LSLInteger REGION_FLAG_ALLOW_DAMAGE = 0x00000001; // Used with llGetRegionFlags to find if a region is entirely damage enabled
+        public static readonly LSL_Types.LSLInteger REGION_FLAG_ALLOW_DIRECT_TELEPORT = 0x00100000; // Used with llGetRegionFlags to find if a region allows direct teleports
+        public static readonly LSL_Types.LSLInteger REGION_FLAG_BLOCK_FLY = 0x00080000; // Used with llGetRegionFlags to find if a region blocks flying
+        public static readonly LSL_Types.LSLInteger REGION_FLAG_BLOCK_FLYOVER = 0x08000000; // Used with llGetRegionFlags to find if a region enforces higher altitude parcel access rules
+        public static readonly LSL_Types.LSLInteger REGION_FLAG_BLOCK_TERRAFORM = 0x00000040; //Used with llGetRegionFlags to find if a region terraforming disabled
+        public static readonly LSL_Types.LSLInteger REGION_FLAG_DISABLE_COLLISIONS = 0x00001000; // Used with llGetRegionFlags to find if a region has disabled collisions
+        public static readonly LSL_Types.LSLInteger REGION_FLAG_DISABLE_PHYSICS = 0x00004000; // Used with llGetRegionFlags to find if a region has disabled physics
+        public static readonly LSL_Types.LSLInteger REGION_FLAG_FIXED_SUN = 0x00000010; // Used with llGetRegionFlags to find if a region has a fixed sun position
+        public static readonly LSL_Types.LSLInteger REGION_FLAG_RESTRICT_PUSHOBJECT = 0x00400000; // Used with llGetRegionFlags to find if a region restricts llPushObject() calls
+        public static readonly LSL_Types.LSLInteger REGION_FLAG_SANDBOX = 0x00000100; // Used with llGetRegionFlags to find if a region is a sandbox
 
         public static readonly LSL_Types.LSLInteger PAY_HIDE = new LSL_Types.LSLInteger (-1);
         public static readonly LSL_Types.LSLInteger PAY_DEFAULT = new LSL_Types.LSLInteger (-2);
@@ -630,7 +645,6 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.Runtime
         public static readonly LSL_Types.LSLInteger OBJECT_HOVER_HEIGHT = 25;
         public static readonly LSL_Types.LSLInteger OBJECT_BODY_SHAPE_TYPE = 26;
         public static readonly LSL_Types.LSLInteger OBJECT_LAST_OWNER_ID = 27;
-        // new constants since Apr 2016
         public static readonly LSL_Types.LSLInteger OBJECT_CLICK_ACTION = 28;
         public static readonly LSL_Types.LSLInteger OBJECT_OMEGA = 29;
         public static readonly LSL_Types.LSLInteger OBJECT_PRIM_COUNT = 30;
@@ -638,11 +652,12 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.Runtime
         public static readonly LSL_Types.LSLInteger OBJECT_REZZER_KEY = 32;
         public static readonly LSL_Types.LSLInteger OBJECT_GROUP_TAG = 33;
         public static readonly LSL_Types.LSLInteger OBJECT_TEMP_ATTACHED = 34;
-        // new constants since Sep 2017
         public static readonly LSL_Types.LSLInteger OBJECT_ATTACHED_SLOTS_AVAILABLE = 35;
         public static readonly LSL_Types.LSLInteger OBJECT_CREATION_TIME = 36;
         public static readonly LSL_Types.LSLInteger OBJECT_SELECT_COUNT = 37;
         public static readonly LSL_Types.LSLInteger OBJECT_SIT_COUNT = 38;
+        public static readonly LSL_Types.LSLInteger OBJECT_ANIMATED_COUNT = 39;
+        public static readonly LSL_Types.LSLInteger OBJECT_ANIMATED_SLOTS_AVAILABLE = 40;
         	        
         public static readonly vector ZERO_VECTOR = new vector (0.0, 0.0, 0.0);
         public static readonly rotation ZERO_ROTATION = new rotation (0.0, 0.0, 0.0, 1.0);
@@ -650,9 +665,9 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.Runtime
         // constants for llSetCameraParams
         public static readonly LSL_Types.LSLInteger CAMERA_PITCH = 0;
         public static readonly LSL_Types.LSLInteger CAMERA_FOCUS_OFFSET = 1;
-        public static readonly LSL_Types.LSLInteger CAMERA_FOCUS_OFFSET_X = 2;
-        public static readonly LSL_Types.LSLInteger CAMERA_FOCUS_OFFSET_Y = 3;
-        public static readonly LSL_Types.LSLInteger CAMERA_FOCUS_OFFSET_Z = 4;
+        public static readonly LSL_Types.LSLInteger CAMERA_FOCUS_OFFSET_X = 2; // 07-2018 Unknown constant
+        public static readonly LSL_Types.LSLInteger CAMERA_FOCUS_OFFSET_Y = 3; // 07-2018 Unknown constant
+        public static readonly LSL_Types.LSLInteger CAMERA_FOCUS_OFFSET_Z = 4; // 07-2018 Unknown constant
         public static readonly LSL_Types.LSLInteger CAMERA_POSITION_LAG = 5;
         public static readonly LSL_Types.LSLInteger CAMERA_FOCUS_LAG = 6;
         public static readonly LSL_Types.LSLInteger CAMERA_DISTANCE = 7;
@@ -662,13 +677,13 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.Runtime
         public static readonly LSL_Types.LSLInteger CAMERA_FOCUS_THRESHOLD = 11;
         public static readonly LSL_Types.LSLInteger CAMERA_ACTIVE = 12;
         public static readonly LSL_Types.LSLInteger CAMERA_POSITION = 13;
-        public static readonly LSL_Types.LSLInteger CAMERA_POSITION_X = 14;
-        public static readonly LSL_Types.LSLInteger CAMERA_POSITION_Y = 15;
-        public static readonly LSL_Types.LSLInteger CAMERA_POSITION_Z = 16;
+        public static readonly LSL_Types.LSLInteger CAMERA_POSITION_X = 14; // 07-2018 Unknown constant
+        public static readonly LSL_Types.LSLInteger CAMERA_POSITION_Y = 15; // 07-2018 Unknown constant
+        public static readonly LSL_Types.LSLInteger CAMERA_POSITION_Z = 16; // 07-2018 Unknown constant
         public static readonly LSL_Types.LSLInteger CAMERA_FOCUS = 17;
-        public static readonly LSL_Types.LSLInteger CAMERA_FOCUS_X = 18;
-        public static readonly LSL_Types.LSLInteger CAMERA_FOCUS_Y = 19;
-        public static readonly LSL_Types.LSLInteger CAMERA_FOCUS_Z = 20;
+        public static readonly LSL_Types.LSLInteger CAMERA_FOCUS_X = 18; // 07-2018 Unknown constant
+        public static readonly LSL_Types.LSLInteger CAMERA_FOCUS_Y = 19; // 07-2018 Unknown constant
+        public static readonly LSL_Types.LSLInteger CAMERA_FOCUS_Z = 20; // 07-2018 Unknown constant
         public static readonly LSL_Types.LSLInteger CAMERA_POSITION_LOCKED = 21;
         public static readonly LSL_Types.LSLInteger CAMERA_FOCUS_LOCKED = 22;
 
@@ -681,6 +696,8 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.Runtime
         public static readonly LSL_Types.LSLInteger PARCEL_DETAILS_ID = 5;
         public static readonly LSL_Types.LSLInteger PARCEL_DETAILS_PRIVACY = 6; //Old name
         public static readonly LSL_Types.LSLInteger PARCEL_DETAILS_SEE_AVATARS = 6;
+        public static readonly LSL_Types.LSLInteger PARCEL_DETAILS_ANY_AVATAR_SOUNDS = 7;
+        public static readonly LSL_Types.LSLInteger PARCEL_DETAILS_GROUP_SOUNDS = 8;
 
         // constants for llSetClickAction
         public static readonly LSL_Types.LSLInteger CLICK_ACTION_NONE = 0;
@@ -712,33 +729,37 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.Runtime
         public static readonly LSL_Types.LSLInteger PASS_ALWAYS = 1;
         public static readonly LSL_Types.LSLInteger PASS_NEVER = 2;
 
-        public static readonly LSL_Types.LSLInteger RC_DATA_FLAGS = 4;
-        public static readonly LSL_Types.LSLInteger RC_MAX_HITS = 8;
-        public static readonly LSL_Types.LSLInteger RC_DETECT_PHANTOM = 16;
+        public static readonly LSL_Types.LSLInteger RC_DATA_FLAGS = 2; // 07-2018 Changed values
+        public static readonly LSL_Types.LSLInteger RC_MAX_HITS = 3; // 07-2018 Changed values
+        public static readonly LSL_Types.LSLInteger RC_DETECT_PHANTOM = 1; // 07-2018 Changed values
 
         public static readonly LSL_Types.LSLInteger RC_REJECT_TYPES = 0;
-        public static readonly LSL_Types.LSLInteger RC_REJECT_AGENTS = 0x1;
-        public static readonly LSL_Types.LSLInteger RC_REJECT_PHYSICAL = 0x2;
-        public static readonly LSL_Types.LSLInteger RC_REJECT_NONPHYSICAL = 0x4;
-        public static readonly LSL_Types.LSLInteger RC_REJECT_LAND = 0x8;
+        public static readonly LSL_Types.LSLInteger RC_REJECT_AGENTS = 1;
+        public static readonly LSL_Types.LSLInteger RC_REJECT_PHYSICAL = 2;
+        public static readonly LSL_Types.LSLInteger RC_REJECT_NONPHYSICAL = 4;
+        public static readonly LSL_Types.LSLInteger RC_REJECT_LAND = 8;
 
-        public static readonly LSL_Types.LSLInteger RC_GET_NORMAL = 2;
-        public static readonly LSL_Types.LSLInteger RC_GET_ROOT_KEY = 4;
-        public static readonly LSL_Types.LSLInteger RC_GET_LINK_NUM = 8;
+        public static readonly LSL_Types.LSLInteger RC_GET_NORMAL = 1; // 07-2018 Changed values
+        public static readonly LSL_Types.LSLInteger RC_GET_ROOT_KEY = 2; // 07-2018 Changed values
+        public static readonly LSL_Types.LSLInteger RC_GET_LINK_NUM = 4; // 07-2018 Changed values
 
-        public static readonly LSL_Types.LSLInteger RCERR_CAST_TIME_EXCEEDED = 1;
+        // llCastRay
+        public static readonly LSL_Types.LSLInteger RCERR_CAST_TIME_EXCEEDED = -3; // 07-2018 Changed values
+        public static readonly LSL_Types.LSLInteger RCERR_SIM_PERF_LOW = -2; // 07-2018 Changed values
+        public static readonly LSL_Types.LSLInteger RCERR_UNKNOWN = -1; // 07-2018 Changed values
 
         public static readonly LSL_Types.LSLInteger PROFILE_NONE = 0;
         public static readonly LSL_Types.LSLInteger PROFILE_SCRIPT_MEMORY = 1;
 
         //llManageEstateAccess
-        public static readonly LSL_Types.LSLInteger ESTATE_ACCESS_ALLOWED_AGENT_ADD = 0;
-        public static readonly LSL_Types.LSLInteger ESTATE_ACCESS_ALLOWED_AGENT_REMOVE = 1;
-        public static readonly LSL_Types.LSLInteger ESTATE_ACCESS_ALLOWED_GROUP_ADD = 2;
-        public static readonly LSL_Types.LSLInteger ESTATE_ACCESS_ALLOWED_GROUP_REMOVE = 3;
-        public static readonly LSL_Types.LSLInteger ESTATE_ACCESS_BANNED_AGENT_ADD = 4;
-        public static readonly LSL_Types.LSLInteger ESTATE_ACCESS_BANNED_AGENT_REMOVE = 5;
+        public static readonly LSL_Types.LSLInteger ESTATE_ACCESS_ALLOWED_AGENT_ADD = 4;  // 07-2018 Changed values
+        public static readonly LSL_Types.LSLInteger ESTATE_ACCESS_ALLOWED_AGENT_REMOVE = 8;  // 07-2018 Changed values
+        public static readonly LSL_Types.LSLInteger ESTATE_ACCESS_ALLOWED_GROUP_ADD = 16;  // 07-2018 Changed values
+        public static readonly LSL_Types.LSLInteger ESTATE_ACCESS_ALLOWED_GROUP_REMOVE = 32;  // 07-2018 Changed values
+        public static readonly LSL_Types.LSLInteger ESTATE_ACCESS_BANNED_AGENT_ADD = 64;  // 07-2018 Changed values
+        public static readonly LSL_Types.LSLInteger ESTATE_ACCESS_BANNED_AGENT_REMOVE = 128;  // 07-2018 Changed values
 
+        // llSetKeyframedMotion
         public static readonly LSL_Types.LSLInteger KFM_MODE = 2;
         public static readonly LSL_Types.LSLInteger KFM_LOOP = 4;
         public static readonly LSL_Types.LSLInteger KFM_REVERSE = 8;
@@ -789,6 +810,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.Runtime
         public static readonly LSL_Types.LSLInteger CHARACTER_TYPE_D = 3;
         public static readonly LSL_Types.LSLInteger CHARACTER_TYPE_NONE = 4;
 
+        public static readonly LSL_Types.LSLInteger AVOID_NONE = 0; // 07-2018 Pathfinding
         public static readonly LSL_Types.LSLInteger AVOID_CHARACTERS = 1;
         public static readonly LSL_Types.LSLInteger AVOID_DYNAMIC_OBSTACLES = 2;
 
@@ -830,6 +852,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.Runtime
         public static readonly LSL_Types.LSLString JSON_FALSE = "JSON_FALSE";
         public static readonly LSL_Types.LSLString JSON_NULL = "JSON_NULL";
         public static readonly LSL_Types.LSLString JSON_APPEND = "JSON_APPEND";
+        public static readonly LSL_Types.LSLString JSON_DELETE = "JSON_DELETE"; // 07-2018 Added constants
 
         // Experience Parameters (from event "experience_error")
         public static readonly LSL_Types.LSLInteger XP_ERROR_NONE = 0;
@@ -860,5 +883,36 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.Runtime
         public static readonly LSL_Types.LSLInteger SIT_NO_ACCESS = -6;
         public static readonly LSL_Types.LSLInteger SIT_NO_EXPERIENCE_PERMISSION = -2;
         public static readonly LSL_Types.LSLInteger SIT_NO_SIT_TARGET = -3;
+
+        // Added 07-2018 (llReturnObjectsByID / llReturnObjectsByOwner)
+        public static readonly LSL_Types.LSLInteger ERR_GENERIC = -1;
+        public static readonly LSL_Types.LSLInteger ERR_MALFORMED_PARAMS = -3;
+        public static readonly LSL_Types.LSLInteger ERR_PARCEL_PERMISSIONS = -2;
+        public static readonly LSL_Types.LSLInteger ERR_RUNTIME_PERMISSIONS = -4;
+        public static readonly LSL_Types.LSLInteger ERR_THROTTLED = -5;
+
+        // Added 07-2018 (llGetClosestNavPoint)
+        public static readonly LSL_Types.LSLInteger GCNP_RADIUS = 0;
+        public static readonly LSL_Types.LSLInteger GCNP_STATIC = 1;
+
+        // Added 07-2018 (llPatrolPoints)
+        public static readonly LSL_Types.LSLInteger PATROL_PAUSE_AT_WAYPOINTS = 0;
+
+        // Added 07-2018 (llWanderWithin)
+        public static readonly LSL_Types.LSLInteger WANDER_PAUSE_AT_WAYPOINTS = 0;
+
+        // Added 07-2018 (llGetPrimitiveParams([PRIM_ALPHA_MODE])
+        public static readonly LSL_Types.LSLInteger PRIM_ALPHA_MODE_BLEND = 1;
+        public static readonly LSL_Types.LSLInteger PRIM_ALPHA_MODE_EMISSIVE = 3;
+        public static readonly LSL_Types.LSLInteger PRIM_ALPHA_MODE_MASK = 2;
+        public static readonly LSL_Types.LSLInteger PRIM_ALPHA_MODE_NONE = 0;
+
+        // Added 07-2018 (Presumable llSetPrimMediaParams)
+        public static readonly LSL_Types.LSLInteger PRIM_MEDIA_MAX_HEIGHT_PIXELS = 2048;
+        public static readonly LSL_Types.LSLInteger PRIM_MEDIA_MAX_URL_LENGTH = 1024;
+        public static readonly LSL_Types.LSLInteger PRIM_MEDIA_MAX_WHITELIST_COUNT = 64;
+        public static readonly LSL_Types.LSLInteger PRIM_MEDIA_MAX_WHITELIST_SIZE = 1024;
+        public static readonly LSL_Types.LSLInteger PRIM_MEDIA_MAX_WIDTH_PIXELS = 2048;
+        public static readonly LSL_Types.LSLInteger PRIM_MEDIA_PARAM_MAX = 14;
     }
 }

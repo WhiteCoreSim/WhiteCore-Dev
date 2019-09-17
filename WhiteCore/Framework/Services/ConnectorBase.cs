@@ -122,7 +122,7 @@ namespace WhiteCore.Framework.Services
                     m_OSDRequestTryCount = config.GetInt ("OSDRequestTryCount", m_OSDRequestTryCount);
             }
             if (m_doRemoteCalls)
-                m_doRemoteOnly = true; //Lock out local + remote for now
+                m_doRemoteOnly = true; // Lock out local + remote for now
 
             ConnectorRegistry.RegisterConnector (this);
 

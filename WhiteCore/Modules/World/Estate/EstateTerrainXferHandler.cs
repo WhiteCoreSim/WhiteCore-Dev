@@ -43,7 +43,7 @@ namespace WhiteCore.Modules.Estate
         #endregion
 
         readonly AssetBase m_asset;
-        readonly object _lock = new object ();
+        readonly object _xfrlock = new object ();
 
         TerrainUploadComplete handlerTerrainUploadDone;
         public ulong mXferID;
@@ -77,7 +77,7 @@ namespace WhiteCore.Modules.Estate
         public void XferReceive (IClientAPI remoteClient, ulong xferID, uint packetID, byte [] data)
         {
             if (mXferID == xferID) {
-                lock (_lock) {
+                lock (_xfrlock) {
                     if (m_asset.Data.Length > 1) {
                         byte [] destinationArray = new byte [m_asset.Data.Length + data.Length];
                         Array.Copy (m_asset.Data, 0, destinationArray, 0, m_asset.Data.Length);

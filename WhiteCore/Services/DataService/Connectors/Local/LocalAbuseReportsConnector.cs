@@ -37,38 +37,35 @@ namespace WhiteCore.Services.DataService
 {
     public class LocalAbuseReportsConnector : IAbuseReportsConnector
     {
-        IGenericData GD;
+        IGenericData genData;
         string m_abuseReportsTable = "abusereports";
         bool m_enabled;
 
         #region IAbuseReportsConnector Members
 
-        public void Initialize(IGenericData GenericData, IConfigSource source, IRegistryCore simBase,
+        public void Initialize (IGenericData GenericData, IConfigSource source, IRegistryCore simBase,
                                string defaultConnectionString)
         {
-            GD = GenericData;
+            genData = GenericData;
 
-            if (source.Configs[Name] != null)
-                defaultConnectionString = source.Configs[Name].GetString("ConnectionString", defaultConnectionString);
+            if (source.Configs [Name] != null)
+                defaultConnectionString = source.Configs [Name].GetString ("ConnectionString", defaultConnectionString);
 
-            if (GD != null)
-            {
-                GD.ConnectToDatabase (defaultConnectionString, "AbuseReports",
+            if (genData != null) {
+                genData.ConnectToDatabase (defaultConnectionString, "AbuseReports",
                     source.Configs ["WhiteCoreConnectors"].GetBoolean ("ValidateTables", true));
 
-            
+
                 Framework.Utilities.DataManager.RegisterPlugin (Name + "Local", this);
                 if (source.Configs ["WhiteCoreConnectors"].GetString ("AbuseReportsConnector", "LocalConnector") ==
-                    "LocalConnector")
-                {
+                    "LocalConnector") {
                     m_enabled = true;
                     Framework.Utilities.DataManager.RegisterPlugin (this);
                 }
             }
         }
 
-        public string Name
-        {
+        public string Name {
             get { return "IAbuseReportsConnector"; }
         }
 
@@ -84,7 +81,7 @@ namespace WhiteCore.Services.DataService
         public int AbuseReportCount ()
         {
             QueryFilter filter = new QueryFilter ();
-            var reports = GD.Query (new string[1] { "count(*)" }, m_abuseReportsTable, filter, null, null, null);
+            var reports = genData.Query (new string [1] { "count(*)" }, m_abuseReportsTable, filter, null, null, null);
             if ((reports == null) || (reports.Count == 0))
                 return 0;
 
@@ -98,9 +95,9 @@ namespace WhiteCore.Services.DataService
         /// <param name="Number"></param>
         /// <param name="Password"></param>
         /// <returns></returns>
-        public AbuseReport GetAbuseReport(int Number, string Password)
+        public AbuseReport GetAbuseReport (int Number, string Password)
         {
-            return GetAbuseReport(Number);
+            return GetAbuseReport (Number);
         }
 
         /// <summary>
@@ -108,49 +105,46 @@ namespace WhiteCore.Services.DataService
         /// </summary>
         /// <param name="Number"></param>
         /// <returns></returns>
-        public AbuseReport GetAbuseReport(int Number)
+        public AbuseReport GetAbuseReport (int Number)
         {
             QueryFilter filter = new QueryFilter ();
             filter.andFilters ["Number"] = Number;
-            List<string> Reports = GD.Query (new string[] { "*" }, m_abuseReportsTable, filter, null, null, null);
+            List<string> reports = genData.Query (new string [] { "*" }, m_abuseReportsTable, filter, null, null, null);
 
-            return (Reports.Count == 0)
+            return (reports.Count == 0)
                        ? null
                        : new AbuseReport {
-                Category = Reports [0],
-                ReporterName = Reports [1],
-                ObjectName = Reports [2],
-                ObjectUUID = new UUID (Reports [3]),
-                AbuserName = Reports [4],
-                AbuseLocation = Reports [5],
-                AbuseDetails = Reports [6],
-                ObjectPosition = Reports [7],
-                RegionName = Reports [8],
-                ScreenshotID = new UUID (Reports [9]),
-                AbuseSummary = Reports [10],
-                Number = int.Parse (Reports [11]),
-                AssignedTo = Reports [12],
-                Active = int.Parse (Reports [13]) == 1,
-                Checked = int.Parse (Reports [14]) == 1,
-                Notes = Reports [15]
-            };
+                           Category = reports [0],
+                           ReporterName = reports [1],
+                           ObjectName = reports [2],
+                           ObjectUUID = new UUID (reports [3]),
+                           AbuserName = reports [4],
+                           AbuseLocation = reports [5],
+                           AbuseDetails = reports [6],
+                           ObjectPosition = reports [7],
+                           RegionName = reports [8],
+                           ScreenshotID = new UUID (reports [9]),
+                           AbuseSummary = reports [10],
+                           Number = int.Parse (reports [11]),
+                           AssignedTo = reports [12],
+                           Active = int.Parse (reports [13]) == 1,
+                           Checked = int.Parse (reports [14]) == 1,
+                           Notes = reports [15]
+                       };
         }
 
-        public List<AbuseReport> GetAbuseReports(int start, int count, bool active)
+        public List<AbuseReport> GetAbuseReports (int start, int count, bool active)
         {
             List<AbuseReport> rv = new List<AbuseReport> ();
             QueryFilter filter = new QueryFilter ();
             filter.andGreaterThanEqFilters ["CAST(number AS UNSIGNED)"] = start;
             filter.andFilters ["Active"] = active ? 1 : 0;
-            List<string> query = GD.Query (new string[1] { "*" }, m_abuseReportsTable, filter, null, null, null);
-            if (query.Count % 16 != 0)
-            {
+            List<string> query = genData.Query (new string [1] { "*" }, m_abuseReportsTable, filter, null, null, null);
+            if (query.Count % 16 != 0) {
                 return rv;
             }
-            try
-            {
-                for (int i = 0; i < query.Count; i += 16)
-                {
+            try {
+                for (int i = 0; i < query.Count; i += 16) {
                     AbuseReport report = new AbuseReport {
                         Category = query [i + 0],
                         ReporterName = query [i + 1],
@@ -171,8 +165,7 @@ namespace WhiteCore.Services.DataService
                     };
                     rv.Add (report);
                 }
-            } catch
-            {
+            } catch {
             }
             return rv;
         }
@@ -181,7 +174,7 @@ namespace WhiteCore.Services.DataService
         ///     Adds a new abuse report to the database
         /// </summary>
         /// <param name="report"></param>
-        public void AddAbuseReport(AbuseReport report)
+        public void AddAbuseReport (AbuseReport report)
         {
             List<object> InsertValues = new List<object> {
                 report.Category.ToString (),
@@ -197,23 +190,23 @@ namespace WhiteCore.Services.DataService
                 report.AbuseSummary
             };
 
-            Dictionary<string, bool> sort = new Dictionary<string, bool>(1);
-            sort["Number"] = false;
+            Dictionary<string, bool> sort = new Dictionary<string, bool> (1);
+            sort ["Number"] = false;
 
             //We do not trust the number sent by the region. Always find it ourselves
-            List<string> values = GD.Query(new string[1] {"Number"}, m_abuseReportsTable, null, sort, null, null);
-            report.Number = values.Count == 0 ? 0 : int.Parse(values[0]);
+            List<string> values = genData.Query (new string [1] { "Number" }, m_abuseReportsTable, null, sort, null, null);
+            report.Number = values.Count == 0 ? 0 : int.Parse (values [0]);
 
             report.Number++;
 
-            InsertValues.Add(report.Number);
+            InsertValues.Add (report.Number);
 
-            InsertValues.Add(report.AssignedTo);
-            InsertValues.Add(report.Active ? 1 : 0);
-            InsertValues.Add(report.Checked ? 1 : 0);
-            InsertValues.Add(report.Notes);
+            InsertValues.Add (report.AssignedTo);
+            InsertValues.Add (report.Active ? 1 : 0);
+            InsertValues.Add (report.Checked ? 1 : 0);
+            InsertValues.Add (report.Notes);
 
-            GD.Insert(m_abuseReportsTable, InsertValues.ToArray());
+            genData.Insert (m_abuseReportsTable, InsertValues.ToArray ());
         }
 
         /// <summary>
@@ -221,42 +214,42 @@ namespace WhiteCore.Services.DataService
         /// </summary>
         /// <param name="report"></param>
         /// <param name="Password"></param>
-        public void UpdateAbuseReport(AbuseReport report, string Password)
+        public void UpdateAbuseReport (AbuseReport report, string Password)
         {
-            UpdateAbuseReport(report);
+            UpdateAbuseReport (report);
         }
 
         /// <summary>
         ///     Updates an abuse report without authentication
         /// </summary>
         /// <param name="report"></param>
-        public void UpdateAbuseReport(AbuseReport report)
+        public void UpdateAbuseReport (AbuseReport report)
         {
-            Dictionary<string, object> row = new Dictionary<string, object>(16);
+            Dictionary<string, object> row = new Dictionary<string, object> (16);
             //This is update, so we trust the number as it should know the number it's updating now.
-            row["Category"] = report.Category.ToString();
-            row["ReporterName"] = report.ReporterName;
-            row["ObjectName"] = report.ObjectName;
-            row["ObjectUUID"] = report.ObjectUUID;
-            row["AbuserName"] = report.AbuserName;
-            row["AbuseLocation"] = report.AbuseLocation;
-            row["AbuseDetails"] = report.AbuseDetails;
-            row["ObjectPosition"] = report.ObjectPosition;
-            row["RegionName"] = report.RegionName;
-            row["ScreenshotID"] = report.ScreenshotID;
-            row["AbuseSummary"] = report.AbuseSummary;
-            row["Number"] = report.Number;
-            row["AssignedTo"] = report.AssignedTo;
-            row["Active"] = report.Active ? 1 : 0;
-            row["Checked"] = report.Checked ? 1 : 0;
-            row["Notes"] = report.Notes;
+            row ["Category"] = report.Category.ToString ();
+            row ["ReporterName"] = report.ReporterName;
+            row ["ObjectName"] = report.ObjectName;
+            row ["ObjectUUID"] = report.ObjectUUID;
+            row ["AbuserName"] = report.AbuserName;
+            row ["AbuseLocation"] = report.AbuseLocation;
+            row ["AbuseDetails"] = report.AbuseDetails;
+            row ["ObjectPosition"] = report.ObjectPosition;
+            row ["RegionName"] = report.RegionName;
+            row ["ScreenshotID"] = report.ScreenshotID;
+            row ["AbuseSummary"] = report.AbuseSummary;
+            row ["Number"] = report.Number;
+            row ["AssignedTo"] = report.AssignedTo;
+            row ["Active"] = report.Active ? 1 : 0;
+            row ["Checked"] = report.Checked ? 1 : 0;
+            row ["Notes"] = report.Notes;
 
-            GD.Replace(m_abuseReportsTable, row);
+            genData.Replace (m_abuseReportsTable, row);
         }
 
         #endregion
 
-        public void Dispose()
+        public void Dispose ()
         {
         }
     }

@@ -39,27 +39,26 @@ namespace WhiteCore.Services.DataService
 {
     public class LocalDataService
     {
-        string ConnectionString = "";
-        string StorageProvider = "";
+        string connectionString = "";
+        string storageProvider = "";
 
-        public void Initialise(IConfigSource config, IRegistryCore registry)
+        public void Initialise (IConfigSource config, IRegistryCore registry)
         {
-            IConfig m_config = config.Configs["WhiteCoreData"];
-            if (m_config != null)
-            {
-                StorageProvider = m_config.GetString("StorageProvider", StorageProvider);
-                ConnectionString = m_config.GetString("ConnectionString", ConnectionString);
+            IConfig m_config = config.Configs ["WhiteCoreData"];
+            if (m_config != null) {
+                storageProvider = m_config.GetString ("StorageProvider", storageProvider);
+                connectionString = m_config.GetString ("ConnectionString", connectionString);
             }
 
-            IGenericData DataConnector = null;
-            if (StorageProvider == "MySQL")
-                //Allow for fallback when WhiteCoreData isn't set
+            IGenericData dataConnector = null;
+            if (storageProvider == "MySQL")
+            // Allow for fallback when WhiteCoreData isn't set
             {
-                MySQLDataLoader GenericData = new MySQLDataLoader();
+                MySQLDataLoader genericData = new MySQLDataLoader ();
 
-                DataConnector = GenericData;
+                dataConnector = genericData;
             }
-                /*else if (StorageProvider == "MSSQL2008")
+            /*else if (StorageProvider == "MSSQL2008")
             {
                 MSSQLDataLoader GenericData = new MSSQLDataLoader();
 
@@ -71,53 +70,48 @@ namespace WhiteCore.Services.DataService
 
                 DataConnector = GenericData;
             }*/
-            else if (StorageProvider == "SQLite")
-                //Allow for fallback when WhiteCoreData isn't set
+            else if (storageProvider == "SQLite")
+            // Allow for fallback when WhiteCoreData isn't set
             {
-                SQLiteLoader GenericData = new SQLiteLoader();
+                SQLiteLoader genericData = new SQLiteLoader ();
 
                 // set default data directory in case it is needed
                 var simBase = registry.RequestModuleInterface<ISimulationBase> ();
-                GenericData.DefaultDataPath = simBase.DefaultDataPath;
+                genericData.DefaultDataPath = simBase.DefaultDataPath;
 
-                DataConnector = GenericData;
+                dataConnector = genericData;
             }
 
-            List<IWhiteCoreDataPlugin> Plugins = WhiteCoreModuleLoader.PickupModules<IWhiteCoreDataPlugin>();
-            foreach (IWhiteCoreDataPlugin plugin in Plugins)
-            {
-                try
-                {
-                    plugin.Initialize(DataConnector == null ? null : DataConnector.Copy(), config, registry,
-                                      ConnectionString);
-                }
-                catch (Exception ex)
-                {
+            List<IWhiteCoreDataPlugin> Plugins = WhiteCoreModuleLoader.PickupModules<IWhiteCoreDataPlugin> ();
+            foreach (IWhiteCoreDataPlugin plugin in Plugins) {
+                try {
+                    plugin.Initialize (dataConnector == null ? null : dataConnector.Copy (), config, registry,
+                                      connectionString);
+                } catch (Exception ex) {
                     if (MainConsole.Instance != null)
-                        MainConsole.Instance.Warn("[DataService]: Exception occurred starting data plugin " +
+                        MainConsole.Instance.Warn ("[DataService]: Exception occurred starting data plugin " +
                                                   plugin.Name + ", " + ex);
                 }
             }
         }
 
-        public void Initialise(IConfigSource config, IRegistryCore registry, List<Type> types)
+        public void Initialise (IConfigSource config, IRegistryCore registry, List<Type> types)
         {
-            IConfig m_config = config.Configs["WhiteCoreData"];
-            if (m_config != null)
-            {
-                StorageProvider = m_config.GetString("StorageProvider", StorageProvider);
-                ConnectionString = m_config.GetString("ConnectionString", ConnectionString);
+            IConfig m_config = config.Configs ["WhiteCoreData"];
+            if (m_config != null) {
+                storageProvider = m_config.GetString ("StorageProvider", storageProvider);
+                connectionString = m_config.GetString ("ConnectionString", connectionString);
             }
 
-            IGenericData DataConnector = null;
-            if (StorageProvider == "MySQL")
-                //Allow for fallback when WhiteCoreData isn't set
+            IGenericData dataConnector = null;
+            if (storageProvider == "MySQL")
+            // Allow for fallback when WhiteCoreData isn't set
             {
-                MySQLDataLoader GenericData = new MySQLDataLoader();
+                MySQLDataLoader genericData = new MySQLDataLoader ();
 
-                DataConnector = GenericData;
+                dataConnector = genericData;
             }
-                /*else if (StorageProvider == "MSSQL2008")
+            /*else if (StorageProvider == "MSSQL2008")
             {
                 MSSQLDataLoader GenericData = new MSSQLDataLoader();
 
@@ -129,30 +123,26 @@ namespace WhiteCore.Services.DataService
 
                 DataConnector = GenericData;
             }*/
-            else if (StorageProvider == "SQLite")
-                //Allow for fallback when WhiteCoreData isn't set
+            else if (storageProvider == "SQLite")
+            // Allow for fallback when WhiteCoreData isn't set
             {
-                SQLiteLoader GenericData = new SQLiteLoader();
+                SQLiteLoader genericData = new SQLiteLoader ();
 
                 // set default data directory in case it is needed
                 var simBase = registry.RequestModuleInterface<ISimulationBase> ();
-                GenericData.DefaultDataPath = simBase.DefaultDataPath;
+                genericData.DefaultDataPath = simBase.DefaultDataPath;
 
-                DataConnector = GenericData;
+                dataConnector = genericData;
             }
 
-            if (DataConnector != null)      // we have a problem if so...
+            if (dataConnector != null)      // we have a problem if so...
             {
-                foreach (Type t in types)
-                {
-                    List<dynamic> Plugins = WhiteCoreModuleLoader.PickupModules (t);
-                    foreach (dynamic plugin in Plugins)
-                    {
-                        try
-                        {
-                            plugin.Initialize (DataConnector.Copy (), config, registry, ConnectionString);
-                        } catch (Exception ex)
-                        {
+                foreach (Type t in types) {
+                    List<dynamic> plugins = WhiteCoreModuleLoader.PickupModules (t);
+                    foreach (dynamic plugin in plugins) {
+                        try {
+                            plugin.Initialize (dataConnector.Copy (), config, registry, connectionString);
+                        } catch (Exception ex) {
                             if (MainConsole.Instance != null)
                                 MainConsole.Instance.Warn ("[DataService]: Exception occurred starting data plugin " +
                                 plugin.Name + ", " + ex);

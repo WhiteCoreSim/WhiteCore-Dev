@@ -90,7 +90,7 @@ namespace WhiteCore.Services
             get { return m_CapsService.Registry; }
         }
 
-        public String HostUri
+        public string HostUri
         {
             get { return m_CapsService.HostUri; }
         }
@@ -152,7 +152,7 @@ namespace WhiteCore.Services
         public IRegionClientCapsService GetOrCreateCapsService (UUID regionID, string capsBase,
                                                                AgentCircuitData circuitData, uint port)
         {
-            //If one already exists, don't add a new one
+            // If one already exists, don't add a new one
             if (m_RegionCapsServices.ContainsKey (regionID))
             {
                 if (port == 0 || m_RegionCapsServices [regionID].Server.Port == port)
@@ -163,7 +163,7 @@ namespace WhiteCore.Services
 
                 RemoveCAPS (regionID);
             }
-            //Create a new one, and then call Get to find it
+            // Create a new one, and then call Get to find it
             AddCapsServiceForRegion (regionID, capsBase, circuitData, port);
             return GetCapsService (regionID);
         }
@@ -177,12 +177,12 @@ namespace WhiteCore.Services
             if (!m_RegionCapsServices.ContainsKey (regionHandle))
                 return;
 
-            //Remove the agent from the region caps
+            // Remove the agent from the region caps
             IRegionCapsService regionCaps = m_CapsService.GetCapsForRegion (regionHandle);
             if (regionCaps != null)
                 regionCaps.RemoveClientFromRegion (m_RegionCapsServices [regionHandle]);
 
-            //Remove all the CAPS handlers
+            // Remove all the CAPS handlers
             m_RegionCapsServices [regionHandle].Close ();
             m_RegionCapsServices.Remove (regionHandle);
         }
@@ -200,8 +200,8 @@ namespace WhiteCore.Services
         {
             if (!m_RegionCapsServices.ContainsKey (regionID))
             {
-                //Now add this client to the region caps
-                //Create if needed
+                // Now add this client to the region caps
+                // Create if needed
                 m_CapsService.AddCapsForRegion (regionID);
                 IRegionCapsService regionCaps = m_CapsService.GetCapsForRegion (regionID);
 
@@ -209,7 +209,7 @@ namespace WhiteCore.Services
                 regionClient.Initialise (this, regionCaps, capsBase, circuitData, port);
                 m_RegionCapsServices [regionID] = regionClient;
 
-                //Now get and add them
+                // Now get and add them
                 regionCaps.AddClientToRegion (regionClient);
             }
         }

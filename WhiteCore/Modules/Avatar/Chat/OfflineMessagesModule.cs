@@ -217,9 +217,9 @@ namespace WhiteCore.Modules.Chat
                     IUserProfileInfo profile =
                         Framework.Utilities.DataManager.RequestPlugin<IProfileConnector> ().GetUserProfile (im.ToAgentID);
                     if (profile != null && profile.IMViaEmail) {
-                        UserAccount account = m_Scene.UserAccountService.GetUserAccount (null, im.ToAgentID);
-                        if (account != null && !string.IsNullOrEmpty (account.Email)) {
-                            emailModule.SendEmail (UUID.Zero, account.Email,
+                        UserAccount userAcct = m_Scene.UserAccountService.GetUserAccount (null, im.ToAgentID);
+                        if (userAcct.Valid && !string.IsNullOrEmpty (userAcct.Email)) {
+                            emailModule.SendEmail (UUID.Zero, userAcct.Email,
                                                   string.Format ("Offline Message from {0}", im.FromAgentName),
                                                   string.Format ("Time: {0}\n",
                                                                 Util.ToDateTime (im.Timestamp).ToShortDateString ()) +

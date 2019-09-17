@@ -1,0 +1,11 @@
+;;  This file is used as a template when the configurator setting up a MYSQL database
+;;  ##  You DO NOT need to change anything here  ##
+;;
+
+[WhiteCoreData]
+;;
+;; Change the connection string to your db details
+;; NOTE: This sets up the database for grid services
+;; 
+ConnectionString = "Data Source=localhost;Port=3306;Database=whitecore;User ID=whitecore;Password=whitecorepass;Charset=utf8;"
+StorageProvider = MySQL

@@ -57,7 +57,7 @@ namespace WhiteCore.Modules.Land
 
         //Land types set with flags in ParcelOverlay.
         //Only one of these can be used.
-        public const float BAN_LINE_SAFETY_HEIGHT = 100;
+        public const float BAN_LINE_SAFETY_HEIGHT = 5000;   // 07-2018 Changed to severe height
         public const int LAND_RESULT_NO_DATA = -1;          // The request they made had no data
         public const int LAND_RESULT_SINGLE = 0;            // The request they made contained only a single piece of land
         public const int LAND_RESULT_MULTIPLE = 1;          // The request they made contained more than a single piece of land
@@ -163,9 +163,9 @@ namespace WhiteCore.Modules.Land
 
             // This is an configuration override to the default GodOwner and allows specifying a specific user
             if (_godParcelOwner != "") {
-                UserAccount acc = m_scene.UserAccountService.GetUserAccount (null, _godParcelOwner);
-                if (acc != null)
-                    godParcelOwner = acc.PrincipalID;
+                UserAccount godAcct = m_scene.UserAccountService.GetUserAccount (null, _godParcelOwner);
+                if (godAcct.Valid)
+                    godParcelOwner = godAcct.PrincipalID;
             }
 
             GodParcelOwner = godParcelOwner;
@@ -498,16 +498,14 @@ namespace WhiteCore.Modules.Land
             if (fullSimParcel.LandData.OwnerID == UUID.Zero)
                 fullSimParcel.LandData.OwnerID = m_scene.RegionInfo.EstateSettings.EstateOwner;
 
-            UserAccount account = m_scene.UserAccountService.GetUserAccount (m_scene.RegionInfo.AllScopeIDs,
+            UserAccount ownerAcct = m_scene.UserAccountService.GetUserAccount (m_scene.RegionInfo.AllScopeIDs,
                                       fullSimParcel.LandData.OwnerID);
             // we should always have the estate user
-            string ownerName = "";
-            if (account != null)
-                ownerName = account.Name;
+            string ownerName = ownerAcct.Name;
 
-            while (fullSimParcel.LandData.OwnerID == UUID.Zero || account == null) {
+            while (fullSimParcel.LandData.OwnerID == UUID.Zero || !ownerAcct.Valid) {
                 MainConsole.Instance.Warn (
-                    "[Land management]: Could not find user for parcel, please give a valid user to make the owner");
+                    "[Land management]: Could not find user for parcel, please enter a valid user to set as owner");
 
                 string userName = MainConsole.Instance.Prompt ("User Name:", "");
                 if (userName == "") {
@@ -515,10 +513,10 @@ namespace WhiteCore.Modules.Land
                     continue;
                 }
 
-                account = m_scene.UserAccountService.GetUserAccount (m_scene.RegionInfo.AllScopeIDs, userName);
-                if (account != null) {
-                    fullSimParcel.LandData.OwnerID = account.PrincipalID;
-                    ownerName = account.Name;
+                ownerAcct = m_scene.UserAccountService.GetUserAccount (m_scene.RegionInfo.AllScopeIDs, userName);
+                if (ownerAcct.Valid) {
+                    fullSimParcel.LandData.OwnerID = ownerAcct.PrincipalID;
+                    ownerName = ownerAcct.Name;
                 } else
                     MainConsole.Instance.Warn ("Could not find the user.");
             }
@@ -1659,10 +1657,12 @@ namespace WhiteCore.Modules.Land
                 }
 
                 // verify that the owner exists
-                UserAccount account = m_scene.UserAccountService.GetUserAccount (m_scene.RegionInfo.AllScopeIDs, land.OwnerID);
-                if (account == null) {
+                UserAccount ownerAcct = m_scene.UserAccountService.GetUserAccount (m_scene.RegionInfo.AllScopeIDs, land.OwnerID);
+                if (!ownerAcct.Valid) {
                     // incomming owner is invalid so re-assign
-                    land.OwnerID = (UUID)Constants.RealEstateOwnerUUID;
+                    var estateOwnerId = m_scene.RegionInfo.EstateSettings.EstateOwner;
+                    land.OwnerID = estateOwnerId;
+                    // land.OwnerID = (UUID)Constants.RealEstateOwnerUUID;
                     land.IsGroupOwned = false;
                 }
 
@@ -2122,6 +2122,8 @@ namespace WhiteCore.Modules.Land
                     LandData d = o.LandData.Copy ();
                     if (d.UserLocation == Vector3.Zero)
                         d.UserLocation = GetParcelCenterAtGround (o);
+                    if (d.UserLookAt == Vector3.Zero)
+                        d.UserLookAt = new Vector3(0, 1, 0);
                     d.RegionID = o.RegionUUID;
                     return d;
                 }));

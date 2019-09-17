@@ -82,15 +82,12 @@ namespace WhiteCore.Modules.Web
                     EstateSettings estate = estateConnector.GetRegionEstateSettings (region.RegionID);
                     if (estate != null) {
                         ownerUUID = estate.EstateOwner;
-                        UserAccount estateOwnerAccount = null;
+                        UserAccount estateOwnerAccount = new UserAccount();
                         var accountService = webInterface.Registry.RequestModuleInterface<IUserAccountService> ();
                         if (accountService != null)
                             estateOwnerAccount = accountService.GetUserAccount (null, estate.EstateOwner);
-                        ownerName = estateOwnerAccount == null ? "No account found" : estateOwnerAccount.Name;
+                        ownerName = estateOwnerAccount.Valid ? estateOwnerAccount.Name : "No account found";
                     }
-                } else {
-                    ownerUUID = UUID.Zero;
-                    ownerName = "Unknown";
                 }
 
                 vars.Add ("OwnerUUID", ownerUUID);
@@ -128,9 +125,9 @@ namespace WhiteCore.Modules.Web
                             parcel.Add ("ParcelOwnerUUID", p.OwnerID);
                             parcel.Add ("ParcelSnapshotURL", url);
                             if (accountService != null) {
-                                var account = accountService.GetUserAccount (null, p.OwnerID);
-                                if (account != null)
-                                    parcel.Add ("ParcelOwnerName", account.Name);
+                                var parcelownerAcct = accountService.GetUserAccount (null, p.OwnerID);
+                                if (parcelownerAcct.Valid)
+                                    parcel.Add ("ParcelOwnerName", parcelownerAcct.Name);
                                 else
                                     parcel.Add ("ParcelOwnerName", translator.GetTranslatedString ("NoAccountFound"));
                             }
