@@ -84,3 +84,28 @@ function loadcontent(pageid){
 	}
 }
 
+/* submit a form */
+function submitupdate(formname) {
+  event.preventDefault();
+  var $form = $("#" + formname);
+  var url = $form.attr("action");
+  var formdata = $form.serialize();
+  formdata = formdata + "&Submit=update";
+
+/*    $.ajax({
+    url: url,
+    type: 'POST',
+    datatype: 'string',
+    data: formdata
+  })
+  .done(function (msg) {
+    $(".error_message").html(msg);
+  });
+*/
+  $.post(url, formdata,
+    function( data ) {
+      $(".error_message").html(data);
+    }
+  );
+};
+

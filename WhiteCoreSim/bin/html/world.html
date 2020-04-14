@@ -1,33 +1,33 @@
 <!-- World map -->
 
 <link type="text/css" rel="stylesheet" href="map/leaflet.css?v=20180420">
-<link type="text/css" rel="stylesheet" href="css/mapapi.css?v=20180420">
+<link type="text/css" rel="stylesheet" href="map/mapapi.css?v=20180420">
 
 <div class="row">
-  <div class="col-md-2">
+  <div class="col-2">
     <label><p>{RegionText}</p></label>
     {RegionListArrayBegin}
-    <div class="mapregion">
-      <a class="regionslurl"
-        onclick="document.location.href='hop://{MainServerURL}/{RegionName}/128/128/50'">
-        <img height="60" src="{RegionWorldViewURL}" alt="{RegionName}" title="{RegionName}" />
-        <label><p>{RegionName}</p></label>
-        <p>
-          <!--{RegionLocX},{RegionLocY}-->
-          {RegionInfo}
-          {RegionStatus}
-        </p>
-      </a>
+      <div class="mapregion">
+        <a class="regionslurl"
+          onclick="document.location.href='hop://{MainServerURL}/{RegionName}/128/128/50'">
+          <img height="60" src="{RegionWorldViewURL}" alt="{RegionName}" title="{RegionName}" />
+          <label><p>{RegionName}</p></label>
+          <p>
+            <!--{RegionLocX},{RegionLocY}-->
+            {RegionInfo}
+            {RegionStatus}
+          </p>
+        </a>
 
-      <label>
-        <p>
-          <a target="_self" class='regioninfo' href="regionprofile/?regionid={RegionID}">{MoreInfoText}</a>
-        </p>
-      </label>
-    </div>
+        <label>
+          <p>
+            <a target="_self" class='regioninfo' href="regionprofile/?regionid={RegionID}">{MoreInfoText}</a>
+          </p>
+        </label>
+      </div>
     {RegionListArrayEnd}
   </div>
-  <div class="col-md-10">
+  <div class="col-10">
     <div class="mapapi-map-container" id="map-container"></div>
   </div>
 </div>

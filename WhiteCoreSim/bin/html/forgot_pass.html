@@ -1,12 +1,14 @@
 <!-- forgot password -->
 
 <section class="sign-up  text-center">
+  <div id="error_message" class="error_message"><h3>{ErrorMessage}</h3></div>
   <div class="container">
     <div class="row">
-      <div id="error_message" class="error_message"><h3>{ErrorMessage}</h3></div>
-      <h3>{ForgotPassword}</h3>
-      <img src="static/images/reset_password.png" />
-      <div class="col-md-6 col-md-offset-3">
+      <div class="col-2">
+        <img src="static/images/reset_password.png" />
+      </div>
+      <div class="col-6">
+        <h3>{ForgotPassword}</h3>
         <form class="signup-form" action="forgot_pass.html" id="forgotpass_form" method="POST" role="form">
           <div class="form-input-group">
             <i class="fa fa-user"></i>
@@ -27,7 +29,9 @@
 
 
 <script>
-  $(document).ready(function() { document.getElementById("login_input").focus(); } );
+  $(function() {
+    $("#login_input").focus();
+  });
 
   /* attach a submit handler to the form */
   $("#forgotpass_form").submit(function(event) {

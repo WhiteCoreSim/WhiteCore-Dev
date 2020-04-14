@@ -110,7 +110,7 @@ namespace WhiteCore.Modules.Web
 
             IUserProfileInfo profile = Framework.Utilities.DataManager.RequestPlugin<IProfileConnector>().
                                               GetUserProfile(userAcct.PrincipalID);
-            string picUrl = "../images/icons/no_avatar.jpg";
+            string picUrl = "../static/icons/no_avatar.jpg";
             if (profile != null)
             {
                 vars.Add ("UserType", profile.MembershipGroup == "" ? "Resident" : profile.MembershipGroup);

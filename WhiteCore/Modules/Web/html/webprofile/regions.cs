@@ -109,7 +109,7 @@ namespace WhiteCore.Modules.Web
                         if (webTextureService != null && region.TerrainMapImage != UUID.Zero)
                             regionData.Add("RegionImageURL", webTextureService.GetTextureURL(region.TerrainMapImage));
                         else
-                            regionData.Add("RegionImageURL", "../images/icons/no_terrain.jpg");
+                            regionData.Add("RegionImageURL", "../static/icons/no_terrain.jpg");
 
                         regionslist.Add (regionData);
                     }
@@ -126,7 +126,7 @@ namespace WhiteCore.Modules.Web
                     {"RegionInfo", ""},
                     {"RegionStatus", ""},
                     {"RegionID", ""},
-                    {"RegionImageURL", "../images/icons/no_terrain.jpg"}
+                    {"RegionImageURL", "../static/icons/no_terrain.jpg"}
                     });
              }
 

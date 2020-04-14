@@ -43,6 +43,7 @@ using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.DatabaseInterfaces;
 using WhiteCore.Framework.ModuleLoader;
 using WhiteCore.Framework.Modules;
+using WhiteCore.Framework.SceneInfo;
 using WhiteCore.Framework.Servers;
 using WhiteCore.Framework.Servers.HttpServer;
 using WhiteCore.Framework.Servers.HttpServer.Implementation;
@@ -207,7 +208,45 @@ namespace WhiteCore.Modules.Web
                     PagesMigrator.ResetToDefaults ();
                 if (SettingsMigrator.RequiresInitialUpdate ())
                     SettingsMigrator.ResetToDefaults (this);
+
+                // console commands
+                if (MainConsole.Instance != null) {
+                    MainConsole.Instance.Commands.AddCommand(
+                        "web reset menus",
+                        "web reset menu",
+                        "Reset the web UI menus to the default configuration",
+                        HandleMenuReset, false, true);
+
+                    MainConsole.Instance.Commands.AddCommand(
+                        "web reset settings",
+                        "web reset settings",
+                        "Reset the web UI settings to the default configuration",
+                        HandleSettingsReset, false, true);
+                }
             }
+        }
+
+        #endregion
+
+        #region console commands
+        protected void HandleMenuReset(IScene scene, string[] cmd) {
+
+            var resetmenu = MainConsole.Instance.Prompt("Reset web menus to the current defaults? (y/n)", "no").ToLower();
+            if (resetmenu.StartsWith("y", StringComparison.Ordinal)) {
+                PagesMigrator.ResetToDefaults();
+                MainConsole.Instance.Info("[Web]: Web menus reset to defaults.");
+            } else
+                MainConsole.Instance.Info("[Web]: Web menus not reset.");
+        }
+
+        protected void HandleSettingsReset(IScene scene, string[] cmd) {
+
+            var resetsettings = MainConsole.Instance.Prompt("Reset web settings to the current defaults? (y/n)", "no").ToLower();
+            if (!resetsettings.StartsWith("y", StringComparison.Ordinal)) {
+                SettingsMigrator.ResetToDefaults(this);
+                MainConsole.Instance.Info("[Web]: Web settings reset to defaults.");
+            } else
+                MainConsole.Instance.Info("[Web]: Web settings not reset.");
         }
 
         #endregion
@@ -615,7 +654,7 @@ namespace WhiteCore.Modules.Web
 
                     if (!File.Exists (file)) {
                         // use the default pages
-                        //MainConsole.Instance.Info ("Using the bin page");
+                        // MainConsole.Instance.Info ("Using the bin page");
                         file = Path.Combine ("html/", filePath);
                         if (!Path.GetFullPath (file).StartsWith (Path.GetFullPath ("html/"), StringComparison.Ordinal)) {
                             MainConsole.Instance.Debug ("Using the default index page");
@@ -796,14 +835,14 @@ namespace WhiteCore.Modules.Web
         {
 	        if (userTopPages == null) {
 		        IGenericsConnector generics = Framework.Utilities.DataManager.RequestPlugin<IGenericsConnector> ();
-		        GridPage userTopPages = generics.GetGeneric<GridPage> (UUID.Zero, "WebPages", "UserTop");
-		        if (userTopPages == null)
-			        userTopPages = new GridPage ();
+		        GridPage usrtopPages = generics.GetGeneric<GridPage> (UUID.Zero, "WebPages", "UserTop");
+		        if (usrtopPages == null)
+                    usrtopPages = new GridPage ();
 
-		        return userTopPages;
-	        }  
+		        return usrtopPages;
+            }
 
-	        return userTopPages;
+            return userTopPages;
         }
 
         internal GridPage GetAdminPages ()
@@ -888,6 +927,17 @@ namespace WhiteCore.Modules.Web
 
         }
 
+        public string UserMsg(string msg, bool returnhome, int delaysec) {
+            int delayms = 0;
+            if (delaysec > 0)
+                delayms = delaysec * 1000;
+
+            var retstr = "<h3>" + msg + "</h3>";
+            if (returnhome)
+                retstr = retstr + "<script>setTimeout(function() {window.location.href = \"/\";}," + delayms + ");</script>";
+
+            return retstr;
+        }
 
         #endregion
 

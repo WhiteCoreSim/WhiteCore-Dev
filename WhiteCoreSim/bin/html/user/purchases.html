@@ -1,0 +1,117 @@
+<!-- User Purchases -->
+
+<div id="fullPage">
+  <div class="container">
+    <h2>{UserName}: {PurchasesText}</h2>
+    <legend class="text-left">{DateInfoText}</legend>
+
+    <div class="col-12">
+      <form class="form form-inline" role="form" id="purchases_search_form" action="user/user_purchases.html" method="post">
+
+  			<div class="col-4 form-group">
+ 				  <label for="date_start">{DateStartText}&nbsp;&nbsp;</label>
+  				  <input class="form-control" type="text" style="width:120px;" name="date_start" id="date_start" value="{DateStart}" />
+            <span class="add-on"><i class="fa fa-calendar fa-lg" style="margin-left:-20px;color:black;" id="cal"></i></span>
+        </div>
+
+        <div class="col-4 form-group">
+  				  <label for="date_end">{DateEndText}&nbsp;&nbsp;</label>
+  			  	<input class="form-control" type="text" style="width:120px;" name="date_end" id="date_end" value="{DateEnd}" />
+            <span class="add-on"><i class="fa fa-calendar fa-lg"  style="margin-left:-20px;color:black;"id="cal"></i></span>
+
+        </div>
+
+        <div class="col-2">
+            <label>{Period}</label>
+        </div>
+
+        <div class="col-2 form-group">
+		      <input hidden type="hidden" label="Submit" id="Submit" name="Submit" value="Submit" />
+  				<button class="button" id="Submit"style="float:right;width:200px;" type="Submit" name="Submit">{Search}</button>
+        </div>
+
+
+      </form>
+    </div>
+  </div>
+
+  <div class="div10"></div>
+
+  <div class="col-12">
+
+    <table class="table table-dark table-striped table-bordered" width="100%" id="purchases_list">
+  	  <thead>
+     		<tr>
+     		  <th>{PurchaseDateText}</th>
+     		  <th>{PurchaseAgentText}</th>
+     		  <th>{LoggedIPText}</th>
+     		  <th>{PurchaseDetailText}</th>
+     		  <th>{PurchaseAmountText}</th>
+     		  <th>{PurchaseRealAmountText}</th>
+     		</tr>
+   	  </thead>
+
+      <tbody>
+    	  {PurchasesListArrayBegin}
+        <tr>
+          <td>{PurchaseDate}</td>
+          <td>{AgentName}</td>
+          <td>{LoggedIP}</td>
+          <td>{Description}</td>
+          <td>{Amount}</td>
+          <td>{RealAmount}</td>
+        </tr>
+    	  {PurchasesListArrayEnd}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+  $(function() {
+    $('#purchases_list').dataTable({
+      "order": [[ 0, "asc" ]],
+      "aoColumnDefs": [{"bSortable":false,"aTargets":["no-sort"]}],
+      /*"aaSorting":[], */
+      "oLanguage": {"sSearch": "Filter: "},
+    });
+
+    $('#date_start, #date_end').datepicker({
+      showTrigger: '<button type="button" class="trigger">...</button>'});
+
+    <!--  /* date pickers */ -->
+
+    $( "#date_start" ).datepicker( {
+      orientation: "bottom left",
+      defaultDate: "-1w",
+      changeMonth: true,
+      numberOfMonths: 3,
+      onClose: function( selectedDate ) {
+        $( "#to" ).datepicker( "option", "minDate", selectedDate );
+      }
+    });
+    $( "#date_end" ).datepicker( {
+      //defaultDate: "+1w",
+      changeMonth: true,
+      numberOfMonths: 3,
+      onClose: function( selectedDate ) {
+        $( "#from" ).datepicker( "option", "maxDate", selectedDate );
+      }
+    });
+  });
+
+  /* attach a submit handler to the form */
+  $("#purchases_search_form").submit(function(event) {
+
+    /* stop form from submitting normally */
+    event.preventDefault();
+    /* get some values from elements on the page: */
+    var $form = $( this ),
+        url = $form.attr( 'action' );
+    /* Send the data using post and put the results in a div */
+    $.post( url, $form.serialize(), function( data ) {
+      $("#fullPage").empty().append(data);
+    });
+  });
+</script>
+

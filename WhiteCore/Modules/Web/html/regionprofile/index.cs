@@ -159,7 +159,7 @@ namespace WhiteCore.Modules.Web
                         vars.Add ("NumberOfParcelsInRegion", 0);
                 }
                 IWebHttpTextureService webTextureService = webInterface.Registry.RequestModuleInterface<IWebHttpTextureService> ();
-                var regionMapURL = "../images/icons/no_terrain.jpg";
+                var regionMapURL = "../static/icons/no_terrain.jpg";
 
                 if (webTextureService != null && region.TerrainMapImage != UUID.Zero)
                     regionMapURL = webTextureService.GetTextureURL (region.TerrainMapImage);

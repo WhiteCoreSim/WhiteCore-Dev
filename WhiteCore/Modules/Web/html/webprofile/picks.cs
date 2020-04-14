@@ -119,14 +119,14 @@ namespace WhiteCore.Modules.Web
                 else
                     vars.Add("UserPartner", "No partner");
                 vars.Add("UserAboutMe", profile.AboutText == "" ? "Nothing here" : profile.AboutText);
-                string url = "../images/icons/no_avatar.jpg";
+                string url = "../static/icons/no_avatar.jpg";
                 if (webhttpService != null && profile.Image != UUID.Zero)
                     url = webhttpService.GetTextureURL(profile.Image);
                 vars.Add("UserPictureURL", url);
 
                 foreach (var pick in profileConnector.GetPicks(profile.PrincipalID))
                 {
-                    url = "../images/icons/no_picks.png";
+                    url = "../static/icons/no_picks.png";
                     if (webhttpService != null && pick.SnapshotUUID != UUID.Zero)
                         url = webhttpService.GetTextureURL(pick.SnapshotUUID);
 
@@ -149,7 +149,7 @@ namespace WhiteCore.Modules.Web
             {
                 picks.Add(new Dictionary<string, object>
                 {
-                    {"PickSnapshotURL", "../images/icons/no_picks.png"},
+                    {"PickSnapshotURL", "../static/icons/no_picks.png"},
                     {"PickName", "None yet"},
                     {"PickRegion", ""},
                     {"PickLocation", ""}

@@ -295,6 +295,7 @@ namespace WhiteCore.Modules.Web
             vars.Add ("UserTypeText", translator.GetTranslatedString ("UserTypeText"));
             vars.Add ("UserType", WebHelpers.UserTypeArgs (translator));
 
+            vars.Add("AvatarDefault", WebHelpers.AvatarDefaultSelection());
             vars.Add ("AvatarArchive", WebHelpers.AvatarSelections (webInterface.Registry));
 
             string tosLocation = "";

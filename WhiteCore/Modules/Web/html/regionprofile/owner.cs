@@ -113,7 +113,7 @@ namespace WhiteCore.Modules.Web
                         vars.Add ("UserPartner", "No partner");
                     vars.Add ("UserAboutMe", profile.AboutText == "" ? "Nothing here" : profile.AboutText);
 
-                    string url = "../images/icons/no_avatar.jpg";
+                    string url = "../static/icons/no_avatar.jpg";
                     IWebHttpTextureService webhttpService =
                         webInterface.Registry.RequestModuleInterface<IWebHttpTextureService> ();
                     if (webhttpService != null && profile.Image != UUID.Zero)
@@ -125,7 +125,7 @@ namespace WhiteCore.Modules.Web
                 // no profile yet for this user
                 vars.Add ("UserType", "Unknown");
                 vars.Add ("UserPartner", "Unknown");
-                vars.Add ("UserPictureURL", "../images/icons/no_avatar.jpg");
+                vars.Add ("UserPictureURL", "../static/icons/no_avatar.jpg");
             }
 
 

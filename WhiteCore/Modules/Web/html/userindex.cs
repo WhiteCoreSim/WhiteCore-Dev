@@ -42,7 +42,7 @@ namespace WhiteCore.Modules.Web
                 return new []
                            {
                                "html/userindex.html",
-                               "html/js/usermenu.js"
+                               "html/static/js/usermenu.js"
                            };
             }
         }
@@ -69,13 +69,13 @@ namespace WhiteCore.Modules.Web
             var IsAdmin = Authenticator.CheckAdminAuthentication (httpRequest);
 
             var settings = webInterface.GetWebUISettings ();
-            var userPage = webInterface.GetUserPages ();
-            var userTopPage = webInterface.GetUserTopPages ();
+            var userPages = webInterface.GetUserPages ();
+            var userTopPages = webInterface.GetUserTopPages ();
 
-            var mainmenu = webInterface.BuildPageMenus (userTopPage, httpRequest, translator);
+            var mainmenu = webInterface.BuildPageMenus (userTopPages, httpRequest, translator);
             vars.Add ("MenuItems", mainmenu);
 
-            var usermenu = webInterface.BuildPageMenus (userPage, httpRequest, translator);
+            var usermenu = webInterface.BuildPageMenus (userPages, httpRequest, translator);
 
             if (IsAdmin) {
                 var adminPage = webInterface.GetAdminPages ();
@@ -86,7 +86,7 @@ namespace WhiteCore.Modules.Web
 
             #endregion
 
-            string picUrl = "../images/icons/no_avatar.jpg";
+            string picUrl = "../static/icons/no_avatar.jpg";
             UserAccount account = Authenticator.GetAuthentication (httpRequest);
             if (account == null)
                 vars.Add ("UserName", "Unknown??");

@@ -40,6 +40,10 @@ namespace WhiteCore.Framework.Utilities
             get { return m_cultureInfo.NumberFormat; }
         }
 
+        public static DateTimeFormatInfo DateTimeFormatInfo {
+            get { return m_cultureInfo.DateTimeFormat; }
+        }
+
         public static IFormatProvider FormatProvider
         {
             get { return m_cultureInfo; }

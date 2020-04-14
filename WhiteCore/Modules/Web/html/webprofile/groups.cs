@@ -114,7 +114,7 @@ namespace WhiteCore.Modules.Web
                     vars.Add("UserPartner", "No partner");
                 
                 vars.Add("UserAboutMe", profile.AboutText == "" ? "Nothing here" : profile.AboutText);
-                string url = "../images/icons/no_avatar.jpg";
+                string url = "../static/icons/no_avatar.jpg";
                 if (webhttpService != null && profile.Image != UUID.Zero)
                     url = webhttpService.GetTextureURL(profile.Image);
                 vars.Add("UserPictureURL", url);
@@ -124,7 +124,7 @@ namespace WhiteCore.Modules.Web
                 vars.Add ("UserType", "Guest");
                 vars.Add ("UserPartner", "Not specified yet");
                 vars.Add ("UserAboutMe", "Nothing here yet");
-                vars.Add("UserPictureURL", "../images/icons/no_avatar.jpg");
+                vars.Add("UserPictureURL", "../static/icons/no_avatar.jpg");
 
             }
 
@@ -139,7 +139,7 @@ namespace WhiteCore.Modules.Web
                 foreach (var grp in groupsConnector.GetAgentGroupMemberships(userAcct.PrincipalID, userAcct.PrincipalID))
                 {
                     var grpData = groupsConnector.GetGroupProfile (userAcct.PrincipalID, grp.GroupID);
-                    string url = "../images/icons/no_groups.jpg";
+                    string url = "../static/icons/no_groups.jpg";
                     if (webhttpService != null && grpData.InsigniaID != UUID.Zero)
                         url = webhttpService.GetTextureURL (grpData.InsigniaID);
                     groups.Add (new Dictionary<string, object> {
@@ -152,7 +152,7 @@ namespace WhiteCore.Modules.Web
                 if (groups.Count == 0)
                 {
                     groups.Add (new Dictionary<string, object> {
-                        { "GroupPictureURL", "../images/icons/no_groups.jpg" },
+                        { "GroupPictureURL", "../static/icons/no_groups.jpg" },
                         { "GroupName", "None yet" }
                     });
 

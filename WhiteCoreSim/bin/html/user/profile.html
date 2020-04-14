@@ -1,0 +1,162 @@
+<!-- User Profile -->
+
+<div class="container">
+  <div class="row justify-content-center">
+    <h2>{UserProfileFor} {UserName}</h2>
+  </div>
+
+  <div class="row justify-content-center">
+    <div class="col-4">
+        <a href="#">
+          <img class="rounded" title="{UserProfileFor}: {UserName} ({UserType})" src="{UserPictureURL}" alt="{UserProfileFor}: {UserName} ({UserType})" height="256" />
+        </a>
+<!--      <p class="user_agent_profile_picture_text">{UserProfileFor}: {UserName} ({UserType})</p>  -->
+
+    </div>
+    <div class="col-8">
+      <div class="row">
+        <div class="col"><p>{IsOnlineText}</p></div>
+        <div class="col"><p>{IsOnline}</p></div>
+      </div>
+      {IfUserIsOnlineBegin}
+      <div class="row">
+        <div class="col"><p>{OnlineLocationText}</p></div>
+        <div class="col"><p>{OnlineLocation}</p></div>
+      </div>
+      {IfUserIsOnlineEnd}
+      <div class="row">
+        <div class="col"><p>{ResidentSince}</p></div>
+        <div class="col"><p>{UserBorn}</p></div>
+      </div>
+      <div class="row">
+        <div class="col"><p>{AccountType}</p></div>
+        <div class="col"><p>{UserType}</p></div>
+      </div>
+      <div class="row">
+        <div class="col"><p>{PartnersName}</p></div>
+        <div class="col"><p>{UserPartner}</p></div>
+      </div>
+      <div class="row">
+        <div class="col"><p>{AboutMe}</p></div>
+        <div class="col"><p>{UserAboutMe}</p></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="containter">
+  <div class="row justify-content-center">
+    <h4>{UsersGroupsText} by {UserName} ({GroupsJoined})</h4>
+  </div>
+
+<div class="row justify-content-center">
+  <div class="col"></div>
+  <div class="col-6">
+    <div class="avatar-contain">
+          {GroupsArrayBegin}
+    	    <div class="profile_picture_small" id="group_picture">
+    	      <a href="#">
+    	        <img class="rounded" height="128"
+    		        src="{GroupPictureURL}"
+    		        alt="{GroupNameText}: {GroupName}"
+    			      title="{GroupNameText}: {GroupName}" />
+              </a>
+    		      <p class="group_profile_picture_text">{GroupNameText}: {GroupName}</p>
+    		  </div>
+          {GroupsArrayEnd}
+    </div>
+
+<!--    <div class="glider-contain">
+      <div class="glider">
+        <button role="button" aria-label="Previous" class="glider-prev">«</button>
+
+          {GroupsArrayBegin}
+          <div class="profile_picture_small" id="group_picture">
+            <a href="#">
+              <img height="128"
+                src="{GroupPictureURL}"
+                alt="{GroupNameText}: {GroupName}"
+                title="{GroupNameText}: {GroupName}" />
+              </a>
+              <p class="group_profile_picture_text">{GroupNameText}: {GroupName}</p>
+          </div>
+          {GroupsArrayEnd}
+          <button role="button" aria-label="Next" class="glider-next">»</button>  -->
+        <!-- <div role="tablist" class="dots"></div>  -->
+<!--      </div>
+-->
+
+
+
+
+  </div>
+  <div class="col"></div>
+  </div>
+
+</div>
+
+<!-- Group Carousel -->
+<!--
+    <div class="prev-horiz-big">◄</div>
+    <div class="next-horiz-big">►</div>
+    <center>
+    <div class="groupscarousel">
+    <ul id="groupcarousel" class="jcarousel-wc-bigsize jcarousel-bigsize">
+{GroupsArrayBegin}
+  <li>
+      <div class="profile_picture_small" id="group_picture">
+      <a href="#">
+      <img height="128"
+         src="{GroupPictureURL}"
+         alt="{GroupNameText}: {GroupName}"
+       title="{GroupNameText}: {GroupName}" /></a>
+    <p class="group_profile_picture_text">{GroupNameText}: {GroupName}</p>
+    </div>
+  </li>
+{GroupsArrayEnd}
+  </ul>
+  </div>
+  </center>
+-->
+<!-- <link type="text/css" rel="stylesheet" href="static/css/jcarousellite.css">
+<script src="static/js/jquery.jcarousellite.js"></script>  -->
+
+<script>
+  $(function() {
+    $('.avatar-contain').slick({
+      infinite: true,
+      slidesToShow: 3,
+      slidesToScroll: 1
+    });
+
+    /*
+      $('#group_picture').each(function(i) {
+        var img_ = $('img', this);
+        var img_height = img_.attr('height');
+        var p_height = $('p', this).outerHeight();
+        $(this).height(img_height);
+        $(this).hover(function() {
+          img_.animate({marginTop : -p_height-5}, 500);
+        }, function() {
+          img_.animate({marginTop : '0'}, 500);
+        });
+      });
+    */
+
+
+
+    /*new Glider(document.querySelector('.glider'), {
+      slidesToShow: 'auto',
+      itemWidth: 128,
+      slidesToScroll: 1,
+      rewind: true,
+      draggable: true,
+      //dots: '.dots',
+      arrows: {
+        prev: '.glider-prev',
+        next: '.glider-next'
+      }
+    });  */
+
+  });
+</script>

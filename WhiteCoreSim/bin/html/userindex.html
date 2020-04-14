@@ -5,35 +5,43 @@
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 
-	  <link type="text/css" rel="stylesheet" href="css/normalize.min.css">
-	  <link type="text/css" rel="stylesheet" href="css/bootstrap.min.css" />
-  	<link type="text/css" rel="stylesheet" href="css/datatables.min.css" />
-		<link type="text/css" rel="stylesheet" href="css/bootstrap-datepicker.css" />
-  	<link type="text/css" rel="stylesheet" href="css/user.css" />
-  	<link type="text/css" rel="stylesheet" href="css/queries.css" />
-<!--  	<link type="text/css" rel="stylesheet" href="css/etline-font.css">  -->
-    <link type="text/css" rel="stylesheet" href="css/font-awesome.css">
+    <!-- Speaking of Google, don't forget to set your site up:
+         http://google.com/webmasters -->
+    <meta name="google-site-verification" content="" />
 
-  	<script src="js/modernizr-2.8.3-respond-1.4.2.min.js"></script>
+    <link rel="apple-touch-icon" sizes="180x180" href="/static/apple-touch-icon.png?v=20190901">
+    <link rel="icon" type="image/png" sizes="32x32" href="/static/favicon-32x32.png?v=20190901">
+    <link rel="icon" type="image/png" sizes="16x16" href="/static/favicon-16x16.png?v=20190901">
+    <link rel="manifest" href="/static/site.webmanifest">
+
+    <link type="text/css" rel="stylesheet" href="static/css/normalize.min.css?v=20190901">
+    <link type="text/css" rel="stylesheet" href="static/css/bootstrap.min.css?v=20190901" >
+    <link type="text/css" rel="stylesheet" href="static/css/datatables.min.css?v=20190902" />
+    <link type="text/css" rel="stylesheet" href="static/css/bootstrap-datepicker3.css?v=20190901" />
+    <link type="text/css" rel="stylesheet" href="static/css/font-awesome.css?v=20190901" />
+
+    <link type="text/css" rel="stylesheet" href="static/css/slick.css?v=20190901">
+    <link type="text/css" rel="stylesheet" href="static/css/slick-theme.css?v=20190901">
+    <link type="text/css" rel="stylesheet" href="static/css/queries.css?v=20190901">
+    <link type="text/css" rel="stylesheet" href="static/css/user.css?v=20190901" />
+
+  <script src="static/js/modernizr-2.8.3-respond-1.4.2.min.js?v=20190901"></script>
 
 	</head>
 	<body>
 
 		<!-- Sidebar -->
 			<div id="sbheader">
-
 				<div class="top">
 
 					<!-- Logo -->
 					<div id="logo">
-
 						<span class="image avatar48"><img src="{UserAvatarURL}" alt="" /></span>
 						<h1 id="title">{UserName}</h1>
 						<p>{UserType}</p>
 					</div>
 
 					<!-- Side Nav -->
-
 				  <nav class="nav">
 				      <div id="sidenavbar"> <!-- class="navbar-collapse collapse"> -->
 								<ul class="nav navbar-nav" id="sidemenu">
@@ -48,7 +56,7 @@
                       <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{MenuItemTitle}
                       	<span class="caret"></span>
                       </a>
-   									  <ul class="dropdown-menu" style="left:0;right:auto;top:-50px;" id="submenu">
+   									  <ul class="dropdown-menu" id="submenu">
 												{ChildrenMenuItemsArrayBegin}
 													{IfChildShowInMenuBegin}
 														<li id="{ChildMenuItemID}" alt="{ChildMenuItemTitle}" title="{ChildMenuItemTitleHelp}">{ChildMenuItemTitle}</li>
@@ -76,14 +84,14 @@
 						<ul class="icons">
 							<li><a href="#" class="icon fa-twitter"><span class="label">Twitter</span></a></li>
 							<li><a href="#" class="icon fa-facebook"><span class="label">Facebook</span></a></li>
-							<li><a href="#" class="icon fa-github"><span class="label">Github</span></a></li>
-							<li><a href="#" class="icon fa-dribbble"><span class="label">Dribbble</span></a></li>
+							<li><a href="https://github.com/WhiteCoreSim/WhiteCore-Dev" class="icon fa-github"><span class="label">Github</span></a></li>
+							<li><a href="https://mewe.com/group/5cb284545da1780ba88ca30d" class="icon fa-dribbble"><span class="label">MeWe</span></a></li>
 							<li><a href="#" class="icon fa-envelope"><span class="label">Email</span></a></li>
 						</ul>
 
 				</div>
 
-			</div>
+			</div> <!-- end of sidebar -->
 
 		<!-- Main -->
 			<div id="main">
@@ -93,43 +101,63 @@
  						<div id="sbheaderToggle"><a id="toggleSideNav" href="#sbheader" class="toggle"></a></div>
 
 		        <div class="header-content">
-          		<div class="systemlogo">
-          			<a href="#"><img src="../images/logo.png" height="25" width="25" alt="WhiteCore Sim logo"></a>
-							</div>
-							<div class="systemname">
-								{SystemName}
-							</div>
-		          <div class="header-nav">
-		            <nav>
-		            	<div class="col-xs-12">
-		              <ul class="primary-nav" id="topmenu">
-									{MenuItemsArrayBegin}
-									{IfShowInMenuBegin}
-								  	<li id="{MenuItemID}" class="active" alt="{MenuItemTitle}" title="{MenuItemTitleHelp}">{MenuItemTitle}
-										{IfHasChildrenBegin}
-											<ul id="submenu">
-										{ChildrenMenuItemsArrayBegin}
-										{IfChildShowInMenuBegin}
-												<li id="{ChildMenuItemID}" alt="{ChildMenuItemTitle}" title="{ChildMenuItemTitleHelp}">{ChildMenuItemTitle}</li>
-										{IfChildShowInMenuEnd}
-										{ChildrenMenuItemsArrayEnd}
-											</ul>
-										{IfHasChildrenEnd}
-										</li>
-									{IfShowInMenuEnd}
-									{MenuItemsArrayEnd}
-		              </ul>
-		              <ul class="member-actions" id="member-actions">
-		                <li id="logout" title="Log out of WebUI"><a href="#" class="btn-white btn-xsmall">Logout </a></li>
-		              </ul>
+<!--          		<div class="systemlogo">
+          			<a href="#"><img src="../static/images/logo.png" height="25" width="25" alt="WhiteCore Sim logo"></a>
 
-		            </div>
+							  <div class="systemname">
+								  {SystemName}
+							  </div>
+              </div>
+            -->
+              <div class="header-nav">
+
+                <nav class="navbar navbar-expand-sm navbar-dark navbar-fixed-top">
+                  <div class="container">
+                    <a class="navbar-brand" href="#">
+                          <img src="../static/images/logo.png" height="25" width="25" alt="WhiteCore Sim logo">
+                          <div class="systemname">
+                            {SystemName}
+                          </div>
+                    </a>
+                    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+                      <span class="navbar-toggler-icon"></span>
+                    </button>
+
+                    <div class="collapse navbar-collapse" id="navbarResponsive">
+                      <ul class="navbar-nav mr-auto" id="topmenu">
+
+
+<!--                <nav class="navbar navbar-inverse">
+                  <div class="container-fluid">
+    		              <ul class="primary-nav" id="topmenu"> -->
+
+      									{MenuItemsArrayBegin}
+      									{IfShowInMenuBegin}
+      								  	<li id="{MenuItemID}" class="active" alt="{MenuItemTitle}" title="{MenuItemTitleHelp}">{MenuItemTitle}
+      										{IfHasChildrenBegin}
+      											<ul id="submenu">
+      										{ChildrenMenuItemsArrayBegin}
+      										{IfChildShowInMenuBegin}
+      												<li id="{ChildMenuItemID}" alt="{ChildMenuItemTitle}" title="{ChildMenuItemTitleHelp}">{ChildMenuItemTitle}</li>
+      										{IfChildShowInMenuEnd}
+      										{ChildrenMenuItemsArrayEnd}
+      											</ul>
+      										{IfHasChildrenEnd}
+      										</li>
+      									{IfShowInMenuEnd}
+      									{MenuItemsArrayEnd}
+      		            </ul>
+      		            <ul class="member-actions" id="member-actions">
+      		              <li id="logout" title="Log out of WebUI"><a href="#" class="btn-white btn-xsmall">Logout </a></li>
+      		            </ul>
+                    </div>
+                  </div>
 		          	</nav>
 		          </div>
 
-		      	  <div class="navicon">
+<!--		      	  <div class="navicon">
 		        	  <a class="nav-toggle" href="#"><span></span></a>
-		        	</div>
+		        	</div>-->
 		      	</div>
 		      </header>
 		    </section>
@@ -138,7 +166,7 @@
 					<section id="top" class="one dark cover">
 						<div id="content">
        				<div id="loading">
-								<img src="../images/icons/loading.gif" alt="Loading..." />
+								<img src="../static/icons/loading.gif" alt="Loading..." />
 							</div>
 						</div>
 					</section>
@@ -151,7 +179,7 @@
 
 				<!-- Copyright -->
 					<ul class="copyright">
-            <li>Copyright &copy; 2018 WhiteCore Sim</li>
+            <li>Copyright &copy; 2019 WhiteCore Sim</li>
             <li><a href="http://whitecore-sim.org/licensing/">Licence</a></li>
             <li><a href="http://whitecore-sim.org/">WhiteCore Sim</a>.</li>
 					</ul>
@@ -159,22 +187,28 @@
 			</div>
 
 		<!-- Scripts -->
-  	<script src="js/jquery-3.1.1.min.js"></script>
-  	<script src="js/retina.js"></script>
-    <script type="text/javascript" src="js/bootstrap.min.js"></script>
-		<script type="text/javascript" src="js/datatables.min.js"></script>
-  	<script type="text/javascript" src="js/bootstrap-datepicker.js"></script>
-	  <script  type="text/javascript" src="js/scripts.js"></script>
-    <script  type="text/javascript" src="js/classie.js"></script>
-  	<script  type="text/javascript" src="js/jquery.waypoints.min.js"></script>
-	  <script type="text/javascript" src="js/usermenu.js"></script>
+    <script src="static/js/jquery-3.4.1.min.js?v=20190901"></script>
+    <script src="static/js/retina.js?v=20190901"></script>
+    <script src="static/js/bootstrap.bundle.min.js?v=20190901"></script>
+    <script src="static/js/datatables.min.js?v=20190902"></script>
+    <script src="static/js/bootstrap-datepicker.min.js?v=20190902"></script>
+
+    <script src="static/js/slick.min.js?v=20190901"></script>
+    <script src="static/js/scripts.js?v=20190901"></script>
+     <script src="static/js/classie.js?v=20190901"></script>
+<!--    <script src="static/js/jquery.waypoints.min.js?v=20190901"></script>  -->
+    <script src="static/js/usermenu.js?v=20190901"></script>
+<!--
+  <script type="text/javascript" src="static/js/menu.js?v=20190901"></script>  -->
+
+
 
 
 <script>
 		function tooltip() {$('#container *').tooltip({showURL: false});};
 
 		<!-- fade in -->
-	  $(document).ready(function() {
+	  $(function() {
 
 			$('#container').fadeIn("slow");
 			var result = {};

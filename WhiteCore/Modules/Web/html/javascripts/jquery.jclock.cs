@@ -38,7 +38,7 @@ namespace WhiteCore.Modules.Web
             {
                 return new[]
                            {
-                               "html/js/jquery.jclock.js"
+                               "html/static/js/jquery.jclock.js"
                            };
             }
         }

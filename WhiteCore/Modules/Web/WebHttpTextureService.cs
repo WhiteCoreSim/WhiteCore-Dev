@@ -138,7 +138,7 @@ namespace WhiteCore.Modules.Web
                 return jpeg;
 
             // no UUID here so...
-            string nouuid = "html/images/icons/no_image.png";
+            string nouuid = "html/static/icons/no_image.png";
             try {
                 return File.ReadAllBytes (nouuid);
             } catch {
@@ -154,7 +154,7 @@ namespace WhiteCore.Modules.Web
             httpResponse.ContentType = "image/jpeg";
 
             string uri = httpRequest.QueryString ["imageurl"];
-            string nourl = "html/images/icons/no_avatar.jpg";
+            string nourl = "html/static/icons/no_avatar.jpg";
 
             try {
                 if (File.Exists (uri)) {
@@ -174,7 +174,7 @@ namespace WhiteCore.Modules.Web
             httpResponse.ContentType = "image/jpeg";
 
             string uri = httpRequest.QueryString ["imageurl"];
-            string nourl = "html/images/noimage.jpg";
+            string nourl = "html/static/images/noimage.jpg";
 
             try {
                 if (File.Exists (uri)) {

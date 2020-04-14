@@ -158,7 +158,7 @@ namespace WhiteCore.Modules.Web
                 if (webTextureService != null && region.TerrainMapImage != UUID.Zero)
                     vars.Add ("RegionImageURL", webTextureService.GetTextureURL (region.TerrainMapImage));
                 else
-                    vars.Add ("RegionImageURL", "images/icons/no_picture.jpg");
+                    vars.Add ("RegionImageURL", "static/icons/no_picture.jpg");
 
                 // Menu Region
                 vars.Add ("MenuRegionTitle", translator.GetTranslatedString ("MenuRegionTitle"));

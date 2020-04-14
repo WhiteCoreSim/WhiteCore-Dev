@@ -37,7 +37,7 @@ namespace WhiteCore.Modules.Web
             get {
                 return new []
                            {
-                               "html/css/"
+                               "html/static/css/"
                            };
             }
         }

@@ -38,7 +38,7 @@ namespace WhiteCore.Modules.Web
             {
                 return new[]
                            {
-                               "html/js/jquery.colorbox.js"
+                               "html/static/js/jquery.colorbox.js"
                            };
             }
         }

@@ -115,14 +115,14 @@ namespace WhiteCore.Modules.Web
             // build a list of available images
             var galleryListVars = new List<Dictionary<string, object>> ();
             if (!settings.HideSlideshowBar) {
-                var defaultGalleryDir = Path.Combine (webInterface.LocalHtmlPath, "images/gallery");
+                var defaultGalleryDir = Path.Combine (webInterface.LocalHtmlPath, "static/images/gallery");
 
                 if (Directory.Exists (defaultGalleryDir)) {
                     var images = new List<string> (Directory.GetFiles (defaultGalleryDir, "*.jpg"));
                     images.AddRange (new List<string> (Directory.GetFiles (defaultGalleryDir, "*.png")));
                     foreach (string file in images) {
                         galleryListVars.Add (new Dictionary<string, object> {
-                            { "ImageSRC", "local/images/gallery/"+ Path.GetFileName(file) },
+                            { "ImageSRC", "local/static/images/gallery/"+ Path.GetFileName(file) },
                             { "ImageTitle", Path.GetFileNameWithoutExtension (file) },
                             { "ImageInfo", "some info here" }
                         });

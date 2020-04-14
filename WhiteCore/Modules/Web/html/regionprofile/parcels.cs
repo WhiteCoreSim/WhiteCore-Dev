@@ -113,7 +113,7 @@ namespace WhiteCore.Modules.Web
                     List<LandData> data = directoryConnector.GetParcelsByRegion (0, 10, region.RegionID, UUID.Zero,
                         ParcelFlags.None, ParcelCategory.Any);
                     List<Dictionary<string, object>> parcels = new List<Dictionary<string, object>> ();
-                    string url = "../images/icons/no_parcel.jpg";
+                    string url = "../static/icons/no_parcel.jpg";
 
                     if (data != null) {
                         foreach (var p in data) {
@@ -142,7 +142,7 @@ namespace WhiteCore.Modules.Web
                 if (webTextureService != null && region.TerrainMapImage != UUID.Zero)
                     vars.Add ("RegionImageURL", webTextureService.GetTextureURL (region.TerrainMapImage));
                 else
-                    vars.Add ("RegionImageURL", "../images/icons/no_terrain.jpg");
+                    vars.Add ("RegionImageURL", "../static/icons/no_terrain.jpg");
 
                 /*   // Regionprofile Menus
                    vars.Add("MenuRegionTitle", translator.GetTranslatedString("MenuRegionTitle"));

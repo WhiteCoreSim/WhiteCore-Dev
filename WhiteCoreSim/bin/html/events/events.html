@@ -2,74 +2,83 @@
 <!-- <link href="css/datatables.min.css" rel="stylesheet" type="text/css"> -->
 
 <div id="fullPage">
-  <h2>{EventsText}</h2>
-  <div class="col-sm-10 col-sm-offset-1" style="margin-bottom:10px;">
-  {IsAuthenticatedBegin}
-    <button class="btn btn-xs btn-default" style="float:right;margin-left:10px;" id="add_event" onClick="window.location.href='index.html?page=add_event';" id="add_event">{AddEventText}</button>
-  {IsAuthenticatedEnd}
-  <form id="events_search_form" action="events/events.html" method="post">
-  	<div class="form-fieldset-range">
-      <select id="events-category" name="category"  style="width:120px;">
-        {CategoryTypeArrayBegin}
-          <option value="{Index}" {selected}>{Value}</option>
-        {CategoryTypeArrayEnd}
-      </select>
-
-      <select id="events-timeframe" name="timeframe"  style="width:120px;">
-        {TimeFrameArrayBegin}
-          <option value="{Index}" {selected}>{Value}</option>
-        {TimeFrameArrayEnd}
-      </select>
-
-      <input style="width:20px;" type="checkbox" id="display_pg" name="display_pg" value="on" {PG_checked}>
-      <label for="display_pg" class="for-check"><img src="/images/icons/general.png" alt="PG ratings" style="margin-bottom:3px;">&nbsp;&nbsp;{GeneralText}</label>
+  <h2>
+    {EventsText}
+    <img alt="{EventsText}" src="static/icons/event.png" />
+  </h2>
+  <!-- selection - search -->
+  <div class="row justify-content-center">
+    <div class="col-10" style="margin-bottom:10px;">
       {IsAuthenticatedBegin}
-      <input style="width:20px;" type="checkbox" id="display_ma" name="display_ma" value="on" {MA_checked}>
-      <label for="display_ma" class="for-check"><img src="/images/icons/moderate.png" alt="MA ratings" style="margin-bottom:3px;">&nbsp;&nbsp;{MatureText}</label>
-      <input style="width:20px;" type="checkbox" id="display_ao" name="display_ao" value="on" {AO_checked}>
-      <label for="display_ao" class="for-check"><img src="/images/icons/adult.png" alt="AO ratings" style="margin-bottom:3px;">&nbsp;&nbsp;{AdultText}</label>
+        <button class="btn btn-xs btn-default" style="float:right;margin-left:10px;" id="add_event" onClick="window.location.href='index.html?page=add_event';" id="add_event">{AddEventText}</button>
       {IsAuthenticatedEnd}
+      <form id="events_search_form" action="events/events.html" method="post">
+      	<div class="form-fieldset-range">
+          <select id="events-category" name="category"  style="width:120px;">
+            {CategoryTypeArrayBegin}
+              <option value="{Index}" {selected}>{Value}</option>
+            {CategoryTypeArrayEnd}
+          </select>
 
-      <input hidden type="hidden" label="Submit" id="Submit" name="Submit" value="Submit" />
-      <button class="btn btn-info" style="float:right;width:200px;" id="Submit" type="Submit" name="Submit">{SearchText}</button>
+          <select id="events-timeframe" name="timeframe"  style="width:120px;">
+            {TimeFrameArrayBegin}
+              <option value="{Index}" {selected}>{Value}</option>
+            {TimeFrameArrayEnd}
+          </select>
 
-  	</div>
-  </form>
+          <input style="width:20px;" type="checkbox" id="display_pg" name="display_pg" value="on" {PG_checked}>
+          <label for="display_pg" class="for-check"><img src="/static/icons/general.png" alt="PG ratings" style="margin-bottom:3px;">&nbsp;&nbsp;{GeneralText}</label>
+          {IsAuthenticatedBegin}
+          <input style="width:20px;" type="checkbox" id="display_ma" name="display_ma" value="on" {MA_checked}>
+          <label for="display_ma" class="for-check"><img src="/static/icons/moderate.png" alt="MA ratings" style="margin-bottom:3px;">&nbsp;&nbsp;{MatureText}</label>
+          <input style="width:20px;" type="checkbox" id="display_ao" name="display_ao" value="on" {AO_checked}>
+          <label for="display_ao" class="for-check"><img src="/static/icons/adult.png" alt="AO ratings" style="margin-bottom:3px;">&nbsp;&nbsp;{AdultText}</label>
+          {IsAuthenticatedEnd}
+
+          <input hidden type="hidden" label="Submit" id="Submit" name="Submit" value="Submit" />
+          <button class="btn btn-info" style="float:right;width:200px;" id="Submit" type="Submit" name="Submit">{SearchText}</button>
+
+      	</div>
+      </form>
+    </div>
   </div>
 
 
+  <!--events listing -->
   <div class="container">
-    <div class="row">
-      <div class="[ col-xs-12 col-sm-8 col-sm-offset-2 ]">
+    <div class="row justify-content-center">
+      <div class="col-10">
         <ul class="event-list">
-      {EventListArrayBegin}
-          <li>
-            <time datetime="{EventDateTimeUTC}">
-              <span class="day">{EventDateTime}</span>
-              <span class="month">{EventHourTime}</span>
-              <span class="year">{EventMinuteTime}</span>
-              <span class="time">{EventTime}</span>
-            </time>
-            <img alt="{SimName}" src="{CategoryImage}" />
-            <div class="info">
-              <h2 class="title">{Name}</h2>
-              <p class="desc">{Description}</p>
-             <ul>
-                <li style="width:25%;"><span class="fa fa-list"></span> {Category}</li>
-                <li style="width:25%;"><span class="fa fa-user"></span>{Maturity}</li>
-                <li style="width:25%;"><span class="fa fa-money"></span>{CoverCharge}</li>
-                <li style="width:25%;"><span class="fa fa-time"></span>{DurationText}</li>
-              </ul>
-            </div>
-            <div class="social">
-              <ul>
-                <li class="facebook" style="width:33%;"><a href="#facebook"><span class="fa fa-facebook"></span></a></li>
-                <li class="twitter" style="width:34%;"><a href="#twitter"><span class="fa fa-twitter"></span></a></li>
-                <li class="google-plus" style="width:33%;"><a href="#google-plus"><span class="fa fa-google-plus"></span></a></li>
-              </ul>
-            </div>
-          </li>
-      {EventListArrayEnd}
+          {EventListArrayBegin}
+            <li>
+              <time datetime="{EventDateTimeUTC}">
+                <span class="day">{EventDateTime}</span>
+                <span class="month">{EventHourTime}</span>
+                <span class="year">{EventMinuteTime}</span>
+                <span class="time">{EventTime}</span>
+              </time>
+              <div class="info">
+                <h2 class="title">
+                  <img alt="{SimName}" src="{CategoryImage}" style="display:inline;width:50px;height:50px;" />
+                  {Name}
+                </h2>
+                <p class="desc">{Description}</p>
+               <ul>
+                  <li style="width:25%;"><span class="fa fa-list"></span>{Category}</li>
+                  <li style="width:25%;"><span class="fa fa-user"></span>{Maturity}</li>
+                  <li style="width:25%;"><span class="fa fa-money"></span>{CoverCharge}</li>
+                  <li style="width:25%;"><span class="fa fa-time"></span>{DurationText}</li>
+                </ul>
+              </div>
+              <div class="social">
+                <ul>
+                  <li class="facebook" style="width:33%;"><a href="#facebook"><span class="fa fa-facebook"></span></a></li>
+                  <li class="twitter" style="width:33%;"><a href="#twitter"><span class="fa fa-twitter"></span></a></li>
+                  <li class="google-plus" style="width:33%;"><a href="#google-plus"><span><img src="static/icons/mewe.png" style="height:20px;width:20px;" /></span></a></li>
+                </ul>
+              </div>
+            </li>
+          {EventListArrayEnd}
  <!--         <li>
             <time datetime="2014-07-20 0000">
               <span class="day">8</span>

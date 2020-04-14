@@ -244,7 +244,7 @@ namespace WhiteCore.Modules.Web
         public static string EventCategoryImage (int category)
         {
             // return the image url for an event category
-            var url = "images/icons/";
+            var url = "static/icons/";
             switch (category) {
             case 0:  return url + "event.png";
             case 18: return url + "discussion.png";
@@ -988,7 +988,7 @@ namespace WhiteCore.Modules.Web
                     });
                     else
                         regionArchives.Add (new Dictionary<string, object> {
-                        {"RegionArchiveSnapshotURL", "../images/icons/no_terrain.jpg"},
+                        {"RegionArchiveSnapshotURL", "../static/icons/no_terrain.jpg"},
                         {"RegionArchive", file},
                         {"RegionArchiveName", Path.GetFileNameWithoutExtension(file)}
                     });
@@ -1127,6 +1127,24 @@ namespace WhiteCore.Modules.Web
             return avatarArchives;
         }
 
+
+        /// <summary>
+        /// Builds details for the default Avatar selection.
+        /// </summary>
+        /// <returns>The default avatar selection.</returns>
+        public static List<Dictionary<string, object>> AvatarDefaultSelection()
+        {
+            var defaultArchive = new List<Dictionary<string, object>>();
+
+            var defaultAvatarInfo = new Dictionary<string, object>();
+            defaultAvatarInfo.Add("AvatarArchiveName", "Default");
+            defaultAvatarInfo.Add("AvatarArchiveSnapshotID", "");
+            defaultAvatarInfo.Add("AvatarArchiveSnapshotURL", "static/images/simona.png");
+
+            defaultArchive.Add(defaultAvatarInfo);
+
+            return defaultArchive;
+        }
 
         // user regions
         /*        public static List<Dictionary<string, object>> UserRegionSelections (UserAccount user, string selRegion)

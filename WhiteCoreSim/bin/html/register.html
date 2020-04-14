@@ -5,382 +5,256 @@
 {IfNoRegistrationsEnd}
 
 {IfRegistrationsBegin}
-<h2>{RegistrationText}</h2>
 <div id="error_message" class="error">{ErrorMessage}</div>
+<div class="container">
+  <h2>{RegistrationText}</h2>
+  <div class="row justify-content-center">
+    <form id="register_form" action="{SubmitURL}" method="POST">
+      <div class="col-12 text-left">
 
-<form id="register_form" action="{SubmitURL}" method="POST">
-  <div class="col-xs-12 col-sm-10 col-sm-offset-1 text-left">
+        <div class="row">
+          <div class="col-3">
+            {AvatarNameText}*
+          </div>
+          <div class="col-5">
+            <input class="form-control" id="AvatarName" maxlength="30" name="AvatarName" size="25" type="text" value="{AvatarName}" />
+          </div>
+          <div class="col help-block">Enter your avatar name</div>
+        </div>
 
-    <div class="rTable"><caption>&nbsp;</caption>
-      <div class="rTableHeading">
-        <div class="rTableBody">
-          <div class="rTableRow">
-            <div class="rTableCell col-xs-2">
-              <p id="regname_label">{AvatarNameText}*</p>
-            </div>
-            <div class="rTableCell">
-              <input class="form-control" id="AvatarName" maxlength="30" name="AvatarName" size="25" type="text" value="{AvatarName}" />
-            </div>
-            <div class="rTableCell help-block">Enter your avatar name</div>
+        <div class="row">
+          <div class="col-3">
+            {AvatarPasswordText}*
           </div>
-          <div class="rTableRow">
-            <div class="rTableCell col-xs-2">
-              <p id="password_label">{AvatarPasswordText}*</p>
-            </div>
-            <div class="rTableCell">
-              <input class="form-control" id="AvatarPassword" maxlength="15" name="AvatarPassword" size="30" type="password" />
-            </div>
-            <div class="rTableCell help-block">Your login password</div>
+          <div class="col-5">
+            <input class="form-control" id="AvatarPassword" maxlength="15" name="AvatarPassword" size="30" type="password" />
           </div>
-          <div class="rTableRow">
-            <div class="rTableCell col-xs-2">
-              <p>{AvatarPasswordConfirmationText}*</p>
-            </div>
-            <div class="rTableCell">
-              <input class="form-control" id="AvatarPassword2" maxlength="15" name="AvatarPassword2" size="30" type="password" />
-            </div>
+          <div class="col help-block">Your login password</div>
+        </div>
+
+        <div class="row">
+          <div class="col-3">
+            {AvatarPasswordConfirmationText}*
           </div>
-          {IsAdminAuthenticatedBegin}
-          <!-- Only admins can set scope IDs -->
-          <div class="rTableRow">
-            <div class="rTableCell col-xs-2">
-              <p>{AvatarScopeText}*</p>
-            </div>
-            <div class="rTableCell">
-              <input class="form-control" id="AvatarScope" maxlength="15" name="AvatarScope" size="40" type="text" placeholder="00000000-0000-0000-0000-000000000000" value=""/>
-            </div>
+          <div class="col-5">
+            <input class="form-control" id="AvatarPassword2" maxlength="15" name="AvatarPassword2" size="30" type="password" />
           </div>
-          {IsAdminAuthenticatedEnd}
-          <div class="rTableRow">
-            <div class="rTableCell col-xs-2">
-              <p>{FirstNameText}</p>
-            </div>
-            <div class="rTableCell">
-              <input class="form-control" id="FirstName" maxlength="15" name="FirstName" size="25" type="text" value="" />
-            </div>
+          <div class="col"></div>
+        </div>
+
+        {IsAdminAuthenticatedBegin}
+        <!-- Only admins can set scope IDs -->
+        <div class="row">
+          <div class="col-3">
+            <p>{AvatarScopeText}*</p>
           </div>
-          <div class="rTableRow">
-            <div class="rTableCell col-xs-2">
-              <p>{LastNameText}</p>
-            </div>
-            <div class="rTableCell">
-              <input class="form-control" id="LastName" maxlength="15" name="LastName" size="25" type="text" value="" />
-            </div>
+          <div class="col-5">
+            <input class="form-control" id="AvatarScope" maxlength="15" name="AvatarScope" size="40" type="text" placeholder="00000000-0000-0000-0000-000000000000" value=""/>
           </div>
-          <!-- greythane - removed as the address details are not really relevant now
-          <div class="rTableRow">
-            <div class="rTableCell col-xs-2"><p>{UserAddressText}</p></div>
-            <div class="rTableCell"><input label="UserAddress" id="UserAddress" name="UserAddress" type="text" size="50" maxlength="50" value=""></div>
+          <div class="col"></div>
+        </div>
+        {IsAdminAuthenticatedEnd}
+
+        <div class="row">
+          <div class="col-3">{FirstNameText}</div>
+          <div class="col-5">
+            <input class="form-control" id="FirstName" maxlength="15" name="FirstName" size="25" type="text" value="" />
           </div>
-          <div class="rTableRow">
-            <div class="rTableCell col-xs-2"><p>{UserZipText}</p></div>
-            <div class="rTableCell"><input label="UserZip" id="UserZip" name="UserZip" type="text" size="25" maxlength="15" value=""></div>
+          <div class="col-4"></div>
+        </div>
+
+        <div class="row">
+          <div class="col-3">{LastNameText}</div>
+          <div class="col-5">
+            <input class="form-control" id="LastName" maxlength="15" name="LastName" size="25" type="text" value="" />
           </div>
-          -->
-          <div class="rTableRow">
-            <div class="rTableCell col-xs-2">
-              <p>{UserCityText}</p>
-            </div>
-            <div class="rTableCell">
-              <input class="form-control" id="UserCity" maxlength="15" name="UserCity" size="25" type="text" value="" />
-            </div>
+          <div class="col"></div>
+        </div>
+
+        <!-- greythane - removed as the address details are not really relevant now
+        <div class="row">
+          <div class="col-3">{UserAddressText}</div>
+          <div class="col-5"><input label="UserAddress" id="UserAddress" name="UserAddress" type="text" size="50" maxlength="50" value=""></div>
+        </div>
+        <div class="rTableRow">
+          <div class="col-3">{UserZipText}</div>
+          <div class="col-5"><input label="UserZip" id="UserZip" name="UserZip" type="text" size="25" maxlength="15" value=""></div>
+        </div>
+        -->
+
+        <div class="row">
+          <div class="col-3">{UserCityText}</div>
+          <div class="col-5">
+            <input class="form-control" id="UserCity" maxlength="15" name="UserCity" size="25" type="text" value="" />
           </div>
-          <div class="rTableRow">
-            <div class="rTableCell col-xs-2">
-              <p>{UserDOBText}</p>
-            </div>
-            <div class="rTableCell">
-              <select class="form-control" id="UserDOBMonth" name="UserDOBMonth">
-              {MonthsArrayBegin}
-                <option value="{Value}">{Value}</option>
-              {MonthsArrayEnd}
-              </select>
-            </div>
-            <div class="rTableCell">
-              <select class="form-control" id="UserDOBDay" name="UserDOBDay">
-                {DaysArrayBegin}
-                <option value="{Value}">{Value}</option>
-                {DaysArrayEnd}
-              </select>
-            </div>
-            <div class="rTableCell">
-              <select class="form-control" id="UserDOBYear" name="UserDOBYear">
-                {YearsArrayBegin}
-                <option value="{Value}">{Value}</option>
-                {YearsArrayEnd}
-              </select>
+          <div class="col"></div>
+        </div>
+
+        <div class="row">
+          <div class="col-3">{UserDOBText}</div>
+          <div class="col-5">
+              <div class="row">
+              <div class="col-4">
+                <select class="form-control" id="UserDOBMonth" name="UserDOBMonth">
+                {MonthsArrayBegin}
+                  <option value="{Value}">{Value}</option>
+                {MonthsArrayEnd}
+                </select>
+              </div>
+              <div class="col-4">
+                <select class="form-control" id="UserDOBDay" name="UserDOBDay">
+                  {DaysArrayBegin}
+                  <option value="{Value}">{Value}</option>
+                  {DaysArrayEnd}
+                </select>
+              </div>
+              <div class="col-4">
+                <select class="form-control" id="UserDOBYear" name="UserDOBYear">
+                  {YearsArrayBegin}
+                  <option value="{Value}">{Value}</option>
+                  {YearsArrayEnd}
+                </select>
+              </div>
             </div>
           </div>
-          <div class="rTableRow">
-            <div class="rTableCell col-xs-2">
-              <p>{UserEmailText}*</p>
-            </div>
-            <div class="rTableCell">
-              <input class="form-control" id="UserEmail" maxlength="40" name="UserEmail" size="40" type="text" value="" />
-            </div>
-            <div class="rTableCell help-block">(For password recovery only)</div>
+          <div class="col-4"></div>
+        </div>
+
+        <div class="row">
+          <div class="col-3">{UserEmailText}*</div>
+          <div class="col-5">
+            <input class="form-control" id="UserEmail" maxlength="40" name="UserEmail" size="40" type="text" value="" />
           </div>
-          <div class="rTableRow">
-            <div class="rTableCell col-xs-2">
-              <p>{UserHomeRegionText}*</p>
-            </div>
-            <div class="rTableCell">
-              <select class="form-control" id="UserHomeRegion" style="width: 120px;" name="UserHomeRegion">
-                {RegionListArrayBegin}
-                <option value="{RegionUUID}">{RegionName}</option>
-                {RegionListArrayEnd}
-              </select>
-            </div>
+          <div class="col help-block">(For password recovery only)</div>
+        </div>
+
+        <div class="row">
+          <div class="col-3">{UserHomeRegionText}*</div>
+          <div class="col-5">
+            <select class="form-control" id="UserHomeRegion" style="width: 180px;" name="UserHomeRegion">
+              {RegionListArrayBegin}
+              <option value="{RegionUUID}">{RegionName}</option>
+              {RegionListArrayEnd}
+            </select>
           </div>
-          {IsAdminAuthenticatedBegin}
-          <!-- Only admins can set membership types -->
-          <div class="rTableRow">
-            <div class="rTableCell col-xs-2">
-              <p>{UserTypeText}*</p>
-            </div>
-            <div class="rTableCell">
-              <select class="form-control" id="UserType" style="width: 120px;" name="UserType">
-                {UserTypeArrayBegin}
-                <option value="{Index}">{Value}</option>
-                {UserTypeArrayEnd}
-              </select>
-            </div>
+          <div class="col"></div>
+        </div>
+
+        {IsAdminAuthenticatedBegin}
+        <!-- Only admins can set membership types -->
+        <div class="row">
+          <div class="col-3">{UserTypeText}*</div>
+          <div class="col-5">
+            <select class="form-control" id="UserType" style="width: 120px;" name="UserType">
+              {UserTypeArrayBegin}
+              <option value="{Index}">{Value}</option>
+              {UserTypeArrayEnd}
+            </select>
           </div>
-          {IsAdminAuthenticatedEnd}
-          <div class="rTableRow">
-            <div class="rTableCell col-xs-2">Avatar Selection</div>
-            <div class="rTableCell" style="height:auto;">
-              <div class="carousel">
-                <div class="prev-horiz">◄</div>
-                <div class="next-horiz">►</div>
-                <center>
-                <div class="avatararchivecarousel" style="height: 190px;">
-                  <ul id="avatarcarousel" class="jcarousel-wc">
-                    {AvatarArchiveArrayBegin}
-                    <li>
-                      <div class="avatar_archive_screenshot">
-                        <label title="{AvatarArchiveName}" for="{AvatarArchiveName}">{AvatarArchiveName}</label>
-                        <input id="{AvatarArchiveName}x" title="{AvatarArchiveName}" alt="{AvatarArchiveName}" name="{AvatarArchiveName}" type="radio" value="{AvatarArchiveName}" />
-                        <img title="{AvatarArchiveName}" src="{AvatarArchiveSnapshotURL}" alt="{AvatarArchiveName}" />
-                      </div>
-                    </li>
-                    {AvatarArchiveArrayEnd}
-                  </ul>
+          <div class="col"></div>
+        </div>
+        {IsAdminAuthenticatedEnd}
+
+        <div class="row">
+          <div class="col-3">Avatar Selection</div>
+          <div class="col-6">
+            <div id="avatarcarousel" class="carousel slide" data-ride="carousel" style="height: 190px;">
+              <div class="carousel-inner">
+                {AvatarDefaultArrayBegin}
+                <div class="carousel-item active" data-interval="">
+                  <img class="d-block rounded float-right" title="{AvatarArchiveName}" src="{AvatarArchiveSnapshotURL}" alt="{AvatarArchiveName}" style="width:150px;height:150px;margin-right:45px;" />
+                  <div class="carousel-caption d-none d-md-block" style="right:50%;">
+                      <input class="form-check-input" type="radio" id="{AvatarArchiveName}" name="{AvatarArchiveName}" value="{AvatarArchiveName}" checked/>
+                      <label class="form-check-label" for="{AvatarArchiveName}">&nbsp;&nbsp{AvatarArchiveName}</label>
+                  </div>
                 </div>
-              </center></div>
+                {AvatarDefaultArrayEnd}
+                {AvatarArchiveArrayBegin}
+                <div class="carousel-item" data-interval="">
+                  <img class="d-block rounded float-right" title="{AvatarArchiveName}" src="{AvatarArchiveSnapshotURL}" alt="{AvatarArchiveName}"  style="width:150px;height:150px;margin-right:45px;" />
+                  <div class="carousel-caption d-none d-md-block" style="right:50%;">
+                      <input class="form-check-input" type="radio" id="{AvatarArchiveName}" name="{AvatarArchiveName}"  value="{AvatarArchiveName}" />
+                      <label class="form-check-label" for="{AvatarArchiveName}">&nbsp;&nbsp{AvatarArchiveName};</label>
+                  </div>
+                </div>
+                {AvatarArchiveArrayEnd}
+              </div>
+            </div>
+
+            <a class="carousel-control-prev" href="#avatarcarousel" role="button" data-slide="prev">
+              <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+              <span class="sr-only">Previous</span>
+            </a>
+            <a class="carousel-control-next" href="#avatarcarousel" role="button" data-slide="next">
+              <span class="carousel-control-next-icon" aria-hidden="true"></span>
+              <span class="sr-only">Next</span>
+            </a>
+          </div>
+
+          <div class="col"></div>
+        </div>
+
+        <div class="row">
+          <div class="col-3">{TermsOfServiceText}</div>
+          <div class="col" style="height:auto;">
+            <textarea class="form-control" id="TosText" cols="90" name="TosText" rows="6">{ToSMessage}</textarea>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-3"></div>
+          <div class="col-6 text-right">
+            {TermsOfServiceAccept}
+          </div>
+          <div class="col-3">
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" id="termscheckbox" name="ToSAccept" type="checkbox" value="Accepted" />
+              <label class="form-check-label" for="termscheckbox">{Accept}</label>
             </div>
           </div>
-          <div class="rTableRow">
-            <div class="rTableCell col-xs-2">
-              <p>{TermsOfServiceText}</p>
-            </div>
-            <div class="rTableCell" style="height:auto;">
-              <textarea class="form-control" id="TosText" cols="90" name="TosText" rows="10">{ToSMessage}</textarea>
-            </div>
-          </div>
-          <div class="rTableRow">
-            <div class="rTableCell">
-              <p>{TermsOfServiceAccept}</p>
-            </div>
-            <div class="rTableCell">
-              <input class="form-control" id="checkbox" class="checkbox" name="ToSAccept" type="checkbox" value="Accepted" />
-              <label for="checkbox">{Accept}</label>
-            </div>
-          </div>
-          <div class="rTableRow">
-            <div class="col-xs-3 col-xs-offset-9" style="margin-top:15px;margin-bottom:15px;">
-              <input name="action" type="hidden" value="check" />
-              <button class="btn btn-sm btn-success" id="Submit" name="Submit" type="Submit">{Submit}</button>
-            </div>
+
+        </div>
+
+        <div class="row">
+          <div class="col-9"></div>
+          <div class="col-3" style="margin-top:15px;margin-bottom:15px;">
+            <input name="action" type="hidden" value="check" />
+            <button class="btn btn-lg btn-success" id="Submit" name="Submit" type="Submit">{Submit}</button>
           </div>
         </div>
       </div>
-    </div>
-  </form>
+    </form>
+  </div>
+</div>
 
-<!--
-<form id="register_form" action="{SubmitURL}" method="POST">
-<div style ="display: inline-block;"><table>
-  <caption></caption>
-
-  <thead>
-    <tr>
-      <th class="register_left"></th>
-      <th class="register_right" colspan="3"></th>
-    </tr>
-  </thead>
-
-  <tfoot>
-    <tr>
-      <th class="register_left"></th>
-      <th class="register_right" colspan="3"></th>
-    </tr>
-  </tfoot>
-
-  <tbody>
-    <tr>
-      <td class="register_left"><p id="regname_label">{AvatarNameText}*</p></td>
-      <td class="register_right" colspan="3"><input minlength="3" id="AvatarName" require="true" label="AvatarName" name="AvatarName" type="text" size="25" maxlength="30" value="{AvatarName}"></td>
-	  <td class="register_left"> Enter your avatar name</td>
-    </tr>
-    <tr>
-      <td class="register_left"><p id="password_label">{AvatarPasswordText}*</p></td>
-      <td class="register_right" colspan="3"><input minlength="6" compare="AvatarPassword2" require="true" label="AvatarPassword" id="AvatarPassword" name="AvatarPassword" type="password" size="30" maxlength="15"></td>
-	  <td class="register_left"> Your login password</td>
-    </tr>
-    <tr>
-      <td class="register_left"><p>{AvatarPasswordConfirmationText}*</p></td>
-      <td class="register_right" colspan="3"><input minlength="6" require="true" label="AvatarPassword2" id="AvatarPassword2" name="AvatarPassword2" type="password" size="30" maxlength="15"></td>
-    </tr>
-{IsAdminAuthenticatedBegin}
-<!-- ##Only admins can set scope IDs -->
-<!--    <tr>
-      <td class="register_left"><p>{AvatarScopeText}*</p></td>
-      <td class="register_right" colspan="3"><input minlength="6" require="true" label="AvatarScope" id="AvatarScope" name="AvatarScope" type="text" size="40" maxlength="15" value="00000000-0000-0000-0000-000000000000"></td>
-    </tr>
-{IsAdminAuthenticatedEnd}
-    <tr>
-      <td class="register_left"><p>{FirstNameText}</p></td>
-      <td class="register_right" colspan="3"><input label="FirstName" id="FirstName" name="FirstName" type="text" size="25" maxlength="15" value=""></td>
-    </tr>
-    <tr>
-      <td class="register_left"><p>{LastNameText}</p></td>
-      <td class="register_right" colspan="3"><input label="LastName" id="LastName" name="LastName" type="text" size="25" maxlength="15" value=""></td>
-    </tr>
-  -->
-<!-- ##greythane - removed as the address details are not really relevant now
-    <tr>
-      <td class="register_left"><p>{UserAddressText}</p></td>
-      <td class="register_right" colspan="3"><input label="UserAddress" id="UserAddress" name="UserAddress" type="text" size="50" maxlength="50" value=""></td>
-    </tr>
-    <tr>
-      <td class="register_left"><p>{UserZipText}</p></td>
-      <td class="register_right" colspan="3"><input label="UserZip" id="UserZip" name="UserZip" type="text" size="25" maxlength="15" value=""></td>
-    </tr>
-## -->
-<!--    <tr>
-      <td class="register_left"><p>{UserCityText}</p></td>
-      <td class="register_right" colspan="3"><input label="UserCity" id="UserCity" name="UserCity" type="text" size="25" maxlength="15" value=""></td>
-    </tr>
-    <tr>
-      <td class="register_left"><p>{UserDOBText}</p></td>
-      <td class="register_dob" style="text-align:center;">
-	    <select id="UserDOBMonth" require="true" name='UserDOBMonth'>
-{MonthsArrayBegin}
-		  <option value="{Value}">{Value}</option>
-{MonthsArrayEnd}
-		</select>
-	  </td>
-      <td class="register_dob">
-		<select id="UserDOBDay" require="true" name='UserDOBDay'>
-{DaysArrayBegin}
-		  <option value="{Value}">{Value}</option>
-{DaysArrayEnd}
-		</select>
-	  </td>
-      <td class="register_dob">
-		<select id="UserDOBYear" require="true" name='UserDOBYear'>
-{YearsArrayBegin}
-		  <option value="{Value}">{Value}</option>
-{YearsArrayEnd}
-		</select>
-	  </td>
-    </tr>
-    <tr>
-      <td class="register_left"><p>{UserEmailText}*</p></td>
-      <td class="register_right" colspan="3"><input label="UserEmail" id="UserEmail" name="UserEmail" type="text" size="40" maxlength="40" value=""></td>
-	  <td class="register_left"> (For password recovery only)</td>
-    </tr>
-    <tr>
-      <td class="register_left"><p>{UserHomeRegionText}*</p></td>
-      <td class="register_dob">
-	    <select id="UserHomeRegion" require="true" name="UserHomeRegion" style="width:120px;">
-{RegionListArrayBegin}
-		  <option value="{RegionUUID}">{RegionName}</option>
-{RegionListArrayEnd}
-		</select>
-	  </td>
-    </tr>
-
-{IsAdminAuthenticatedBegin}
-<!-- Only admins can set membership types -->
-<!--    <tr>
-      <td class="register_left"><p>{UserTypeText}*</p></td>
-      <td class="register_dob">
-	    <select id="UserType" require="true" name="UserType" style="width:120px;">
-{UserTypeArrayBegin}
-		  <option value="{Index}">{Value}</option>
-{UserTypeArrayEnd}
-		</select>
-	  </td>
-    </tr>
-{IsAdminAuthenticatedEnd}
-
-    <tr>
-      <td class="register_left">Avatar Selection</td>
-      <td class="register_left" colspan="5" valign="top">
-	    <div class="carousel">
-         <div class="prev-horiz">◄</div>
-		 <div class="next-horiz">►</div>
-		 <center>
-         <div class= "avatararchivecarousel" style="height: 190px;">
-           <ul id="avatarcarousel" class="jcarousel-skin-aurora">
-{AvatarArchiveArrayBegin}
-	       <li>
-		     <div class="avatar_archive_screenshot">
-		       <label for="{AvatarArchiveName}" alt="{AvatarArchiveName}" title="{AvatarArchiveName}">{AvatarArchiveName}</label>
-			   <input type="radio" id="{AvatarArchiveName}" name="AvatarArchive" value="{AvatarArchiveName}" alt="{AvatarArchiveName}" title="{AvatarArchiveName}">
-			   <img src="{AvatarArchiveSnapshotURL}" alt="{AvatarArchiveName}" title="{AvatarArchiveName}" />
-		     </div>
-	       </li>
-{AvatarArchiveArrayEnd}
-         </ul>
-		</div>
-		</center>
-		</div>
-	  </td>
-    </tr>
-    <tr>
-      <td class="register_left"><p>{TermsOfServiceText}</p></td>
-      <td class="register_right" colspan="4"><textarea name="TosText" cols="90" rows="10" id="TosText">{ToSMessage}</textarea></td>
-    </tr>
-    <tr>
-      <td class="register_left"><p>{TermsOfServiceAccept}</p></td>
-      <td class="register_right" colspan="3"><input class="checkbox" id="checkbox" type="checkbox" name="ToSAccept" value="Accepted" /><label for="checkbox">{Accept}</label></td>
-    </tr>
-    <tr>
-	  <td class="register_left"></td><input hidden type="hidden" label="Submit" id="Submit" name="Submit" value="Submit" />
-      <td class="register_right" colspan="3"><input type="hidden" name="action" value="check"><button id="Submit" name="Submit" type="Submit">{Submit}</button></input></td>
-    </tr>
-  </tbody>
-</table></div>
-</form>
--->
-<link type="text/css" rel="stylesheet" href="css/jcarousellite.css">
-<script type="text/javascript" src="js/jquery.jcarousellite.js"></script>
 
 <script>
- $(function() {
-  $(".avatararchivecarousel").jCarouselLite({
-        btnNext: ".next-horiz",
-        btnPrev: ".prev-horiz"
+
+  $(function() {
+    $('.carousel').carousel({
+      interval: 5000
+    });
+
+    $("#avatarcarousel input[type='radio']").change(function() {
+      $("#avatarcarousel input[type='radio']").prop('checked',false);
+      $(this).prop('checked', true);
+    });
+
+    /* attach a submit handler to the form */
+    $("#register_form").submit(function(event) {
+
+      /* stop form from submitting normally */
+      event.preventDefault();
+      /* get some values from elements on the page: */
+      var $form = $( this ),
+          url = $form.attr( 'action' );
+      /* Send the data using post and put the results in a div */
+      $.post( url, $form.serialize(), function( data ) {
+  		  $("#error_message").empty().append(data);
+      });
     });
   });
 
-  /* attach a submit handler to the form */
-  $("#register_form").submit(function(event) {
-
-    /* stop form from submitting normally */
-    event.preventDefault();
-    /* get some values from elements on the page: */
-    var $form = $( this ),
-        url = $form.attr( 'action' );
-    /* Send the data using post and put the results in a div */
-    $.post( url, $form.serialize(),
-      function( data ) {
-		$("#error_message").empty().append(data);
-      }
-    );
-  });
 </script>
+
 {IfRegistrationsEnd}

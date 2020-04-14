@@ -104,7 +104,7 @@ namespace WhiteCore.Modules.Web
                     }
                     if (searchUsersList.Count > 0) {
                         noDetails = "";
-                        var nopicUrl = "../images/icons/no_avatar.jpg";
+                        var nopicUrl = "../static/icons/no_avatar.jpg";
                         var picUrl = "";
                         var userType = "Resident";
 

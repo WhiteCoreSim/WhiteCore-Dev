@@ -1,7 +1,7 @@
 $(document).ready(function() {
 
 	/***************** Waypoints ******************/
-
+/*
 	$('.wp1').waypoint(function() {
 		$('.wp1').addClass('animated fadeInUp');
 	}, {
@@ -17,18 +17,8 @@ $(document).ready(function() {
 	}, {
 		offset: '75%'
 	});
+*/
 
-	/***************** Initiate Flexslider ******************/
-	/*$('.flexslider').flexslider({
-		animation: "slide"
-	}); */
-
-	/***************** Initiate Fancybox ******************/
-
-	/*$('.single_image').fancybox({
-		padding: 4,
-	});
-	*/
 	/***************** Tooltips ******************/
     $('[data-toggle="tooltip"]').tooltip();
 
@@ -64,7 +54,8 @@ $(document).ready(function() {
 				$('section.top-navigation').addClass('fixed');
 				$('header').css({
 					"border-bottom": "none",
-					"padding": "35px 0px 5px"
+					"background-color": "rgba(34, 34, 34, 0.55)"
+					//"padding": "35px 0px 5px"
 				});
 				$('header .member-actions').css({
 					"top": "5px",
@@ -77,7 +68,8 @@ $(document).ready(function() {
 				$('section.top-navigation').removeClass('fixed');
 				$('header').css({
 					"border-bottom": "solid 1px rgba(255, 255, 255, 0.2)",
-					"padding": "40px 0px 5px 0px"
+					"background-color": "transparent"
+					//"padding": "40px 0px 5px 0px"
 				});
 				$('header .member-actions').css({
 					"top": "5px",
@@ -89,7 +81,7 @@ $(document).ready(function() {
 		});
 	});
 	/***************** Smooth Scrolling ******************/
-
+/*
 	$(function() {
 
 		$('a[href*=\\#]:not([href=\\#])').click(function() {
@@ -107,5 +99,5 @@ $(document).ready(function() {
 		});
 
 	});
-
+*/
 });

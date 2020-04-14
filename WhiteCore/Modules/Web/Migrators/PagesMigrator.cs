@@ -665,7 +665,7 @@ namespace WhiteCore.Modules.Web
                         ShowInMenu = true,
                         LoggedInRequired = true,
                         MenuID = "user_profile",
-                        Location = "user_profile.html",
+                        Location = "user/profile.html",
                         MenuPosition = 0,
                         MenuTitle = "MenuUserProfile",
                         MenuToolTip = "TooltipsMenuProfile"
@@ -674,7 +674,7 @@ namespace WhiteCore.Modules.Web
                         ShowInMenu = true,
                         LoggedInRequired = true,
                         MenuID = "user_purchases",
-                        Location = "user/user_purchases.html",
+                        Location = "user/purchases.html",
                         MenuPosition = 1,
                         MenuTitle = "MenuMyPurchases",
                         MenuToolTip = "TooltipsMenuPurchases"
@@ -684,7 +684,7 @@ namespace WhiteCore.Modules.Web
                         ShowInMenu = true,
                         LoggedInRequired = true,
                         MenuID = "user_transactions",
-                        Location = "user/user_transactions.html",
+                        Location = "user/transactions.html",
                         MenuPosition = 2,
                         MenuTitle = "MenuMyTransactions",
                         MenuToolTip = "TooltipsMenuTransactions"
@@ -693,8 +693,8 @@ namespace WhiteCore.Modules.Web
                         ShowInMenu = true,
                         LoggedInRequired = true,
                         MenuID = "user_contact",
-                        Location = "user/contactinfo.html",
-                        MenuPosition = 5,
+                        Location = "user/contact.html",
+                        MenuPosition = 3,
                         MenuTitle = "MenuContactInfo",
                         MenuToolTip = "TooltipsMenuContactInfo"
                     },
@@ -702,44 +702,44 @@ namespace WhiteCore.Modules.Web
                         ShowInMenu = true,
                         LoggedInRequired = true,
                         MenuID = "user_email",
-                        Location = "user/emailaddress.html",
-                        MenuPosition = 6,
+                        Location = "user/email.html",
+                        MenuPosition = 4,
                         MenuTitle = "MenuEmail",
                         MenuToolTip = "TooltipsMenuEmail"
                     },
                     new GridPage {
                         ShowInMenu = true,
                         LoggedInRequired = true,
-                        MenuID = "user_password",
-                        Location = "user/password.html",
-                        MenuPosition = 7,
-                        MenuTitle = "MenuChangeUserInformation",
-                        MenuToolTip = "TooltipsMenuChangeUserInformation"
-                    },
-                    new GridPage {
-                        ShowInMenu = true,
-                        LoggedInRequired = true,
                         MenuID = "user_partners",
-                        Location = "user/partners.html",
-                        MenuPosition = 7,
+                        Location = "user/partnership.html",
+                        MenuPosition = 5,
                         MenuTitle = "MenuPartners",
                         MenuToolTip = "TooltipsMenuPartners"
                     },
                     new GridPage {
                         ShowInMenu = true,
                         LoggedInRequired = true,
-                        MenuID = "delete_account",
+                        MenuID = "user_password",
+                        Location = "user/password.html",
+                        MenuPosition = 6,
+                        MenuTitle = "MenuChangeUserPassword",
+                        MenuToolTip = "TooltipsMenuChangeUserPassword"
+                    },
+                    new GridPage {
+                        ShowInMenu = true,
+                        LoggedInRequired = true,
+                        MenuID = "user_delete_account",
                         Location = "user/deleteaccount.html",
-                        MenuPosition = 4,
-                        MenuTitle = "MenuDeletAccount",
+                        MenuPosition = 7,
+                        MenuTitle = "MenuDeleteAccount",
                         MenuToolTip = "TooltipsMenuDeleteAccount"
                     },
                     new GridPage {
                         ShowInMenu = true,
                         LoggedInRequired = true,
                         MenuID = "change_user_information",
-                        Location = "change_user_information.html",
-                        MenuPosition = 7,
+                        Location = "user/update_user.html",
+                        MenuPosition = 8,
                         MenuTitle = "MenuChangeUserInformation",
                         MenuToolTip = "TooltipsMenuChangeUserInformation"
                     }
@@ -812,18 +812,45 @@ namespace WhiteCore.Modules.Web
                     new GridPage {
                         ShowInMenu = true,
                         LoggedInRequired = true,
-                        MenuID = "user_regionmanager",
-                        Location = "user/region_manager.html",
+                        MenuID = "user_buyland",
+                        Location = "user/buyland.html",
+                        MenuPosition = 0,
+                        MenuTitle = "MenuUserBuyLand",
+                        MenuToolTip = "TooltipsMenuUserBuyLand"
+                    },
+                   new GridPage {
+                        ShowInMenu = true,
+                        LoggedInRequired = true,
+                        MenuID = "user_groupland",
+                        Location = "user/groupland.html",
                         MenuPosition = 1,
-                        MenuTitle = "MenuRegionManager",
-                        MenuToolTip = "TooltipsMenuRegionManager"
+                        MenuTitle = "MenuGroupLand",
+                        MenuToolTip = "TooltipsMenuGroupLand"
+                    },
+                     new GridPage {
+                        ShowInMenu = true,
+                        LoggedInRequired = true,
+                        MenuID = "user_landfees",
+                        Location = "user/landfees.html",
+                        MenuPosition = 2,
+                        MenuTitle = "MenuUserLandfees",
+                        MenuToolTip = "TooltipsMenuUserLandfees"
+                    },
+                   new GridPage {
+                        ShowInMenu = true,
+                        LoggedInRequired = true,
+                        MenuID = "user_mainland",
+                        Location = "user/mainland.html",
+                        MenuPosition = 3,
+                        MenuTitle = "MenuUserMainland",
+                        MenuToolTip = "TooltipsMenuUserMainland"
                     },
                     new GridPage {
                         ShowInMenu = true,
                         LoggedInRequired = true,
                         MenuID = "user_estatemanager",
                         Location = "user/estate_manager.html",
-                        MenuPosition = 2,
+                        MenuPosition = 4,
                         MenuTitle = "MenuEstateManager",
                         MenuToolTip = "TooltipsMenuEstateManager"
                     },
@@ -834,7 +861,7 @@ namespace WhiteCore.Modules.Web
                 ShowInMenu = true,
                 LoggedInRequired = true,
                 MenuID = "userfriends",
-                Location = "l",
+                Location = "userfriends.html",
                 MenuPosition = 5,
                 MenuTitle = "MenuUserFriends",
                 MenuToolTip = "TooltipsMenuUserFriends",

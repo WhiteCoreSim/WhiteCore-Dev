@@ -71,7 +71,7 @@ namespace WhiteCore.Modules.Web
             string infoMessage = "";
 
             AbuseReport rpt;
-            var snapshotURL = "../images/icons/no_screenshot.jpg";
+            var snapshotURL = "../static/icons/no_screenshot.jpg";
 
             // the card number can come in a number of ways
             int cardID = httpRequest.Query.ContainsKey ("cardid")

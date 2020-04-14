@@ -37,7 +37,7 @@ namespace WhiteCore.Modules.Web
                 return new []
                            {
                                "html/index.html",
-                               "html/js/menu.js"
+                               "html/static/js/menu.js"
                             };
             }
         }
