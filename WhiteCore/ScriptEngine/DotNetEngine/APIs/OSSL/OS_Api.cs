@@ -1284,7 +1284,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.APIs
 
         public double osList2Double(LSL_List src, int index) {
             // There is really no double type in OSSL. C# and other
-            // have one, but the current implementation of LSL_Types.list
+            // have one, but the current implementation of LSL_Types.List
             // is not allowed to contain any.
             // This really should be removed.
             //
