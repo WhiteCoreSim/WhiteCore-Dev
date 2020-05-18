@@ -96,7 +96,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.CompilerTools
                                                 {"string", "LSL_Types.LSLString"},
                                                 {"vector", "LSL_Types.Vector3"},
                                                 {"rotation", "LSL_Types.Quaternion"},
-                                                {"list", "LSL_Types.list"}
+                                                {"list", "LSL_Types.List"}
                                             };
             }
         }
@@ -585,7 +585,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.CompilerTools
 			new EventInfo("experience_permissions", new [] { "LSL_Types.LSLString" }),
 			new EventInfo("experience_permissions_denied", new [] { "LSL_Types.LSLString", "LSL_Types.LSLInteger" }),
 			new EventInfo("http_request", new [] { "LSL_Types.LSLString", "LSL_Types.LSLString", "LSL_Types.LSLString" }),
-			new EventInfo("http_response", new [] { "LSL_Types.LSLString", "LSL_Types.LSLInteger", "LSL_Types.list", "LSL_Types.LSLString" }),
+			new EventInfo("http_response", new [] { "LSL_Types.LSLString", "LSL_Types.LSLInteger", "LSL_Types.List", "LSL_Types.LSLString" }),
 			new EventInfo("land_collision", new [] { "LSL_Types.Vector3" }),
 			new EventInfo("land_collision_end", new [] { "LSL_Types.Vector3" }),
 			new EventInfo("land_collision_start", new [] { "LSL_Types.Vector3" }),
@@ -600,7 +600,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.CompilerTools
 			new EventInfo("object_rez", new [] { "LSL_Types.LSLString" }),
 			new EventInfo("on_error", new [] { "LSL_Types.LSLString" }),
 			new EventInfo("on_rez", new [] { "LSL_Types.LSLInteger" }),
-			new EventInfo("path_update", new [] { "LSL_Types.LSLInteger", "LSL_Types.list" }),
+			new EventInfo("path_update", new [] { "LSL_Types.LSLInteger", "LSL_Types.List" }),
 			new EventInfo("remote_data", new [] { "LSL_Types.LSLInteger", "LSL_Types.LSLString", "LSL_Types.LSLString", "LSL_Types.LSLString", 
 			              	"LSL_Types.LSLInteger", "LSL_Types.LSLString" }),
 			new EventInfo("run_time_permissions", new [] { "LSL_Types.LSLInteger" }),

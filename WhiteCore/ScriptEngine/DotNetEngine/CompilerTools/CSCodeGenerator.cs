@@ -233,13 +233,13 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.CompilerTools
                         IenFunctions.Add("llSendRemoteData", "LSL_Types.LSLString");
                         IenFunctions.Add("llXorBase64Strings", "LSL_Types.LSLString");
                         IenFunctions.Add("llRequestSimulatorData", "LSL_Types.LSLString");
-                        IenFunctions.Add("llParcelMediaQuery", "LSL_Types.list");
-                        IenFunctions.Add("llGetPrimMediaParams", "LSL_Types.list");
+                        IenFunctions.Add("llParcelMediaQuery", "LSL_Types.List");
+                        IenFunctions.Add("llGetPrimMediaParams", "LSL_Types.List");
                         IenFunctions.Add("llSetPrimMediaParams", "LSL_Types.LSLInteger");
                         IenFunctions.Add("llClearPrimMedia", "LSL_Types.LSLInteger");
                         IenFunctions.Add("llModPow", "LSL_Types.LSLInteger");
                         IenFunctions.Add("llGetNumberOfNotecardLines", "LSL_Types.LSLString");
-                        IenFunctions.Add("llGetParcelPrimOwners", "LSL_Types.list");
+                        IenFunctions.Add("llGetParcelPrimOwners", "LSL_Types.List");
                         IenFunctions.Add("llGetNotecardLine", "LSL_Types.LSLString");
             */
 

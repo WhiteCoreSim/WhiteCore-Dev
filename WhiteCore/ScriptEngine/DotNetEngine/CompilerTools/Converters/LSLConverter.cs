@@ -57,7 +57,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.CompilerTools
             LSL2CSCodeTransformer.AddLSLEvent(new EventInfo("experience_permissions_denied", new [] {
 				"LSL_Types.LSLString", "LSL_Types.LSLInteger" }));
             LSL2CSCodeTransformer.AddLSLEvent(new EventInfo("path_update", new [] {
-                "LSL_Types.LSLInteger", "LSL_Types.list" }));
+                "LSL_Types.LSLInteger", "LSL_Types.List" }));
             LSL2CSCodeTransformer.AddLSLEvent(new EventInfo("transaction_result", new [] {
                 "LSL_Types.LSLString", "LSL_Types.LSLInteger", "LSL_Types.LSLString" }));
         }
@@ -207,7 +207,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.CompilerTools
                 "float");
 
             message = message.Replace(
-                "WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.list",
+                "WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.List",
                 "list");
 
             return message;

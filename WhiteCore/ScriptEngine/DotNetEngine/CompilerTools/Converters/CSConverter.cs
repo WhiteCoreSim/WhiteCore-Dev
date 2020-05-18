@@ -133,7 +133,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.CompilerTools
                                                   "WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.LSLFloat");
 
             compileScript = compileScript.Replace("list",
-                                                  "WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.list");
+                                                  "WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.List");
 
             compileScript = compileScript.Replace("rotation",
                                                   "WhiteCore.ScriptEngine.DotNetEngine.LSL_Types.Quaternion");
