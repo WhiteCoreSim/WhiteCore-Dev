@@ -26,6 +26,7 @@
  */
 
 using System.Collections.Generic;
+using WhiteCore.Framework.Modules;
 using WhiteCore.Framework.Servers.HttpServer.Implementation;
 using WhiteCore.Framework.Services;
 using WhiteCore.Framework.Utilities;
@@ -61,6 +62,15 @@ namespace WhiteCore.Modules.Web
         {
             response = null;
             var vars = new Dictionary<string, object>();
+            // worldview
+            var webTextureService = webInterface.Registry.RequestModuleInterface<IWebHttpTextureService>();
+
+            var worldViewConfig =
+                    webInterface.Registry.RequestModuleInterface<ISimulationBase>().ConfigSource.Configs["WorldViewModule"];
+            bool worldViewEnabled = false;
+            if (worldViewConfig != null)
+                worldViewEnabled = worldViewConfig.GetBoolean("Enabled", true);
+
 
             List<Dictionary<string, object>> RegionListVars = new List<Dictionary<string, object>>();
             var sortBy = new Dictionary<string, bool>();
@@ -69,41 +79,59 @@ namespace WhiteCore.Modules.Web
             else if (httpRequest.Query.ContainsKey("Order"))
                 sortBy.Add(httpRequest.Query["Order"].ToString(), true);
 
+            //?? needed ??
             uint amountPerQuery = 50;
             int start = httpRequest.Query.ContainsKey("Start") ? int.Parse(httpRequest.Query["Start"].ToString()) : 0;
-            uint count = Framework.Utilities.DataManager.RequestPlugin<IRegionData>().Count((RegionFlags) 0,
+            uint count = Framework.Utilities.DataManager.RequestPlugin<IRegionData>().Count((RegionFlags)0,
                                                                                     RegionFlags.Hyperlink |
                                                                                     RegionFlags.Foreign |
                                                                                     RegionFlags.Hidden);
-            int maxPages = (int) (count/amountPerQuery) - 1;
+            int maxPages = (int)(count / amountPerQuery) - 1;
 
             if (start == -1)
-                start = (int) (maxPages < 0 ? 0 : maxPages);
+                start = (int)(maxPages < 0 ? 0 : maxPages);
 
             vars.Add("CurrentPage", start);
             vars.Add("NextOne", start + 1 > maxPages ? start : start + 1);
             vars.Add("BackOne", start - 1 < 0 ? 0 : start - 1);
 
-            var regions = Framework.Utilities.DataManager.RequestPlugin<IRegionData>().GetList((RegionFlags) 0,
+            var regions = Framework.Utilities.DataManager.RequestPlugin<IRegionData>().GetList((RegionFlags)0,
                                                                                    RegionFlags.Hyperlink |
                                                                                    RegionFlags.Foreign |
                                                                                    RegionFlags.Hidden,
-                                                                                   (uint) (start*amountPerQuery),
+                                                                                   (uint)(start * amountPerQuery),
                                                                                    amountPerQuery, sortBy);
+            var default_landing = new OpenMetaverse.Vector3(128, 128, 40);
+
             foreach (var region in regions)
             {
                 string info;
                 info = (region.RegionArea < 1000000) ? region.RegionArea + " m2" : (region.RegionArea / 1000000) + " km2";
-                info = info + ", " +region.RegionTerrain;
+                info = info + ", " + region.RegionTerrain;
 
-                RegionListVars.Add (new Dictionary<string, object> {
+                var regionviewURL = "";
+                if (region.IsOnline)
+                {
+                    if (webTextureService != null && worldViewEnabled)
+                        regionviewURL = webTextureService.GetRegionWorldViewURL(region.RegionID);
+                    else
+                        regionviewURL = "/static/icons/region.png";
+                }
+                else
+                {
+                    regionviewURL = "/static/icons/offline_world.png";
+                }
+
+                RegionListVars.Add(new Dictionary<string, object> {
                     { "RegionLocX", region.RegionLocX / Constants.RegionSize },
                     { "RegionLocY", region.RegionLocY / Constants.RegionSize },
                     { "RegionName", region.RegionName },
                     { "RegionInfo", info},
-                    { "RegionStatus", region.IsOnline ? "yes" : "no"},
+                    { "RegionStatus", region.IsOnline ? "Online" : "Offline"},
                     { "RegionID", region.RegionID },
-                    { "RegionURI", region.RegionURI }
+                    { "RegionURI", region.RegionURI },
+                    { "HopUrl", webInterface.HopVectorUrl(region.RegionName, default_landing) },
+                    { "RegionWorldViewURL", regionviewURL}
                 });
             }
 
@@ -114,7 +142,7 @@ namespace WhiteCore.Modules.Web
             vars.Add("RegionNameText", translator.GetTranslatedString("RegionNameText"));
             vars.Add("RegionLocXText", translator.GetTranslatedString("RegionLocXText"));
             vars.Add("RegionLocYText", translator.GetTranslatedString("RegionLocYText"));
-            vars.Add ("RegionOnlineText", translator.GetTranslatedString ("Online"));
+            vars.Add("RegionOnlineText", translator.GetTranslatedString("Online"));
             vars.Add("SortByLocX", translator.GetTranslatedString("SortByLocX"));
             vars.Add("SortByLocY", translator.GetTranslatedString("SortByLocY"));
             vars.Add("SortByName", translator.GetTranslatedString("SortByName"));
@@ -126,7 +154,7 @@ namespace WhiteCore.Modules.Web
             vars.Add("CurrentPageText", translator.GetTranslatedString("CurrentPageText"));
             vars.Add("MoreInfoText", translator.GetTranslatedString("MoreInfoText"));
             vars.Add("RegionMoreInfo", translator.GetTranslatedString("RegionMoreInfo"));
-            vars.Add ("MainServerURL", webInterface.GridURL);
+            vars.Add("MainServerURL", webInterface.GridURL);
 
             return vars;
         }

@@ -127,7 +127,10 @@ namespace WhiteCore.Modules.Web
                 events = directoryService.GetUserEvents (user.PrincipalID.ToString (), timeframe, category, eventLevel);
 
                 if (events.Count == 0) {
-                    vars.Add ("EditText", "");
+                    vars.Add("HaveData", false);
+                    vars.Add("NoData", true);
+                    /*
+                    vars.Add("EditText", "");
                     eventListVars.Add (new Dictionary<string, object> {
                         { "EventID", "" },
                         { "CreatorUUID", "" },
@@ -147,8 +150,11 @@ namespace WhiteCore.Modules.Web
                         { "Maturity", "" },
                         { "EventFlags", "" },   // same as maturity??
                         { "Category", "" }
-                });
+                }); */
                 } else {
+                    vars.Add("HaveData", true);
+                    vars.Add("NoData", false);
+
                     vars.Add ("EditText", translator.GetTranslatedString ("EditText"));
                     foreach (var evnt in events) {
                         var evntDateTime = Util.ToDateTime (evnt.dateUTC).ToLocalTime ();

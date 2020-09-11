@@ -65,6 +65,9 @@ namespace WhiteCore.Modules.Web
             var regionData = Framework.Utilities.DataManager.RequestPlugin<IRegionData> ();
             var regions = regionData.GetOwnerRegions (user.PrincipalID);
             if (regions.Count > 0) {
+                vars.Add("HaveData", true);
+                vars.Add("NoData", false);
+
                 foreach (var region in regions) {
                     string info;
                     info = (region.RegionArea < 1000000) ? region.RegionArea + " m2" : (region.RegionArea / 1000000) + " km2";
@@ -81,6 +84,10 @@ namespace WhiteCore.Modules.Web
                     });
                 }
             } else {
+                vars.Add("HaveData", false);
+                vars.Add("NoData", true);
+
+                /*
                 regionListVars.Add (new Dictionary<string, object> {
                     { "RegionLocX", "" },
                     { "RegionLocY", "" },
@@ -90,13 +97,13 @@ namespace WhiteCore.Modules.Web
                     { "RegionID", "" },
                     { "RegionURI", "" }
                 });
-
+                */
             }
 
             vars.Add ("RegionList", regionListVars);
+            vars.Add("UserName", user.Name);
 
             // labels
-            vars.Add ("UserName", user.Name);
             vars.Add ("RegionsText", translator.GetTranslatedString ("MenuRegionsTitle"));
             vars.Add ("AddRegionText", translator.GetTranslatedString ("AddRegionText"));
             vars.Add ("EditRegionText", translator.GetTranslatedString ("EditText"));

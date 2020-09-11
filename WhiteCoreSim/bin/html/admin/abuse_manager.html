@@ -1,0 +1,70 @@
+<!-- Abuse report listing -->
+<style>
+  .page-link {background-color: transparent !important;}
+</style>
+
+
+{IsAdminAuthenticatedBegin}
+<div class="col98">
+  <h2>{SystemName}: {AbuseReportText}</h2>
+
+  {IfHaveDataBegin}
+  <table class="table-compact table-hover display" id="abusereport_list" width="100%">
+    <thead>
+      <tr class="tablehead">
+        <th class="text-center">{CategoryText}</th>
+        <th class="text-center">{AbuseReporterNameText}</th>
+        <th class="text-center">{AbuserNameText}</th>
+        <th class="text-center no-sort">{SummaryText}</th>
+        <th class="text-center">{AssignedToText}</th>
+        <th class="text-center">{ActiveText}</th>
+        <th class="no-sort"></th>
+      </tr>
+    </thead>
+
+    <tbody>
+      {AbuseReportsListArrayBegin}
+      <tr onclick="loadusercontent('admin-abuse_report', 'cardid={CardNumber}');">
+        <td class="text-left">{Category}</td>
+        <td class="text-left">{ReporterName}</td>
+        <td class="text-left">{Abusername}</td>
+        <td class="text-left">{Summary}</td>
+        <td class="text-left">{AssignedTo}</td>
+        <td class="text-left">{Active}</td>
+        <td class="text-center">
+          <a title="{MoreInfoText}" href="#">
+            <i class="fa fa-edit"></i>
+          </a>
+        </td>
+      </tr>
+      {AbuseReportsListArrayEnd}
+    </tbody>
+  </table>
+
+  <script type="text/javascript">
+    $(function() {
+      $('#abusereport_list').dataTable( {
+        "order": [[ 0, "asc" ]],
+        "aoColumnDefs": [{"bSortable":false,"aTargets":["no-sort"]}],
+        "fixedHeader": {
+          header: true,
+          //footer: true
+        },
+      });
+    });
+  </script>
+  {IfHaveDataEnd}
+
+  {IfNoDataBegin}
+  <div id="error404" align="center">
+    <h4 class="error404">
+      No abuse reports on record
+    </h4>
+    <div class="error404">
+      <img src="/static/images/happy_avatar.png"/>
+    </div>
+  </div>
+  {IfNoDataEnd}
+
+</div>
+{IsAdminAuthenticatedEnd}

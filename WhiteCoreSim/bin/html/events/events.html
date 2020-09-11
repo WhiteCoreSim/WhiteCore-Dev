@@ -1,45 +1,71 @@
-<!-- Events -->
-<!-- <link href="css/datatables.min.css" rel="stylesheet" type="text/css"> -->
+<!-- Events  -->
 
-<div id="fullPage">
+<div class="col98" id="events_page">
   <h2>
     {EventsText}
     <img alt="{EventsText}" src="static/icons/event.png" />
   </h2>
   <!-- selection - search -->
   <div class="row justify-content-center">
-    <div class="col-10" style="margin-bottom:10px;">
+    <div class="col" style="margin-bottom:10px;">
       {IsAuthenticatedBegin}
-        <button class="btn btn-xs btn-default" style="float:right;margin-left:10px;" id="add_event" onClick="window.location.href='index.html?page=add_event';" id="add_event">{AddEventText}</button>
+        <button class="btn btn-xs btn-default" style="float:right;margin-left:10px;" onClick="loadusercontent('events-add_event');">{AddEventText}</button>
       {IsAuthenticatedEnd}
+      
       <form id="events_search_form" action="events/events.html" method="post">
-      	<div class="form-fieldset-range">
-          <select id="events-category" name="category"  style="width:120px;">
-            {CategoryTypeArrayBegin}
-              <option value="{Index}" {selected}>{Value}</option>
-            {CategoryTypeArrayEnd}
-          </select>
+        <div class="form-group row">
+          <div class="col-4 form-group">
+            <select class="custom-select" id="events-category" name="category"  style="width:120px;">
+              {CategoryTypeArrayBegin}
+                <option value="{Index}" {selected}>{Value}</option>
+              {CategoryTypeArrayEnd}
+            </select>
 
-          <select id="events-timeframe" name="timeframe"  style="width:120px;">
-            {TimeFrameArrayBegin}
-              <option value="{Index}" {selected}>{Value}</option>
-            {TimeFrameArrayEnd}
-          </select>
+            <select class="custom-select" id="events-timeframe" name="timeframe"  style="width:150px;">
+              {TimeFrameArrayBegin}
+                <option value="{Index}" {selected}>{Value}</option>
+              {TimeFrameArrayEnd}
+            </select>
+          </div>
 
-          <input style="width:20px;" type="checkbox" id="display_pg" name="display_pg" value="on" {PG_checked}>
-          <label for="display_pg" class="for-check"><img src="/static/icons/general.png" alt="PG ratings" style="margin-bottom:3px;">&nbsp;&nbsp;{GeneralText}</label>
-          {IsAuthenticatedBegin}
-          <input style="width:20px;" type="checkbox" id="display_ma" name="display_ma" value="on" {MA_checked}>
-          <label for="display_ma" class="for-check"><img src="/static/icons/moderate.png" alt="MA ratings" style="margin-bottom:3px;">&nbsp;&nbsp;{MatureText}</label>
-          <input style="width:20px;" type="checkbox" id="display_ao" name="display_ao" value="on" {AO_checked}>
-          <label for="display_ao" class="for-check"><img src="/static/icons/adult.png" alt="AO ratings" style="margin-bottom:3px;">&nbsp;&nbsp;{AdultText}</label>
-          {IsAuthenticatedEnd}
+          <div class="col-6 form-group">
+            <div class="form-check form-check-inline">
+              <input style="width:20px;" type="checkbox" id="display_pg" name="display_pg" value="on" {PG_checked}>
+              <label for="display_pg" class="event-check">
+                <img src="/static/icons/general.png" alt="PG ratings" style="margin-bottom:3px;">
+                {GeneralText}
+              </label>
+            </div>
 
-          <input hidden type="hidden" label="Submit" id="Submit" name="Submit" value="Submit" />
-          <button class="btn btn-info" style="float:right;width:200px;" id="Submit" type="Submit" name="Submit">{SearchText}</button>
+            {IsAuthenticatedBegin}
+            <div class="form-check form-check-inline">
+              <input style="width:20px;" type="checkbox" id="display_ma" name="display_ma" value="on" {MA_checked}>
+              <label for="display_ma" class="event-check">
+                <img src="/static/icons/moderate.png" alt="MA ratings" style="margin-bottom:3px;">
+                {MatureText}
+              </label>
+            </div>
 
-      	</div>
+            <div class="form-check form-check-inline">
+              <input style="width:20px;" type="checkbox" id="display_ao" name="display_ao" value="on" {AO_checked}>
+              <label for="display_ao" class="event-check">
+                <img src="/static/icons/adult.png" alt="AO ratings" style="margin-bottom:3px;">
+                {AdultText}
+              </label>
+            </div>
+            {IsAuthenticatedEnd}
+          </div>
+
+          <div class="col-2">
+  <!--          <input hidden type="hidden" label="Submit" id="Submit" name="Submit" value="Submit" />  -->
+            <button class="btn btn-info pull-right" style="width:200px;" 
+                     onclick="submitpagesearch('events_search_form', 'events_page');">
+              {SearchText}
+            </button>
+        	</div>
+        </div>
       </form>
+
     </div>
   </div>
 
@@ -79,91 +105,36 @@
               </div>
             </li>
           {EventListArrayEnd}
- <!--         <li>
-            <time datetime="2014-07-20 0000">
-              <span class="day">8</span>
-              <span class="month">Jul</span>
-              <span class="year">2014</span>
-              <span class="time">12:00 AM</span>
-            </time>
-            <div class="info">
-              <h2 class="title">One Piece Unlimited World Red</h2>
-              <p class="desc">PS Vita</p>
-              <ul>
-                <li style="width:50%;"><a href="#website"><span class="fa fa-globe"></span> Website</a></li>
-                <li style="width:50%;"><span class="fa fa-money"></span> $39.99</li>
-              </ul>
-            </div>
-            <div class="social">
-              <ul>
-                <li class="facebook" style="width:33%;"><a href="#facebook"><span class="fa fa-facebook"></span></a></li>
-                <li class="twitter" style="width:34%;"><a href="#twitter"><span class="fa fa-twitter"></span></a></li>
-                <li class="google-plus" style="width:33%;"><a href="#google-plus"><span class="fa fa-google-plus"></span></a></li>
-              </ul>
-            </div>
-          </li>
-
-          <li>
-            <time datetime="2014-07-20 2000">
-              <span class="day">20</span>
-              <span class="month">Jan</span>
-              <span class="year">2014</span>
-              <span class="time">8:00 PM</span>
-            </time>
-            <img alt="My 24th Birthday!" src="https://farm5.staticflickr.com/4150/5045502202_1d867c8a41_q.jpg" />
-            <div class="info">
-              <h2 class="title">Mouse0270's 24th Birthday!</h2>
-              <p class="desc">Bar Hopping in Erie, Pa.</p>
-              <ul>
-                <li style="width:33%;">1 <span class="glyphicon glyphicon-ok"></span></li>
-                <li style="width:34%;">3 <span class="fa fa-question"></span></li>
-                <li style="width:33%;">103 <span class="fa fa-envelope"></span></li>
-              </ul>
-            </div>
-            <div class="social">
-              <ul>
-                <li class="facebook" style="width:33%;"><a href="#facebook"><span class="fa fa-facebook"></span></a></li>
-                <li class="twitter" style="width:34%;"><a href="#twitter"><span class="fa fa-twitter"></span></a></li>
-                <li class="google-plus" style="width:33%;"><a href="#google-plus"><span class="fa fa-google-plus"></span></a></li>
-              </ul>
-            </div>
-          </li>
-
-          <li>
-            <time datetime="2014-07-31 1600">
-              <span class="day">31</span>
-              <span class="month">Jan</span>
-              <span class="year">2014</span>
-              <span class="time">4:00 PM</span>
-            </time>
-            <img alt="Disney Junior Live On Tour!" src="http://www.thechaifetzarena.com/images/main/DL13_PiratePrincess_thumb.jpg" />
-            <div class="info">
-              <h2 class="title">Disney Junior Live On Tour!</h2>
-              <p class="desc"> Pirate and Princess Adventure</p>
-              <ul>
-                <li style="width:33%;">$49.99 <span class="fa fa-male"></span></li>
-                <li style="width:34%;">$29.99 <span class="fa fa-child"></span></li>
-              </ul>
-            </div>
-            <div class="social">
-              <ul>
-                <li class="facebook" style="width:33%;"><a href="#facebook"><span class="fa fa-facebook"></span></a></li>
-                <li class="twitter" style="width:34%;"><a href="#twitter"><span class="fa fa-twitter"></span></a></li>
-                <li class="google-plus" style="width:33%;"><a href="#google-plus"><span class="fa fa-google-plus"></span></a></li>
-              </ul>
-            </div>
-          </li>  -->
         </ul>
       </div>
     </div>
   </div>
 
 
+  {IsAuthenticatedBegin}
+    {IfNoDataBegin}
+      <div id="error404" align="center">
+        <h4 class="error404">
+          No events found?
+        </h4>
+        <div class="error404" style="cursor:pointer;">
+          <a class="btn btn-xs btn-default" onClick="loadusercontent('events-add_event');">
+            <img src="/static/images/special_event.jpg"/>
+            <br/>
+            <div class="btn-success">
+              {AddEventText}
+            </div>
+          </a>
+        </div>
+      </div>
+    {IfNoDataEnd}
+  {IsAuthenticatedEnd}
+</div>
 <!--
 
 
   <table id="events_list">
-	  <thead class="listhead">
+	  <thead>
    		<tr>
    		  <th class="text-left"><p>{EventDateText}</p></th>
    		  <th class="text-left"><p>{LocationText}</p></th>
@@ -201,18 +172,5 @@
 //  });
 
 
-  /* attach a submit handler to the form */
-  $("#events_search_form").submit(function(event) {
-
-    /* stop form from submitting normally */
-    event.preventDefault();
-    /* get some values from elements on the page: */
-    var $form = $( this ),
-        url = $form.attr( 'action' );
-    /* Send the data using post and put the results in a div */
-    $.post( url, $form.serialize(), function( data ) {
-      $("#fullPage").empty().append(data);
-    });
-  });
 </script>
 

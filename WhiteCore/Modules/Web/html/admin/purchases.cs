@@ -38,87 +38,97 @@ namespace WhiteCore.Modules.Web
 {
     public class AdminUserPurchasesPage : IWebInterfacePage
     {
-        public string [] FilePath {
-            get {
-                return new []
+        public string[] FilePath
+        {
+            get
+            {
+                return new[]
                            {
                                "html/admin/purchases.html"
                            };
             }
         }
 
-        public bool RequiresAuthentication {
+        public bool RequiresAuthentication
+        {
             get { return true; }
         }
 
-        public bool RequiresAdminAuthentication {
+        public bool RequiresAdminAuthentication
+        {
             get { return true; }
         }
 
-        public Dictionary<string, object> Fill (WebInterface webInterface, string filename, OSHttpRequest httpRequest,
+        public Dictionary<string, object> Fill(WebInterface webInterface, string filename, OSHttpRequest httpRequest,
                                                 OSHttpResponse httpResponse, Dictionary<string, object> requestParameters,
                                                 ITranslator translator, out string response)
         {
             response = null;
-            IConfig gridInfo = webInterface.Registry.RequestModuleInterface<ISimulationBase> ().ConfigSource.Configs ["GridInfoService"];
-            var InWorldCurrency = gridInfo.GetString ("CurrencySymbol", string.Empty) + " ";
-            var RealCurrency = gridInfo.GetString ("RealCurrencySymbol", string.Empty) + " ";
+            IConfig gridInfo = webInterface.Registry.RequestModuleInterface<ISimulationBase>().ConfigSource.Configs["GridInfoService"];
+            var InWorldCurrency = gridInfo.GetString("CurrencySymbol", string.Empty) + " ";
+            var RealCurrency = gridInfo.GetString("RealCurrencySymbol", string.Empty) + " ";
 
-            var vars = new Dictionary<string, object> ();
-            var purchasesList = new List<Dictionary<string, object>> ();
+            var vars = new Dictionary<string, object>();
+            var purchasesList = new List<Dictionary<string, object>>();
 
             var today = DateTime.Now;
-            var thirtyDays = today.AddDays (-30);
-            string DateStart = thirtyDays.ToShortDateString ();
-            string DateEnd = today.ToShortDateString ();
+            var thirtyDays = today.AddDays(-30);
+            string DateStart = thirtyDays.ToShortDateString();
+            string DateEnd = today.ToShortDateString();
             string UserName = "";
             UUID UserID = UUID.Zero;
 
-            IMoneyModule moneyModule = webInterface.Registry.RequestModuleInterface<IMoneyModule> ();
-            string noDetails = translator.GetTranslatedString ("NoPurchasesText");
-            if (moneyModule != null) {
+            IMoneyModule moneyModule = webInterface.Registry.RequestModuleInterface<IMoneyModule>();
+            string noDetails = translator.GetTranslatedString("NoPurchasesText");
+            if (moneyModule != null)
+            {
 
                 // Check if we're looking at the standard page or the submitted one
-                if (requestParameters.ContainsKey ("Submit")) {
-                    if (requestParameters.ContainsKey ("date_start"))
-                        DateStart = requestParameters ["date_start"].ToString ();
-                    if (requestParameters.ContainsKey ("date_end"))
-                        DateEnd = requestParameters ["date_end"].ToString ();
-                    if (requestParameters.ContainsKey ("user_name"))
-                        UserName = requestParameters ["user_name"].ToString ();
+                if (requestParameters.ContainsKey("search"))
+                {
+                    if (requestParameters.ContainsKey("date_start"))
+                        DateStart = requestParameters["date_start"].ToString();
+                    if (requestParameters.ContainsKey("date_end"))
+                        DateEnd = requestParameters["date_end"].ToString();
+                    if (requestParameters.ContainsKey("user_name"))
+                        UserName = requestParameters["user_name"].ToString();
 
-                    IUserAccountService accountService = webInterface.Registry.RequestModuleInterface<IUserAccountService> ();
+                    IUserAccountService accountService = webInterface.Registry.RequestModuleInterface<IUserAccountService>();
 
-                    if (UserName != "") {
+                    if (UserName != "")
+                    {
                         UserID = (UUID)Constants.LibraryOwnerUUID;         // This user should hopefully never have transactions
 
-                        if (UserName.Split (' ').Length == 2) {
-                            var userAcct = accountService.GetUserAccount (null, UserName);
+                        if (UserName.Split(' ').Length == 2)
+                        {
+                            var userAcct = accountService.GetUserAccount(null, UserName);
                             if (userAcct.Valid)
                                 UserID = userAcct.PrincipalID;
                         }
                     }
 
                     // Purchases Logs
-                    var timeNow = DateTime.Now.ToString ("HH:mm:ss");
-                    var dateFrom = DateTime.Parse (DateStart + " " + timeNow);
-                    var dateTo = DateTime.Parse (DateEnd + " " + timeNow);
-                    var purchases = new List<AgentPurchase> ();
+                    var timeNow = DateTime.Now.ToString("HH:mm:ss");
+                    var dateFrom = DateTime.Parse(DateStart + " " + timeNow);
+                    var dateTo = DateTime.Parse(DateEnd + " " + timeNow);
+                    var purchases = new List<AgentPurchase>();
 
                     if (UserID != UUID.Zero)
-                        purchases = moneyModule.GetPurchaseHistory (UserID, dateFrom, dateTo, null, null);
+                        purchases = moneyModule.GetPurchaseHistory(UserID, dateFrom, dateTo, null, null);
                     else
-                        purchases = moneyModule.GetPurchaseHistory (dateFrom, dateTo, null, null);
+                        purchases = moneyModule.GetPurchaseHistory(dateFrom, dateTo, null, null);
 
                     // data
-                    if (purchases != null && purchases.Count > 0) {
+                    if (purchases != null && purchases.Count > 0)
+                    {
                         noDetails = "";
 
-                        foreach (var purchase in purchases) {
-                            var buyerAcct = accountService.GetUserAccount (null, purchase.AgentID);
+                        foreach (var purchase in purchases)
+                        {
+                            var buyerAcct = accountService.GetUserAccount(null, purchase.AgentID);
                             string AgentName = buyerAcct.Name;
 
-                            purchasesList.Add (new Dictionary<string, object> {
+                            purchasesList.Add(new Dictionary<string, object> {
                             { "ID", purchase.ID },
                             { "AgentID", purchase.AgentID },
                             { "AgentName", AgentName },
@@ -134,8 +144,9 @@ namespace WhiteCore.Modules.Web
                     }
                 }
 
-                if (purchasesList.Count == 0) {
-                    purchasesList.Add (new Dictionary<string, object> {
+                if (purchasesList.Count == 0)
+                {
+                    purchasesList.Add(new Dictionary<string, object> {
                         {"ID", ""},
                         {"AgentID", ""},
                         {"AgentName", ""},
@@ -150,38 +161,39 @@ namespace WhiteCore.Modules.Web
             }
 
             // always required data
-            vars.Add ("DateStart", DateStart);
-            vars.Add ("DateEnd", DateEnd);
-            vars.Add ("SearchUser", UserName);
-            vars.Add ("PurchasesList", purchasesList);
-            vars.Add ("NoPurchasesText", noDetails);
+            vars.Add("DateStart", DateStart);
+            vars.Add("DateEnd", DateEnd);
+            vars.Add("SearchUser", UserName);
+            vars.Add("PurchasesList", purchasesList);
+            vars.Add("NoPurchasesText", noDetails);
 
             // labels
-            vars.Add ("PurchasesText", translator.GetTranslatedString ("PurchasesText"));
-            vars.Add ("DateInfoText", translator.GetTranslatedString ("DateInfoText"));
-            vars.Add ("DateStartText", translator.GetTranslatedString ("DateStartText"));
-            vars.Add ("DateEndText", translator.GetTranslatedString ("DateEndText"));
-            vars.Add ("SearchUserText", translator.GetTranslatedString ("AvatarNameText"));
+            vars.Add("PurchasesText", translator.GetTranslatedString("PurchasesText"));
+            vars.Add("DateInfoText", translator.GetTranslatedString("DateInfoText"));
+            vars.Add("DateStartText", translator.GetTranslatedString("DateStartText"));
+            vars.Add("DateEndText", translator.GetTranslatedString("DateEndText"));
+            vars.Add("SearchUserText", translator.GetTranslatedString("AvatarNameText"));
+            vars.Add("Search", translator.GetTranslatedString("Search"));
 
-            vars.Add ("PurchaseAgentText", translator.GetTranslatedString ("TransactionToAgentText"));
-            vars.Add ("PurchaseDateText", translator.GetTranslatedString ("TransactionDateText"));
-            vars.Add ("PurchaseUpdateDateText", translator.GetTranslatedString ("TransactionDateText"));
+            vars.Add("PurchaseAgentText", translator.GetTranslatedString("TransactionToAgentText"));
+            vars.Add("PurchaseDateText", translator.GetTranslatedString("TransactionDateText"));
+            vars.Add("PurchaseUpdateDateText", translator.GetTranslatedString("TransactionDateText"));
             //vars.Add("PurchaseTimeText", translator.GetTranslatedString("Time"));
-            vars.Add ("PurchaseDetailText", translator.GetTranslatedString ("TransactionDetailText"));
-            vars.Add ("LoggedIPText", translator.GetTranslatedString ("LoggedIPText"));
-            vars.Add ("PurchaseAmountText", InWorldCurrency + translator.GetTranslatedString ("TransactionAmountText"));
-            vars.Add ("PurchaseRealAmountText", RealCurrency + translator.GetTranslatedString ("PurchaseCostText"));
+            vars.Add("PurchaseDetailText", translator.GetTranslatedString("TransactionDetailText"));
+            vars.Add("LoggedIPText", translator.GetTranslatedString("LoggedIPText"));
+            vars.Add("PurchaseAmountText", InWorldCurrency + translator.GetTranslatedString("TransactionAmountText"));
+            vars.Add("PurchaseRealAmountText", RealCurrency + translator.GetTranslatedString("PurchaseCostText"));
 
-            vars.Add ("FirstText", translator.GetTranslatedString ("FirstText"));
-            vars.Add ("BackText", translator.GetTranslatedString ("BackText"));
-            vars.Add ("NextText", translator.GetTranslatedString ("NextText"));
-            vars.Add ("LastText", translator.GetTranslatedString ("LastText"));
-            vars.Add ("CurrentPageText", translator.GetTranslatedString ("CurrentPageText"));
+            //vars.Add ("FirstText", translator.GetTranslatedString ("FirstText"));
+            //vars.Add ("BackText", translator.GetTranslatedString ("BackText"));
+            //vars.Add ("NextText", translator.GetTranslatedString ("NextText"));
+            //vars.Add ("LastText", translator.GetTranslatedString ("LastText"));
+            //vars.Add ("CurrentPageText", translator.GetTranslatedString ("CurrentPageText"));
 
             return vars;
         }
 
-        public bool AttemptFindPage (string filename, ref OSHttpResponse httpResponse, out string text)
+        public bool AttemptFindPage(string filename, ref OSHttpResponse httpResponse, out string text)
         {
             text = "";
             return false;

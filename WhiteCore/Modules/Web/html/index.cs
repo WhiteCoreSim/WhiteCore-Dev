@@ -63,8 +63,12 @@ namespace WhiteCore.Modules.Web
 
             var settings = webInterface.GetWebUISettings ();
             var rootPage = webInterface.GetGridPages ();
-            var pages = webInterface.BuildPageMenus (rootPage, httpRequest, translator);
+            var modalPage = webInterface.GetModalPages();
+            var pages = webInterface.BuildPageMenus(rootPage, httpRequest, translator);
+            var mdlpages = webInterface.BuildPageMenus(modalPage, httpRequest, translator);
+
             vars.Add ("MenuItems", pages);
+            vars.Add("ModalItems", mdlpages);
 
             /*
             rootPage.Children.Sort ((a, b) => a.MenuPosition.CompareTo (b.MenuPosition));
@@ -184,6 +188,7 @@ namespace WhiteCore.Modules.Web
             return vars;
         }
 
+        /*
         string GetTranslatedString (ITranslator translator, string name, GridPage page, bool isTooltip)
         {
             string retVal = translator.GetTranslatedString (name);
@@ -191,6 +196,7 @@ namespace WhiteCore.Modules.Web
                 return isTooltip ? page.MenuToolTip : page.MenuTitle;
             return retVal;
         }
+        */
 
         public bool AttemptFindPage (string filename, ref OSHttpResponse httpResponse, out string text)
         {

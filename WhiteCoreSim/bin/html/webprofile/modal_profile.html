@@ -1,0 +1,109 @@
+<!-- Modal user profile data-->
+
+
+  <div class="modal-header" style="color:#8cbdf3;">
+    <h2 class="modal-title">{UserName}</h2>
+    {IsAuthenticatedBegin}
+      <div class="col">
+        <div class="btn-group pull-right">
+          <button class="btn btn-sm btn-default" onclick="loadmodalcontent('webprofile-modal_groups', 'userid={UserID}');">
+            {MenuGroupTitle}
+          </button>
+
+          <button class="btn btn-sm btn-default" onclick="loadmodalcontent('webprofile-modal_picks', 'userid={UserID}');">
+            {MenuPicksTitle}
+          </button>
+
+          <button class="btn btn-sm btn-default" onclick="loadmodalcontent('webprofile-modal_regions', 'userid={UserID}');">
+            {MenuRegionsTitle}
+          </button>
+        </div>
+      </div>
+    {IsAuthenticatedEnd}
+
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+      <span aria-hidden="true">
+        <i class="fa fa-window-close fa-2x"></i>
+      </span>
+    </button>
+  </div>
+
+  <div class="modal-body" style="color:#8cbdf3;">
+    <div class="row">
+      <div class="col-4">
+  	    <div class="user_agent_profile_picture">
+  	        <img height="256"
+  		      src="{UserPictureURL}"
+  		      alt="{UserProfileFor}: {UserName} ({UserType})"
+  			     title="{UserProfileFor}: {UserName} ({UserType})" />
+        </div>
+  	  </div>
+
+      <div class="col-8">
+        <div class="row">
+          <div class="col-4 text-right">
+            {IsOnlineText}:
+          </div>
+          <div class="col-8">
+            {IsOnline}
+          </div>
+        </div>
+
+        {IfUserIsOnlineBegin}
+        <div class="row">
+          <div class="col-4 text-right">
+            {OnlineLocationText}:
+          </div>
+          <div class="col-8">
+            {OnlineLocation}
+          </div>
+        </div>
+        {IfUserIsOnlineEnd}
+
+        <div class="row">
+          <div class="col-4 text-right">
+            {IsOnlineText}:
+          </div>
+          <div class="col-8">
+            {IsOnline}
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-4 text-right">
+            {ResidentSince}:
+          </div>
+          <div class="col-8">
+            {UserBorn}
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-4 text-right">
+            {AccountType}:
+          </div>
+          <div class="col-8">
+            {UserType}
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-4 text-right">
+            {PartnersName}:
+          </div>
+          <div class="col-8">
+            {UserPartner}
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-4 text-right">
+            {AboutMe}:
+          </div>
+          <div class="col-8">
+            {UserAboutMe}
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+

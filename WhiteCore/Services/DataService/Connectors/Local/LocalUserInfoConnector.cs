@@ -108,6 +108,11 @@ namespace WhiteCore.Services.DataService
             genData.Update (m_userInfoTable, values, null, filter, null, null);
         }
 
+        public bool SaveUserInfo(UserInfo userInfo)
+        {
+            return Set(userInfo);
+        }
+
         public void SetLastPosition (string userID, UUID regionID, string regionURI, Vector3 lastPosition,
                                     Vector3 lastLookAt)
         {

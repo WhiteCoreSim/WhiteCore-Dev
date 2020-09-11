@@ -73,7 +73,7 @@ namespace WhiteCore.Modules.Web
             string noDetails = translator.GetTranslatedString ("NoTransactionsText");
             if (moneyModule != null) {
                 // Check if we're looking at the standard page or the submitted one
-                if (requestParameters.ContainsKey ("Submit")) {
+                if (requestParameters.ContainsKey ("search")) {
                     if (requestParameters.ContainsKey ("date_start"))
                         DateStart = requestParameters ["date_start"].ToString ();
                     if (requestParameters.ContainsKey ("date_end"))
@@ -148,6 +148,7 @@ namespace WhiteCore.Modules.Web
             vars.Add ("DateStartText", translator.GetTranslatedString ("DateStartText"));
             vars.Add ("DateEndText", translator.GetTranslatedString ("DateEndText"));
             vars.Add ("SearchUserText", translator.GetTranslatedString ("AvatarNameText"));
+            vars.Add("Search", translator.GetTranslatedString("Search"));
 
             vars.Add ("TransactionDateText", translator.GetTranslatedString ("TransactionDateText"));
             vars.Add ("TransactionToAgentText", translator.GetTranslatedString ("TransactionToAgentText"));
@@ -157,11 +158,11 @@ namespace WhiteCore.Modules.Web
             vars.Add ("TransactionAmountText", translator.GetTranslatedString ("TransactionAmountText"));
             vars.Add ("TransactionBalanceText", translator.GetTranslatedString ("TransactionBalanceText"));
 
-            vars.Add ("FirstText", translator.GetTranslatedString ("FirstText"));
-            vars.Add ("BackText", translator.GetTranslatedString ("BackText"));
-            vars.Add ("NextText", translator.GetTranslatedString ("NextText"));
-            vars.Add ("LastText", translator.GetTranslatedString ("LastText"));
-            vars.Add ("CurrentPageText", translator.GetTranslatedString ("CurrentPageText"));
+            //vars.Add ("FirstText", translator.GetTranslatedString ("FirstText"));
+            //vars.Add ("BackText", translator.GetTranslatedString ("BackText"));
+            //vars.Add ("NextText", translator.GetTranslatedString ("NextText"));
+            //vars.Add ("LastText", translator.GetTranslatedString ("LastText"));
+            //vars.Add ("CurrentPageText", translator.GetTranslatedString ("CurrentPageText"));
 
             return vars;
         }

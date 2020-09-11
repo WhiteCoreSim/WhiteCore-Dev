@@ -60,33 +60,50 @@ namespace WhiteCore.Modules.Web
             var estateConnector = Framework.Utilities.DataManager.RequestPlugin<IEstateConnector> ();
             var user = Authenticator.GetAuthentication (httpRequest);
 
+            int estateid;
+
+            // the estate id can come in a number of ways
+            bool idok = httpRequest.Query.ContainsKey("estateid")
+                ? int.TryParse(httpRequest.Query["estateid"].ToString(), out estateid)
+                : int.TryParse(requestParameters["estateid"].ToString(), out estateid);
+
+            if (!idok)
+            {
+                response = webInterface.UserMsg("!Estate details not supplied", true);
+                return null;
+            }
+            /*
             string estate;
 
-            if (httpRequest.Query.ContainsKey ("EstateID")) {
-                estate = httpRequest.Query ["EstateID"].ToString ();
+            if (httpRequest.Query.ContainsKey ("estateid")) {
+                estate = httpRequest.Query ["estateid"].ToString ();
             } else {
-                if (requestParameters.ContainsKey ("EstateID")) {
-                    estate = requestParameters ["EstateID"].ToString ();
+                if (requestParameters.ContainsKey ("estateid")) {
+                    estate = requestParameters ["estateid"].ToString ();
                 } else {
-                    response = "<h3>Estate details not supplied, redirecting to main page</h3>" +
-                        "<script>" +
-                        "setTimeout(function() {window.location.href = \"/?page=user_estatemanager\";}, 5000);" +
-                        "</script>";
+                    response = webInterface.UserMsg("!Estate details not supplied", true);
+
+                    //response = "<h3>Estate details not supplied, redirecting to main page</h3>" +
+                    //    "<script>" +
+                    //    "setTimeout(function() {window.location.href = \"/?page=user_estatemanager\";}, 5000);" +
+                    //    "</script>";
                     return null;
                 }
             }
 
             var estateid = -1;
             int.TryParse (estate, out estateid);
+            */
 
-            if (requestParameters.ContainsKey ("Delete")) {
-                response = "<h3>This estate would have been deleted... but not yet</h3>";
+            if (requestParameters.ContainsKey ("delete")) {
+                response = webInterface.UserMsg("!This estate would have been deleted.. but not yet (in progress)", false);
+                //response = "<h3>This estate would have been deleted... but not yet</h3>";
                 return null;
             }
 
             var estateSettings = estateConnector.GetEstateIDSettings (estateid);
             if (estateSettings != null) {
-                if (requestParameters.ContainsKey ("Submit")) {
+                if (requestParameters.ContainsKey ("update")) {
 
                     var estateOwner = requestParameters ["EstateOwner"].ToString ();
 
@@ -100,10 +117,12 @@ namespace WhiteCore.Modules.Web
 
                     estateConnector.SaveEstateSettings (estateSettings);
 
-                    response = "Estate details have been updated." +
-                                "<script>" +
-                                "setTimeout(function() {window.location.href = \"/?page=user_estatemanager\";}, 5000);" +
-                                "</script>";
+                    response = webInterface.UserMsg("Estate details have been updated");
+
+                    //response = "Estate details have been updated." +
+                    //            "<script>" +
+                    //            "setTimeout(function() {window.location.href = \"/?page=user_estatemanager\";}, 5000);" +
+                    //            "</script>";
 
                     return null;
                 }
@@ -133,7 +152,7 @@ namespace WhiteCore.Modules.Web
             vars.Add ("TaxFreeText", translator.GetTranslatedString ("TaxFreeText"));
             vars.Add ("AllowDirectTeleportText", translator.GetTranslatedString ("AllowDirectTeleportText"));
             vars.Add ("Cancel", translator.GetTranslatedString ("Cancel"));
-            vars.Add ("InfoMessage", "");
+            vars.Add("Delete", translator.GetTranslatedString("DeleteText"));
 
             return vars;
 

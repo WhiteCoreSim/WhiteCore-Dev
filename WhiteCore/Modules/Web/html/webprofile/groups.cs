@@ -45,6 +45,7 @@ namespace WhiteCore.Modules.Web
             {
                 return new[]
                            {
+                               "html/webprofile/modal_groups.html",
                                "html/webprofile/groups.html"
                            };
             }
@@ -69,25 +70,27 @@ namespace WhiteCore.Modules.Web
 
             string username = filename.Split('/').LastOrDefault();
             UserAccount userAcct = new UserAccount();
+            var accountservice = webInterface.Registry.RequestModuleInterface<IUserAccountService>();
+
+            if (accountservice is null) {
+                return vars;
+            }
+
             if (httpRequest.Query.ContainsKey("userid"))
             {
                 string userid = httpRequest.Query["userid"].ToString();
-
-                userAcct = webInterface.Registry.RequestModuleInterface<IUserAccountService>().
-                                       GetUserAccount(null, UUID.Parse(userid));
+                userAcct = accountservice.GetUserAccount(null, UUID.Parse(userid));
             }
             else if (httpRequest.Query.ContainsKey("name") || username.Contains('.'))
             {
                 string name = httpRequest.Query.ContainsKey("name") ? httpRequest.Query["name"].ToString() : username;
                 name = name.Replace('.', ' ');
-                userAcct = webInterface.Registry.RequestModuleInterface<IUserAccountService>().
-                                       GetUserAccount(null, name);
+                userAcct = accountservice.GetUserAccount(null, name);
             }
             else
             {
                 username = username.Replace("%20", " ");
-                userAcct = webInterface.Registry.RequestModuleInterface<IUserAccountService>().
-                                       GetUserAccount(null, username);
+                userAcct = accountservice.GetUserAccount(null, username);
             }
 
             if (!userAcct.Valid)
@@ -95,6 +98,7 @@ namespace WhiteCore.Modules.Web
 
             // User found...
             vars.Add("UserName", userAcct.Name);
+            vars.Add("UserID", userAcct.PrincipalID);
 
             IUserProfileInfo profile = Framework.Utilities.DataManager.RequestPlugin<IProfileConnector>().
                                               GetUserProfile(userAcct.PrincipalID);
@@ -106,8 +110,7 @@ namespace WhiteCore.Modules.Web
                 vars.Add("UserType", profile.MembershipGroup == "" ? "Resident" : profile.MembershipGroup);
                 if (profile.Partner != UUID.Zero)
                 {
-                    var partnerAcct = webInterface.Registry.RequestModuleInterface<IUserAccountService>().
-                                           GetUserAccount(null, profile.Partner);
+                    var partnerAcct = accountservice.GetUserAccount(null, profile.Partner);
                     vars.Add("UserPartner", partnerAcct.Name);
                 }
                 else
@@ -160,9 +163,19 @@ namespace WhiteCore.Modules.Web
 
             }
 
+            // Menus
+            vars.Add("MenuProfileTitle", translator.GetTranslatedString("MenuProfileTitle"));
+            vars.Add("TooltipsMenuProfile", translator.GetTranslatedString("TooltipsMenuProfile"));
+            //vars.Add("MenuGroupTitle", translator.GetTranslatedString("MenuGroupTitle"));
+            //vars.Add("TooltipsMenuGroups", translator.GetTranslatedString("TooltipsMenuGroups"));
+            vars.Add("MenuPicksTitle", translator.GetTranslatedString("MenuPicksTitle"));
+            vars.Add("TooltipsMenuPicks", translator.GetTranslatedString("TooltipsMenuPicks"));
+            vars.Add("MenuRegionsTitle", translator.GetTranslatedString("MenuRegionsTitle"));
+            vars.Add("TooltipsMenuRegions", translator.GetTranslatedString("TooltipsMenuRegions"));
+
             vars.Add("GroupNameText", translator.GetTranslatedString("GroupNameText"));
             vars.Add ("Groups", groups);
-            vars.Add ("GroupsJoined", groups.Count);
+            vars.Add ("GroupsJoined", groups.Count-1);
 
             return vars;
         }

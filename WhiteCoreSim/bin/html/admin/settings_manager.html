@@ -1,116 +1,85 @@
-<!-- params to replace
+<!-- Web UI settings -->
 
-SystemURL
-SystemName
-WebRegistrationText
-GridCenterX
-GridCenterY
-SettingsManager               Settings Manager
-GridCenterXText               Grid Center Location X
-GridCenterYText               Grid Center Location Y
-GoogleMapAPIKeyText           Google Maps API Key
-GoogleMapAPIKeyHelpText       Google Maps API Key
-ChangesSavedSuccessfully      Changes saved successfully
-Save                          Save
+<div class="container-fluid">
+  <h2>{SystemName}: {SettingsManager}</h2>
+  <form class="form-inline" id="settings_manager_form" action="admin/settings_manager.html" method="post">
+    <div class="row w-100">
+      <div class="col-md-8 offset-md-2">
+
+        <div class="form-group mb-1">
+          <label for="WebRegistration" class="col-4 col-form-label text-right mr-2">{WebRegistrationText}</label>
+          <div class="input-group" style="width:100px">
+            <select class="custom-select form-control" id="WebRegistration" name="WebRegistration">
+              <option value="0" style="background-color:#FF0000" {WebRegistrationNo}>{No}</option>
+              <option value="1" style="background-color:#00FF00" {WebRegistrationYes}>{Yes}</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group mb-1">
+          <label for="GridCenterX" class="col-4 col-form-label text-right mr-2">{GridCenterXText}</label>
+          <input class="form-control" style="width:300px;" minlength="3" id="GridCenterX" require="true" name="GridCenterX" type="text" size="10" maxlength="10" value="{GridCenterX}">
+        </div>
+
+        <div class="form-group mb-1">
+          <label for="GridCenterY" class="col-4 col-form-label text-right mr-2">{GridCenterYText}</label>
+          <input class="form-control" style="width:300px;" minlength="3" id="GridCenterY" require="true" name="GridCenterY" type="text" size="10" maxlength="10" value="{GridCenterY}">
+        </div>
+
+<!-- deprecated
+        <div class="form-group mb-1">
+          <label for="HideSlideshowBar" class="col-4 col-form-label text-right mr-2">{HideSlideshowBarText}</label>
+          <div class="input-group" style="width:100px">
+            <select class="custom-select form-control" id="HideSlideshowBar" name="HideSlideshowBar" disabled>
+              <option value="0" style="background-color:#FF0000" {HideSlideshowBarNo}>{No}</option>
+              <option value="1" style="background-color:#00FF00" {HideSlideshowBarYes}>{Yes}</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group mb-1">
+          <label for="HideLanguageBar" class="col-4 col-form-label text-right mr-2">{HideLanguageBarText}</label>
+          <div class="input-group" style="width:100px">
+            <select class="custom-select form-control" id="HideLanguageBar" name="HideLanguageBar" disabled>
+              <option value="0" style="background-color:#FF0000" {HideLanguageBarNo}>{No}</option>
+              <option value="1" style="background-color:#00FF00" {HideLanguageBarYes}>{Yes}</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group mb-1">
+          <label for="HideStylesBar" class="col-4 col-form-label text-right mr-2">{HideStyleBarText}</label>
+          <div class="input-group" style="width:100px">
+            <select class="custom-select form-control" id="HideStylesBar" name="HideStylesBar" disabled>
+              <option value="0" style="background-color:#FF0000" {HideStylesBarNo}>{No}</option>
+              <option value="1" style="background-color:#00FF00" {HideStylesBarYes}>{Yes}</option>
+            </select>
+          </div>
+        </div>
 -->
+        <div class="form-group mb-1">
+          <label for="LocalFrontPage" class="col-4 col-form-label text-right mr-2">{LocalFrontPageText}</label>
+          <input class="form-control" style="width:300px;" id="LocalFrontPage" name="LocalFrontPage" type="text" size="120" maxlength="120" value="{LocalFrontPage}">
+        </div>
 
-<h2>{SystemName}: {SettingsManager}</h2>
-<form id="settings_manager_form" action="admin/settings_manager.html" method="post">
-<div id="info_message" class="info"><h3></h3></div>
-<table id="settings_manager">
-  <caption></caption>
+        <div class="form-group mb-1">
+          <label for="LocalCSS" class="col-4 col-form-label text-right mr-2">{LocalCSSText}</label>
+          <input class="form-control" style="width:300px;" id="LocalCSS" name="LocalCSS" type="text" size="120" maxlength="120" value="{LocalCSS}">
+        </div>
 
-  <thead>
-    <tr>
-      <th class="settings_manager_left"></th>
-      <th class="settings_manager_right"></th>
-    </tr>
-  </thead>
+        <div class="row w-100 mt-3">
+          <div class="col"></div>
+          <div class="col-6 pull-right">
+            <button onclick="gohome();">{Cancel}</button>
+            <button class="btn-info pull-right" style="width:200px;" 
+                    onclick="submitupdate('settings_manager_form', 'update=true');">
+              {Save}
+            </button>
+          </div>
+        </div>
 
-  <tfoot>
-    <tr>
-      <th class="settings_manager_left"></th>
-      <th class="settings_manager_right"></th>
-    </tr>
-  </tfoot>
+      </div>
+    </div>
+  </form>
+</div>
 
-  <tbody>
-    <tr>
-      <td class="settings_manager_left"><p id="gridcentery_label">{WebRegistrationText}</p></td>
-      <td class="settings_manager_right">
-	    <select name="WebRegistration" id="WebRegistration">
-		  <option value="0" style="background-color:#FF0000" {WebRegistrationNo}>{No}</option>
-		  <option value="1" style="background-color:#00FF00" {WebRegistrationYes}>{Yes}</option>
-	    </select>
-	  </td>
-    </tr>
-    <tr>
-      <td class="settings_manager_left"><p id="gridcenterx_label">{GridCenterXText}</p></td>
-      <td class="settings_manager_right"><input name="GridCenterX" type="text" id="GridCenterX" size="119" value="{GridCenterX}" /></td>
-    </tr>
-    <tr>
-      <td class="settings_manager_left"><p id="gridcentery_label">{GridCenterYText}</p></td>
-      <td class="settings_manager_right"><input name="GridCenterY" type="text" id="GridCenterY" size="119" value="{GridCenterY}" /></td>
-    </tr>
-    <tr>
-      <td class="settings_manager_left"><p id="gridcentery_label">{HideSlideshowBarText}</p></td>
-      <td class="settings_manager_right">
-	    <select name="HideSlideshowBar" id="HideSlideshowBar">
-		  <option value="0" style="background-color:#FF0000" {HideSlideshowBarNo}>{No}</option>
-		  <option value="1" style="background-color:#00FF00" {HideSlideshowBarYes}>{Yes}</option>
-	    </select>
-	  </td>
-    </tr>
-    <tr>
-      <td class="settings_manager_left"><p id="gridcentery_label">{HideLanguageBarText}</p></td>
-      <td class="settings_manager_right">
-	    <select name="HideLanguageBar" id="HideLanguageBar">
-		  <option value="0" style="background-color:#FF0000" {HideLanguageBarNo}>{No}</option>
-		  <option value="1" style="background-color:#00FF00" {HideLanguageBarYes}>{Yes}</option>
-	    </select>
-	  </td>
-    </tr>
-    <tr>
-      <td class="settings_manager_left"><p id="gridcentery_label">{HideStyleBarText}</p></td>
-      <td class="settings_manager_right">
-	    <select name="HideStyleBar" id="HideStylesBar">
-		  <option value="0" style="background-color:#FF0000" {HideStyleBarNo}>{No}</option>
-		  <option value="1" style="background-color:#00FF00" {HideStyleBarYes}>{Yes}</option>
-	    </select>
-	  </td>
-    </tr>
-    <tr>
-      <td class="settings_manager_left"><p id="gridcenterx_label">{LocalFrontPageText}</p></td>
-      <td class="settings_manager_right"><input name="LocalFrontPage" type="text" id="LocalFrontPage" size="119" value="{LocalFrontPage}" /></td>
-    </tr>
-    <tr>
-      <td class="settings_manager_left"><p id="gridcenterx_label">{LocalCSSText}</p></td>
-      <td class="settings_manager_right"><input name="LocalCSS" type="text" id="LocalCSS" size="119" value="{LocalCSS}" /></td>
-    </tr>
-    <tr>
-    <td></td>
-    <td></td>
-	  <input hidden type="hidden" label="Submit" id="Submit" name="Submit" value="Submit" />
-      <td class="settings_manager_right"><button id="Submit" type="Submit" name="Submit" style="width:100px;">{Save}</button></td>
-    </tr>
-  </tbody>
-</table>
-</form>
-
-<script>
-  /* attach a submit handler to the form */
-  $("#settings_manager_form").submit(function(event) {
-
-    /* stop form from submitting normally */
-    event.preventDefault();
-    /* get some values from elements on the page: */
-    var $form = $( this ),
-        url = $form.attr( 'action' );
-    /* Send the data using post and put the results in a div */
-    $.post( url, $form.serialize(),
-      function( data ) {
-		$("#info_message").empty().append("<p>" + data + "</p>");
-      }
-    );
-  });
-</script>

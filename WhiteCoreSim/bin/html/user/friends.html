@@ -1,0 +1,89 @@
+<!--
+UsersFriendsList
+	UserName
+	UserRegion
+	UserID
+
+UserFriendsList  Online Users
+RegionNameText   Region Name
+UserNameText     User Name
+MoreInfoText     More Info
+-->
+<style>
+  .page-link {background-color: transparent !important;}
+</style>
+
+
+
+<div class="col98" id="fullPage">
+  <h2>{UserName} {UserFriendsText}</h2>
+
+  {IfHaveDataBegin}
+  <table id="user_friends">
+    <thead>
+      <tr class="tablehead">
+        <th>{UserNameText}</th>
+        <th>{RegionNameText}</th>
+        <th>{OnlineLocationText}</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      {UserFriendsListArrayBegin}
+        <tr>
+          <td>
+<!--            <a target="_blank" class='agentinfo' href="webprofile/?userid={UserID}">{UserName}</a>  -->
+            <a title="{UserName}" href="#"  onclick="loadmodalcontent('webprofile-modal_profile', 'userid={UserID}');">
+              <span class="agentlink">{UserName}</span>
+            </a>
+          </td>
+          <td>
+<!--            <a target="_blank" class='regioninfo' href="regionprofile/?regionid={UserRegionID}">{UserRegion}</a> -->
+            <a title="{UserRegion}" href="#" onclick="loadmodalcontent('regionprofile-modal_profile', 'regionid={RegionID}');">
+            <span class="regionlink">{UserRegion}</span>
+          </a>
+        </td>
+          <td>
+            <a class="regionslurl"
+              onclick="document.location.href='{HopUrl}'">
+              {UserLocation}
+            </a>
+          </td>
+        </tr>
+      {UserFriendsListArrayEnd}
+
+    </tbody>
+  </table>
+
+  <!--#__include file="regionprofile/index" -->
+
+  <script>
+    $(function(){
+      $('#user_friends').dataTable({
+        dom: 'frtip',
+        "order": [[ 0, "asc" ]],
+        "aoColumnDefs": [{"bSortable":false,"aTargets":["no-sort"]}],
+        "pageLength": 10,
+        "fixedHeader": {
+          header: true,
+           //footer: true
+        },
+      });
+
+    });
+  </script>
+  {IfHaveDataEnd}
+
+  {IfNoDataBegin}
+    <div id="error404" align="center">
+      <h4 class="error404">
+        No friends yet? Better find some quick
+      </h4>
+      <div class="error404">
+        <img src="/static/images/happy_avatar.png"/>
+      </div>
+    </div>
+  {IfNoDataEnd}
+
+
+</div>

@@ -1,5 +1,52 @@
 <!-- User Partnership -->
 
-<div>
-	
-</div>
+
+<section class="text-center">
+
+  <div class="container">
+    <div class="row justify-content-center">
+      <h2>{UserName}:&nbsp;{PartnerProposalText}</h2>
+    </div>
+
+    <div class="container justify-content-center">
+      <div class="row">
+        <div class="col">
+          <img src="static/images/proposal.png" />
+        </div>
+
+        <div class="col-4">
+
+          <form role="form" id="partner_proposal" action="user/partner.html" method="post">
+
+            <div class="form-group mb-3">
+              <input type="text" placeholder="{PartnersName}*" required name="partnernew" />
+            </div>
+
+            <div class="form-group mb-3">
+              <textarea rows="5" cols="50" required name="partnerporposal" style="text-align:left;">{PartnerProposalText}*
+              </textarea>
+            </div>
+            <div class="div20"></div>
+
+            <div class="button-group">
+              <a class="btn btn-sm btn-success" onclick="gohome();">{CancelText}</a>
+              <a class="btn btn-sm btn-warning float-right" 
+                  onclick="submitupdate('partner_proposal', 'update=true');">
+                {SendProposalText}
+              </a>
+            </div>
+          </form>
+        </div>
+        <div class="col"></div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+<script>
+  $("#partnernew").focus();
+</script>
+
+

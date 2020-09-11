@@ -226,9 +226,9 @@ namespace WhiteCore.Services
             return info;
         }
 
-        public virtual void Save (UserInfo userInfo)
+        public virtual bool Save (UserInfo userInfo)
         {
-            m_agentInfoConnector.Set (userInfo);
+            return m_agentInfoConnector.Set (userInfo);
         }
 
         #endregion

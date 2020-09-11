@@ -98,23 +98,20 @@ namespace WhiteCore.Modules.Web
 
             #endregion
 
-            if (requestParameters.ContainsKey("DeleteItem"))
+            if (requestParameters.ContainsKey("deleteitem"))
             {
                 rootPage.RemovePageByLocation(MenuItem, null);
                 generics.AddGeneric(UUID.Zero, "WebPages", "Root", rootPage.ToOSD());
-                response = "<h3>Successfully updated menu</h3>" +
-                           "<script language=\"javascript\">" +
-                           "setTimeout(function() {window.location.href = \"index.html\";}, 0);" +
-                           "</script>";
+                response = webInterface.UserMsg("Successfully updated menu", true);
                 return null;
             }
-            if (requestParameters.ContainsKey("AddItem"))
+            if (requestParameters.ContainsKey("additem"))
             {
                 //generics.AddGeneric(UUID.Zero, "WebPages", "Root", rootPage.ToOSD());
                 vars.Add("EdittingPageID", -2);
                 vars.Add("DisplayEdit", true);
             }
-            if (requestParameters.ContainsKey("SelectItem"))
+            if (requestParameters.ContainsKey("selectitem"))
             {
                 GridPage page = rootPage.GetPageByLocation(MenuItem);
 
@@ -161,7 +158,7 @@ namespace WhiteCore.Modules.Web
                 vars.Add("ParentPagesList", pages);
             }
 
-            if (requestParameters.ContainsKey("AddItem"))
+            if (requestParameters.ContainsKey("additem"))
             {
                 vars.Add("PageTitle", "");
                 vars.Add("PageTooltip", "");
@@ -199,9 +196,10 @@ namespace WhiteCore.Modules.Web
                 vars.Add("ParentPagesList", pages);
             }
 
-            if (requestParameters.ContainsKey("SaveMenuItem"))
+            if (requestParameters.ContainsKey("savemenuitem"))
             {
-                string edittingPageID = requestParameters["EdittingPageID"].ToString();
+                string edittingPageID = requestParameters["edittingpageid"].ToString();
+
                 string PageTitle = requestParameters["PageTitle"].ToString();
                 string PageTooltip = requestParameters["PageTooltip"].ToString();
                 string PagePosition = requestParameters["PagePosition"].ToString();
@@ -231,8 +229,7 @@ namespace WhiteCore.Modules.Web
 
                 GridPage parent = rootPage.GetPageByLocation(ParentMenuItem);
 
-                if (parent != page)
-                {
+                if (parent != page) {
                     if (!add)
                         rootPage.RemovePage(edittingPageID, page);
 
@@ -241,18 +238,16 @@ namespace WhiteCore.Modules.Web
                     else //Top Level
                         rootPage.Children.Add(page);
 
-                    response = "<h3>Successfully updated menu</h3>" +
-                               "<script language=\"javascript\">" +
-                               "setTimeout(function() {window.location.href = \"index.html\";}, 0);" +
-                               "</script>";
-                }
-                else
-                    response = "<h3>" + translator.GetTranslatedString("CannotSetParentToChild") + "</h3>";
+                    response = webInterface.UserMsg("Successfully updated menu", true);
+
+                } else
+                    response = webInterface.UserMsg("!" + translator.GetTranslatedString("CannotSetParentToChild"), false);
 
                 generics.AddGeneric(UUID.Zero, "WebPages", "Root", rootPage.ToOSD());
                 return null;
             }
 
+            vars.Add("PageText", translator.GetTranslatedString("Page"));
             vars.Add("PageTitleText", translator.GetTranslatedString("PageTitleText"));
             vars.Add("PageTooltipText", translator.GetTranslatedString("PageTooltipText"));
             vars.Add("PagePositionText", translator.GetTranslatedString("PagePositionText"));

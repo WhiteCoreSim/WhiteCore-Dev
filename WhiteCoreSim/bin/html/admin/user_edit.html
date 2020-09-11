@@ -1,0 +1,554 @@
+<!-- Edit user -->
+
+<div id="content">
+  <div class="text-center" id="ContentHeaderCenterx">
+    <h2>{SystemName}: {EdittingText} {UserName}</h2>
+  </div>
+
+  <!-- User type -->
+  <div class="offset-md-1">
+    <h3 class="text-left">{AdminSetUserTypeText}</h3>
+  </div>
+  <p class="info">{AdminUserTypeInfoText}</p>
+  <form class="form-inline" id="set_user_type_form" action="admin/user_edit.html" method="post">
+    <div class="col-md-8 offset-md-2">
+      <div class="row w-100">
+        <div class="col">
+          <div class="form-group">
+            <label for="UserType" class="col-3 col-form-label text-right mr-2">{AdminSetUserTypeText}</label>
+            <div class="input-group" style="width:160px">
+              <select class="custom-select form-control" id="UserType" name="UserType">
+                {UserTypeArrayBegin}
+                  <option value="{Index}" {selected}>{Value}</option>
+                {UserTypeArrayEnd}
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-3 pull-right">
+          <div class="form-group">
+            <a class="btn btn-info" style="width:200px;" 
+               onclick="submitupdate('set_user_type_form', 'userid={UserID}&setusertype=true');">
+              {SaveUpdates}
+            </a>
+        </div>
+        </div>
+      </div>
+    </div>
+  </form>
+<!--
+    <table id="login">
+        <tbody>
+          <tr>
+              <td class="text-right" style="width:340px;">{AdminSetUserTypeText}</td>
+              <td class="register_dob">
+              <select class="form-control custom-select" id="UserType" name="UserType"  style="width:120px;">
+                {UserTypeArrayBegin}
+                <option value="{Index}">{Value}</option>
+                {UserTypeArrayEnd}
+            </select>
+            </td>
+          <td>
+            <input hidden="true" label="userid" id="userid" name="userid" value="{UserID}"/>
+            <input type="hidden" label="Submit" id="Submit" name="Submit" value="SubmitSetUserType" />
+            <button id="settype_bouton" type="Submit" name="Submit" value="SubmitSetUserType">{Submit}</button>
+          </td>
+          </tr>
+      </tbody>
+    </table>  -->
+
+  <div class="div20"></div>
+
+  <!-- Message online user -->
+  <div class="offset-md-1">
+    <h3 class="text-left">{ChangeEmailText}</h3>
+  </div>
+  <p class="info">{NewEmailText}</p>
+  <form class="form-inline" id="user_email_form" action="admin/user_edit.html" method="post">
+    <div class="col-md-8 offset-md-2">
+      <div class="row w-100">
+        <label class="col-form-label">{NewEmailText}</label>
+        <div class="col">
+          <input class="form-control" style="width:300px;"minlength="3" id="email" require="true" name="email" type="text" size="25" maxlength="30" value="{EmailValue}">
+        </div>
+
+        <div class="col-3 pull-right">
+          <div class="form-group">
+<!--              <input hidden="true" label="userid" id="userid" name="userid" value="{UserID}"/>
+            <input type="hidden" name="Action" value="SubmitMessageUser" />
+-->
+            <a class="btn btn-info" style="width:200px;" 
+               onclick="submitupdate('user_email_form', 'userid={UserID}&updateemail=true');">
+              {MessageUserText}
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
+
+
+  <div class="div20"></div>
+
+  <!-- Login -->
+  <div class="offset-md-1">
+    <h3 class="text-left">{AdminLoginInAsUserText}</h3>
+  </div>
+  <p class="info">{AdminLoginInAsUserInfoText}</p>
+  <form class="form-inline" id="login_as_user_form" action="admin/user_edit.html" method="post">
+    <div class="col-md-8 offset-md-2">
+      <div class="row w-100">
+        <div class="col"></div>
+
+        <div class="col-3 pull-right">
+          <div class="form-group">
+<!--             <input hidden="true" label="userid" id="userid" name="userid" value="{UserID}"/>
+            <input type="hidden" name="Action" value="SubmitLoginAsUser" />
+           <button id="login_bouton" type="Submit" name="Submit" value="SubmitLoginAsUser">{Login}</button> -->
+
+            <a class="btn btn-info" style="width:200px;" 
+               onclick="submitupdate('login_as_user_form, 'userid={UserID}&loginasuser=true');">
+              {Login}
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
+
+  <div class="div20"></div>
+
+  <!-- Delete user -->
+  <div class="offset-md-1">
+    <h3 class="text-left">{AdminDeleteUserText}</h3>
+  </div>
+  <label class="text-light">{AdminDeleteUserInfoText}</label>
+  <form class="form-inline" id="delete_user_form" action="admin/user_edit.html" method="post">
+    <div class="col-md-8 offset-md-2">
+      <div class="row w-100">
+        <label class="col-form-label">{TypeUserNameToConfirm}</label>
+        <div class="col">
+          <input class="form-control" style="width:300px;"minlength="3" id="username" require="true" name="username" type="text" size="25" maxlength="30" value="">
+        </div>
+<!--      <td class="delete_my_account_left"><p id="username_label">{TypeUserNameToConfirm}</p></td>
+      <td class="delete_my_account_right"><input require="true" label="username" id="login_input" name="username" /></td>
+    </tr>
+    <tr>
+      <input hidden="true" label="userid" id="userid" name="userid" value="{UserID}"/>
+      <input type="hidden" label="Submit" id="Submit" name="Submit" value="SubmitDeleteUser" />
+      <button id="delete_bouton" type="Submit" name="Submit" value="SubmitDeleteUser">{DeleteText}</button>
+    </tr>  -->
+
+        <div class="col-3 pull-right">
+          <div class="form-group">
+<!--            <input hidden="true" label="userid" id="userid" name="userid" value="{UserID}"/>
+            <input type="hidden" name="Action" value="SubmitDeleteUser" />
+-->
+            <a class="btn btn-info" style="width:200px;" 
+               onclick="submitupdate('delete_user_form', 'userid={UserID}&deleteuser=true');">
+              {DeleteText}
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
+
+  <div class="div20"></div>
+
+  <!-- UnBan user -->
+  {IfUserBannedBegin}
+    <div class="offset-md-1">
+      <h3 class="text-left">{AdminUnbanUserText}</h3>
+    </div>
+    {IfTempUserBannedBegin}
+      <p class="info">{BannedUntilText} {BannedUntil}</p>
+    {IfTempUserBannedEnd}
+    <form class="form-inline" id="unban_user_form" action="admin/user_edit.html" method="post">
+      <div class="col-md-8 offset-md-2">
+        <div class="row w-100">
+          <div class="col"></div>
+          <div class="col-3 pull-right">
+            <div class="form-group">
+<!--              <input hidden="true" label="userid" id="userid" name="userid" value="{UserID}"/>
+              <input type="hidden" name="Action" value="SubmitUnbanUser" />
+-->
+              <a class="btn btn-info" style="width:200px;" 
+                 onclick="submitupdate('unban_user_form', 'userid={UserID}&unban=true');">
+                {UnbanText}
+              </a>
+            </div>
+          </div>
+     <!--        <input hidden="true" label="userid" id="userid" name="userid" value="{UserID}"/>
+      <input type="hidden" label="Submit" id="Submit" name="Submit" value="SubmitUnbanUser" />
+      <button id="delete_bouton" type="Submit" name="Submit" value="SubmitUnbanUser">{UnbanText}</button> -->
+        </div>
+      </div>
+    </form>
+  {IfUserBannedEnd}
+
+  <!-- Temp ban user -->
+  {IfNotUserBannedBegin}
+    <div class="offset-md-1">
+      <h3 class="text-left">{AdminTempBanUserText}</h3>
+    </div>
+    <p class="info">{AdminTempBanUserInfoText}</p>
+    <form class="form-inline" id="temp_ban_form" action="admin/user_edit.html" method="post">
+      <div class="col-md-8 offset-md-2">
+        <div class="row w-100">
+          <div class="col">
+            <label for="UserType" class="col-form-label text-right mr-2">{TimeUntilUnbannedText}</label>
+            <div class="form-group">
+              <div class="col">
+                <div class="input-group mr-2">
+                  <select class="custom-select form-control" id="TimeDays" name="TimeDays">
+                    {DaysArrayBegin}
+                      <option value="{Value}">{Value}</option>
+                    {DaysArrayEnd}
+                  </select>
+                  &nbsp;&nbsp;{DaysText}
+                </div>
+              </div>
+              <div class="col">
+                <div class="input-group">
+                  <select class="custom-select form-control" id="TimeHours" name="TimeHours">
+                    {HoursArrayBegin}
+                      <option value="{Value}">{Value}</option>
+                    {HoursArrayEnd}
+                  </select>
+                  &nbsp;&nbsp;{HoursText}
+                </div>
+              </div>
+              <div class="col">
+                <div class="input-group">
+                  <select class="custom-select form-control" id="TimeMinutes" name="TimeMinutes">
+                    {MinutesArrayBegin}
+                      <option value="{Value}">{Value}</option>
+                    {MinutesArrayEnd}
+                  </select>&nbsp;&nbsp;{MinutesText}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-3 pull-right">
+            <div class="form-group">
+<!--              <input hidden="true" label="userid" id="userid" name="userid" value="{UserID}"/>
+              <input type="hidden" name="Action" value="SubmitTempBanUser" />
+-->
+              <a class="btn btn-info" style="width:200px;" 
+                onclick="submitupdate('temp_ban_form', 'userid={UserID}&tempban=true');">
+                {BanText}
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!--
+    <table id="login">
+      <tbody>
+        <tr>
+          <td class="login_left"><p id="logname_label">{TimeUntilUnbannedText}</p></td>
+          <td class="login_right">
+            <select id="TimeDays" require="true" name='TimeDays'>
+    {DaysArrayBegin}
+              <option value="{Value}">{Value}</option>
+    {DaysArrayEnd}
+            </select> {DaysText}
+        </td>
+          <td class="login_right">
+            <select id="TimeHours" require="true" name='TimeHours'>
+    {HoursArrayBegin}
+              <option value="{Value}">{Value}</option>
+    {HoursArrayEnd}
+            </select> {HoursText}
+        </td>
+          <td class="login_right">
+            <select id="TimeMinutes" require="true" name='TimeMinutes'>
+    {MinutesArrayBegin}
+              <option value="{Value}">{Value}</option>
+    {MinutesArrayEnd}
+            </select> {MinutesText}
+        </td>
+        </tr>
+
+        <tr>
+          <td class="login_left"></td>
+          <td class="login_right" colspan="3">
+          <input hidden="true" label="userid" id="userid" name="userid" value="{UserID}"/>
+        <input type="hidden" label="Submit" id="Submit" name="Submit" value="SubmitTempBanUser" />
+          <button id="login_bouton" type="Submit" name="Submit" value="SubmitTempBanUser">{BanText}</button>
+        </td>
+        </tr>
+      </tbody>
+    </table>  -->
+    </form>
+
+    <div class="div20"></div>
+
+    <!-- Ban user -->
+    <div class="offset-md-1">
+      <h3 class="text-left">{AdminBanUserText}</h3>
+    </div>
+    <p class="info">{AdminBanUserInfoText}</p>
+    <form class="form-inline" id="ban_user_form" action="admin/user_edit.html" method="post">
+      <div class="col-md-8 offset-md-2">
+        <div class="row w-100">
+          <div class="col"></div>
+          <div class="col-3 pull-right">
+            <div class="form-group">
+<!--              <input hidden="true" label="userid" id="userid" name="userid" value="{UserID}"/>
+              <input type="hidden" name="Action" value="SubmitBanUser" />
+-->
+              <a class="btn btn-info" style="width:200px;" 
+                 onclick="submitupdate('ban_user_form', 'userid={UserID}&banuser=true');">
+                {BanText}
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+        <!--
+      <input hidden="true" label="userid" id="userid" name="userid" value="{UserID}"/>
+      <input type="hidden" label="Submit" id="Submit" name="Submit" value="SubmitBanUser" />
+      <button id="login_bouton" type="Submit" name="Submit" value="SubmitBanUser">{BanText}</button>  -->
+    </form>
+  {IfNotUserBannedEnd}
+
+  <div class="div20"></div>
+
+
+  {IfUserOnlineBegin}
+    <div class="offset-md-1">
+      <h3 class="text-left">{KickAUserText}</h3>
+    </div>
+    <p class="info">{KickAUserInfoText}</p>
+    <form class="form-inline" id="kick_user_form" action="admin/user_edit.html" method="post">
+      <div class="col-md-8 offset-md-2">
+        <div class="row w-100">
+          <label class="col-form-label">{KickMessageText}</label>
+          <div class="col">
+            <input class="form-control" style="width:300px;"minlength="3" id="KickMessage" require="true" name="KickMessage" type="text" size="25" maxlength="30" value="">
+          </div>
+
+          <div class="col-3 pull-right">
+            <div class="form-group">
+<!--              <input hidden="true" label="userid" id="userid" name="userid" value="{UserID}"/>
+              <input type="hidden" name="Action" value="SubmitKickUser" />
+-->
+              <a class="btn btn-info" style="width:200px;" 
+                onclick="submitupdate('kick_user_form', 'userid={UserID}&kickuser=true');">
+                {KickUserText}
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+<!--
+
+    <table id="login">
+      <tbody>
+        <tr>
+          <td class="login_left"><p id="logname_label">{KickMessageText}</p></td>
+          <td class="login_right"><input label="KickMessage" id="KickMessage" name="KickMessage" type="text" size="25" maxlength="30" value=""></td>
+        </tr>
+        <tr>
+          <td class="login_left"></td>
+          <td class="login_right">
+          <input hidden="true" label="userid" id="userid" name="userid" value="{UserID}"/>
+        <input type="hidden" label="Submit" id="Submit" name="Submit" value="SubmitKickUser" />
+        <button id="login_bouton" type="Submit" name="Submit" value="KickMessage">{KickUserText}</button>
+        </td>
+        </tr>
+      </tbody>
+    </table>  -->
+    </form>
+
+    <div class="div20"></div>
+
+    <!-- Message online user -->
+    <div class="offset-md-1">
+      <h3 class="text-left">{MessageAUserText}</h3>
+    </div>
+    <p class="info">{MessageAUserInfoText}</p>
+    <form class="form-inline" id="message_user_form" action="admin/user_edit.html" method="post">
+      <div class="col-md-8 offset-md-2">
+        <div class="row w-100">
+          <label class="col-form-label">{KickMessageText}</label>
+          <div class="col">
+            <input class="form-control" style="width:300px;"minlength="3" id="Message" require="true" name="Message" type="text" size="25" maxlength="30" value="">
+          </div>
+
+          <div class="col-3 pull-right">
+            <div class="form-group">
+<!--              <input hidden="true" label="userid" id="userid" name="userid" value="{UserID}"/>
+              <input type="hidden" name="Action" value="SubmitMessageUser" />
+-->
+              <a class="btn btn-info" style="width:200px;" 
+                 onclick="submitupdate('message_user_form', 'userid={UserID}&usermsg=true');">
+                {MessageUserText}
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!--
+
+  <table id="login">
+    <tbody>
+      <tr>
+        <td class="login_left"><p id="logname_label">{KickMessageText}</p></td>
+        <td class="login_right"><input label="Message" id="Message" name="Message" type="text" size="25" maxlength="30" value=""></td>
+      </tr>
+      <tr>
+        <td class="login_left"></td>
+        <td class="login_right">
+        <input hidden="true" label="userid" id="userid" name="userid" value="{UserID}"/>
+      <input type="hidden" label="Submit" id="Submit" name="Submit" value="SubmitMessageUser" />
+      <button id="login_bouton" type="Submit" name="Submit" value="SubmitMessageUser">{MessageUserText}</button>
+      </td>
+      </tr>
+    </tbody>
+  </table> -->
+    </form>
+  {IfUserOnlineEnd}
+</div>
+
+
+<!--
+<script>
+  /* attach a submit handler to the form */
+  $("#set_user_type_form").submit(function(event) {
+
+    /* stop form from submitting normally */
+    event.preventDefault();
+    /* get some values from elements on the page: */
+    var $form = $( this ),
+        url = $form.attr( 'action' );
+    /* Send the data using post and put the results in a div */
+    $.post( url, $form.serialize(),
+      function( data ) {
+    $("#info_message").empty().append("<h3>" + data + "</h3>");
+      }
+    );
+  });
+
+  /* attach a submit handler to the form */
+  $("#login_as_user_form").submit(function(event) {
+
+    /* stop form from submitting normally */
+    event.preventDefault();
+    /* get some values from elements on the page: */
+    var $form = $( this ),
+        url = $form.attr( 'action' );
+    /* Send the data using post and put the results in a div */
+    $.post( url, $form.serialize(),
+      function( data ) {
+    $("#info_message").empty().append("<h3>" + data + "</h3>");
+      }
+    );
+  });
+
+  /* attach a submit handler to the form */
+  $("#delete_user_form").submit(function(event) {
+
+    /* stop form from submitting normally */
+    event.preventDefault();
+    /* get some values from elements on the page: */
+    var $form = $( this ),
+        url = $form.attr( 'action' );
+    /* Send the data using post and put the results in a div */
+    $.post( url, $form.serialize(),
+      function( data ) {
+    $("#info_message").empty().append("<h3>" + data + "</h3>");
+      }
+    );
+  });
+
+  /* attach a submit handler to the form */
+  $("#unban_user_form").submit(function(event) {
+
+    /* stop form from submitting normally */
+    event.preventDefault();
+    /* get some values from elements on the page: */
+    var $form = $( this ),
+        url = $form.attr( 'action' );
+    /* Send the data using post and put the results in a div */
+    $.post( url, $form.serialize(),
+      function( data ) {
+    $("#content").empty().append(data);
+      }
+    );
+  });
+
+  /* attach a submit handler to the form */
+  $("#temp_ban_form").submit(function(event) {
+
+    /* stop form from submitting normally */
+    event.preventDefault();
+    /* get some values from elements on the page: */
+    var $form = $( this ),
+        url = $form.attr( 'action' );
+    /* Send the data using post and put the results in a div */
+    $.post( url, $form.serialize(),
+      function( data ) {
+    $("#content").empty().append(data);
+      }
+    );
+  });
+
+  /* attach a submit handler to the form */
+  $("#ban_user_form").submit(function(event) {
+
+    /* stop form from submitting normally */
+    event.preventDefault();
+    /* get some values from elements on the page: */
+    var $form = $( this ),
+        url = $form.attr( 'action' );
+    /* Send the data using post and put the results in a div */
+    $.post( url, $form.serialize(),
+      function( data ) {
+    $("#content").empty().append(data);
+      }
+    );
+  });
+
+  /* attach a submit handler to the form */
+  $("#kick_user_form").submit(function(event) {
+
+    /* stop form from submitting normally */
+    event.preventDefault();
+    /* get some values from elements on the page: */
+    var $form = $( this ),
+        url = $form.attr( 'action' );
+    /* Send the data using post and put the results in a div */
+    $.post( url, $form.serialize(),
+      function( data ) {
+    $("#info_message").empty().append("<h3>" + data + "</h3>");
+      }
+    );
+  });
+
+  /* attach a submit handler to the form */
+  $("#message_user_form").submit(function(event) {
+
+    /* stop form from submitting normally */
+    event.preventDefault();
+    /* get some values from elements on the page: */
+    var $form = $( this ),
+        url = $form.attr( 'action' );
+    /* Send the data using post and put the results in a div */
+    $.post( url, $form.serialize(),
+      function( data ) {
+    $("#info_message").empty().append("<h3>" + data + "</h3>");
+      }
+    );
+  });
+</script>
+
+-->

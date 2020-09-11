@@ -61,7 +61,7 @@ namespace WhiteCore.Modules.Web
             var vars = new Dictionary<string, object>();
             var settings = webInterface.GetWebUISettings();
 
-            if (requestParameters.ContainsKey("Submit"))
+            if (requestParameters.ContainsKey("update"))
             {
                 settings.WebRegistration = requestParameters["WebRegistration"].ToString() == "1";
                 settings.MapCenter.X = int.Parse(requestParameters["GridCenterX"].ToString());
@@ -70,51 +70,58 @@ namespace WhiteCore.Modules.Web
                 if (settings.LocalFrontPage != "")
                     settings.LocalFrontPage = "local/" + settings.LocalFrontPage;
                 settings.LocalCSS = requestParameters["LocalCSS"].ToString();
-                 settings.HideSlideshowBar = requestParameters["HideSlideshowBar"].ToString() == "1";
+
+                // these settings are no longer used
+                /*
+                settings.HideSlideshowBar = requestParameters["HideSlideshowBar"].ToString() == "1";
                 settings.HideLanguageTranslatorBar = requestParameters["HideLanguageBar"].ToString() == "1";
                 settings.HideStyleBar = requestParameters["HideStyleBar"].ToString() == "1";
+                */
                 if (settings.LocalCSS != "")
                 {
                     settings.LocalCSS = "local/" + settings.LocalCSS;
                     settings.HideStyleBar = true;                               // not needed if a local style is used
                 }
 
-                webInterface.SaveWebUISettings (settings);
+                webInterface.SaveWebUISettings(settings);
 
-                response = "Successfully updated WebUI settings.";
+                response = webInterface.UserMsg("Successfully updated WebUI settings", false);
 
                 return null;
             }
             else if (requestParameters.ContainsKey("IgnorePagesUpdates"))
             {
                 settings.LastPagesVersionUpdateIgnored = PagesMigrator.CurrentVersion;
-                webInterface.SaveWebUISettings (settings);
+                webInterface.SaveWebUISettings(settings);
             }
             else if (requestParameters.ContainsKey("IgnoreSettingsUpdates"))
             {
                 settings.LastSettingsVersionUpdateIgnored = PagesMigrator.CurrentVersion;
-                webInterface.SaveWebUISettings (settings);
+                webInterface.SaveWebUISettings(settings);
             }
             vars.Add("WebRegistrationNo", !settings.WebRegistration ? "selected=\"selected\"" : "");
             vars.Add("WebRegistrationYes", settings.WebRegistration ? "selected=\"selected\"" : "");
             vars.Add("GridCenterX", settings.MapCenter.X);
             vars.Add("GridCenterY", settings.MapCenter.Y);
             if (settings.LocalFrontPage.StartsWith("local/"))
-                vars.Add("LocalFrontPage", settings.LocalFrontPage.Remove(0,6));                // remove 'local/' prefix
+                vars.Add("LocalFrontPage", settings.LocalFrontPage.Remove(0, 6));                // remove 'local/' prefix
             else
                 vars.Add("LocalFrontPage", settings.LocalFrontPage);
 
             if (settings.LocalCSS.StartsWith("local/"))
-                vars.Add("LocalCSS", settings.LocalCSS.Remove(0,6));                            // remove 'local/' prefix
+                vars.Add("LocalCSS", settings.LocalCSS.Remove(0, 6));                            // remove 'local/' prefix
             else
                 vars.Add("LocalCSS", settings.LocalCSS);
 
+            // no longer used
             vars.Add("HideSlideshowBarNo", !settings.HideSlideshowBar ? "selected=\"selected\"" : "");
             vars.Add("HideSlideshowBarYes", settings.HideSlideshowBar ? "selected=\"selected\"" : "");
             vars.Add("HideLanguageBarNo", !settings.HideLanguageTranslatorBar ? "selected=\"selected\"" : "");
             vars.Add("HideLanguageBarYes", settings.HideLanguageTranslatorBar ? "selected=\"selected\"" : "");
             vars.Add("HideStyleBarNo", !settings.HideStyleBar ? "selected=\"selected\"" : "");
             vars.Add("HideStyleBarYes", settings.HideStyleBar ? "selected=\"selected\"" : "");
+
+            // these appear to have been removed somtime
             vars.Add("IgnorePagesUpdates",
                      PagesMigrator.CheckWhetherIgnoredVersionUpdate(settings.LastPagesVersionUpdateIgnored)
                          ? ""

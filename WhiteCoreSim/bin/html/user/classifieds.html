@@ -1,0 +1,137 @@
+<!-- User classifieds -->
+
+<style>
+  .page-link {background-color: transparent !important;}
+</style>
+
+<div class="col98" id="user_classifieds_page">
+  <h2>{UserName} {ClassifiedsText}</h2>
+  {IfHaveDataBegin}
+
+  <div class="row justify-content-center">
+    <div class="col" style="margin-bottom:10px;">
+      <button class="btn btn-xs btn-default" style="float:right;margin-left:10px;" id="add_classified" onClick="loadusercontent('classifieds-add_classified');">
+        {AddClassifiedText}
+      </button>
+      <form id="classifieds_search_form" action="user/classifieds.html" method="post">
+        <div class="form-group row">
+          <div class="col-4 form-group">
+            <select class="custom-select pull-right" id="classifieds-category" name="category"  style="width:160px;">
+              {CategoryTypeArrayBegin}
+                <option value="{Index}" {selected}>{Value}</option>
+              {CategoryTypeArrayEnd}
+            </select>
+          </div>
+
+          <div class="col-6 form-group">
+            <div class="form-check form-check-inline">
+              <input style="width:20px;" type="checkbox" id="display_pg" name="display_pg" value="on" {PG_checked}>
+              <label for="display_pg" class="event-check">
+                <img src="/static/icons/general.png" alt="PG ratings" style="margin-bottom:3px;">
+                {GeneralText}
+              </label>
+            </div>
+
+            <div class="form-check form-check-inline">
+              <input style="width:20px;" type="checkbox" id="display_ma" name="display_ma" value="on" {MA_checked}>
+              <label for="display_ma" class="event-check">
+                <img src="/static/icons/moderate.png" alt="MA ratings" style="margin-bottom:3px;">
+                {MatureText}
+              </label>
+            </div>
+
+            <div class="form-check form-check-inline">
+              <input style="width:20px;" type="checkbox" id="display_ao" name="display_ao" value="on" {AO_checked}>
+              <label for="display_ao" class="event-check">
+                <img src="/static/icons/adult.png" alt="AO ratings" style="margin-bottom:3px;">
+                {AdultText}
+              </label>
+            </div>
+          </div>
+
+        <div class="col-2">
+           <button class="btn btn-info" style="float:right;width:200px;" 
+                   onclick="submitpagesearch('classifieds_search_form', 'user_classifieds_page');">
+              {SearchText}
+            </button>
+          </div>
+
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="container">
+    <table id="user_classifieds_list">
+      <thead>
+        <tr class="tablehead">
+          <th class="text-left">{CreationDateText}</th>
+          <th class="text-left">{CategoryText}</th>
+          <th class="text-left">{ClassifiedNameText}</th>
+          <th class="text-left">{DescriptionText}</th>
+          <th class="text-centered">{MaturityText}</th>
+          <th class="text-left">{PriceOfListingText}</th>
+          <th class="text-left">{ExpirationDateText}</th>
+          <th class="no-sort"></th>
+        </tr>
+      </thead>
+
+      <tbody>
+        {ClassifiedListArrayBegin}
+        <tr onclick="loadusercontent('user-edit_classified', 'classifiedid={ClassifiedID}');">
+          <td class="text-left"><p>{CreationDate}</p></td>
+          <td class="text-left"><p>{Category}</p></td>
+          <td class="text-left"><p>{Name}</p></td>
+          <td class="text-left"><p>{Description}</p></td>
+          <td class="text-centered"><p>{Maturity}</p></td>
+          <td class="text-left"><p>{PriceForListing}</p></td>
+          <td class="text-left"><p>{ExpirationDate}</p></td>
+          <td class="text-centered">
+            <i class="fa fa-edit fa-lg"></i>
+          </td>
+        </tr>
+        {ClassifiedListArrayEnd}
+      </tbody>
+    </table>
+  </div>
+  {IfHaveDataEnd}
+
+  {IfNoDataBegin}
+    <div id="error404" align="center">
+      <h4 class="error404">
+        No classifieds found, maybe add one?
+      </h4>
+      <div class="error404" style="cursor:pointer;">
+        <a  class="btn btn-xs btn-default" onClick="loadusercontent('classifieds-add_classified');">
+          <img src="/static/images/for_sale.png"/>
+          <br/>
+          <div class="btn-success">
+            {AddClassifiedText}
+          </div>
+        </a>
+      </div>
+    </div>
+  {IfNoDataEnd}
+
+</div>
+
+
+<script>
+  $(function() {
+   //$(".eventinfo").colorbox({iframe:true, width:"990px", height:"440px"});
+   $('#user_classifieds_list').dataTable({
+      dom: 'frtip',
+      "order": [[ 0, "asc" ]],
+      "pageLength": 25,
+      "aoColumnDefs": [{"bSortable":false,"aTargets":["no-sort"]}],
+      "aaSorting":[],
+      "language": {"search": "Filter: "},
+      "fixedHeader": {
+        header: true,
+        //footer: true
+      },
+    });
+  });
+
+</script>
+

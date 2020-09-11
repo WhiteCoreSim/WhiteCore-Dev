@@ -1,34 +1,45 @@
 <!-- World map -->
 
 <link type="text/css" rel="stylesheet" href="map/leaflet.css?v=20180420">
-<link type="text/css" rel="stylesheet" href="map/mapapi.css?v=20180420">
+<link type="text/css" rel="stylesheet" href="map/mapapi.css?v=20180428">
+
+<!-- some overrides -->
+<style>
+  a.leaflet-control-zoom-in { background-color: #2f7dab;}
+  a.leaflet-control-zoom-out { background-color: #2f7dab;}
+  .leaflet-container .leaflet-control-attribution {background-color: #1f648c;}
+</style>
 
 <div class="row">
   <div class="col-2">
-    <label><p>{RegionText}</p></label>
+    <label>{RegionText}</label>
     {RegionListArrayBegin}
       <div class="mapregion">
         <a class="regionslurl"
           onclick="document.location.href='hop://{MainServerURL}/{RegionName}/128/128/50'">
-          <img height="60" src="{RegionWorldViewURL}" alt="{RegionName}" title="{RegionName}" />
-          <label><p>{RegionName}</p></label>
-          <p>
+          <img
+            height="60"
+            src="{RegionWorldViewURL}"
+            alt="{RegionName}"
+            title="Teleport to {RegionName}" />
+          <label>{RegionName}</label>
             <!--{RegionLocX},{RegionLocY}-->
+          <br/>
             {RegionInfo}
+          <br/>
             {RegionStatus}
-          </p>
         </a>
-
+        <br/>
         <label>
-          <p>
-            <a target="_self" class='regioninfo' href="regionprofile/?regionid={RegionID}">{MoreInfoText}</a>
-          </p>
+          <a href="#" onclick="loadmodalcontent('regionprofile-modal_profile', 'regionid={RegionID}');">
+            <span class="regionlink">{MoreInfoText}</span>
+          </a>
         </label>
       </div>
     {RegionListArrayEnd}
   </div>
   <div class="col-10">
-    <div class="mapapi-map-container" id="map-container"></div>
+    <div class="mapapi-map-container text-dark" id="map-container"></div>
   </div>
 </div>
 
@@ -45,8 +56,15 @@
 
   };
 
-  $(document).ready(function() {
-     loadmap();
+  $(function() {
+    //$('a.regionslurl').hover(function() { //mouse in
+    //  $(this).css('cursor', 'pointer');
+    //  //$(this).animate({ paddingLeft: '25px' }, 400);
+    //}, function() { //mouse out
+    //  //$(this).animate({ paddingLeft: 0 }, 400);});
+    //  $(this).css('cursor', 'default');
+    //}
+    loadmap();
   });
 </script>
 

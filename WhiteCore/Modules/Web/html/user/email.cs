@@ -60,10 +60,9 @@ namespace WhiteCore.Modules.Web
             response = null;
             var vars = new Dictionary<string, object>();
 
-            string error = "";
             UserAccount user = Authenticator.GetAuthentication(httpRequest);
             if (user == null) {
-                response = webInterface.UserMsg("Unable to authenticate user details", true, 5);
+                response = webInterface.UserMsg("!Unable to authenticate user details", true);
                 return null;
             }
 
@@ -73,25 +72,31 @@ namespace WhiteCore.Modules.Web
             // email change
             if (requestParameters.ContainsKey("Submit")) {
                 string email = requestParameters["emailnew"].ToString();
+                string emailconf = requestParameters["emailnewconf"].ToString();
 
-                IUserAccountService userService = webInterface.Registry.RequestModuleInterface<IUserAccountService>();
-                if (userService != null) {
-                    user.Email = email;
-                    userService.StoreUserAccount(user);
-                    response = webInterface.UserMsg("Email addres updated", true, 3);
-                } else
-                    response = webInterface.UserMsg("The account service was not available to update your email", true, 5);
-                return null;
+                if (email != emailconf) {
+                    response = webInterface.UserMsg("!Email's do not match", false);
+
+                } else {
+
+                    IUserAccountService userService = webInterface.Registry.RequestModuleInterface<IUserAccountService>();
+                    if (userService != null) {
+                        user.Email = email;
+                        userService.StoreUserAccount(user);
+                        response = webInterface.UserMsg("Email address updated", true);
+                    } else
+                        response = webInterface.UserMsg("!The account service was not available to update your email", true);
+                    return null;
+                }
             }
 
             // Page variables
             vars.Add("UserEmail", user.Email);
-            vars.Add("ErrorMessage", error);
-            vars.Add("ChangeUserInformationText", translator.GetTranslatedString("ChangeUserInformationText"));
             vars.Add("ChangeEmailText", translator.GetTranslatedString("ChangeEmailText"));
             vars.Add("NewEmailText", translator.GetTranslatedString("NewEmailText"));
+            vars.Add("NewEmailConfirmationText", translator.GetTranslatedString("NewEmailConfirmationText"));
             vars.Add("UserNameText", translator.GetTranslatedString("UserNameText"));
-            vars.Add("Submit", translator.GetTranslatedString("Submit"));
+            vars.Add("CancelText", translator.GetTranslatedString("Cancel"));
 
             return vars;
 		}

@@ -58,6 +58,9 @@ namespace WhiteCore.Modules.Web
             // This page should allow a user to purchase land, regions etc
             // 
             //
+            vars.Add("Error404Text", translator.GetTranslatedString("Error404Text"));
+            vars.Add("Error404InfoText", translator.GetTranslatedString("Error404InfoText"));
+            vars.Add("HomePage404Text", translator.GetTranslatedString("HomePage404Text"));
 
             return vars;
         }

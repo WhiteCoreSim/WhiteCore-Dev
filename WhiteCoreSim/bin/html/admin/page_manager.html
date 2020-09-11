@@ -1,33 +1,154 @@
-<!-- params to replace
-
-SystemURL
-SystemName
-PagesList
-  PageID
-  PageTitle
-  PagePosition
-  PageTooltip
-  PageLocation
-  RequiresAdmin
-  RequiresLogin
-  RequiresLogout
-PageManager                   Page Manager
-SaveMenuItemChanges           Save Menu Item
-PageTitleText                 Menu Item Title
-PageTooltipText               Menu Item Tooltip
-PagePositionText              Menu Item Position
-PageIDText                    Menu Item ID
-PageLocationText              Menu Item Location
-RequiresLoginText             Requires Login To View
-RequiresLogoutText             Requires Logout To View
-RequiresAdminText             Requires Admin To View
-ChangesSavedSuccessfully      Changes saved successfully
-SelectItem                    Select Item
-EdittingPageID
--->
+<!-- Menu page manager -->
 
 {IsAdminAuthenticatedBegin}
-<div id="fullPage">
+<div class="container-fluid" id="fullPage">
+  <h2>{SystemName}: {PageManager}</h2>
+
+    <form class="form-inline" id="page_manager_add_form" action="admin/page_manager.html" method="post">
+      <div class="row w-100 mb-3">
+        <div class="col pull-right">
+          <button class="pull-right" id="add_news" onClick="submitupdate('page_manager_add_form', 'additem=true');">{AddItem}</button>
+        </div>
+        <div class="col-1"></div>
+      </div>
+    </form>
+
+    <div class="div20"></div>
+
+    <form class="form-inline" id="page_manager_select_form" action="admin/page_manager.html" method="post">
+      <div class="row w-100">
+        <div class="col-8">
+          <div class="form-group mb-1">
+            <label for="MenuItem" class="col-5 col-form-label text-right mr-2">{PageText}</label>
+            <div class="input-group" style="width:240px">
+              <select class="custom-select form-control" id="MenuItem" name="MenuItem" require="true">
+                {PagesListArrayBegin}
+                  <option value="{Value}" {PageSelected}>{Name}</option>
+                {PagesListArrayEnd}
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-4">
+              <a href="#" title="{EditText}" onclick="submitupdate('admin-page_manager_select_form','edititem=true');">
+                <i class="fa fa-edit fa-lg"></i>
+              </a>
+              &nbsp;&nbsp;
+              <a title="{DeleteItem}" href="#" onclick="submitupdate('admin-page_manager_select_form', 'deleteitem=true');">
+                 <i class="fa fa-trash fa-red fa-lg"></i>
+              </a>
+        </div>
+      </div>
+    </form>
+
+    <!-- selected page -->
+    {IfDisplayEditBegin}
+    <form id="page_manager_edit_form" action="admin/page_manager.html" method="post">
+      <div class="row w-100">
+        <div class="col-md-8 offset-md-2">
+
+          <div class="form-group mb-1">
+            <label for="PageTitle" class="col-3 col-form-label text-right mr-2">{PageTitleText}</label>
+            <input class="form-control" style="width:300px;"minlength="3" id="PageTitle" name="PageTitle" type="text" size="25" maxlength="30" value="{PageTitle}">
+          </div>
+
+          <div class="form-group mb-1">
+            <label for="PageTooltip" class="col-3 col-form-label text-right mr-2">{PageTooltipText}</label>
+            <input class="form-control" style="width:300px;"minlength="3" id="PageTooltip" name="PageTooltip" type="text" size="25" maxlength="30" value="{PageTooltip}">
+          </div>
+
+          <div class="form-group mb-1">
+            <label for="PagePosition" class="col-3 col-form-label text-right mr-2">{PagePositionText}</label>
+            <input class="form-control" style="width:300px;"minlength="3" id="PagePosition" name="PagePosition" type="text" size="25" maxlength="30" value="{PagePosition}">
+          </div>
+
+          <div class="form-group mb-1">
+            <label for="PageID" class="col-3 col-form-label text-right mr-2">{PageIDText}</label>
+            <input class="form-control" style="width:300px;"minlength="3" id="PageID" name="PageID" type="text" size="25" maxlength="30" value="{PageID}">
+          </div>
+
+          <div class="form-group mb-1">
+            <label for="PageLocation" class="col-3 col-form-label text-right mr-2">{PageLocationText}</label>
+            <input class="form-control" style="width:300px;"minlength="3" id="PageLocation" name="PageLocation" type="text" size="25" maxlength="30" value="{PageLocation}">
+          </div>
+
+          <div class="form-group mb-1">
+            <label for="PublicAccess" class="col-3 col-form-label text-right mr-2">{DisplayInMenu}</label>
+            <div class="input-group" style="width:100px">
+              <select class="custom-select form-control" require="true" id="DisplayInMenu" name="DisplayInMenu">
+                <option value="false" {DisplayInMenuNo}>{No}</option>
+                <option value="true" {DisplayInMenuYes}>{Yes}</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group mb-1">
+            <label for="RequiresLogin" class="col-3 col-form-label text-right mr-2">{RequiresLoginText}</label>
+            <div class="input-group" style="width:100px">
+              <select class="custom-select form-control"require="true"  id="RequiresLogin" name="RequiresLogin">
+                <option value="false" {RequiresLoginNo}>{No}</option>
+                <option value="true" {RequiresLoginYes}>{Yes}</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group mb-1">
+            <label for="RequiresLogoutNo" class="col-3 col-form-label text-right mr-2">{RequiresLogoutText}</label>
+            <div class="input-group" style="width:100px">
+              <select class="custom-select form-control" require="true" id="RequiresLogoutNo" name="RequiresLogoutNo">
+                <option value="false" {RequiresLogoutNo}>{No}</option>
+                <option value="true" {RequiresLogoutYes}>{Yes}</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group mb-1">
+            <label for="RequiresAdmin" class="col-3 col-form-label text-right mr-2">{RequiresAdminText}</label>
+            <div class="input-group" style="width:100px">
+              <select class="custom-select form-control" require="true" id="RequiresAdmin" name="RequiresAdmin">
+                <option value="false" {RequiresAdminNo}>{No}</option>
+                <option value="true" {RequiresAdminYes}>{Yes}</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group mb-1">
+            <label for="RequiredAdminLevel" class="col-3 col-form-label text-right mr-2">{RequiresAdminLevelText}</label>
+            <input class="form-control" style="width:300px;"minlength="3" id="RequiredAdminLevel" name="RequiredAdminLevel" type="text" size="25" maxlength="30" value="{RequiredAdminLevel}">
+          </div>
+
+          <div class="form-group mb-1">
+            <label for="ParentMenuItem" class="col-3 col-form-label text-right mr-2">{ParentText}</label>
+            <div class="input-group" style="width:100px">
+              <select class="custom-select form-control" require="true" id="ParentMenuItem" name="ParentMenuItem">
+                {ParentPagesListArrayBegin}
+                  <option value="{Value}" {PageSelected}>{Name}</option>
+                {ParentPagesListArrayEnd}
+              </select>
+            </div>
+          </div>
+
+          <div class="row w-100 mb-3">
+            <div class="col pull-right">
+              <button class="pull-right" id="add_news" onClick="submitupdate('page_manager_add_form', 'edittingpageid={EdittingPageID}&savemenuitem=true');">{SaveMenuItemChanges}</button>
+            </div>
+            <div class="col-1"></div>
+          </div>
+
+        </div>
+      </div>
+    </form>
+    {IfDisplayEditEnd}
+
+  </div>  <!-- container -->
+{IsAdminAuthenticatedEnd}
+
+
+
+<!--
+
+<div >
 <h2>{SystemName}: {PageManager}</h2>
 <div id="info_message" class="info_message"></div>
 <table id="page_manager_select">
@@ -123,7 +244,10 @@ EdittingPageID
   });
 </script>
 
-{IfDisplayEditBegin}
+-->
+
+<!--
+{xIfDisplayEditBegin}
 <form id="page_manager_edit_form" action="admin/page_manager.html" method="post">
 <table id="page_manager">
   <caption></caption>
@@ -237,6 +361,8 @@ EdittingPageID
     );
   });
 </script>
-</div>
-{IfDisplayEditEnd}
-{IsAdminAuthenticatedEnd}
+
+  {xIfDisplayEditEnd}
+  </div>  
+{xIsAdminAuthenticatedEnd}
+-->

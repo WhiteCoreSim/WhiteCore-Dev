@@ -1,12 +1,26 @@
-<!-- Caption -->
+<!-- Modal Region parcel data-->
+<!--  NOT REQUIRED ?? -->
 
+  <div class="modal-header" style="color:#8cbdf3;">
+    <div class="col">
+      <h2 class="modal-title">{RegionName}</h2>
+    </div>
+    {IsAuthenticatedBegin}
+      <div class="col">
+        <button class="btn btn-sm btn-default pull-right" onclick="loadmodalcontent('regionprofile-modal_profile', 'regionid={RegionID}');">
+          {MenuRegionTitle}
+        </button>
+      </div>
+    {IsAuthenticatedEnd}
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+      <span aria-hidden="true">
+        <i class="fa fa-window-close fa-2x"></i>
+      </span>
+    </button>
+  </div>
 
-<h2>{SystemName}: {RegionInfoText}</h2>
-<div id="region_info_container">
-
-<div class="rTable">&nbsp;
-  <div class="rTableBody">
-    <div class="rTableRow">
+  <div class="modal-body">
+    <div class="row">
       <div class="rTableCell">
         <div class="parcel_picture"><a class="regionslurl" title="{RegionNameText}: {RegionName}&lt;br /&gt;secondlife://{MainServerURL}/{RegionName}/128/128/50"> <img title="{RegionNameText}: {RegionName}" src="{RegionImageURL}" alt="{RegionNameText}: {RegionName}" width="128" height="128" /></a></div>
       </div>

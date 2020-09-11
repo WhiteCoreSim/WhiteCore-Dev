@@ -1,37 +1,33 @@
-<!doctype html>
-<html lang="en">
-<head>
-	<meta charset="utf-8">
-	<title>{SystemName}: Welcome Screen</title>
-	<meta name="keywords" content="{SystemName}" />
-	<meta name="description" content="{SystemName}"/>
-	<link rel="shortcut icon" href="../images/icons/favicon.ico" />
+<!-- Welcomescreen news -->
 
-<!-- params to replace
-SystemURL
-SystemName
-News        News
-NewsList    All the news
-NewsDate    Date of the news item
-NewsTitle   Title of the news item
-NewsID      ID of the news item
--->
+<div class="gridstatus" id="news">
+  <div>
+    <div class="form-row w-100" style="color:aqua;">
+      <img src="/static/icons/news.png" width="35"/>
+	  &nbsp;<strong>{SystemName} {News}</strong>
+	</div>
 
-<!-- StyleSwitch -->
-<link href="../css/styles1.css" rel="stylesheet" type="text/css" media="screen" title="styles1" />
-<link href="../css/styles2.css" rel="alternate stylesheet" type="text/css" title="styles2" media="screen" />
-<link href="../css/styles3.css" rel="alternate stylesheet" type="text/css" title="styles3" media="screen" />
-<link href="../css/styles4.css" rel="alternate stylesheet" type="text/css" title="styles4" media="screen" />
-<link href="../css/styles5.css" rel="alternate stylesheet" type="text/css" title="styles5" media="screen" />
-</head>
+	{NewsListArrayBegin}
+	<div class="form-row boxtext w-100" style="margin-left:0px;">
+	 	<a href="{SystemURL}/index.html?page=news_info&newsid={NewsID}" target="_blank">
+	 	 	<div class="col-5 newsdate">
+ 	   		{NewsDate}
+	 	  </div>
+		  {NewsTitle}
 
-<body class="gridstatus">
-<div id=news>
-<div class=headerthread>
+		</a>
+
+    </div>
+	{NewsListArrayEnd}
+  </div>
+</div>
+
+<!--
+<div>
 <table>
   <thead>
     <tr>
-	  <th class=gridtext align=left><img src="../images/icons/news.png" align="absMiddle">&nbsp;<strong>{SystemName} {News}</strong></th>
+	  <th class=gridtext align=left><img src="/static/icons/news.png" width="35" align="absMiddle">&nbsp;<strong>{SystemName} {News}</strong></th>
     </tr>
   </thead>
   <tfoot><tr><td></td><td></td></tr></tfoot>
@@ -58,10 +54,9 @@ NewsID      ID of the news item
   </tbody>
 </table>
 
-</div>
-
-<script src="../js/jquery-3.1.1.min.js" type="text/javascript"></script>
-<script src="../js/styleswitch.js" type="text/javascript"></script>
+</div>  -->
+<!--
+  <script src="/static/js/jquery-3.4.1.min.js?v=20190901"></script>
 
 <script type="text/javascript">
 	// fade class
@@ -70,5 +65,4 @@ NewsID      ID of the news item
 	$("a.styleswitch, a.welcomescreen, a.world_map, a.copyright").hover(function(){$(this).fadeOut(250);$(this).fadeIn(250);});
 </script>
 
-</body>
-</html>
+-->

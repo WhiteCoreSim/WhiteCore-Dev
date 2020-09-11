@@ -1131,22 +1131,6 @@ World map
 .mapapi-map-container {
   width: 100%;
   height: 550px;
-  border-radius: 10px 10px 10px 10px;
-  -moz-border-radius: 10px 10px 10px 10px;
-  -webkit-border-radius: 10px 10px 10px 10px;
-  border:4px solid #3b7971;
-}
-
-.mapapi-map-container .leaflet-container {
-    background-color: #1D475F; /* SL_OCEAN_COLOR */
-clear:both;
-}
-
-div.mapregion {
-  border-radius: 10px 10px 10px 10px;
-  -moz-border-radius: 10px 10px 10px 10px;
-  -webkit-border-radius: 10px 10px 10px 10px;
-  border:4px solid #3b7971;
 }
 
 /* ==========================================================================
@@ -1322,7 +1306,7 @@ Events (also used for news items)
 .event-list > li > .social > ul > li {
   display: table-cell;
   cursor: pointer;
-  color: rgb(30, 30, 30);
+  color: rgb(84, 210, 135);
   font-size: 11pt;
   font-weight: 300;
       padding: 3px 0px;
@@ -1344,6 +1328,11 @@ Events (also used for news items)
   color: rgb(30, 30, 30);
   background-color: rgb(200, 200, 200);
 }
+
+.event-check {
+  margin-bottom: 0px;
+}
+
 .facebook a,
 .twitter a,
 .mewe a
@@ -1395,7 +1384,7 @@ Events (also used for news items)
     float: left;
   }
   .event-list > li > .info {
-    background-color: rgb(245, 245, 245);
+    background-color: rgb(40, 58, 66);
     overflow: hidden;
   }
   .event-list > li > time,

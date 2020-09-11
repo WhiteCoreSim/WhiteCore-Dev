@@ -71,7 +71,9 @@ namespace WhiteCore.Modules.Web
             }
             else
                 vars["Success"] = "";
+
             var newsItems = connector.GetGenerics<GridNewsItem>(UUID.Zero, "WebGridNews");
+
             vars.Add("News", newsItems.ConvertAll<Dictionary<string, object>>(item => item.ToDictionary()));
             vars.Add("NewsManager", translator.GetTranslatedString("NewsManager"));
             vars.Add("EditNewsItem", translator.GetTranslatedString("EditNewsItem"));
@@ -79,8 +81,8 @@ namespace WhiteCore.Modules.Web
             vars.Add("DeleteNewsItem", translator.GetTranslatedString("DeleteNewsItem"));
             vars.Add("NewsTitleText", translator.GetTranslatedString("NewsTitleText"));
             vars.Add("NewsDateText", translator.GetTranslatedString("NewsDateText"));
-            vars.Add("EditNewsText", translator.GetTranslatedString("EditNewsText"));
-            vars.Add("DeleteNewsText", translator.GetTranslatedString("DeleteNewsText"));
+            //vars.Add("EditNewsText", translator.GetTranslatedString("EditNewsText"));
+            //vars.Add("DeleteNewsText", translator.GetTranslatedString("DeleteNewsText"));
             return vars;
         }
 

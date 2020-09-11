@@ -82,6 +82,13 @@ namespace WhiteCore.Modules.Web
                 vars.Add ("LocalFrontPage", settings.LocalUserFrontPage);
             }
 
+            UserAccount account = Authenticator.GetAuthentication(httpRequest);
+            if (account == null)
+                vars.Add("UserName", "Unknown??");
+            else {
+                vars.Add("UserName", account.Name);
+            }
+
             return vars;
         }
 

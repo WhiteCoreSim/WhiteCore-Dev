@@ -1,0 +1,130 @@
+<!-- Modal Region profile data-->
+
+  <div class="modal-header" style="color:#8cbdf3;">
+    <div class="col">
+      <h2 class="modal-title">{RegionName}</h2>
+    </div>
+    {IsAuthenticatedBegin}
+      <div class="col">
+        <button class="btn btn-sm btn-default pull-right" onclick="loadmodalcontent('regionprofile-modal_parcels', 'regionid={RegionID}');">
+          {MenuParcelTitle}
+        </button>
+      </div>
+    {IsAuthenticatedEnd}
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+      <span aria-hidden="true">
+        <i class="fa fa-window-close fa-2x"></i>
+      </span>
+    </button>
+  </div>
+
+  <div class="modal-body">
+    <div class="row">
+      <div class="col-4">
+        <div class="region_info_picture" style="height: 256px;">
+          <a class="regionslurl" title="{RegionNameText}: {RegionName}" href="hop://{MainServerURL}/{RegionName}/128/128/50">
+            <img title="{RegionNameText}: {RegionName}" src="{RegionWorldViewURL}" alt="{RegionNameText}: {RegionName}" height="256" />
+          </a>
+        </div>
+      </div>
+
+      <div class="col-8">
+        <div class="row">
+          <div class="col-4 text-right">
+            {OwnerNameText}:
+          </div>
+          <div class="col-8">
+            <a title="{OwnerNameText}: {OwnerName}" href="#"  onclick="loadmodalcontent('webprofile-modal_profile', 'userid={OwnerUUID}');">
+              <span class="agentlink">{OwnerName}</span>
+            </a>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-4 text-right">
+            {RegionTypeText}:
+          </div>
+          <div class="col-8">
+            {RegionType}
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-4 text-right">
+            {ParcelsInRegionText}:
+          </div>
+          <div class="col-8">
+            {NumberOfParcelsInRegion}
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-4 text-right">
+            {RegionMaturityText}:
+          </div>
+          <div class="col-8">
+            {RegionMaturity}
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-4 text-right">
+            {RegionLocationText}:
+          </div>
+          <div class="col-8">
+            <div class="row">
+              <div class="col-6">
+                X:&nbsp;{RegionLocX}
+              </div>
+              <div class="col-6">
+                Y:&nbsp;{RegionLocY}
+              </div>
+              <div class="col-12 text-center">
+                <a href="hop://{RegionName}/128/128/50">
+                  <span class="regionlink">Teleport to {RegionName}</span>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-4 text-right">
+            {RegionTerrainText}:
+          </div>
+          <div class="col-8">
+            {RegionTerrain}
+          </div>
+        </div>
+
+        <div class="div20"></div>
+
+        <div class="row">
+          <div class="col">
+            {RegionOnlineText}: {RegionOnline}
+          </div>
+          <div class="col">
+            {NumberOfUsersInRegionText}: {NumberOfUsersInRegion}
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-3 text-right">
+            {UserNameText}:
+          </div>
+          <div class="col-9">
+            {UsersInRegionArrayBegin}
+            <div class="col-3">
+              <a class="agentlink"  href="#" onclick="loadmodalcontent('webprofile-modal_profile', 'userid={UserUUID}');">
+                <span class="agentlink">{UserName}</span>
+              </a>
+            </div>
+            {UsersInRegionArrayEnd}
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+

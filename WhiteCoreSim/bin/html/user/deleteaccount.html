@@ -1,0 +1,62 @@
+<!-- user delete account -->
+<section class="text-center">
+
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col">
+        <h2>{UserName}</h2>
+      </div>
+      <div class="col-6 alert bg-danger">
+        <strong>{DeleteUserInfoText}</strong>
+      </div>
+      <div class="col"></div>
+
+    </div>
+    <hr />
+
+    <div class="container justify-content-center">
+      <div class="row">
+        <div class="col">
+          <img src="static/images/bin_delete.png" />
+        </div>
+
+        <div class="col">
+
+          <form role="form" id="delete_user" action="user/deleteaccount.html" method="post">
+            <input type="hidden" value="{UserName}" name="uname" id="uname" \>
+            <div class="form-group mb-3">
+                <input class="form-contol" type="text" placeholder="{DeleteUserNameText}*" name="username" id="username" \>
+            </div>
+
+            <div class="form-group mb-3">
+                <input class="form-contol" type="password" placeholder="{EnterPasswordText}*" required name="password" id="password"\>
+            </div>
+
+            <div class="form-group mb-3">
+              <div class="form-check form-check-inline">
+                <label class="form-check-label mr-1" for="deleteuserconf">{DeleteUserConfirmationText}</label>
+                <input class="form-check-input" id="deleteuserconf" name="deleteuserconf" type="checkbox" value="Accepted" />
+              </div>
+            </div>
+
+            <div class="div20"></div>
+
+            <div class="button-group">
+              <a class="btn btn-sm btn-success" onclick="gohome();">{CancelText}</a>
+              <a class="btn btn-sm btn-danger float-right" onclick="submitupdate('delete_user', 'delete=true');">
+                {DeleteUserText}
+              </a>
+            </div>
+          </form>
+        </div>
+        <div class="col"></div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+<script>
+  $("#password").focus();
+</script>

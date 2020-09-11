@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>{SystemName}: Welcome Screen</title>
+	<meta name="keywords" content="{SystemName}" />
+	<meta name="description" content="{SystemName}"/>
+	<link rel="shortcut icon" href="../images/icons/favicon.ico" />
+
+<!-- params to replace
+SystemURL
+SystemName
+News        News
+NewsList    All the news
+NewsDate    Date of the news item
+NewsTitle   Title of the news item
+NewsID      ID of the news item
+-->
+
+<!-- StyleSwitch -->
+<link href="../css/style.css" rel="alternate stylesheet" type="text/css" title="styles5" media="screen" />
+</head>
+
+<body class="gridstatus">
+<div id=news>
+<div class=headerthread>
+<table>
+  <thead>
+    <tr>
+	  <th class=gridtext align=left><img src="../images/icons/news.png" align="absMiddle">&nbsp;<strong>{SystemName} {News}</strong></th>
+    </tr>
+  </thead>
+  <tfoot><tr><td></td><td></td></tr></tfoot>
+  <tbody><tr><td></td><td></td></tr></tbody>
+</table>
+</div>
+
+<table>
+  <thead>
+    <tr>
+	  <th class=gridtext align=left></th>
+    </tr>
+  </thead>
+  <tfoot><tr><td></td><td></td></tr></tfoot>
+  <tbody>
+{NewsListArrayBegin}
+    <tr>
+	  <td class=boxtext vAlign=top>
+		<a href="{SystemURL}/index.html?page=news_info&newsid={NewsID}" target="_blank">{NewsTitle}</a>
+	  </td>
+	  <td class=boxtext vAlign=top noWrap width="1%">{NewsDate}</td>
+	</tr>
+{NewsListArrayEnd}
+  </tbody>
+</table>
+
+</div>
+
+  <script src="static/js/jquery-3.4.1.min.js?v=20190901"></script>
+
+<script type="text/javascript">
+	// fade class
+	$("li.fade, a.fade").hover(function(){$(this).fadeOut(200);$(this).fadeIn(200);});
+	$("a.logofade").hover(function(){$(this).fadeOut(200);$(this).fadeIn(200);});
+	$("a.styleswitch, a.welcomescreen, a.world_map, a.copyright").hover(function(){$(this).fadeOut(250);$(this).fadeIn(250);});
+</script>
+
+</body>
+</html>

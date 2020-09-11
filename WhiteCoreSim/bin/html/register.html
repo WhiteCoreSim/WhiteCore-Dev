@@ -8,31 +8,35 @@
 <div id="error_message" class="error">{ErrorMessage}</div>
 <div class="container">
   <h2>{RegistrationText}</h2>
-  <div class="row justify-content-center">
-    <form id="register_form" action="{SubmitURL}" method="POST">
+  <div class="row w-100 justify-content-center">
+    <form style="width:85%;" id="register_form" action="{SubmitURL}" method="post">
       <div class="col-12 text-left">
 
-        <div class="row">
+        <div class="row mb-1">
           <div class="col-3">
             {AvatarNameText}*
           </div>
           <div class="col-5">
             <input class="form-control" id="AvatarName" maxlength="30" name="AvatarName" size="25" type="text" value="{AvatarName}" />
           </div>
-          <div class="col help-block">Enter your avatar name</div>
+          <div class="col help-block">
+            <small class="form-text text-light">Enter your avatar name</small>
+          </div>
         </div>
 
-        <div class="row">
+        <div class="row mb-1">
           <div class="col-3">
             {AvatarPasswordText}*
           </div>
           <div class="col-5">
             <input class="form-control" id="AvatarPassword" maxlength="15" name="AvatarPassword" size="30" type="password" />
           </div>
-          <div class="col help-block">Your login password</div>
+          <div class="col help-block">
+            <small class="form-text text-light">Your login password</small>
+          </div>
         </div>
 
-        <div class="row">
+        <div class="row mb-1">
           <div class="col-3">
             {AvatarPasswordConfirmationText}*
           </div>
@@ -44,7 +48,7 @@
 
         {IsAdminAuthenticatedBegin}
         <!-- Only admins can set scope IDs -->
-        <div class="row">
+        <div class="row mb-1">
           <div class="col-3">
             <p>{AvatarScopeText}*</p>
           </div>
@@ -55,7 +59,7 @@
         </div>
         {IsAdminAuthenticatedEnd}
 
-        <div class="row">
+        <div class="row mb-1">
           <div class="col-3">{FirstNameText}</div>
           <div class="col-5">
             <input class="form-control" id="FirstName" maxlength="15" name="FirstName" size="25" type="text" value="" />
@@ -63,7 +67,7 @@
           <div class="col-4"></div>
         </div>
 
-        <div class="row">
+        <div class="row mb-1">
           <div class="col-3">{LastNameText}</div>
           <div class="col-5">
             <input class="form-control" id="LastName" maxlength="15" name="LastName" size="25" type="text" value="" />
@@ -82,7 +86,7 @@
         </div>
         -->
 
-        <div class="row">
+        <div class="row mb-1">
           <div class="col-3">{UserCityText}</div>
           <div class="col-5">
             <input class="form-control" id="UserCity" maxlength="15" name="UserCity" size="25" type="text" value="" />
@@ -90,26 +94,26 @@
           <div class="col"></div>
         </div>
 
-        <div class="row">
+        <div class="row mb-1">
           <div class="col-3">{UserDOBText}</div>
           <div class="col-5">
               <div class="row">
               <div class="col-4">
-                <select class="form-control" id="UserDOBMonth" name="UserDOBMonth">
+                <select class="form-control custom-select" id="UserDOBMonth" name="UserDOBMonth">
                 {MonthsArrayBegin}
                   <option value="{Value}">{Value}</option>
                 {MonthsArrayEnd}
                 </select>
               </div>
               <div class="col-4">
-                <select class="form-control" id="UserDOBDay" name="UserDOBDay">
+                <select class="form-control custom-select" id="UserDOBDay" name="UserDOBDay">
                   {DaysArrayBegin}
                   <option value="{Value}">{Value}</option>
                   {DaysArrayEnd}
                 </select>
               </div>
               <div class="col-4">
-                <select class="form-control" id="UserDOBYear" name="UserDOBYear">
+                <select class="form-control custom-select" id="UserDOBYear" name="UserDOBYear">
                   {YearsArrayBegin}
                   <option value="{Value}">{Value}</option>
                   {YearsArrayEnd}
@@ -120,18 +124,20 @@
           <div class="col-4"></div>
         </div>
 
-        <div class="row">
+        <div class="row mb-1">
           <div class="col-3">{UserEmailText}*</div>
           <div class="col-5">
             <input class="form-control" id="UserEmail" maxlength="40" name="UserEmail" size="40" type="text" value="" />
           </div>
-          <div class="col help-block">(For password recovery only)</div>
+          <div class="col help-block">
+            <small class="form-text text-light">For password recovery only</small>
+          </div>
         </div>
 
-        <div class="row">
+        <div class="row mb-1">
           <div class="col-3">{UserHomeRegionText}*</div>
           <div class="col-5">
-            <select class="form-control" id="UserHomeRegion" style="width: 180px;" name="UserHomeRegion">
+            <select class="form-control custom-select" id="UserHomeRegion" style="width: 180px;" name="UserHomeRegion">
               {RegionListArrayBegin}
               <option value="{RegionUUID}">{RegionName}</option>
               {RegionListArrayEnd}
@@ -142,10 +148,10 @@
 
         {IsAdminAuthenticatedBegin}
         <!-- Only admins can set membership types -->
-        <div class="row">
+        <div class="row mb-1">
           <div class="col-3">{UserTypeText}*</div>
           <div class="col-5">
-            <select class="form-control" id="UserType" style="width: 120px;" name="UserType">
+            <select class="form-control custom-select" id="UserType" style="width: 180px;" name="UserType">
               {UserTypeArrayBegin}
               <option value="{Index}">{Value}</option>
               {UserTypeArrayEnd}
@@ -155,26 +161,26 @@
         </div>
         {IsAdminAuthenticatedEnd}
 
-        <div class="row">
+        <div class="row mb-1">
           <div class="col-3">Avatar Selection</div>
-          <div class="col-6">
+          <div class="col-8">
             <div id="avatarcarousel" class="carousel slide" data-ride="carousel" style="height: 190px;">
               <div class="carousel-inner">
-                {AvatarDefaultArrayBegin}
-                <div class="carousel-item active" data-interval="">
+<!--                {AvatarDefaultArrayBegin}
+                <div class="carousel-item" data-interval="">
                   <img class="d-block rounded float-right" title="{AvatarArchiveName}" src="{AvatarArchiveSnapshotURL}" alt="{AvatarArchiveName}" style="width:150px;height:150px;margin-right:45px;" />
                   <div class="carousel-caption d-none d-md-block" style="right:50%;">
                       <input class="form-check-input" type="radio" id="{AvatarArchiveName}" name="{AvatarArchiveName}" value="{AvatarArchiveName}" checked/>
                       <label class="form-check-label" for="{AvatarArchiveName}">&nbsp;&nbsp{AvatarArchiveName}</label>
                   </div>
                 </div>
-                {AvatarDefaultArrayEnd}
+                {AvatarDefaultArrayEnd}  -->
                 {AvatarArchiveArrayBegin}
                 <div class="carousel-item" data-interval="">
-                  <img class="d-block rounded float-right" title="{AvatarArchiveName}" src="{AvatarArchiveSnapshotURL}" alt="{AvatarArchiveName}"  style="width:150px;height:150px;margin-right:45px;" />
-                  <div class="carousel-caption d-none d-md-block" style="right:50%;">
+                  <img class="d-block rounded float-right" title="{AvatarArchiveName}" src="{AvatarArchiveSnapshotURL}" alt="{AvatarArchiveName}"  style="width:150px;height:150px;margin-right:100px;" />
+                  <div class="carousel-caption d-none d-md-block" style="right:82%;">
                       <input class="form-check-input" type="radio" id="{AvatarArchiveName}" name="{AvatarArchiveName}"  value="{AvatarArchiveName}" />
-                      <label class="form-check-label" for="{AvatarArchiveName}">&nbsp;&nbsp{AvatarArchiveName};</label>
+                      <label class="form-check-label" for="{AvatarArchiveName}">&nbsp;&nbsp;{AvatarArchiveName}</label>
                   </div>
                 </div>
                 {AvatarArchiveArrayEnd}
@@ -194,14 +200,15 @@
           <div class="col"></div>
         </div>
 
-        <div class="row">
+        <div class="row mb-1">
           <div class="col-3">{TermsOfServiceText}</div>
-          <div class="col" style="height:auto;">
-            <textarea class="form-control" id="TosText" cols="90" name="TosText" rows="6">{ToSMessage}</textarea>
+          <div class="col-8" style="height:auto;">
+            <textarea class="form-control" id="TosText" cols="70" name="TosText" rows="5">{ToSMessage}</textarea>
           </div>
+          <div class="col"></div>
         </div>
 
-        <div class="row">
+        <div class="row mb-1">
           <div class="col-3"></div>
           <div class="col-6 text-right">
             {TermsOfServiceAccept}
@@ -215,11 +222,14 @@
 
         </div>
 
-        <div class="row">
+        <div class="row mt-2">
           <div class="col-9"></div>
           <div class="col-3" style="margin-top:15px;margin-bottom:15px;">
             <input name="action" type="hidden" value="check" />
-            <button class="btn btn-lg btn-success" id="Submit" name="Submit" type="Submit">{Submit}</button>
+            <button class="btn btn-block btn-success" type="Submit" onclick="submitupdate('register_form');">
+              {Submit}
+            </button>
+<!--            <button class="btn btn-lg btn-success" id="Submit" name="Submit" type="Submit">{Submit}</button> -->
           </div>
         </div>
       </div>
@@ -231,27 +241,14 @@
 <script>
 
   $(function() {
-    $('.carousel').carousel({
+    $(".carousel").carousel({
       interval: 5000
     });
+    $(".carousel-item").first().addClass("active");
 
     $("#avatarcarousel input[type='radio']").change(function() {
       $("#avatarcarousel input[type='radio']").prop('checked',false);
       $(this).prop('checked', true);
-    });
-
-    /* attach a submit handler to the form */
-    $("#register_form").submit(function(event) {
-
-      /* stop form from submitting normally */
-      event.preventDefault();
-      /* get some values from elements on the page: */
-      var $form = $( this ),
-          url = $form.attr( 'action' );
-      /* Send the data using post and put the results in a div */
-      $.post( url, $form.serialize(), function( data ) {
-  		  $("#error_message").empty().append(data);
-      });
     });
   });
 

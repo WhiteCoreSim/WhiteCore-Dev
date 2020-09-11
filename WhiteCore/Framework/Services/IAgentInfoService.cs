@@ -123,6 +123,13 @@ namespace WhiteCore.Framework.Services
         IAgentInfoService InnerService { get; }
 
         /// <summary>
+        ///     Save the user info for the given user
+        /// </summary>
+        /// <param name="userInfo">The user info data</param>
+        /// <returns></returns>
+        bool Save(UserInfo userInfo);
+
+        /// <summary>
         ///     Get the user info for the given user
         /// </summary>
         /// <param name="userID">The ID of the user to fetch info of</param>

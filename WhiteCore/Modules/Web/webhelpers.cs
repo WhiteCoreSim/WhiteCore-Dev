@@ -37,6 +37,7 @@ using WhiteCore.Framework.Utilities;
 
 namespace WhiteCore.Modules.Web
 {
+
     public static class WebHelpers
     {
         #region General
@@ -94,6 +95,42 @@ namespace WhiteCore.Modules.Web
             return monthsArgs;
         }
 
+        public static string ClassifiedMaturity(uint maturity) {
+            switch (maturity) {
+                case 4:
+                    return "PG";
+                case 8:
+                    return "Mature";
+                case 64:
+                    return "Adult";
+                default:
+                    return "All";
+            }
+        }
+
+        public static List<Dictionary<string, object>> MaturitySelections(int mlevel, ITranslator translator) {
+            // index is assumed General - 1 etc
+            var maturityArgs = new List<Dictionary<string, object>>();
+            maturityArgs.Add(new Dictionary<string, object> {
+                {"Value", translator.GetTranslatedString("CatAll")},
+                {"Index","0"},
+                {"selected", mlevel == 0 ? "selected" : "" } });
+            maturityArgs.Add(new Dictionary<string, object> {
+                {"Value", translator.GetTranslatedString("General")},
+                {"Index","1"},
+                {"selected", mlevel == 0 ? "selected" : "" } });
+            maturityArgs.Add(new Dictionary<string, object> {
+                {"Value", translator.GetTranslatedString("PG")},
+                {"Index","2"},
+                {"selected", mlevel == 0 ? "selected" : "" } });
+            maturityArgs.Add(new Dictionary<string, object> {
+                 {"Value", translator.GetTranslatedString("Adult")},
+                {"Index","3"},
+                {"selected", mlevel == 0 ? "selected" : "" } });
+
+            return maturityArgs;
+        }
+
         #endregion
 
         #region Classifieds
@@ -146,19 +183,7 @@ namespace WhiteCore.Modules.Web
             return categories;
         }
 
-        public static string ClassifiedMaturity (uint maturity)
-        {
-            switch (maturity) {
-            case 4:
-                return "PG";
-            case 8:
-                return "Mature";
-            case 64:
-                return "Adult";
-            default:
-                return "All";
-            }
-        }
+
 
         public static string ClassifiedCategory (uint category, ITranslator translator)
         {
@@ -642,8 +667,8 @@ namespace WhiteCore.Modules.Web
             return parcelList;
         }
 
-        // event locations
-        public static List<Dictionary<string, object>> EventLocations (UserAccount user, IRegistryCore registry, string selParcel)
+        // event/classified locations
+        public static List<Dictionary<string, object>> UserLocations (UserAccount user, IRegistryCore registry, string selParcel)
         {
             // Get current parcels on regions etc
             var regionList = new List<Dictionary<string, object>> ();
@@ -818,6 +843,49 @@ namespace WhiteCore.Modules.Web
 
         #region Regions
 
+        /// <summary>
+        /// New Region size selection.
+        /// </summary>
+        /// <returns>The startup selection.</returns>
+        /// <param name="translator">Translator.</param>
+        /// <param name="selStartup">Sel size.</param>
+        public static List<Dictionary<string, object>> RegionSizeSelection(ITranslator translator, int selSize) {
+            var args = new List<Dictionary<string, object>>();
+            args.Add(new Dictionary<string, object> {
+                {"Value", "256 x 256 (Std)"},
+                {"Index","1"},
+                { "selected", selSize == 1 ? "selected" : "" }
+            });
+            args.Add(new Dictionary<string, object> {
+                {"Value", "512 x 512"},
+                {"Index","2"},
+                { "selected", selSize == 2 ? "selected" : "" }
+            });
+            args.Add(new Dictionary<string, object> {
+                {"Value", "256 x 512"},
+                {"Index","3"},
+                { "selected", selSize == 3 ? "selected" : "" }
+            });
+            args.Add(new Dictionary<string, object> {
+                {"Value", "512 x 256"},
+                {"Index","4"},
+                { "selected", selSize == 4 ? "selected" : "" }
+            });
+            args.Add(new Dictionary<string, object> {
+                {"Value", "1024 x 1024"},
+                {"Index","5"},
+                { "selected", selSize == 5 ? "selected" : "" }
+            });
+            args.Add(new Dictionary<string, object> {
+                {"Value", "Custom (from OAR)"},
+                {"Index","10"},
+                { "selected", selSize == 10 ? "selected" : "" }
+            });
+
+            return args;
+        }
+
+
         public static List<Dictionary<string, object>> RegionTypeArgs (ITranslator translator, string selType)
         {
             if (selType != "")
@@ -974,6 +1042,12 @@ namespace WhiteCore.Modules.Web
             var defaultOarDir = Path.Combine (simBase.DefaultDataPath, Constants.DEFAULT_OARARCHIVE_DIR);
             var regionArchives = new List<Dictionary<string, object>> ();
 
+            // add a 'blank' for the system generated terrain
+            regionArchives.Add(new Dictionary<string, object> {
+                {"RegionArchiveSnapshotURL", "../static/icons/no_terrain.jpg"},
+                {"RegionArchive", ""},
+                {"RegionArchiveName", "Auto generated"}
+            });
 
             if (Directory.Exists (defaultOarDir)) {
                 var archives = new List<string> (Directory.GetFiles (defaultOarDir, "*.oar"));
@@ -1006,19 +1080,35 @@ namespace WhiteCore.Modules.Web
         /// </summary>
         /// <returns>The type arguments.</returns>
         /// <param name="translator">Translator.</param>
-        public static List<Dictionary<string, object>> UserTypeArgs (ITranslator translator)
+        /// <param name="int">CUrrent selection.</param>
+        public static List<Dictionary<string, object>> UserTypeSelections (ITranslator translator, int usertype)
         {
             var args = new List<Dictionary<string, object>> ();
             args.Add (new Dictionary<string, object> {
-                {"Value", translator.GetTranslatedString("Guest")}, {"Index","0"} });
+                {"Value", translator.GetTranslatedString("Guest")},
+                {"Index","0"},
+                {"selected", usertype == 0 ? "selected" : "" }
+            });
             args.Add (new Dictionary<string, object> {
-                {"Value", translator.GetTranslatedString("Resident")}, {"Index","1"} });
+                {"Value", translator.GetTranslatedString("Resident")},
+                {"Index","1"},
+                {"selected", usertype == 1 ? "selected" : "" }
+            });
             args.Add (new Dictionary<string, object> {
-                {"Value", translator.GetTranslatedString("Member")}, {"Index","2"} });
+                {"Value", translator.GetTranslatedString("Member")},
+                {"Index","2"},
+                {"selected", usertype == 2 ? "selected" : "" }
+            });
             args.Add (new Dictionary<string, object> {
-                {"Value", translator.GetTranslatedString("Contractor")}, {"Index","3"} });
+                {"Value", translator.GetTranslatedString("Contractor")},
+                {"Index","3"},
+                {"selected", usertype == 3 ? "selected" : "" }
+           });
             args.Add (new Dictionary<string, object> {
-                {"Value", translator.GetTranslatedString("Charter_Member")}, {"Index","4"} });
+                {"Value", translator.GetTranslatedString("Charter_Member")},
+                {"Index","4"},
+                {"selected", usertype == 4 ? "selected" : "" }
+            });
             return args;
         }
 
@@ -1101,17 +1191,23 @@ namespace WhiteCore.Modules.Web
             return userList;
         }
 
+
         /// <summary>
         /// Builds available Avatar selections.
         /// </summary>
         /// <returns>The selections.</returns>
         /// <param name="registry">Registry.</param>
-        public static List<Dictionary<string, object>> AvatarSelections (IRegistryCore registry)
-        {
-            var avArchiver = registry.RequestModuleInterface<IAvatarAppearanceArchiver> ();
-            var webTextureService = registry.RequestModuleInterface<IWebHttpTextureService> ();
-            var avatarArchives = new List<Dictionary<string, object>> ();
-            var archives = avArchiver.GetAvatarArchives ();
+        public static List<Dictionary<string, object>> AvatarSelections(IRegistryCore registry) {
+            var avArchiver = registry.RequestModuleInterface<IAvatarAppearanceArchiver>();
+            var webTextureService = registry.RequestModuleInterface<IWebHttpTextureService>();
+            var avatarArchives = new List<Dictionary<string, object>>();
+            var archives = avArchiver.GetAvatarArchives();
+
+            avatarArchives.Add(new Dictionary<string, object> {
+                { "AvatarArchiveName", "Default"},
+                { "AvatarArchiveSnapshotID", "" },
+                { "AvatarArchiveSnapshotURL", "static/images/simona.png" }
+            });
 
             foreach (var archive in archives) {
                 var archiveInfo = new Dictionary<string, object> ();
@@ -1132,6 +1228,7 @@ namespace WhiteCore.Modules.Web
         /// Builds details for the default Avatar selection.
         /// </summary>
         /// <returns>The default avatar selection.</returns>
+        /* no longer required
         public static List<Dictionary<string, object>> AvatarDefaultSelection()
         {
             var defaultArchive = new List<Dictionary<string, object>>();
@@ -1146,7 +1243,7 @@ namespace WhiteCore.Modules.Web
             return defaultArchive;
         }
 
-        // user regions
+        */// user regions
         /*        public static List<Dictionary<string, object>> UserRegionSelections (UserAccount user, string selRegion)
                 {
                     var regionList = new List<Dictionary<string, object>> ();

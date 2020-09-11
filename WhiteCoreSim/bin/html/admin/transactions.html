@@ -1,68 +1,93 @@
 <!-- User Transactions (Admin) -->
 
-<div id="fullPage">
+<style>
+  .page-link {background-color: transparent !important;}
+</style>
+
+<div id="trans_page">
   <h2>{SystemName}: {TransactionsText}</h2>
+  <div class="container">
+    <div class="col-12">
+      <form class="form form-inline" role="form" id="transactions_search_form" action="admin/transactions.html" method="post">
 
-  <form id="transactions_search_form" action="admin/transactions.html" method="post">
+        <div class="col-3 form-group" data-date-format="dd-mm-yyyy">
+          <label for="date_start">{DateStartText}&nbsp;&nbsp;</label>
+            <input class="form-control" type="text" style="width:130px;" name="date_start" id="date_start" value="{DateStart}" />
+            <span class="add-on"><i class="fa fa-calendar fa-lg event-calendar"></i></span>
+        </div>
 
-  	<div class="form-fieldset-range">
-  		<legend>{DateInfoText}</legend>
-  			<p class="from-to">
-  				<label class="from" for="date_start">{DateStartText}:</label>
-  				<input type="text" style="width:80px;" name="date_start" id="date_start" value="{DateStart}" />
-  				<label class="to" for="date_end">&nbsp;-&nbsp;{DateEndText}:</label>
-  			  	<input type="text" style="width:80px;" name="date_end" id="date_end" value="{DateEnd}" />
-  				<label for="user_name">&nbsp;-&nbsp;{SearchUserText}:</label>
-  			  	<input type="text" style="width:180px;" name="user_name" id="user_name" value="{SearchUser}" />
-  				<input hidden type="hidden" label="Submit" id="Submit" name="Submit" value="Submit" />
-  				<button class="button" style="float:right;width:200;" id="Submit" type="Submit" name="Submit">Search</button>
-  			</p>
-  	</div>
-  </form>
+        <div class="col-3 form-group">
+            <label for="date_end">{DateEndText}&nbsp;&nbsp;</label>
+            <input class="form-control" type="text" style="width:130px;" name="date_end" id="date_end" value="{DateEnd}" />
+            <span class="add-on"><i class="fa fa-calendar fa-lg event-calendar"></i></span>
+        </div>
 
+        <div class="col-3 form-group">
+          <label for="user_name">{SearchUserText}&nbsp;&nbsp;</label>
+          <input class="form-control" type="text" style="width:220px;" name="user_name" id="user_name" value="{SearchUser}" />
+        </div>
 
-  <table id="transactions_list">
- 	  <thead class="listhead">
-  		<tr>
-  		  <th class="transactions_left"><p>{TransactionDateText}</p></th>
-  		  <th class="transactions_user"><p>{TransactionFromAgentText}</p></th>
-  		  <th class="transactions_user"><p>{TransactionToAgentText}</p></th>
-  		  <th class="transactions_description"><p>{TransactionDetailText}</p></th>
-  		  <th class="transactions_value"><p>{TransactionAmountText}</p></th>
-  		  <th class="transactions_value"><p>{TransactionBalanceText}</p></th>
-  		</tr>
- 	  </thead>
+        <div class="col-3 form-group">
+          <a class="button pull-right" style="height:42px;margin-top:16px;width:200px;" 
+             onclick="submitpagesearch('transactions_search_form', 'trans_page');">
+            {Search}
+          </a>
+        </div>
 
-    <tbody>
-  	{TransactionsListArrayBegin}
-      <tr>
-        <td class="transactions_left"><p>{Date}</p></td>
-        <td class="transactions_user"><p>{FromAgent}</p></td>
-        <td class="transactions_user"><p>{ToAgent}</p></td>
-        <td class="transactions_description"><p>{Description}</p></td>
-        <td class="transactions_value"><p>{Amount}</p></td>
-        <td class="transactions_value"><p>{ToBalance}</p></td>
-      </tr>
-  	{TransactionsListArrayEnd}
-    </tbody>
-  </table>
+      </form>
+    </div>
+  </div>
+
+  <div class="div10"></div>
+
+  <div class="col-12">
+
+    <table class="table table-dark table-striped table-bordered" width="100%" id="transactions_list">
+      <thead>
+    		<tr>
+    		  <th>{TransactionDateText}</th>
+    		  <th>{TransactionFromAgentText}</th>
+    		  <th>{TransactionToAgentText}</th>
+    		  <th>{TransactionDetailText}</th>
+    		  <th>{TransactionAmountText}</th>
+    		  <th>{TransactionBalanceText}</th>
+    		</tr>
+      </thead>
+
+      <tbody>
+     	{TransactionsListArrayBegin}
+        <tr>
+          <td>{Date}</td>
+          <td>{FromAgent}</td>
+          <td>{ToAgent}</td>
+          <td>{Description}</td>
+          <td>{Amount}</td>
+          <td>{ToBalance}</td>
+        </tr>
+    	{TransactionsListArrayEnd}
+      </tbody>
+    </table>
+  </div>
 </div>
 
 <script>
-  $(document).ready(function() {
-    $('#transactions_list').dataTable( {
-      "order": [[ 0, "asc" ]]
+  $(function() {
+    $('#transactions_list').dataTable({
+      dom: 'frtip',
+      "order": [[ 0, "asc" ]],
+      "aoColumnDefs": [{"bSortable":false,"aTargets":["no-sort"]}],
+      /*"aaSorting":[], */
+      "oLanguage": {"sSearch": "Filter: "},
+      "pageLength": 10,
+      "fixedHeader": {
+        header: true,
+         //footer: true
+      },
     });
-  });
 
-  $(function() {
-    $('#date_start,#date_end').datepicker( {
-    showTrigger: '<button type="button" class="trigger">...</button>'});
-  });
-
-  <!--  /* date pickers */ -->
-  $(function() {
-    $( "#date_start" ).datepicker( {
+    /* date pickers */
+    $( "#date_start" ).datepicker({
+      showTrigger: '<button type="button" class="trigger">...</button>',
       defaultDate: "-1w",
       changeMonth: true,
       numberOfMonths: 3,
@@ -70,28 +95,21 @@
         $( "#to" ).datepick( "option", "minDate", selectedDate );
       }
     });
-    $( "#date_end" ).datepicker( {
+
+    $( "#date_end" ).datepicker({
       //defaultDate: "+1w",
+      showTrigger: '<button type="button" class="trigger">...</button>',
       changeMonth: true,
       numberOfMonths: 3,
       onClose: function( selectedDate ) {
         $( "#from" ).datepick( "option", "maxDate", selectedDate );
       }
     });
+
+    //$('#date_start,#date_end').datepicker({
+    //  showTrigger: '<button type="button" class="trigger">...</button>'});
+
   });
 
-  /* attach a submit handler to the form */
-  $("#transactions_search_form").submit(function(event) {
-
-    /* stop form from submitting normally */
-    event.preventDefault();
-    /* get some values from elements on the page: */
-    var $form = $( this ),
-        url = $form.attr( 'action' );
-    /* Send the data using post and put the results in a div */
-    $.post( url, $form.serialize(), function( data ) {
-      $("#fullPage").empty().append(data);
-    });
-  });
 </script>
 

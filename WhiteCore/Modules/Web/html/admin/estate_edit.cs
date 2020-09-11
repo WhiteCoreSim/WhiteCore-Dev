@@ -35,9 +35,9 @@ namespace WhiteCore.Modules.Web
 {
     public class EstateEditPage : IWebInterfacePage
     {
-        public string [] FilePath {
+        public string[] FilePath {
             get {
-                return new []
+                return new[]
                            {
                                "html/admin/estate_edit.html"
                            };
@@ -52,117 +52,111 @@ namespace WhiteCore.Modules.Web
             get { return false; }
         }
 
-        public Dictionary<string, object> Fill (WebInterface webInterface, string filename, OSHttpRequest httpRequest,
+        public Dictionary<string, object> Fill(WebInterface webInterface, string filename, OSHttpRequest httpRequest,
                                                OSHttpResponse httpResponse, Dictionary<string, object> requestParameters,
                                                ITranslator translator, out string response)
         {
             response = null;
-            var vars = new Dictionary<string, object> ();
-            var estateConnector = Framework.Utilities.DataManager.RequestPlugin<IEstateConnector> ();
+            var vars = new Dictionary<string, object>();
+            var estateConnector = Framework.Utilities.DataManager.RequestPlugin<IEstateConnector>();
 
+            int estateid;
+
+            // the estate id can come in a number of ways
+            bool idok = httpRequest.Query.ContainsKey("estateid")
+                ? int.TryParse(httpRequest.Query["estateid"].ToString(), out estateid)
+                : int.TryParse(requestParameters["estateid"].ToString(), out estateid);
+
+            if (!idok) {
+                response = webInterface.UserMsg("!Estate details not supplied", true);
+                return null;
+            }
+            /*
             string estate;
-
-            if (httpRequest.Query.ContainsKey ("EstateID")) {
-                estate = httpRequest.Query ["EstateID"].ToString ();
+            if (httpRequest.Query.ContainsKey ("estateid")) {
+                estate = httpRequest.Query ["estateid"].ToString ();
             } else {
-                if (requestParameters.ContainsKey ("EstateID")) {
-                    estate = requestParameters ["EstateID"].ToString ();
+                if (requestParameters.ContainsKey ("estateid")) {
+                    estate = requestParameters ["estateid"].ToString ();
                 } else {
-                    response = "<h3>Estate details not supplied, redirecting to main page</h3>" +
-                        "<script>" +
-                        "setTimeout(function() {window.location.href = \"/?page=estate_manager\";}, 1000);" +
-                        "</script>";
+                    response = webInterface.UserMsg("!Estate details not supplied", true);
                     return null;
                 }
             }
 
-            var estateid = -1;
+
             int.TryParse (estate, out estateid);
+            */
 
-            if (requestParameters.ContainsKey ("Delete")) {
-                //var estateID = httpRequest.Query ["delete"].ToString ();
-                //if (estateConnector.DeleteEstate (estateID))
-                //    response = "<h3>Estate details have been deleted</h3>" +
-                //        "<script>" +
-                //        "setTimeout(function() {window.location.href = \"/?page=estate_manager\";}, 1000);" +
-                //        "</script>";
-                //else
-                response = "Estate details would have been deleted (but not yet).";
-                return null;
-            }
-
-            if (requestParameters.ContainsKey ("Submit")) {
-                var estateSettings = new EstateSettings ();
+            if (requestParameters.ContainsKey("update")) {
+                var estateSettings = new EstateSettings();
                 if (estateid >= 0)
-                    estateSettings = estateConnector.GetEstateIDSettings (estateid);
+                    estateSettings = estateConnector.GetEstateIDSettings(estateid);
 
-                var estateOwner = requestParameters ["EstateOwner"].ToString ();
+                var estateOwner = requestParameters["EstateOwner"].ToString();
 
-                estateSettings.EstateName = requestParameters ["EstateName"].ToString (); 
-                estateSettings.EstateOwner = UUID.Parse (estateOwner);
-                estateSettings.PricePerMeter = int.Parse (requestParameters ["PricePerMeter"].ToString ());
-                estateSettings.PublicAccess = requestParameters ["PublicAccess"].ToString () == "1";
-                estateSettings.TaxFree = requestParameters ["TaxFree"].ToString () == "1";
-                estateSettings.AllowVoice = requestParameters ["AllowVoice"].ToString () == "1";
-                estateSettings.AllowDirectTeleport = requestParameters ["AllowDirectTeleport"].ToString () == "1";
+                estateSettings.EstateName = requestParameters["EstateName"].ToString();
+                estateSettings.EstateOwner = UUID.Parse(estateOwner);
+                estateSettings.PricePerMeter = int.Parse(requestParameters["PricePerMeter"].ToString());
+                estateSettings.PublicAccess = requestParameters["PublicAccess"].ToString() == "1";
+                estateSettings.TaxFree = requestParameters["TaxFree"].ToString() == "1";
+                estateSettings.AllowVoice = requestParameters["AllowVoice"].ToString() == "1";
+                estateSettings.AllowDirectTeleport = requestParameters["AllowDirectTeleport"].ToString() == "1";
 
-                estateConnector.SaveEstateSettings (estateSettings);
+                estateConnector.SaveEstateSettings(estateSettings);
 
-                response = "Estate details have been updated." +
-                            "<script>" +
-                           "setTimeout(function() {window.location.href = \"/?page=estate_manager\";}, 1000);" +
-                            "</script>";
-
+                response = webInterface.UserMsg("Estate details have been updated", true);
                 return null;
             }
 
-            if (requestParameters.ContainsKey ("NewEstate")) {
+            if (requestParameters.ContainsKey("newestate")) {
                 // blank details for new estate
-                vars.Add ("EstateID", "-1");
-                vars.Add ("EstateName", "");
-                vars.Add ("UserList", WebHelpers.UserSelections (webInterface.Registry, UUID.Zero));
-                vars.Add ("PricePerMeter", "");
-                vars.Add ("PublicAccess", WebHelpers.YesNoSelection (translator, true));
-                vars.Add ("AllowVoice", WebHelpers.YesNoSelection (translator, true));
-                vars.Add ("TaxFree", WebHelpers.YesNoSelection (translator, true));
-                vars.Add ("AllowDirectTeleport", WebHelpers.YesNoSelection (translator, true));
+                vars.Add("EstateID", "-1");
+                vars.Add("EstateName", "");
+                vars.Add("UserList", WebHelpers.UserSelections(webInterface.Registry, UUID.Zero));
+                vars.Add("PricePerMeter", "");
+                vars.Add("PublicAccess", WebHelpers.YesNoSelection(translator, true));
+                vars.Add("AllowVoice", WebHelpers.YesNoSelection(translator, true));
+                vars.Add("TaxFree", WebHelpers.YesNoSelection(translator, true));
+                vars.Add("AllowDirectTeleport", WebHelpers.YesNoSelection(translator, true));
 
-                vars.Add ("Submit", translator.GetTranslatedString ("AddEstateText"));
+                vars.Add("UsersList", WebHelpers.UserSelections(webInterface.Registry, UUID.Zero));
+                vars.Add("Submit", translator.GetTranslatedString("AddEstateText"));
             } else {
-                // get selected estate details
-                var estateSettings = estateConnector.GetEstateIDSettings (estateid);
+                // get selected estate details for edit
+                var estateSettings = estateConnector.GetEstateIDSettings(estateid);
                 if (estateSettings != null) {
-                    vars.Add ("EstateID", estateSettings.EstateID.ToString ());
-                    vars.Add ("EstateName", estateSettings.EstateName);
-                    vars.Add ("UserList", WebHelpers.UserSelections (webInterface.Registry, estateSettings.EstateOwner));
-                    vars.Add ("PricePerMeter", estateSettings.PricePerMeter.ToString ());
-                    vars.Add ("PublicAccess", WebHelpers.YesNoSelection (translator, estateSettings.PublicAccess));
-                    vars.Add ("AllowVoice", WebHelpers.YesNoSelection (translator, estateSettings.AllowVoice));
-                    vars.Add ("TaxFree", WebHelpers.YesNoSelection (translator, estateSettings.TaxFree));
-                    vars.Add ("AllowDirectTeleport", WebHelpers.YesNoSelection (translator, estateSettings.AllowDirectTeleport));
+                    vars.Add("EstateID", estateSettings.EstateID.ToString());
+                    vars.Add("EstateName", estateSettings.EstateName);
+                    vars.Add("UserList", WebHelpers.UserSelections(webInterface.Registry, estateSettings.EstateOwner));
+                    vars.Add("PricePerMeter", estateSettings.PricePerMeter.ToString());
+                    vars.Add("PublicAccess", WebHelpers.YesNoSelection(translator, estateSettings.PublicAccess));
+                    vars.Add("AllowVoice", WebHelpers.YesNoSelection(translator, estateSettings.AllowVoice));
+                    vars.Add("TaxFree", WebHelpers.YesNoSelection(translator, estateSettings.TaxFree));
+                    vars.Add("AllowDirectTeleport", WebHelpers.YesNoSelection(translator, estateSettings.AllowDirectTeleport));
 
-                    vars.Add ("Submit", translator.GetTranslatedString ("SaveUpdates"));
+                    vars.Add("UsersList", WebHelpers.UserSelections(webInterface.Registry, estateSettings.EstateOwner));
+                    vars.Add("Submit", translator.GetTranslatedString("SaveUpdates"));
                 }
             }
-
-
+             
             // labels
-            vars.Add ("EstateManagerText", translator.GetTranslatedString ("MenuEstateManager"));
-            vars.Add ("EstateNameText", translator.GetTranslatedString ("EstateText"));
-            vars.Add ("EstateOwnerText", translator.GetTranslatedString ("MenuOwnerTitle"));
-            vars.Add ("PricePerMeterText", translator.GetTranslatedString ("PricePerMeterText"));
-            vars.Add ("PublicAccessText", translator.GetTranslatedString ("PublicAccessText"));
-            vars.Add ("AllowVoiceText", translator.GetTranslatedString ("AllowVoiceText"));
-            vars.Add ("TaxFreeText", translator.GetTranslatedString ("TaxFreeText"));
-            vars.Add ("AllowDirectTeleportText", translator.GetTranslatedString ("AllowDirectTeleportText"));
-            vars.Add ("Cancel", translator.GetTranslatedString ("Cancel"));
-            vars.Add ("InfoMessage", "");
+            vars.Add("EstateManagerText", translator.GetTranslatedString("MenuEstateManager"));
+            vars.Add("EstateNameText", translator.GetTranslatedString("EstateText"));
+            vars.Add("EstateOwnerText", translator.GetTranslatedString("MenuOwnerTitle"));
+            vars.Add("PricePerMeterText", translator.GetTranslatedString("PricePerMeterText"));
+            vars.Add("PublicAccessText", translator.GetTranslatedString("PublicAccessText"));
+            vars.Add("AllowVoiceText", translator.GetTranslatedString("AllowVoiceText"));
+            vars.Add("TaxFreeText", translator.GetTranslatedString("TaxFreeText"));
+            vars.Add("AllowDirectTeleportText", translator.GetTranslatedString("AllowDirectTeleportText"));
+            vars.Add("Cancel", translator.GetTranslatedString("Cancel"));
+            // vars.Add("InfoMessage", "");
 
             return vars;
 
         }
 
-        public bool AttemptFindPage (string filename, ref OSHttpResponse httpResponse, out string text)
+        public bool AttemptFindPage(string filename, ref OSHttpResponse httpResponse, out string text)
         {
             text = "";
             return false;

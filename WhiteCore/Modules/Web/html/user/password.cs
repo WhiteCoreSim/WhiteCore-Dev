@@ -53,14 +53,13 @@ namespace WhiteCore.Modules.Web
         public Dictionary<string, object> Fill(WebInterface webInterface, string filename, OSHttpRequest httpRequest,
             OSHttpResponse httpResponse, Dictionary<string, object> requestParameters,
             ITranslator translator, out string response) {
- 
+
             response = null;
             var vars = new Dictionary<string, object>();
 
-            string error = "";
             UserAccount user = Authenticator.GetAuthentication(httpRequest);
             if (user == null) {
-                response = webInterface.UserMsg("Unable to authenticate user details", true, 5);
+                response = webInterface.UserMsg("!Unable to authenticate user details", true);
                 return null;
             }
 
@@ -68,13 +67,13 @@ namespace WhiteCore.Modules.Web
             vars.Add("UserName", user.Name);
 
             // password change
-            if (requestParameters.ContainsKey("Submit")) {
+            if (requestParameters.ContainsKey("update")) {
                 string password = requestParameters["password"].ToString();
                 string passwordnew = requestParameters["passwordnew"].ToString();
                 string passwordconf = requestParameters["passwordconf"].ToString();
 
                 if (passwordconf != passwordnew) {
-                    response = webInterface.UserMsg("Passwords do not match", false, 0);
+                    response = webInterface.UserMsg("!Passwords do not match", false);
                 } else {
 
                     ILoginService loginService = webInterface.Registry.RequestModuleInterface<ILoginService>();
@@ -85,28 +84,26 @@ namespace WhiteCore.Modules.Web
                         if (authService != null) {
                             bool success = authService.SetPassword(user.PrincipalID, "UserAccount", passwordnew);
                             if (success) {
-                                response = webInterface.UserMsg("Your password has been updated", true, 3);
+                                response = webInterface.UserMsg("Your password has been updated", true);
                             } else {
-                                response = webInterface.UserMsg("Failed to set your password, try again later", true, 5);
+                                response = webInterface.UserMsg("!Failed to set your password, try again later", true);
                             }
                         } else
-                            response = webInterface.UserMsg("No authentication service was available to change your password", true, 5);
+                            response = webInterface.UserMsg("!No authentication service was available to change your password", true);
                     } else {
-                        response = webInterface.UserMsg("Invalid account details. Password not updated.", true, 5);
+                        response = webInterface.UserMsg("!Invalid account details. Password not updated.", true);
                     }
                 }
                 return null;
             }
 
             // Page variables
-            vars.Add("ErrorMessage", error);
-            vars.Add("ChangeUserInformationText", translator.GetTranslatedString("ChangeUserInformationText"));
             vars.Add("ChangePasswordText", translator.GetTranslatedString("ChangePasswordText"));
             vars.Add("NewPasswordText", translator.GetTranslatedString("NewPasswordText"));
             vars.Add("NewPasswordConfirmationText", translator.GetTranslatedString("NewPasswordConfirmationText"));
             vars.Add("UserNameText", translator.GetTranslatedString("UserNameText"));
             vars.Add("PasswordText", translator.GetTranslatedString("PasswordText"));
-            vars.Add("Submit", translator.GetTranslatedString("Submit"));
+            vars.Add("CancelText", translator.GetTranslatedString("Cancel"));
 
             return vars;
         }

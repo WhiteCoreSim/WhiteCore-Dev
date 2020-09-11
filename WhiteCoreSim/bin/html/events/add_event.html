@@ -1,105 +1,128 @@
 
+<div class="container-fluid">
+<!-- <div class="col98">  -->
+<!--     <div class="col-md-8 offset-md-2"> -->
 
+  <h2>{AddEventText}</h2>
+<!--  <div id="info_message" class="error_message"></div>
+  <div id="error_message" class="error">{ErrorMessage}</div>
+-->
+  <div class="col-12">
+  <form id="add_event_form" action="events/add_event.html" method="post">
+<!--    <div id="add_event" class="col-xs-12 col-sm-10 col-sm-offset-1 text-left">  -->
+<!--   <div class="col-md-8 offset-md-2x"> -->
+        <div class="form-row">
+          <div class="form-group col-2 text-right">{EventNameText}</div>
+          <div class="form-group col">
+            <input class="form-control" id="eventName" name="eventName" size="60" type="text" />
+          </div>
+          <div class="col-2"></div>
+        </div>
 
-<h2>{AddEventText}</h2>
-<div id="info_message" class="error_message"></div>
-<div id="error_message" class="error">{ErrorMessage}</div>
+        <div class="form-row">
+          <div class="form-group col-2 text-right">{EventDateText}</div>
+          <div class="form-group col-3">
+            <div class="input-group" style="width:180px;">
+              <input class="form-control" type="text" name="eventDate" id="eventDate" value="{EventDate}" />
+              <div class="input-group-append">
+                <span class="input-group-text">
+                  <i class="fa fa-calendar fa-lg" id="eventCalendar" style="height:24px;"></i>
+                </span>
+              </div>
+            </div>
+          </div>
 
+          <div class="col-3 pull-right">
+            <div class="form-group row">
+              <label for="eventTime" class="col-form-label mr-2">{EventTimeText}</label>
+              <select class="custom-select form-control" style="width:140px;" id="eventTime" name="eventTime">
+                {EventTimesArrayBegin}
+                  <option value="{Index}" {selected}>{Value}</option>
+                {EventTimesArrayEnd}
+              </select>
+            </div>
+            <small class="form-text text-light">{EventTimeInfoText}</small>
+          </div>
+        </div>
 
-<form id="add_event_form" action="events/add_event.html" method="post">
-<div id="add_event" class="col-xs-12 col-sm-10 col-sm-offset-1 text-left">
-  <div class="rTable">
-    <div class="rTableBody">
-      <div class="rTableRow">
-        <div class="rTableCell">
-          <label>{EventNameText}</label>
+        <div class="form-row">
+          <div class="form-group col-2 text-right">{EventDurationText}</div>
+          <div class="form-group col-3">
+            <div class="input-group" style="width:180px">
+              <select class="custom-select form-control" id="eventDuration" name="eventDuration">
+                {EventDurationsArrayBegin}
+                  <option value="{Index}" {selected}>{Value}</option>
+                {EventDurationsArrayEnd}
+              </select>
+            </div>
+          </div>
+          <div class="form-group col"></div>
         </div>
-        <div class="rTableCell" style="width:80%">
-          <input class="form-control" id="eventName" name="eventName" size="90" type="text" />
+
+        <div class="form-row">
+          <div class="form-group col-2 text-right">{EventLocationText}</div>
+          <div class="form-group col-4">
+            <select class="custom-select form-control" id="eventLocation" name="eventLocation">
+              {EventLocationsArrayBegin}
+                <option {disabled} value="{Index}">{Value}</option>
+              {EventLocationsArrayEnd}
+            </select>
+          </div>
+          <div class="form-group col"></div>
         </div>
-      </div>
-      <div class="rTableRow">
-        <div class="rTableCell"></div>
-        <div class="rTableCell"><label>{EventTimeInfoText}</label></div>
-      </div>
-      <div class="rTableRow">
-        <div class="rTableCell"><label>{EventDateText}</label></div>
-        <div class="rTableCell input-group date" id="eventDate" style="width:22%;">
-          <input class="form-control" id="eventDateVal" name="eventDate" type="text" value="{EventDate}" />
-          <span class="input-group-addon">
-            <i class="glyphicon glyphicon-th"></i>
-          </span>
+
+        <div class="form-row">
+          <div class="form-group col-2 text-right">{EventCategoryText}</div>
+          <div class="form-group col-3">
+            <div class="input-group" style="width:240px;">
+              <select class="custom-select form-control"  id="eventCategory" name="eventCategory">
+                {EventCategoriesArrayBegin}
+                  <option {selected} value="{Index}">{Value}</option>
+                {EventCategoriesArrayEnd}
+              </select>
+            </div>
+          </div>
+
+          <div class="col-4 pull-right">
+            <div class="form-row">
+              <label for="eventCoverCharge" class="col-form-label mr-2">{EventCoverChargeText}</label>
+              <input class="form-control" id="eventCoverCharge" style="width:80px;" name="eventCoverCharge" type="text" value="{EventCoverCharge}" />
+            </div>
+          </div>
         </div>
-        <div class="rTableCell text-right" style="width:140px;"><label>{EventTimeText}</label></div>
-        <div class="rTableCell">
-          <select class="form-control" id="eventTime" name="eventTime">
-          {EventTimesArrayBegin}
-            <option value="{Index}" {selected}>{Value}</option>
-          {EventTimesArrayEnd}
-          </select>
+
+        <div class="form-row">
+          <div class="form-group col-2 text-right">{EventDescriptionText}</div>
+          <div class="form-group col" style="height:auto;">
+            <textarea class="form-control" id="eventDescription" name="eventDescription" cols="70" rows="5"></textarea>
+          </div>
+          <div class="col-2"></div>
         </div>
-      </div>
-      <div class="rTableRow">
-        <div class="rTableCell"><label>{EventDurationText}</label></div>
-        <div class="rTableCell">
-          <select class="form-control" id="eventDuration" name="eventDuration">
-          {EventDurationsArrayBegin}
-            <option value="{Index}" {selected}>{Value}</option>
-          {EventDurationsArrayEnd}
-          </select>
+
+        <div class="form-row">
+          <div class="col-2"></div>
+          <div class="col">
+            <div class="pull-right">
+              <a class="btn btn-sm btn-success mr-3" style="width:100px;" onclick="loadusercontent('events-events');">{Cancel}</a>
+              <a class="btn btn-sm btn-warning" style="width:100px;" 
+                  onclick="submitupdate('add_event_form', 'additem=true');">
+                {Submit}
+              </a>
+            </div>
+          </div>
+          <div class="col-2"></div>
         </div>
-      </div>
-      <div class="rTableRow">
-        <div class="rTableCell"><label>{EventLocationText}</label></div>
-        <div class="rTableCell">
-          <select class="form-control" id="eventLocation" name="eventLocation">
-            {EventLocationsArrayBegin}
-              <option disabled="disabled" value="{Index}">{Value}</option>
-            {EventLocationsArrayEnd}
-          </select>
-        </div>
-      </div>
-      <div class="rTableRow">
-        <div class="rTableCell"><label>{EventCategoryText}</label></div>
-        <div class="rTableCell">
-          <select class="form-control" id="eventCategory" name="eventCategory">
-            {EventCategoriesArrayBegin}
-              <option selected="selected" value="{Index}">{Value}</option>
-            {EventCategoriesArrayEnd}
-          </select>
-        </div>
-        <div class="rTableCell text-right"><label>{EventCoverChargeText}</label></div>
-        <div class="rTableCell">
-          <input class="form-control" id="eventCoverCharge" style="width: 80px;" name="eventCoverCharge" type="text" value="{EventCoverCharge}" />
-        </div>
-      </div>
-      <div class="rTableRow">
-        <div class="rTableCell"><label>{EventDescriptionText}</label></div>
-        <div class="rTableCell" style="height:auto;width:80%"">
-          <textarea class="form-control" id="eventDescription" cols="90" name="eventDescription" rows="10"></textarea>
-        </div>
-      </div>
-      <div class="rTableRow">
-        <div class="col-xs-3 col-xs-offset-9" style="margin-top:15px;margin-bottom:15px;">
-          <button class="btn btn-success" id="Submit" name="Submit" type="Submit">{Submit}</button>
-        </div>
-      </div>
-    </div>
-  </div>
+
+  </form>
 </div>
-</form>
+</div>
 
 <script>
-  //$(function() {
-  //  $('#eventDate').datepicker({
-  //    showTrigger: '<button type="button" class="trigger">...</button>'});
-  //});
-
-  <!--  /* date pickers */ -->
+  /* date picker */
   $(function() {
-    $( "#eventDate" ).datepicker({
+    $("#eventDate").datepicker({
       orientation: "bottom left",
-      //defaultDate: "-1w",
+      defaultDate: "+1d",
       changeMonth: true,
       numberOfMonths: 3,
       onClose: function( selectedDate ) {
@@ -108,20 +131,9 @@
     });
   });
 
-  /* attach a submit handler to the form */
-  $("#add_event_form").submit(function(event) {
-
-    /* stop form from submitting normally */
-    event.preventDefault();
-    /* get some values from elements on the page: */
-    var $form = $( this ),
-        url = $form.attr( 'action' );
-    /* Send the data using post and put the results in a div */
-    $.post( url, $form.serialize(),
-      function( data ) {
-    $("#info_message").empty().append(data);
-      }
-    );
+  $('#eventCalendar').on('click',function(){
+    $('#eventDate').datepicker("show");
   });
+
 </script>
 

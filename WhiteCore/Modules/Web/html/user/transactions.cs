@@ -71,7 +71,7 @@ namespace WhiteCore.Modules.Web
             string noDetails = translator.GetTranslatedString ("NoTransactionsText");
 
             // Check if we're looking at the standard page or the submitted one
-            if (requestParameters.ContainsKey ("Submit")) {
+            if (requestParameters.ContainsKey ("search")) {
                 if (requestParameters.ContainsKey ("date_start"))
                     DateStart = requestParameters ["date_start"].ToString ();
                 if (requestParameters.ContainsKey ("date_end"))
@@ -80,11 +80,7 @@ namespace WhiteCore.Modules.Web
 
             UserAccount user = Authenticator.GetAuthentication (httpRequest);
             if (user == null) {
-                response = "<h3>Error validating user details</h3>" +
-                    "<script language=\"javascript\">" +
-                    "setTimeout(function() {window.location.href = \"/?page=user_transactions\";}, 1000);" +
-                    "</script>";
-
+                response = webInterface.UserMsg("!Error validating user", true);
                 return null;
             }
 

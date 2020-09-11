@@ -1,73 +1,71 @@
+<!-- Statistics -->
 
+<div class="container-fluid">
+  <h2>{SystemName}: {StatisticsText}</h2>
+  <form class="form-inline" id="statistics_form" action="admin/statistics.html" method="post">
+    <div class="row w-100 mb-3">
+      <div class="col"></div>
+      <div class="col-4 pull-right">
+        <button id="add_news" onClick="loadusercontent('admin-statistics','resetstats=true');">{ClearStatsText}</button>
+      </div>
+    </div>
 
-<h2>{SystemName}: {StatisticsText}</h2>
-<form id="statistics_form" action="admin/statistics.html" method="post">
-<div id="error_message" class="error"><h3></h3></div>
-<table id="statistics">
-  <tbody>
-    <tr>
-    <td colspan = "5"></td>
-	  <input hidden type="hidden" label="Submit" id="Submit" name="Submit" value="Submit" />
-      <td class="settings_manager_right"><button id="Submit" type="Submit" name="Submit" style="width:160px;">{ClearStatsText}</button></td>
-    </tr>
-    <tr>
-  	  <td colspan="2"><h3>{ViewersText}</h3></td>
-  	</tr>
-	{ViewersListArrayBegin}
-    <tr>
-      <td class="statistics_left"><p>{ViewerName}</p></td>
-      <td class="statistics_left"><p>{ViewerCount}</p></td>
-    </tr>
-	{ViewersListArrayEnd}
+    <div class="row w-100 mb-2">
+      <div class="col-3">
+        <h3>{ViewersText}</h3>
+      </div>
+      <div class="col"></div>
+    </div>
 
-    <tr>
-  	  <td colspan="2"><h3>{GPUText}</h3></td>
-  	</tr>
-	{GPUListArrayBegin}
-    <tr>
-      <td class="statistics_left"><p>{GPUType}</p></td>
-      <td class="statistics_left"><p>{GPUCount}</p></td>
-    </tr>
-	{GPUListArrayEnd}
+    {ViewersListArrayBegin}
+      <div class="col-1 d-inline"></div>
+      <div class="col-5 text-right d-inline">{ViewerName}</div>
+      <div class="col-6 text-center d-inline">{ViewerCount}</div>
+    {ViewersListArrayEnd}
 
-    <tr>
-  	  <td colspan="2"><h3>{PerformanceText}</h3></td>
-  	</tr>
-    <tr>
-      <td class="statistics_right"><p>{FPSText}:</p></td>
-      <td class="statistics_left"><p>{FPS}</p></td>
-      <td class="statistics_right"><p>{RegionsVisitedText}:</p></td>
-      <td class="statistics_left"><p>{RegionsVisited}</p></td>
-      <td class="statistics_right"><p>{AgentsInViewText}:</p></td>
-      <td class="statistics_left"><p>{AgentsInView}</p></td>
-    </tr>
-    <tr>
-      <td class="statistics_right"><p>{RunTimeText}:</p></td>
-      <td class="statistics_left"><p>{RunTime}</p></td>
-      <td class="statistics_right"><p>{MemoryUseageText}:</p></td>
-      <td class="statistics_left"><p>{MemoryUseage}&nbsp;Mb</p></td>
-      <td class="statistics_right"><p>{PingTimeText}:</p></td>
-      <td class="statistics_left"><p>{PingTime}&nbsp;ms</p></td>
-    </tr>
+    <div class="div20"></div>
 
-  </tbody>
-</table>
-</form>
+    <div class="row w-100 mb-2">
+      <div class="col-3">
+        <h3>{GPUText}</h3>
+      </div>
+      <div class="col"></div>
+    </div>
 
-<script>
-  /* attach a submit handler to the form */
-  $("#statistics_form").submit(function(event) {
+    {GPUListArrayBegin}
+      <div class="col-1 d-inline"></div>
+      <div class="col-5 text-right d-inline">{GPUType}</div>
+      <div class="col-6 text-center d-inline">{GPUCount}</div>
+    {GPUListArrayEnd}
 
-    /* stop form from submitting normally */
-    event.preventDefault();
-    /* get some values from elements on the page: */
-    var $form = $( this ),
-        url = $form.attr( 'action' );
-    /* Send the data using post and put the results in a div */
-    $.post( url, $form.serialize(),
-      function( data ) {
-		$("#error_message").empty().append("<h3>" + data + "</h3>");
-      }
-    );
-  });
-</script>
+    <div class="div20"></div>
+    
+    <div class="row w-100">
+      <div class="col-5">
+        <h3>{PerformanceText}</h3>
+        <div class="col"></div>
+      </div>
+    </div>
+
+    <div class="col-3 d-inline text-right">{FPSText}</div>
+    <div class="col-1 d-inline text-left">{FPS}</div>
+
+    <div class="col-3 d-inline text-right">{RegionsVisitedText}</div>
+    <div class="col-1 d-inline text-center">{RegionsVisited}</div>
+
+    <div class="col-3 d-inline text-right">{AgentsInViewText}</div>
+    <div class="col-1 d-inline text-center">{AgentsInView}</div>
+
+    <div class="div20"></div>
+
+    <div class="col-3 d-inline text-right">{RunTimeText}</div>
+    <div class="col-1 d-inline text-left">{RunTime}</div>
+
+    <div class="col-3 d-inline text-right">{MemoryUseageText}</div>
+    <div class="col-1 d-inline text-center">{MemoryUseage}&nbsp;Mb</div>
+
+    <div class="col-3 d-inline text-right">{PingTimeText}</div>
+    <div class="col-1 d-inline text-center">{PingTime}&nbsp;ms</div>
+
+  </form>
+</div>

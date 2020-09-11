@@ -1,0 +1,79 @@
+<!-- Modal user regions data-->
+
+
+  <div class="modal-header">
+    <h2 class="modal-title">{UserName} {RegionListText}</h2>
+    {IsAuthenticatedBegin}
+      <div class="col">
+        <div class="btn-group pull-right">
+          <button class="btn btn-sm btn-default" onclick="loadmodalcontent('webprofile-modal_profile', 'userid={UserID}');">
+            {MenuProfileTitle}
+          </button>
+
+          <button class="btn btn-sm btn-default" onclick="loadmodalcontent('webprofile-modal_groups', 'userid={UserID}');">
+            {MenuGroupTitle}
+          </button>
+
+          <button class="btn btn-sm btn-default" onclick="loadmodalcontent('webprofile-modal_picks', 'userid={UserID}');">
+            {MenuPicksTitle}
+          </button>
+
+        </div>
+      </div>
+    {IsAuthenticatedEnd}
+
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+      <span aria-hidden="true">
+        <i class="fa fa-window-close fa-2x"></i>
+      </span>
+    </button>
+  </div>
+
+  <div class="modal-body">
+    <div class="row">
+      <div class="col-12">
+        <div id="regioncarousel" class="carousel slide" data-ride="carousel" style="height: 280px;">
+          <div class="carousel-inner col-9">
+            {RegionListArrayBegin}
+              <div class="carousel-item" data-interval="">
+                <a href="#" onclick="loadmodalcontent('regionprofile-modal_profile', 'regionid={RegionID}');">
+                  <img class="d-block rounded float-right"
+                    height="256"
+                    src="{RegionImageURL}"
+                    alt="{RegionName}: {RegionLocX}, {RegionLocY}"
+                    title="{RegionName}: {RegionLocX}, {RegionLocY}" />
+
+                  <div class="carousel-caption d-none d-md-block" style="right:50%;">
+                    <label>{RegionName}</label>
+                    <br/>
+                    {RegionInfo}
+                    <br/>
+                    {RegionStatus}
+                  </div>
+                </a>
+              </div>
+            {RegionListArrayEnd}
+          </div>
+
+          <a class="carousel-control-prev" href="#regioncarousel" role="button" data-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="sr-only">Previous</span>
+          </a>
+          <a class="carousel-control-next" href="#regioncarousel" role="button" data-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="sr-only">Next</span>
+          </a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+<script>
+  $(function($) {
+    $('.carousel').carousel({
+      interval: 5000
+    });
+    $('.carousel-item').first().addClass('active');
+  });
+</script>

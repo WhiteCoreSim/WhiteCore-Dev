@@ -40,6 +40,7 @@ namespace WhiteCore.Modules.Web
 {
     public class RegionOwnerPage : IWebInterfacePage
     {
+        // NOTE:  This is probably no longer required as the user_profile modal replaces it
         public string[] FilePath
         {
             get

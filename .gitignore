@@ -104,5 +104,6 @@ WhiteCoreDocs/
 
 # Visual Studio files
 .vs/*
+Icon.
 WhiteCoreSim/bin/html/WhiteCoreWebUI.sublime-project
 WhiteCoreSim/bin/html/WhiteCoreWebUI.sublime-workspace

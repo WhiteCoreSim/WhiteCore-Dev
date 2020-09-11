@@ -77,7 +77,7 @@ namespace WhiteCore.Modules.Web
             var ma_checked = "";
             var ao_checked = "";
 
-            if (requestParameters.ContainsKey ("Submit")) {
+            if (requestParameters.ContainsKey ("search")) {
                 int level = 0;
                 pg_checked = "";
                 ma_checked = "";
@@ -124,6 +124,10 @@ namespace WhiteCore.Modules.Web
                 events = directoryService.GetAllEvents (timeframe, category, eventLevel);
 
                 if (events.Count == 0) {
+                    vars.Add("HaveData", false);
+                    vars.Add("NoData", true);
+
+                    // blank entry for main
                     eventListVars.Add (new Dictionary<string, object> {
                         { "EventID", "" },
                         { "CreatorUUID", "" },
@@ -148,6 +152,9 @@ namespace WhiteCore.Modules.Web
                         { "CategoryImage",WebHelpers.EventCategoryImage(0) }
                 });
                 } else {
+                    vars.Add("HaveData", true);
+                    vars.Add("NoData", false);
+
                     foreach (var evnt in events) {
                         var evntDateTime = Util.ToDateTime (evnt.dateUTC).ToLocalTime ();
                         eventListVars.Add (new Dictionary<string, object> {

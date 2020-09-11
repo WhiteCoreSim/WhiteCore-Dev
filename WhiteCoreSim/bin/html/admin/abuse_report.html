@@ -1,237 +1,132 @@
-<!-- Abuse report -->
+<!-- Abuse manager -->
 
 
-<div id="fullPage">
-  <div id="ContentHeaderCenter">
-    <h2>{SystemName}: {AbuseReportText}</h2>
-  </div>
+<div class="col98" id="abuseReport">
+  <h2 class="text-center">{SystemName}: {AbuseReportText}</h2>
 
   {IsAdminAuthenticatedBegin}
   <div id="info_message" class="error_message">{InfoMessage}</div>
 
-  <form id="abuse_report_form" action="admin/abuse_report.html" method="post">
-    <div style="display: inline-block;">
-      <table id="abuse_report">
-        <caption></caption>
+  <form class="form-inline" id="abuse_report_form" action="admin/abuse_report.html" method="post">
 
-        <thead>
-          <tr>
-            <th class="region_info_left"></th>
-            <th class="region_info_right" ></th>
-            <th class="region_info_right" ></th>
-          </tr>
-        </thead>
+    <div class="row w-100">
+      <div class="col-md-3 text-center">
+        <div class="region_info_picture" style="heightx:256px;cursor:pointer;">
+          <a class="regionslurl" onclick="document.location.href='{HopUrl}'" alt="{RegionName}" title="{RegionName}">
+            <img height="256" src="{ScreenshotURL}" alt="{RegionNameText}: {RegionName}" title="{RegionName}" />  
+            <div class="text-left">
+              {RegionNameText}: {RegionName}
+              <br /> {ObjectNameText}: {ObjectName}
+              <!-- <br /> {HopUrl}  -->
+            </div>
+          </a>
+        </div>
 
-        <tfoot>
-          <tr>
-            <th class="region_info_left"></th>
-            <th class="region_info_right" ></th>
-            <th class="region_info_right" ></th>
-          </tr>
-        </tfoot>
+      </div>
 
-        <tbody>
-          <tr>
-            <td class="region_info_picture" rowspan="10" style="padding-right:25px;">
-              <div class="region_info_picture" style="height:256px;">
-                <a class="regionslurl" onclick="document.location.href='hop://{MainServerURL}/{RegionName}/128/128/50'" alt="{RegionNameText}: {RegionName}" title="{RegionNameText}: {RegionName}<br />hop://{MainServerURL}/{RegionName}/128/128/50">
-                  <img height="256" src="{ScreenshotURL}" alt="{RegionNameText}: {RegionName}" title="{RegionNameText}: {RegionName}" />
-                </a>
-                <p class="region_info_picture_text">{RegionNameText}: {RegionName}
-                  <br /> {ObjectNameText}: {ObjectName}
-                  <br />{ObjectPosition}
-                  <br /> hop://{MainServerURL}/{RegionName}/128/128/50
-                </p>
-              </div>
-            </td>
-          </tr>
+      <div class="col-md-9 text-left">
+        <div class="row mb-1">
+          <div class="col-3 text-right">{CategoryText}</div>
+          <div class="col-9">{Category}</div>
+        </div>
 
-          <tr>
-            <td class="region_info_left">
-              <p>{CategoryText}:</p>
-            </td>
-            <td class="region_info_right" colspan="2">
-              <p>{Category}</p>
-            </td>
-          </tr>
-          <tr>
-            <td class="region_info_left">
-              <p>{SummaryText}:</p>
-            </td>
-            <td class="region_info_right">
-              <p>{Summary}</p>
-            </td>
-          </tr>
-          <tr>
-            <td class="region_info_left">
-              <p>{AbuserNameText}:</p>
-            </td>
-            <td class="region_info_right">
-              <p>{AbuserName}</p>
-            </td>
-          </tr>
-          <tr>
-            <td class="region_info_left">
-              <p>{AbuseReporterNameText}:</p>
-            </td>
-            <td class="region_info_right">
-              <p>{ReporterName}</p>
-            </td>
-          </tr>
-          <tr>
-            <td class="region_info_left">
-              <p>{RegionNameText}:</p>
-            </td>
-            <td class="region_info_right">
-              <p>{RegionName}</p>
-            </td>
-          </tr>
-          <tr>
-            <td class="region_info_left">
-              <p>{ObjectNameText}:</p>
-            </td>
-            <td class="region_info_right">
-              <p>{ObjectName}</p>
-            </td>
-          </tr>
-          <tr>
-            <td class="region_info_left">
-              <p>{LocationText}:</p>
-            </td>
-            <td class="region_info_right">
-              <p>{ObjectPosition}</p>
-            </td>
-          </tr>
-          <tr>
-            <td class="region_info_left">
-              <p>{UUIDText}:</p>
-            </td>
-            <td class="region_info_right">
-              <p>{ObjectUUID}</p>
-            </td>
-          </tr>
-          <tr>
-            <td class="region_info_left">
-              <p>{DetailsText}:</p>
-            </td>
-            <td class="region_info_right">
-              <p>{Details}</p>
-            </td>
-          </tr>
-          <tr />
-          <tr>
-            <td class="region_info_left">
-              <p>{NotesText}:</p>
-            </td>
-            <td class="region_info_right" colspan="2">
-              <textarea name="AbuseNoteText" cols="80" rows="5" id="AbuseNoteText" value="{Notes}">{Notes}</textarea>
-            </td>
-          </tr>
-          <tr>
-            <td class="region_info_left">
-              <p>{ActiveText}:</p>
-            </td>
-            <td class="region_info_right">
+        <div class="row mb-1">
+          <div class="col-3 text-right">{SummaryText}</div>
+          <div class="col-9">{Summary}</div>
+        </div>
 
-              <select id="Active" require="true" name='Active'>
-              {IfIsActiveBegin}
-        <option value="Yes" selected="Yes">{Yes}</option>
-        <option value="No">{No}</option>
-              {IfIsActiveEnd}
-              {IfIsNotActiveBegin}
-        <option value="Yes">{Yes}</option>
-        <option value="No" selected="Yes">{No}</option>
-        {IfIsNotActiveEnd}
-        </select>
+        <div class="row mb-1">
+          <div class="col-3 text-right">{AbuserNameText}</div>
+          <div class="col-9">{AbuserName}</div>
+        </div>
 
-            </td>
-          </tr>
-          <tr>
-            <td class="region_info_left">
-              <p>{CheckedText}:</p>
-            </td>
-            <td class="region_info_right">
-              <select id="Checked" require="true" name='Checked'>
-                {IfIsCheckedBegin}
-          <option value="Yes" selected="Yes">{Yes}</option>
-          <option value="No">{No}</option>
-        {IfIsCheckedEnd}
-                {IfIsNotCheckedBegin}
-          <option value="Yes">{Yes}</option>
-          <option value="No" selected="Yes">{No}</option>
-        {IfIsNotCheckedEnd}
-          </select>
-            </td>
-          </tr>
-          <tr>
-            <td class="region_info_left">
-              <p>{AssignedToText}:</p>
-        </td>
-            <td class="region_info_right">
-                <select id="AssignedTo" require="true" name='AssignedTo' value="{AssignedTo}">
-        {AdminUsersListArrayBegin}
-            <option value="{Value}">{Value}</option>
-        {AdminUsersListArrayEnd}
-        </select>
-            </td>
-          </tr>
-          <tr>
-            <td class="region_info_left"></td>
-            <td class="region_info_left"></td>
-            <td class="region_info_left"></td>
-            <td class="region_info_right" >
-              <input type="hidden" label="cardid" id="cardid" name="cardid" value="{CardNumber}"/>
-          <input type="hidden" label="Submit" id="SubmitUpdates" name="SubmitUpdates" value="SubmitUpdates" />
-              <button id="SubmitUpdates" name="SubmitUpdates" type="Submit">{Submit}</button>
-            </td>
-          </tr>
+        <div class="row mb-1">
+          <div class="col-3 text-right">{AbuseReporterNameText}</div>
+          <div class="col-9">{ReporterName}</div>
+        </div>
 
-        </tbody>
-      </table>
+        <div class="row mb-1">
+          <div class="col-3 text-right">{RegionNameText}</div>
+          <div class="col-9">{RegionName}</div>
+        </div>
+
+        <div class="row mb-1">
+          <div class="col-3 text-right">{ObjectNameText}</div>
+          <div class="col-9">{ObjectName}</div>
+        </div>
+
+        <div class="row mb-1">
+          <div class="col-3 text-right">{LocationText}</div>
+          <div class="col-9">{ObjectPosition}</div>
+        </div>
+
+        <div class="row mb-1">
+          <div class="col-3 text-right">{UUIDText}</div>
+          <div class="col-9">{ObjectUUID}</div>
+        </div>
+
+        <div class="row mb-1">
+          <div class="col-3 text-right">{DetailsText}</div>
+          <div class="col-9">{Details}</div>
+        </div>
+
+        <div class="row mb-1">
+          <div class="col-3 text-right">{NotesText}</div>
+          <div class="col-9"  style="height:auto;">
+            <textarea name="AbuseNoteText" style="min-height:140px;" cols="80" rows="5" id="AbuseNoteText" value="{Notes}">{Notes}</textarea>
+          </div>
+        </div>
+        
+        <div class="form-group mb-1">
+          <div class="col-3 text-right mr-2">{ActiveText}</div>
+          <div class="input-group" style="width:100px">
+            <select class="custom-select form-control" id="Active" name="Active">
+              {IsActiveArrayBegin}
+                <option value="{Index}" {selected}>{Value}</option>
+              {IsActiveArrayEnd}
+
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group mb-1">
+          <div class="col-3 text-right mr-2">{CheckedText}</div>
+          <div class="input-group" style="width:100px">
+            <select class="custom-select form-control" id="Checked" name="Checked">
+              {IsCheckedArrayBegin}
+                <option value="{Index}" {selected}>{Value}</option>
+              {IsCheckedArrayEnd}
+
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group mb-1">
+          <div class="col-3 text-right mr-2">{AssignedToText}</div>
+          <div class="input-group" style="width:200px">
+            <select class="custom-select form-control" id="AssignedTo" name="AssignedTo" value="{AssignedTo}">
+              {AdminUsersListArrayBegin}
+                <option value="{Value}" {selected}>{Value}</option>
+              {AdminUsersListArrayEnd}
+            </select>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="row w-100 mt-3">
+        <div class="col"></div>
+        <div class="col-6 pull-right">
+          <button onclick="loadusercontent('admin-abuse_list');">{Cancel}</button>
+          <button class="btn-info pull-right" style="width:200px;" onclick="submitupdate('abuse_report_form', 'cardid={CardNumber}&update=true','admin-abuse_list');">
+            {Submit}
+          </button>
+        </div>
+      </div>
+
     </div>
   </form>
   {IsAdminAuthenticatedEnd}
 
-<script type="text/javascript" rel="javasript">
-  jQuery(document).ready(function($) {
-    $('div.region_info_picture').each(function(i) {
-      var img_ = $('img', this);
-      var img_height = img_.attr('height');
-      var p_height = $('p', this).outerHeight();
-      $(this).height(img_height);
-      $(this).hover(function() {
-        img_.animate({
-          marginTop: -p_height - 5
-        }, 500);
-      }, function() {
-        img_.animate({
-          marginTop: '0'
-        }, 500);
-      });
-    });
-  });
-
-  /* attach a submit handler to the form */
-  $("#abuse_report_form").submit(function(event) {
-
-    /* stop form from submitting normally */
-    event.preventDefault();
-    /* get some values from elements on the page: */
-    var $form = $(this),
-      url = $form.attr('action');
-    /* Send the data using post and put the results in a div */
-    $.post(url, $form.serialize(),
-      function(data) {
-        $("#fullPage").empty().append(data);
-      }
-    );
-  });
-
-  $(function() { //SET DEFAULT AssignedTo
-    var usr = "{AssignedTo}";
-  $('#AssignedTo').val(usr);
-});
-</script>
-
-
 </div>
+

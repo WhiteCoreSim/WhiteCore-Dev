@@ -1,169 +1,104 @@
-<!-- Region edit/create -->
+<!-- Admin Estate edit/create -->
 
-{IsAdminAuthenticatedBegin}
 <h2>{SystemName}: {EstateManagerText}</h2>
-<div id="info_message" class="info">{InfoMessage}</div>
+{IsAdminAuthenticatedBegin}
 
-<form id="estate_form" action="admin/estate_edit.html" method="post">
-<div style ="display: inline-block;">
+  <form class="form-inline" id="estate_edit_form" action="user/estate_edit.html" method="post">
+    <div class="row w-100">
+      <div class="col-md-8 offset-md-2">
 
-<div class="rTable">
-  <div class="rTableBody">
-    <div class="rTableRow">
-      <div class="rTableCell">
-        <p id="regname_label">{EstateNameText}*</p>
+        <div class="form-group">
+          <label for="EstateName" class="col-4 col-form-label text-right mr-2">{EstateNameText}</label>
+          <input class="form-control" style="width:300px;"minlength="3" id="EstateName" require="true" name="EstateName" type="text" size="25" maxlength="30" value="{EstateName}">
+        </div>
+
+        <div class="form-group mb-1">
+          <label for="EstateOwner" class="col-4 col-form-label text-right mr-2">{EstateOwnerText}</label>
+          <div class="input-group" style="width:200px;">
+            <select class="custom-select form-control" id="EstateOwner" name="EstateOwner">
+              {UsersListArrayBegin}
+                <option value="{Index}" {selected}>{Value}</option>
+              {UsersListArrayEnd}
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="PricePerMeter" class="col-4 col-form-label text-right mr-2">{PricePerMeterText}</label>
+          <input class="form-control" style="width:100px;"minlength="3" id="PricePerMeter" require="true" name="PricePerMeter" type="text" size="25" maxlength="30" value="{PricePerMeter}">
+        </div>
+
+        <div class="form-group mb-1">
+          <label for="PublicAccess" class="col-4 col-form-label text-right mr-2">{PublicAccessText}</label>
+          <div class="input-group" style="width:100px">
+            <select class="custom-select form-control" id="PublicAccess" name="PublicAccess">
+              {PublicAccessArrayBegin}
+                <option value="{Index}" {selected}>{Value}</option>
+              {PublicAccessArrayEnd}
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group mb-1">
+          <label for="AllowVoice" class="col-4 col-form-label text-right mr-2">{AllowVoiceText}</label>
+          <div class="input-group" style="width:100px">
+            <select class="custom-select form-control" id="AllowVoice" name="AllowVoice">
+              {AllowVoiceArrayBegin}
+                <option value="{Index}" {selected}>{Value}</option>
+              {AllowVoiceArrayEnd}
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group mb-1">
+          <label for="TaxFree" class="col-4 col-form-label text-right mr-2">{TaxFreeText}</label>
+          <div class="input-group" style="width:100px">
+            <select class="custom-select form-control" id="TaxFree" name="TaxFree">
+              {TaxFreeArrayBegin}
+                <option value="{Index}" {selected}>{Value}</option>
+              {TaxFreeArrayEnd}
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group mb-1">
+          <label for="PublicAccess" class="col-4 col-form-label text-right mr-2">{PublicAccessText}</label>
+          <div class="input-group" style="width:100px">
+            <select class="custom-select form-control" id="PublicAccess" name="PublicAccess">
+              {PublicAccessArrayBegin}
+                <option value="{Index}" {selected}>{Value}</option>
+              {PublicAccessArrayEnd}
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group mb-1">
+          <label for="AllowDirectTeleport" class="col-4 col-form-label text-right mr-2">{AllowDirectTeleportText}</label>
+          <div class="input-group" style="width:100px">
+            <select class="custom-select form-control" id="AllowDirectTeleport" name="AllowDirectTeleport">
+              {AllowDirectTeleportArrayBegin}
+                <option value="{Index}" {selected}>{Value}</option>
+              {AllowDirectTeleportArrayEnd}
+            </select>
+          </div>
+        </div>
       </div>
-      <div class="rTableCell"><input id="EstateName" maxlength="30" name="EstateName" size="25" type="text" value="{EstateName}" /></div>
-      <div class="rTableCell">
-        <p>{EstateOwnerText}:</p>
+
+        <div class="row w-100 mt-3">
+          <div class="col"></div>
+          <div class="col-6 pull-right">
+            <button onclick="loadusercontent('admin-estate_manager');">{Cancel}</button>
+            <button class="btn-info pull-right" style="width:200px;" 
+                     onclick="submitupdate('estate_edit_form','estateid={EstateID}&update=true','admin-estate_manager');">
+              {Submit}
+            </button>
+          </div>
+          <div class="col-1"></div>
       </div>
-      <div class="rTableCell"><select id="EstateOwner" style="width: 180px;" name="EstateOwner">{UserListArrayBegin}
-        <option selected="selected" value="{Index}">{Value}</option>
-      {UserListArrayEnd}</select></div>
     </div>
-    <div class="rTableRow">
-      <div class="rTableCell">
-        <p id="gridcentery_label">{PricePerMeterText}</p>
-      </div>
-      <div class="rTableCell"><input id="PricePerMeter" style="width: 80px;" name="PricePerMeter" size="8" type="text" value="{PricePerMeter}" /></div>
-    </div>
-    <div class="rTableRow">
-      <div class="rTableCell">
-        <p id="gridcentery_label">{PublicAccessText}</p>
-      </div>
-      <div class="rTableCell"><select id="PublicAccess" name="PublicAccess">
-        {PublicAccessArrayBegin}
-          <option value="{Index}">{Value}</option>
-        {PublicAccessArrayEnd}</select></div>
-      <div class="rTableCell">
-        <p id="gridcentery_label">{AllowVoiceText}</p>
-      </div>
-      <div class="rTableCell"><select id="AllowVoice" name="AllowVoice">
-        {AllowVoiceArrayBegin}
-          <option value="{Index}">{Value}</option>
-        {AllowVoiceArrayEnd}</select></div>
-    </div>
-    <div class="rTableRow">
-      <div class="rTableCell">
-        <p id="gridcentery_label">{TaxFreeText}</p>
-      </div>
-      <div class="rTableCell"><select id="TaxFree" name="TaxFree">
-        {TaxFreeArrayBegin}
-          <option value="{Index}">{Value}</option>
-        {TaxFreeArrayEnd}</select></div>
-      <div class="rTableCell">
-        <p id="gridcentery_label">{AllowDirectTeleportText}</p>
-      </div>
-      <div class="rTableCell"><select id="AllowDirectTeleport" name="AllowDirectTeleport">{AllowDirectTeleportArrayBegin}
-        <option value="{Index}">{Value}</option>
-      {AllowDirectTeleportArrayEnd}</select></div>
-    </div>
-    <div class="rTableRow">
-      <div class="rTableCell"> </div>
-      <div class="rTableCell"> </div>
-      <div class="rTableCell"><input name="action" type="hidden" value="check" /> <button id="Submit" style="color: #888;" disabled="disabled" name="Submit" type="Submit">{Submit}</button></div>
-      <div class="rTableCell"> </div>
-      <div class="rTableCell"><button id="Cancel" name="Cancel" type="Cancel">{Cancel}</button></div>
-    </div>
-  </div>
-</div>
+  </form>
 
-  <!--
-<table>
-  <tbody>
-    <tr>
-      <td class="region_info_left" style="width:120px;"><p id="regname_label">{EstateNameText}*</p></td>
-
-      <td class="region_info_right" colspan="4"><input minlength="3" id="EstateName" require="true" label="EstateName" name="EstateName" type="text" size="25" maxlength="30" value="{EstateName}"></td>
-    <td class="region_info_left"><p>{EstateOwnerText}:</p></td>
-    <td class="region_info_right">
-      <select id="EstateOwner" require="true" name="EstateOwner" style="width:180px;">
-{UserListArrayBegin}
-      <option value="{Index}" {selected}>{Value}</option>
-{UserListArrayEnd}
-    </select>
-    </td>
-    </tr>
-    <tr>
-    <td class="region_info_left"><p id="gridcentery_label">{PricePerMeterText}</p></td>
-    <td class="region_info_left">
-        <input style="width:80px;"id="PricePerMeter" require="true" label="PricePerMeter" name="PricePerMeter" type="text" size="8" value="{PricePerMeter}" />
-    </td>
-  <tr>
-    <td class="region_info_left"><p id="gridcentery_label">{PublicAccessText}</p></td>
-    <td class="region_info_left">
-      <select name="PublicAccess" id="PublicAccess">
-{PublicAccessArrayBegin}
-      <option value="{Index}">{Value}</option>
-{PublicAccessArrayEnd}
-      </select>
-    </td>
-   <td class="region_info_left"><p id="gridcentery_label">{AllowVoiceText}</p></td>
-     <td class="region_info_left">
-      <select name="AllowVoice" id="AllowVoice">
-{AllowVoiceArrayBegin}
-      <option value="{Index}">{Value}</option>
-{AllowVoiceArrayEnd}
-      </select>
-    </td>
-  </tr>
-  <tr>
-   <td class="region_info_left"><p id="gridcentery_label">{TaxFreeText}</p></td>
-     <td class="region_info_left">
-      <select name="TaxFree" id="TaxFree">
-{TaxFreeArrayBegin}
-      <option value="{Index}">{Value}</option>
-{TaxFreeArrayEnd}
-      </select>
-    </td>
-     <td class="region_info_left"><p id="gridcentery_label">{AllowDirectTeleportText}</p></td>
-   <td class="region_info_left">
-      <select name="AllowDirectTeleport" id="AllowDirectTeleport">
-{AllowDirectTeleportArrayBegin}
-      <option value="{Index}">{Value}</option>
-{AllowDirectTeleportArrayEnd}
-      </select>
-    </td>
-
-  </tr>
-
-
-    <tr>
-    <td colspan="4"></td>
-    <td class="region_info_left"></td>
-    <input hidden type="hidden" id="EstateID" name="EstateID" value="{EstateID}" />
-    <input hidden type="hidden" label="Submit" id="Submit" name="Submit" value="Submit" />
-    <td class="region_info_right" >
-      <input type="hidden" name="action" value="check">
-        <button disabled style="color:#888;"id="Submit" name="Submit" type="Submit">{Submit}</button>
-      </input>
-    </td>
-    <td></td>
-    <td class="region_info_left" >
-      <button id="Cancel" name="Cancel" type="Cancel" onclick="document.location = '/?page=estate_manager';">{Cancel}</button>
-      </td>
-    </tr>
-  </tbody>
-</table>
--->
-</div>
-</form>
-
-<script>
-  /* attach a submit handler to the form */
-  $("#estate_form").submit(function(event) {
-
-    /* stop form from submitting normally */
-    event.preventDefault();
-    /* get some values from elements on the page: */
-    var $form = $( this ),
-        url = $form.attr( 'action' );
-    /* Send the data using post and put the results in a div */
-    $.post( url, $form.serialize(),
-      function( data ) {
-    $("#info_message").empty().append(data);
-      }
-    );
-  });
-</script>
 {IsAdminAuthenticatedEnd}
+
+</div>
+

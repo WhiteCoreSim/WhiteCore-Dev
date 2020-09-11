@@ -1,42 +1,70 @@
-<!-- Admin region manager -->
+<!-- User region manager -->
+<style>
+  .page-link {background-color: transparent !important;}
+</style>
 
-<h2>{UserName}: {RegionsText}</h2>
-{IsAuthenticatedBegin}
-<table id="regionlist" class="display" cellspacing="0" width="100%">
-  <thead class="listhead">
-    <tr>
-      <th class="region_list_left" style="width:200px"><p>{RegionText}</p></th>
-      <th class="region_list_left" style="width:100px"><p>{RegionLocXText}</p></th>
-      <th class="region_list_left" style="width:100px"><p>{RegionLocYText}</p></th>
-      <th class="region_list_left" ></th>
-      <th class="region_list_left" style="width:50px"><p>{RegionOnlineText}</p></th>
-      <th class="region_list_left" style="width:150px"><p></p></th>
-    </tr>
-  </thead>
+<div class="col98">
+  <h2>{UserName} {RegionsText}</h2>
 
-  <tbody>
+  {IfHaveDataBegin}
+    {IsAuthenticatedBegin}
+    <table class="table-compact table-hover" id="regionlist" class="display" cellspacing="0" width="100%">
+      <thead>
+        <tr class="tablehead">
+          <th style="width:100px">{RegionLocXText}</th>
+          <th style="width:100px">{RegionLocYText}</th>
+          <th style="width:200px">{RegionText}</th>
+          <th class="no-sort"></th>
+          <th style="width:50px">{RegionOnlineText}</th>
+          <th class="no-sort" style="width:150px"></th>
+        </tr>
+      </thead>
 
-    {RegionListArrayBegin}
-    <tr onclick="document.location = 'index.html?page=user_regionedit&regionid={RegionID}';">
-      <td class="region_list_left"><p>{RegionName}</p></td>
-      <td class="region_list_left"><p>{RegionLocX}</p></td>
-	    <td class="region_list_left"><p>{RegionLocY}</p></td>
-	    <td class="region_list_left"><p>{RegionInfo}</p></td>
-	    <td class="region_list_left"><p>{RegionStatus}</p></td>
-        <td class="text-centered"><p>
-          <a href="index.html?page=user_regionedit&regionid={RegionID}">{EditRegionText}</a>
-          </p></td>
-    </tr>
-    {RegionListArrayEnd}
+      <tbody>
 
-  </tbody>
-</table>
-{IsAuthenticatedEnd}
+        {RegionListArrayBegin}
+        <tr onclick="loadusercontent('user-region_edit', 'regionid={RegionID}');">
+          <td class="text-center">{RegionLocX}</td>
+    	    <td class="text-center">{RegionLocY}</td>
+          <td class="text-center">{RegionName}</td>
+    	    <td class="text-left">{RegionInfo}</td>
+    	    <td class="text-centered">{RegionStatus}</td>
+          <td class="text-centered">
+            <a href="#" title="{EditText}">
+              <i class="fa fa-edit fa-lg"></i>
+            </a>
+          </td>
+        </tr>
+        {RegionListArrayEnd}
+
+      </tbody>
+    </table>
+    {IsAuthenticatedEnd}
+  {IfHaveDataEnd}
+
+  {IfNoDataBegin}
+    <div id="error404" align="center">
+      <h4 class="error404">
+        No land found, maybe buy some?
+      </h4>
+      <div class="error404" style="cursor:pointer;">
+        <img src="/static/images/land_for_rent.jpg"/>
+      </div>
+    </div>
+  {IfNoDataEnd}
+</div>
 
 <script>
-  $(document).ready(function() {
+  $(function() {
     $('#regionlist').dataTable( {
-      "order": [[ 0, "asc" ]]
+      dom: 'frtip',
+      "order": [[ 0, "asc" ]],
+      "aoColumnDefs": [{"bSortable":false,"aTargets":["no-sort"]}],
+      "pageLength": 10,
+      "fixedHeader": {
+        header: true,
+         //footer: true
+      },
     });
   });
 </script>

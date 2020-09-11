@@ -63,11 +63,14 @@ namespace WhiteCore.Modules.Web
             var estates = estateConnector.GetEstates (user.PrincipalID);
 
             if (estates.Count > 0) {
+                vars.Add("HaveData", true);
+                vars.Add("NoData", false);
 
                 foreach (var estate in estates) {
                     var regions = estateConnector.GetRegions ((int)estate.EstateID);
 
                     estateListVars.Add (new Dictionary<string, object> {
+                        {"EstateID", estate.EstateID.ToString()},
                         {"EstateName", estate.EstateName},
                         {"PublicAccess", WebHelpers.YesNo(translator, estate.PublicAccess)},
                         {"AllowVoice", WebHelpers.YesNo(translator, estate.AllowVoice)},
@@ -77,6 +80,9 @@ namespace WhiteCore.Modules.Web
                     });
                 }
             } else {
+                vars.Add("HaveData", false);
+                vars.Add("NoData", true);
+                /*
                 estateListVars.Add (new Dictionary<string, object> {
                     {"EstateName", translator.GetTranslatedString("NoDetailsText")},
                     {"PublicAccess", ""},
@@ -85,7 +91,7 @@ namespace WhiteCore.Modules.Web
                         {"AllowDirectTeleport", ""},
                         {"RegionCount", ""}
                     });
-
+                */
             }
 
             vars.Add ("EstateList", estateListVars);
@@ -93,7 +99,7 @@ namespace WhiteCore.Modules.Web
             // labels
             vars.Add ("UserName", user.Name);
             vars.Add ("AddEstateText", translator.GetTranslatedString ("AddEstateText"));
-            vars.Add ("EditEstateText", translator.GetTranslatedString ("EditText"));
+            vars.Add ("EditText", translator.GetTranslatedString ("EditText"));
             vars.Add ("EstateListText", translator.GetTranslatedString ("EstatesText"));
             vars.Add ("EstateText", translator.GetTranslatedString ("EstateText"));
             vars.Add ("PublicAccessText", translator.GetTranslatedString ("PublicAccessText"));

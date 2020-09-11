@@ -1,0 +1,35 @@
+<!-- Add news article -->
+
+{IsAdminAuthenticatedBegin}
+
+<h2>{SystemName}: {AddNewsText}</h2>
+<form id="add_news_form" action="admin/news_add.html" method="post">
+  <div class="row w-100">
+    <div class="col-md-8 offset-md-2">
+
+      <div class="form-group">
+        <label for="NewsTitle" class="col-3 col-form-label text-right mr-2">{NewsItemTitle}</label>
+        <input class="form-control" minlength="3" name="NewsTitle" id="NewsTitle" require="true" type="text" size="119" value="">
+      </div>
+
+      <div class="form-group">
+        <label for="NewsText" class="col-3 col-form-label text-right mr-2">{NewsItemText}</label>
+        <textarea class="form-control" name="NewsText" id="NewsText" require="true" cols="90" rows="10"></textarea>
+      </div>
+
+      <div class="row w-100 mt-3">
+        <div class="col"></div>
+        <div class="col-8 pull-right">
+          <a class="btn btn-success" onclick="loadusercontent('admin-news_manager');">{Cancel}</a>
+          <a class="btn btn-info pull-right" style="width:200px;" 
+             onclick="submitupdate('add_news_form', 'additem=true', 'admin-news_manager');">
+              {Submit}
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</form>
+
+{IsAdminAuthenticatedEnd}

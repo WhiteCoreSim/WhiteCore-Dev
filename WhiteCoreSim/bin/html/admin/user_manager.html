@@ -1,0 +1,65 @@
+<!-- User manager -->
+
+<style>
+  .page-link {background-color: transparent !important;}
+</style>
+
+
+  <div class="col-12">
+    <label>{TotalUsersCountText} {TotalUsersCount}</label>
+    <table class="table table-dark table-striped table-bordered" width="100%" id="user_list">
+      <thead>
+        <tr>
+          <th>{UserNameText}</th>
+          <th class="no-sort"></th>
+          <th>{UserTypeText}</th>
+          <th>{RegionText}</th>
+          <th>{LocationText}</th>
+          <th>{OnlineText}</th>
+          <th class="no-sort" style=width:80px;></th>
+        </tr>
+      </thead>
+
+      <tbody>
+        {UsersListArrayBegin}
+        <tr>
+          <td>
+            <a title="{UserName}" href="#"  onclick="loadmodalcontent('webprofile-modal_profile', 'userid={UserID}');">
+              <span class="agentlink">{UserName} {UserDisplayName}</span>
+            </a>
+          </td>
+          <td>
+            <img title="{UserName} ({UserType})" src="{UserPictureURL}" alt="{UserName} ({UserType})" height="50" />
+          </td>
+          <td>{UserType}</td>
+          <td>{UserRegion}</td>
+          <td>{Position}</td>
+          <td>{IsOnline}</td>
+          <td class="text-right">
+            <a href="#" onclick="loadusercontent('admin-user_edit', 'userid={UserID}');" title="Edit">
+              <i class="fa fa-edit fa-lg"></i>
+            </a>
+            <a href="#" onclick="loadusercontent('admin-user_password', 'userid={UserID}');" title="Password">
+              <i class="fa fa-lock fa-lg"></i>
+            </a>
+          </td>
+        </tr>
+        {UsersListArrayEnd}
+      </tbody>
+    </table>
+  </div>
+
+
+
+<script>
+  $(function() {
+    $('#user_list').dataTable( {
+        "order": [[ 0, "asc" ]],
+        "aoColumnDefs": [{"bSortable":false,"aTargets":["no-sort"]}],
+        /*"aaSorting":[], */
+        "oLanguage": {"sSearch": "Filter: "},
+    });
+  });
+
+</script>
+

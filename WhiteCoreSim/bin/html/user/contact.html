@@ -1,8 +1,5 @@
 <!-- user email -->
 <section class="text-center">
-  <div class="error_message">
-    <h3>{ErrorMessage}</h3>
-  </div>
 
   <div class="container">
     <div class="row justify-content-center">
@@ -11,31 +8,43 @@
 
     <div class="container justify-content-center">
       <div class="row">
-        <div class="col">
-          <img src="static/images/email_update.png" />
+        <div class="col-3">
+          <img src="static/images/home.png" />
         </div>
 
-        <div class="col-4">
+        <div class="col">
 
           <form role="form" id="change_contact" action="user/contact.html" method="post">
             <div class="form-group mb-3">
-              <input type="text" class="" placeholder="{RLAddress}" name="useraddress" size="50" maxlength="50" value="">
+              <input type="text" class="" placeholder="{UserAddressText}" name="useraddress" size="50" maxlength="50" value="{RLAddress}">
             </div>
             <div class="form-group mb-3">
-              <input type="text" class="" placeholder="{RLCity}" name="usercity" size="50" maxlength="50" value="">
+              <div class="row">
+              <div class="col-8">
+                <input type="text" class="" placeholder="{UserCityText}" name="usercity" size="50" maxlength="50"   value="{RLCity}">
+              </div>
+              <div class="col-4">
+                <input type="text" class="" placeholder="{UserZipText}" name="userzip" size="15" maxlength="15" value="{RLZip}">
+              </div>
+              </div>
             </div>
 
+
             <div class="form-group mb-3">
-              <input type="text" class="" placeholder="{RLZip}" name="userzip" size="25" maxlength="15">
+              <input type="text" class="" placeholder="{UserCountryText}" name="usercountry" size="25" maxlength="40" value="{RLCountry}">
             </div>
 
             <div class="div20"></div>
-            <button class="btn btn-sm btn-warning float-right" onclick="submitupdate('change_contact');">
-              {ChangeContactText}
-            </button>
+            <div class="button-group">
+              <a class="btn btn-sm btn-success" onclick="gohome();">{CancelText}</a>
+              <a class="btn btn-sm btn-warning float-right" 
+                  onclick="submitupdate('change_contact', 'update=true');">
+                {UpdateContactText}
+              </a>
+            </div>
           </form>
         </div>
-        <div class="col"></div>
+        <div class="col-3"></div>
       </div>
 
     </div>
@@ -44,61 +53,5 @@
 
 
 <script>
-/**  function submitupdate(formname) {
-    event.preventDefault();
-    var $form = $("#" + formname);
-    var url = $form.attr("action");
-    var formdata = $form.serialize();
-    formdata = formdata + "&submit=update";
-**/
-/*    $.ajax({
-      url: url,
-      type: 'POST',
-      datatype: 'string',
-      data: formdata
-    })
-    .done(function (msg) {
-      $(".error_message").html(msg);
-    });
-*/
-/**    $.post(url, formdata,
-      function( data ) {
-        $(".error_message").html(data);
-      }
-    );
-  };
-**/
-     /* Send the data using post and put the results in a div */
-/*    $.ajax({
-      url: url,
-      type: 'POST',
-      datatype: 'string',
-      data: formdata
-    })
-    .done(function (msg) {
-      $(".error_message").html("<h3>" + msg + "</h3>");
-      //setTimeout(function() {
-      //  window.location.href = "/?page=home";
-      //}, 1000);
-    })
-  };
-
-  /*
-      $.post( url, $form.serialize(),
-        function( data ) {
-          console.log('got here');
-          console.log(data);
-          $("#password_error_message").html("<h3>" + data + "</h3>");
-          //setTimeout(function() {
-          //  window.location.href = "/?page=home";
-          //}, 1000);
-        });
-
-
-    }; // submit
-*/
-    $("#useraddress").focus();
-
-
-
+  $("#useraddress").focus();
 </script>

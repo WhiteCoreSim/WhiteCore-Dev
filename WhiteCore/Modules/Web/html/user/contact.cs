@@ -54,21 +54,19 @@ namespace WhiteCore.Modules.Web
         public Dictionary<string, object> Fill(WebInterface webInterface, string filename, OSHttpRequest httpRequest,
             OSHttpResponse httpResponse, Dictionary<string, object> requestParameters,
             ITranslator translator, out string response) {
-            response = null;
 
             response = null;
             var vars = new Dictionary<string, object>();
 
-            string error = "";
             UserAccount user = Authenticator.GetAuthentication(httpRequest);
             if (user == null) {
-                response = webInterface.UserMsg("Unable to authenticate user details", true, 5);
+                response = webInterface.UserMsg("!Unable to authenticate user details", true);
                 return null;
             }
 
             // who we are dealing with...
             vars.Add("UserName", user.Name);
-            IUserAccountService acctSrvc = webInterface.Registry.RequestModuleInterface<IUserAccountService>();
+            //  IUserAccountService acctSrvc = webInterface.Registry.RequestModuleInterface<IUserAccountService>();
             IAgentConnector agentSrvc = Framework.Utilities.DataManager.RequestPlugin<IAgentConnector>();
             IAgentInfo agent = null;
 
@@ -77,22 +75,23 @@ namespace WhiteCore.Modules.Web
             }
 
             // contact details change
-            if (requestParameters.ContainsKey("Submit")) {
+            if (requestParameters.ContainsKey("update")) {
                 string UserAddress = requestParameters["useraddress"].ToString();
                 string UserZip = requestParameters["userzip"].ToString();
-                string UserCity = requestParameters ["usercity"].ToString ();
-                               
-                if (agent != null) {
-                    agent.OtherAgentInformation ["RLAddress"] = UserAddress;
-                    agent.OtherAgentInformation["RLCity"] = UserCity;
-                    agent.OtherAgentInformation ["RLZip"] = UserZip;
+                string UserCity = requestParameters["usercity"].ToString();
+                string UserCountry = requestParameters["usercountry"].ToString();
 
+                if (agent != null) {
+                    agent.OtherAgentInformation["RLAddress"] = UserAddress;
+                    agent.OtherAgentInformation["RLCity"] = UserCity;
+                    agent.OtherAgentInformation["RLZip"] = UserZip;
+                    agent.OtherAgentInformation["RLCountry"] = UserCountry;
                     agentSrvc.UpdateAgent(agent);
 
-                    response = webInterface.UserMsg("Email addres updated", true, 3);
+                    response = webInterface.UserMsg("Contact details updated", true);
                 } else
-                    response = webInterface.UserMsg("The agent service was not available to update your details", true, 5);
-                    
+                    response = webInterface.UserMsg("!The agent service was not available to update your details", true);
+
                 return null;
             }
 
@@ -102,20 +101,26 @@ namespace WhiteCore.Modules.Web
                 vars.Add("RLAddress", agent.OtherAgentInformation["RLAddress"]);
                 vars.Add("RLCity", agent.OtherAgentInformation["RLCity"]);
                 vars.Add("RLZip", agent.OtherAgentInformation["RLZip"]);
+                vars.Add("RLCountry", agent.OtherAgentInformation["RLCountry"]);
+                vars.Add("UserAddressText", agent.OtherAgentInformation["RLAddress"]);
+                vars.Add("UserCityText", agent.OtherAgentInformation["RLCity"]);
+                vars.Add("UserZipText", agent.OtherAgentInformation["RLZip"]);
+                vars.Add("UserCountryText", agent.OtherAgentInformation["RLCountry"]);
             } else {
                 vars.Add("RLAddress", "");
                 vars.Add("RLCity", "");
                 vars.Add("RLZip", "");
-
+                vars.Add("RLCountry", "");
+                vars.Add("UserAddressText", translator.GetTranslatedString("UserAddressText"));
+                vars.Add("UserCityText", translator.GetTranslatedString("UserCityText"));
+                vars.Add("UserZipText", translator.GetTranslatedString("UserZipText"));
+                vars.Add("UserCountryText", translator.GetTranslatedString("UserCountryText"));
             }
-            vars.Add("ErrorMessage", error);
-            vars.Add("ChangeUserInformationText", translator.GetTranslatedString("ChangeUserInformationText"));
-            vars.Add("UserAddressText", translator.GetTranslatedString("UserAddressText"));
-            vars.Add("UserZipText", translator.GetTranslatedString("UserZipText"));
-            vars.Add("UserCityText", translator.GetTranslatedString("UserCityText"));
-            vars.Add("UserCountryText", translator.GetTranslatedString("UserCountryText"));
-            vars.Add("UserNameText", translator.GetTranslatedString("UserNameText"));
-            vars.Add("Submit", translator.GetTranslatedString("Submit"));
+
+            vars.Add("ChangeContactText", translator.GetTranslatedString("ChangeContactText"));
+            //vars.Add("UserNameText", translator.GetTranslatedString("UserNameText"));
+            vars.Add("CancelText", translator.GetTranslatedString("Cancel"));
+            vars.Add("UpdateContactText", translator.GetTranslatedString("UpdateContactText"));
 
             return vars;
         }

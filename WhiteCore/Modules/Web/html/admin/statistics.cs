@@ -34,111 +34,117 @@ namespace WhiteCore.Modules.Web
 {
     public class UserStatisticsPage : IWebInterfacePage
     {
-        public string [] FilePath {
-            get {
-                return new []
+        public string[] FilePath
+        {
+            get
+            {
+                return new[]
                            {
                                "html/admin/statistics.html"
                            };
             }
         }
 
-        public bool RequiresAuthentication {
+        public bool RequiresAuthentication
+        {
             get { return true; }
         }
 
-        public bool RequiresAdminAuthentication {
+        public bool RequiresAdminAuthentication
+        {
             get { return true; }
         }
 
-        public Dictionary<string, object> Fill (WebInterface webInterface, string filename, OSHttpRequest httpRequest,
+        public Dictionary<string, object> Fill(WebInterface webInterface, string filename, OSHttpRequest httpRequest,
                                                 OSHttpResponse httpResponse, Dictionary<string, object> requestParameters,
                                                 ITranslator translator, out string response)
         {
             response = null;
-            IUserStatsDataConnector dc = Framework.Utilities.DataManager.RequestPlugin<IUserStatsDataConnector> ();
-            var vars = new Dictionary<string, object> ();
+            IUserStatsDataConnector dc = Framework.Utilities.DataManager.RequestPlugin<IUserStatsDataConnector>();
+            var vars = new Dictionary<string, object>();
 
-            if (dc == null) {
-                response = "Sorry... Statistics information is not available";
+            if (dc == null)
+            {
+                response = webInterface.UserMsg("!Sorry... Statistics information is not available", false);
                 return null;
             }
 
             // Clear statistics
-            if (requestParameters.ContainsKey ("Submit") &&
-                requestParameters ["Submit"].ToString () == "SubmitClearStats") {
-                dc.RemoveAllSessions ();
-                response = "Statistics cleared";
+            if (requestParameters.ContainsKey("resetstats"))
+            { 
+                dc.RemoveAllSessions();
+                response = webInterface.UserMsg("Statistics cleared", false);
                 return null;
             }
 
             // normal stats...
-            var viewerList = new List<Dictionary<string, object>> ();
-            var client_viewers = dc.ViewerUsage ();
-            if (client_viewers.Count == 0) {
-                response = "Sorry... Currently there are no statistics available... waiting for user logins";
+            var viewerList = new List<Dictionary<string, object>>();
+            var client_viewers = dc.ViewerUsage();
+            if (client_viewers.Count == 0)
+            {
+                response = webInterface.UserMsg("!Sorry... Currently there are no statistics available... waiting for user logins", false);
                 return null;
             }
 
             // build the stats details
             foreach (var vclient in client_viewers)
-                viewerList.Add (new Dictionary<string, object> {
+                viewerList.Add(new Dictionary<string, object> {
                     { "ViewerName", vclient.Key },
                     { "ViewerCount", vclient.Value }
                 });
 
-            var gpuList = new List<Dictionary<string, object>> ();
-            gpuList.Add (new Dictionary<string, object> {
+            var gpuList = new List<Dictionary<string, object>>();
+            gpuList.Add(new Dictionary<string, object> {
                 {"GPUType","ATI"},
                 {"GPUCount", dc.GetCount ("s_gpuvendor", new KeyValuePair<string, object> ("s_gpuvendor", "ATI"))}
             });
-            gpuList.Add (new Dictionary<string, object> {
+            gpuList.Add(new Dictionary<string, object> {
                 {"GPUType", "NVIDIA"},
                 {"GPUCount", dc.GetCount ("s_gpuvendor", new KeyValuePair<string, object> ("s_gpuvendor", "NVIDIA"))}
             });
-            gpuList.Add (new Dictionary<string, object> {
+            gpuList.Add(new Dictionary<string, object> {
                 {"GPUType", "Intel"},
                 {"GPUCount", dc.GetCount ("s_gpuvendor", new KeyValuePair<string, object> ("s_gpuvendor", "Intel"))}
             });
 
-            var fps = dc.Get ("fps").ConvertAll ((s) => float.Parse (s));
-            var runtime = dc.Get ("run_time").ConvertAll ((s) => float.Parse (s));
-            var visited = dc.Get ("regions_visited").ConvertAll ((s) => int.Parse (s));
-            var memoryUsage = dc.Get ("mem_use").ConvertAll ((s) => int.Parse (s));
-            var pingTime = dc.Get ("ping").ConvertAll ((s) => float.Parse (s));
-            var agentsInView = dc.Get ("agents_in_view").ConvertAll ((s) => int.Parse (s));
+            var fps = dc.Get("fps").ConvertAll((s) => float.Parse(s));
+            var runtime = dc.Get("run_time").ConvertAll((s) => float.Parse(s));
+            var visited = dc.Get("regions_visited").ConvertAll((s) => int.Parse(s));
+            var memoryUsage = dc.Get("mem_use").ConvertAll((s) => int.Parse(s));
+            var pingTime = dc.Get("ping").ConvertAll((s) => float.Parse(s));
+            var agentsInView = dc.Get("agents_in_view").ConvertAll((s) => int.Parse(s));
 
 
 
             // data
-            vars.Add ("ViewersList", viewerList);
-            vars.Add ("GPUList", gpuList);
-            vars.Add ("FPS", fps.Average ());
-            vars.Add ("RunTime", runtime.Average ());
-            vars.Add ("RegionsVisited", visited.Average ());
-            vars.Add ("MemoryUseage", memoryUsage.Average () / 1000);
-            vars.Add ("PingTime", pingTime.Average ());
-            vars.Add ("AgentsInView", agentsInView.Average ());
+            vars.Add("ViewersList", viewerList);
+            vars.Add("GPUList", gpuList);
+            vars.Add("FPS", fps.Average().ToString("n2"));
+            vars.Add("RunTime", runtime.Average());
+            vars.Add("RegionsVisited", visited.Average());
+            vars.Add("MemoryUseage", (memoryUsage.Average() / 1000).ToString("n3"));
+            vars.Add("PingTime", pingTime.Average().ToString("n2"));
+            vars.Add("AgentsInView", agentsInView.Average());
 
             // labels
-            vars.Add ("StatisticsText", translator.GetTranslatedString ("StatisticsText"));
-            vars.Add ("ViewersText", translator.GetTranslatedString ("ViewersText"));
-            vars.Add ("GPUText", translator.GetTranslatedString ("GPUText"));
-            vars.Add ("PerformanceText", translator.GetTranslatedString ("PerformanceText"));
-            vars.Add ("FPSText", translator.GetTranslatedString ("FPSText"));
-            vars.Add ("RunTimeText", translator.GetTranslatedString ("RunTimeText"));
-            vars.Add ("RegionsVisitedText", translator.GetTranslatedString ("RegionsVisitedText"));
-            vars.Add ("MemoryUseageText", translator.GetTranslatedString ("MemoryUseageText"));
-            vars.Add ("PingTimeText", translator.GetTranslatedString ("PingTimeText"));
-            vars.Add ("AgentsInViewText", translator.GetTranslatedString ("AgentsInViewText"));
+            vars.Add("StatisticsText", translator.GetTranslatedString("StatisticsText"));
+            vars.Add("ViewersText", translator.GetTranslatedString("ViewersText"));
+            vars.Add("GPUText", translator.GetTranslatedString("GPUText"));
+            vars.Add("PerformanceText", translator.GetTranslatedString("PerformanceText"));
+            vars.Add("FPSText", translator.GetTranslatedString("FPSText"));
+            vars.Add("RunTimeText", translator.GetTranslatedString("RunTimeText"));
+            vars.Add("RegionsVisitedText", translator.GetTranslatedString("RegionsVisitedText"));
+            vars.Add("MemoryUseageText", translator.GetTranslatedString("MemoryUseageText"));
+            vars.Add("PingTimeText", translator.GetTranslatedString("PingTimeText"));
+            vars.Add("AgentsInViewText", translator.GetTranslatedString("AgentsInViewText"));
 
-            vars.Add ("ClearStatsText", translator.GetTranslatedString ("ClearStatsText"));
+            vars.Add("ClearStatsText", translator.GetTranslatedString("ClearStatsText"));
 
 
             return vars;
         }
 
-        public bool AttemptFindPage (string filename, ref OSHttpResponse httpResponse, out string text)
+        public bool AttemptFindPage(string filename, ref OSHttpResponse httpResponse, out string text)
         {
             text = "";
             return false;

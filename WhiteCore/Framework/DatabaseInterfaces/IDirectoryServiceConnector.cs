@@ -189,6 +189,16 @@ namespace WhiteCore.Framework.DatabaseInterfaces
         List<DirClassifiedReplyData> FindClassifieds(string queryText, string category, uint queryFlags, int StartQuery,
                                                      UUID scopeID);
         /// <summary>
+        /// Gets a list of user classifieds.
+        /// </summary>
+        /// <returns>The classifieds.</returns>
+        /// <param name="userId">Ovner.</param>
+        /// <param name="category">Category.</param>
+        /// <param name="classifiedFlags">Query flags.</param>
+        List<Classified> GetUserClassifieds(string userId, int category, uint classifiedFlags);
+
+
+        /// <summary>
         /// Gets a lost of all classifieds.
         /// </summary>
         /// <returns>The classifieds.</returns>

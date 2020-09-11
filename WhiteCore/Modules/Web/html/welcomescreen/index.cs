@@ -59,25 +59,26 @@ namespace WhiteCore.Modules.Web
         {
             response = null;
             var vars = new Dictionary<string, object>();
+            var modalPage = webInterface.GetModalPages();
+            var mdlpages = webInterface.BuildPageMenus(modalPage, httpRequest, translator);
+            vars.Add("ModalItems", mdlpages);
 
-            // Style Switcher
-            vars.Add("styles1", translator.GetTranslatedString("styles1"));
-            vars.Add("styles2", translator.GetTranslatedString("styles2"));
-            vars.Add("styles3", translator.GetTranslatedString("styles3"));
-            vars.Add("styles4", translator.GetTranslatedString("styles4"));
-            vars.Add("styles5", translator.GetTranslatedString("styles5"));
+            var settings = webInterface.GetWebUISettings();
 
-            vars.Add("StyleSwitcherStylesText", translator.GetTranslatedString("StyleSwitcherStylesText"));
-            vars.Add("StyleSwitcherLanguagesText", translator.GetTranslatedString("StyleSwitcherLanguagesText"));
-            vars.Add("StyleSwitcherChoiceText", translator.GetTranslatedString("StyleSwitcherChoiceText"));
+            // user news inclusion
+            if (settings.LocalFrontPage == "") {
+                vars.Add("LocalPage", false);
+                vars.Add("LocalFrontPage", "");
+            } else {
+                vars.Add("LocalPage", true);
+                vars.Add("LocalFrontPage", settings.LocalFrontPage);
+            }
 
-            // Language Switcher
-            vars.Add("en", translator.GetTranslatedString("en"));
-            vars.Add("fr", translator.GetTranslatedString("fr"));
-            vars.Add("de", translator.GetTranslatedString("de"));
-            vars.Add("it", translator.GetTranslatedString("it"));
-            vars.Add("es", translator.GetTranslatedString("es"));
-            vars.Add("nl", translator.GetTranslatedString("nl"));
+            vars.Add("Languages", webInterface.AvailableLanguages());
+            vars.Add("ShowLanguageTranslatorBar", !settings.HideLanguageTranslatorBar);
+
+            vars.Add("Maintenance", false);
+            vars.Add("NoMaintenance", true);
 
             return vars;
         }

@@ -29,3 +29,109 @@ new TWTR.Widget({
 }).render().setUser('USERNAME').start();
 </script>
 </div>
+
+
+<!-- possile solution -->
+
+<!--
+  <html>
+<body>
+<script language="javascript" type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.js"></script>
+
+<style type="text/css">
+body{background:#ccc;}
+.status{
+color:#000;
+}    
+h3,h4{
+font-size: 14px;
+font-family: "Segoe UI", Tahoma, Verdana, Arial;
+text-decoration:none;
+}
+#txt
+{
+font-size: 11px;
+font-family: "Segoe UI", Tahoma, Verdana, Arial;
+}
+.status
+{
+min-height:60px;
+padding:6px;
+border-bottom:solid 1px #DEDEDE
+font-size: 11px;
+background:transparent;
+border:#eaeaea 2px;
+}
+.status a
+{
+color:#3cf;
+text-decoration:none
+font-size: 11px;
+}
+.status a:hover{
+color:#3cf;
+text-decoration:underline
+}
+.twitter_image{
+float:left;
+margin-right:14px;
+width:50px;
+height:50px;
+padding:3px;
+}
+.twitter_posted_at{
+font-size:11px;
+color:#999
+}
+#tweets{
+margin:auto auto;
+overflow:scroll;
+background:#eaeaea;
+height:300px;
+width:300px;
+}
+</style>
+<div id="tweets">
+<div id = "heading"></div>
+</div>
+<script type="text/javascript">
+var username = "Google";
+var recentTweetsUrl = "https://api.twitter.com/1/statuses/user_timeline.json?include_entities=true&include_rts=true&screen_name="+username+"&count=15&callback=?"
+var followerCountUrl ="http://api.twitter.com/1/users/show.json?screen_name="+username+"&callback=?";
+$(document).ready(function()
+{
+$.ajax
+({type: "GET",url: followerCountUrl,dataType:"jsonp",success: function(response)
+{
+fCount = response.followers_count;
+var headerData = "<h3>"+username+"</h3><h4>"+fCount+"Followers on Twitter</h4>";
+$(headerData).appendTo('#heading');
+}
+});
+$.ajax
+({type: "GET",url: recentTweetsUrl,dataType:"jsonp",success: function(response)
+{
+var tdata='';
+for(i=0;i<response.length;i++)
+{
+data =response[i];
+var id=data.id;
+var text=data.text;
+var created_time=data.created_at;
+var screen_name=data.user.screen_name;
+var image=data.user.profile_image_url;
+var source=data.source;
+tdata+="<div class='status' id='"+id+"'><img src="+image+" class='twitter_image'/><a href='http://twitter.com/"+screen_name+"'>"+screen_name+"</a><div id='txt'>"+text+"<div class='twitter_posted_at'><span class='timeago' title='"+created_time+"'></span><i>via "+source+" </i></div></div></div>";
+}
+
+$(tdata).appendTo('#tweets');
+}
+});
+});
+
+</script>
+
+</body>
+</html
+
+-->

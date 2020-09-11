@@ -60,16 +60,16 @@ namespace WhiteCore.Modules.Web
             response = null;
             var vars = new Dictionary<string, object>();
 
-            if (requestParameters.ContainsKey("ResetMenu"))
+            if (requestParameters.ContainsKey("resetmenu"))
             {
                 PagesMigrator.ResetToDefaults();
-                response = "Menu: "+ translator.GetTranslatedString("ChangesSavedSuccessfully");
+                response = webInterface.UserMsg("Menu: " + translator.GetTranslatedString("ChangesSavedSuccessfully"));
                 return null;
             }
-            if (requestParameters.ContainsKey("ResetSettings"))
+            if (requestParameters.ContainsKey("resetsettings"))
             {
                 SettingsMigrator.ResetToDefaults(webInterface);
-                response = "WebUI: "+ translator.GetTranslatedString("ChangesSavedSuccessfully");
+                response = webInterface.UserMsg("WebUI: " + translator.GetTranslatedString("ChangesSavedSuccessfully"));
                 return null;
             }
 

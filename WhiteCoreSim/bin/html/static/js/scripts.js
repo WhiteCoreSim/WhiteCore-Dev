@@ -101,3 +101,66 @@ $(document).ready(function() {
 	});
 */
 });
+
+
+/***************** WhiteCore specific ******************/
+
+/* submit a form */
+function submitupdate(formname, parms="", menuid="") {
+  event.preventDefault();
+
+  var $form = $("#" + formname);
+  var url = $form.attr("action");
+  var formdata = $form.serialize();
+  formdata = formdata + "&Submit=update";
+  if (parms != "") {
+  	formdata = formdata + "&" + parms;
+  }
+
+  $.post(url, formdata, function( msg ) {
+  	if (msg.substring(0, 1) == '!') {
+      var emsg = msg.slice(1);
+      MsgError(emsg, 4000, 0);
+    } else {
+      MsgSuccess(msg, 3000,0);
+      if (menuid != "") {
+      	setTimeout(function() {
+      		loadusercontent(menuid);
+      	}, 3100);
+      }
+    }
+  });
+  
+  event.stopPropagation();
+
+};
+
+
+function submitpagesearch(formname, destdiv) {
+  // submit form details and post return data to 'destdiv'
+  event.preventDefault();
+
+  var $form = $("#" + formname);
+  var url = $form.attr("action");
+  var formdata = $form.serialize();
+  formdata = formdata + "&search=true";
+
+  $.post( url, formdata, function( data ) {
+    if (data.substring(0, 1) == '!') {
+      var emsg = data.slice(1);
+      MsgError(emsg, 4000, 0);
+    } else {
+      $("#" + destdiv).empty().append(data);
+    }
+  });
+
+  event.stopPropagation();
+
+};
+
+
+/* go to user home/dashboard */
+function gohome() {
+  //event.stopPropagation();
+  window.location.href = "/";
+}

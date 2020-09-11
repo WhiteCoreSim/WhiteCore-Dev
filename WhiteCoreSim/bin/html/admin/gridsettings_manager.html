@@ -1,160 +1,69 @@
-<!-- params to replace
+<!-- Grid settings -->
 
-SystemURL
-SystemName
-WebRegistrationText
-GridCenterX
-GridCenterY
-SettingsManager               Settings Manager
-GridCenterXText               Grid Center Location X
-GridCenterYText               Grid Center Location Y
-GoogleMapAPIKeyText           Google Maps API Key
-GoogleMapAPIKeyHelpText       Google Maps API Key
-ChangesSavedSuccessfully      Changes saved successfully
-Save                          Save
--->
+<div class="container-fluid">
+  <h2>{SystemName}: {GridSettingsManager}</h2>
 
-<h2>{SystemName}: {GridSettingsManager}</h2>
-<form id="gridsettings_manager_form" action="admin/gridsettings_manager.html" method="post">
-<div id="info_message" class="info"></div>
+  <form class="form-inline" id="gridsettings_manager_form" action="admin/gridsettings_manager.html" method="post">
+    <div class="row w-100">
+      <div class="col-md-8 offset-md-2">
 
-<div class="rTable"><caption> </caption>
-  <div class="rTableBody">
-    <div class="rTableRow">
-      <div class="rTableCell">
-        <p>{GridnameText}</p>
+        <div class="form-group mb-1">
+          <label for="Gridname" class="col-4 col-form-label text-right mr-2">{GridnameText}</label>
+          <input class="form-control" style="width:300px;" minlength="3" id="Gridname" require="true" name="Gridname" type="text" size="40" maxlength="40" value="{Gridname}">
+        </div>
+
+        <div class="form-group mb-1">
+          <label for="Gridnick" class="col-4 col-form-label text-right mr-2">{GridnickText}</label>
+          <input class="form-control" style="width:300px;" minlength="3" id="Gridnick" require="true" name="Gridnick" type="text" size="40" maxlength="40" value="{Gridnick}">
+        </div>
+
+        <div class="form-group mb-1">
+          <label for="WelcomeMessage" class="col-4 col-form-label text-right mr-2">{WelcomeMessageText}</label>
+          <input class="form-control" style="width:300px;" minlength="3" id="WelcomeMessage" require="true" name="WelcomeMessage" type="text" size="120" maxlength="120" value="{WelcomeMessage}">
+        </div>
+
+        <div class="form-group mb-1">
+          <label for="GovernorName" class="col-4 col-form-label text-right mr-2">{GovernorNameText}</label>
+          <input class="form-control" style="width:300px;" minlength="3" id="Gridnick" require="true" name="GovernorName" type="text" size="40" maxlength="40" value="{GovernorName}">
+        </div>
+
+        <div class="form-group mb-1">
+          <label for="MainlandEstateName" class="col-4 col-form-label text-right mr-2">{MainlandEstateNameText}</label>
+          <input class="form-control" style="width:300px;" minlength="3" id="MainlandEstateName" require="true" name="MainlandEstateName" type="text" size="40" maxlength="40" value="{MainlandEstateName}">
+        </div>
+
+        <div class="form-group mb-1">
+          <label for="RealEstateOwnerName" class="col-4 col-form-label text-right mr-2">{RealEstateOwnerNameText}</label>
+          <input class="form-control" style="width:300px;" minlength="3" id="RealEstateOwnerName" require="true" name="RealEstateOwnerName" type="text" size="40" maxlength="40" value="{RealEstateOwnerName}">
+        </div>
+
+        <div class="form-group mb-1">
+          <label for="SystemEstateName" class="col-4 col-form-label text-right mr-2">{SystemEstateNameText}</label>
+          <input class="form-control" style="width:300px;" minlength="3" id="SystemEstateName" require="true" name="SystemEstateName" type="text" size="40" maxlength="40" value="{SystemEstateName}">
+        </div>
+
+        <div class="form-group mb-1">
+          <label for="BankerName" class="col-4 col-form-label text-right mr-2">{BankerNameText}</label>
+          <input class="form-control" style="width:300px;" minlength="3" id="BankerName" require="true" name="BankerName" type="text" size="40" maxlength="40" value="{BankerName}">
+        </div>
+
+        <div class="form-group mb-1">
+          <label for="MarketPlaceOwnerName" class="col-4 col-form-label text-right mr-2">{MarketPlaceOwnerNameText}</label>
+          <input class="form-control" style="width:300px;" minlength="3" id="MarketPlaceOwnerName" require="true" name="MarketPlaceOwnerName" type="text" size="40" maxlength="40" value="{MarketPlaceOwnerName}">
+        </div>
+
+        <div class="row w-100 mt-3">
+          <div class="col pull-right">
+            <button onclick="gohome();">{Cancel}</button>
+            <button class="btn-info pull-right" style="width:200px;" onclick="submitupdate('gridsettings_manager_form', 'update=true');">
+              {Save}
+            </button>
+          </div>
+          <div class="col-1"></div>
+        </div>
+
       </div>
-      <div class="rTableCell"><input id="Gridname" name="Gridname" size="119" type="text" value="{Gridname}" /></div>
-      <div class="rTableCell">
-        <p>{GridnickText}</p>
-      </div>
-      <div class="rTableCell"><input id="Gridnick" name="Gridnick" size="119" type="text" value="{Gridnick}" /></div>
     </div>
-    <div class="rTableRow">
-      <div class="rTableCell">
-        <p>{GovernorNameText}</p>
-      </div>
-      <div class="rTableCell"><input id="GovernorName" name="GovernorName" size="119" type="text" value="{GovernorName}" /></div>
-      <div class="rTableCell">
-        <p>{MainlandEstateNameText}</p>
-      </div>
-      <div class="rTableCell"><input id="MainlandEstateName" name="MainlandEstateName" size="119" type="text" value="{MainlandEstateName}" /></div>
-    </div>
-    <div class="rTableRow">
-      <div class="rTableCell">
-        <p>{RealEstateOwnerNameText}</p>
-      </div>
-      <div class="rTableCell"><input id="RealEstateOwnerName" name="RealEstateOwnerName" size="119" type="text" value="{RealEstateOwnerName}" /></div>
-      <div class="rTableCell">
-        <p>{SystemEstateNameText}</p>
-      </div>
-      <div class="rTableCell"><input id="SystemEstateName" name="SystemEstateName" size="119" type="text" value="{SystemEstateName}" /></div>
-    </div>
-    <div class="rTableRow">
-      <div class="rTableCell">
-        <p>{BankerNameText}</p>
-      </div>
-      <div class="rTableCell"><input id="BankerName" name="BankerName" size="119" type="text" value="{BankerName}" /></div>
-      <div class="rTableCell">
-        <p>{MarketPlaceOwnerNameText}</p>
-      </div>
-      <div class="rTableCell"><input id="MarketplaceOwnerName" name="MarketplaceOwnerName" size="119" type="text" value="{MarketplaceOwnerName}" /></div>
-    </div>
-    <div class="rTableRow">
-      <div class="rTableCell">
-        <p>{WelcomeMessageText}</p>
-      </div>
-      <div class="rTableCell"><input id="WelcomeMessage" name="WelcomeMessage" size="119" type="text" value="{WelcomeMessage}" /></div>
-      <div class="rTableCell"> </div>
-      <div class="rTableCell"> </div>
-    </div>
-    <div class="rTableRow">
-      <div class="rTableCell"> </div>
-      <div class="rTableCell"> </div>
-      <div class="rTableCell"> </div>
-      <div class="rTableCell"><button id="Submit" style="width: 100px;" name="Submit" type="Submit">{Save}</button></div>
-    </div>
-  </div>
+  </form>
+  
 </div>
-
-
-<!--
-<table id="settings_manager">
-  <caption></caption>
-
-  <thead>
-    <tr>
-      <th class="settings_manager_left"></th>
-      <th class="settings_manager_right"></th>
-    </tr>
-  </thead>
-
-  <tfoot>
-    <tr>
-      <th class="settings_manager_left"></th>
-      <th class="settings_manager_right"></th>
-    </tr>
-  </tfoot>
-
-  <tbody>
-    <tr>
-      <td class="settings_manager_left"><p>{GridnameText}</p></td>
-      <td class="settings_manager_right"><input name="Gridname" type="text" id="Gridname" size="119" value="{Gridname}" /></td>
-      <td class="settings_manager_left"><p>{GridnickText}</p></td>
-      <td class="settings_manager_right"><input name="Gridnick" type="text" id="Gridnick" size="119" value="{Gridnick}" /></td>
-    </tr>
-    <tr>
-      <td class="settings_manager_left"><p>{GovernorNameText}</p></td>
-      <td class="settings_manager_right"><input name="GovernorName" type="text" id="GovernorName" size="119" value="{GovernorName}" /></td>
-      <td class="settings_manager_left"><p>{MainlandEstateNameText}</p></td>
-      <td class="settings_manager_right"><input name="MainlandEstateName" type="text" id="MainlandEstateName" size="119" value="{MainlandEstateName}" /></td>
-    </tr>
-    <tr>
-      <td class="settings_manager_left"><p>{RealEstateOwnerNameText}</p></td>
-      <td class="settings_manager_right"><input name="RealEstateOwnerName" type="text" id="RealEstateOwnerName" size="119" value="{RealEstateOwnerName}" /></td>
-      <td class="settings_manager_left"><p>{SystemEstateNameText}</p></td>
-      <td class="settings_manager_right"><input name="SystemEstateName" type="text" id="SystemEstateName" size="119" value="{SystemEstateName}" /></td>
-    </tr>
-
-    <tr>
-      <td class="settings_manager_left"><p>{BankerNameText}</p></td>
-      <td class="settings_manager_right"><input name="BankerName" type="text" id="BankerName" size="119" value="{BankerName}" /></td>
-      <td class="settings_manager_left"><p>{MarketPlaceOwnerNameText}</p></td>
-      <td class="settings_manager_right"><input name="MarketplaceOwnerName" type="text" id="MarketplaceOwnerName" size="119" value="{MarketplaceOwnerName}" /></td>
-    </tr>
-
-    <tr>
-      <td class="settings_manager_left"><p>{WelcomeMessageText}</p></td>
-      <td class="settings_manager_right"><input name="WelcomeMessage" type="text" id="WelcomeMessage" size="119" value="{WelcomeMessage}" /></td>
-      <td class="settings_manager_left"></td>
-      <td class="settings_manager_right"></td>
-    </tr>
-    <tr>
-    <td></td>
-    <td></td>
-    <td></td>
-    <input hidden type="hidden" label="Submit" id="Submit" name="Submit" value="Submit" />
-      <td class="settings_manager_right"><button id="Submit" type="Submit" name="Submit" style="width:100px;">{Save}</button></td>
-    </tr>
-  </tbody>
-</table>
--->
-</form>
-
-<script>
-  /* attach a submit handler to the form */
-  $("#gridsettings_manager_form").submit(function(event) {
-
-    /* stop form from submitting normally */
-    event.preventDefault();
-    /* get some values from elements on the page: */
-    var $form = $( this ),
-        url = $form.attr( 'action' );
-    /* Send the data using post and put the results in a div */
-    $.post( url, $form.serialize(),
-      function( data ) {
-    $("#info_message").empty().append("<p>" + data + "</p>");
-      }
-    );
-  });
-</script>

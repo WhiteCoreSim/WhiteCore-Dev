@@ -1,4 +1,4 @@
-$(document).ready(function(){
+$(function(){
 	//References
 	var topmenu = $("#topmenu li");
 	var usermenu = $("#sidemenu li");
@@ -69,43 +69,47 @@ $(document).ready(function(){
 });
 
 // embedded page content
-function loadcontent(pageid){
-	var content = $("#content");
+function loadusercontent(pageid, params=''){
 
-	//load selected page
+	var content = $("#content");
+	if (params!= '') {
+		params = "?" + params;
+	}
+	content.html('');
+
+	// load selected page
 	switch(pageid){
 		{UserMenuItemsArrayBegin}
 		case "{MenuItemID}":
-	    content.load("{MenuItemLocation}" + window.location.search);
+			//console.log('loading {MenuItemLocation}')
+	    content.load("{MenuItemLocation}" + params + window.location.search);
 			break;
 		{UserMenuItemsArrayEnd}
 		default:
 			break;
 	}
+
 }
 
-/* submit a form */
-function submitupdate(formname) {
-  event.preventDefault();
-  var $form = $("#" + formname);
-  var url = $form.attr("action");
-  var formdata = $form.serialize();
-  formdata = formdata + "&Submit=update";
+function loadmodalcontent(pageid, params='', title=''){
 
-/*    $.ajax({
-    url: url,
-    type: 'POST',
-    datatype: 'string',
-    data: formdata
-  })
-  .done(function (msg) {
-    $(".error_message").html(msg);
-  });
-*/
-  $.post(url, formdata,
-    function( data ) {
-      $(".error_message").html(data);
-    }
-  );
+	var content = $("#modalcontent");
+	if (params!= '') {
+		params = "?" + params;
+	}
+	content.html('');		// clear anything previously loaded
+
+	//load selected page
+	switch(pageid){
+		{ModalItemsArrayBegin}
+		case "{MenuItemID}":
+	    content.load("{MenuItemLocation}" + params + window.location.search);
+			break;
+		{ModalItemsArrayEnd}
+		default:
+			break;
+	}
+  //event.stopPropagation();
+
+	$("#profileModal").modal("show");
 };
-

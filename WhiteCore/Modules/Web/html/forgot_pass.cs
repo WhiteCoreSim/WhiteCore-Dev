@@ -60,7 +60,7 @@ namespace WhiteCore.Modules.Web
             response = null;
             var vars = new Dictionary<string, object> ();
 
-            string error = "";
+            //string error = "";
             if (requestParameters.ContainsKey ("Submit")) {
                 string username = requestParameters ["username"].ToString ();
                 string UserEmail = requestParameters ["UserEmail"].ToString ();
@@ -70,27 +70,31 @@ namespace WhiteCore.Modules.Web
                         .GetUserAccount (null, username);
 
                 if (!userAcct.Valid) {
-                    response = "<h3>Please enter a valid username</h3>";
+                    response = webInterface.UserMsg("!Please enter a valid username", false);
                     return null;
                 }
 
                 // email user etc here...
                 if (userAcct.Email == "") {
-                    response = "<h3>Sorry! Your account has no email details. Please contact the administrator to correct</h3>" +
+                    response = webInterface.UserMsg("!Sorry! Your account has no email details<br/>Please contact the administrator to correct", true);
+
+                    /*response = "<h3>Sorry! Your account has no email details. Please contact the administrator to correct</h3>" +
                         "<script language=\"javascript\">" +
                         "setTimeout(function() {window.location.href = \"index.html\";}, 5000);" +
                         "</script>";
-
+                    */
                     return null;
                 }
 
                 var emailAddress = userAcct.Email;
                 if (UserEmail != emailAddress) {
-                    response = "<h3>Sorry! Unable to authenticate your account.</h3><br />Please contact the administrator to correct" +
+                    response = webInterface.UserMsg("!Sorry! Unable to authenticate your account<br/>Please contact the administrator to correct", false);
+
+                   /* response = "<h3>Sorry! Unable to authenticate your account.</h3><br />Please contact the administrator to correct" +
                         "<script language=\"javascript\">" +
                         "setTimeout(function() {window.location.href = \"index.html\";}, 5000);" +
                         "</script>";
-
+                   */
                     return null;
                 }
 
@@ -112,24 +116,27 @@ namespace WhiteCore.Modules.Web
                             string.Format ("This request was made via the {0} WebUi at {1}\n\nYour new passsword is : {2}",
                                 gridName, Culture.LocaleTimeDate (), newPassword),
                             null);
+                        response = webInterface.UserMsg("An email has been sent with your new password", true);
 
-                        response = "<h3>An email has been sent with your new password</h3>Redirecting to main page";
+                        //response = "<h3>An email has been sent with your new password</h3>Redirecting to main page";
                     } else
-                        response = "<h3>Sorry! Your password was not able to be reset.<h3>Please contact the administrator directly<br>Redirecting to main page</h3>";
+                        response = webInterface.UserMsg("!Sorry! Your password was not able to be reset<br/>Please contact the administrator", true);
+                    //response = "<h3>Sorry! Your password was not able to be reset.<h3>Please contact the administrator directly<br>Redirecting to main page</h3>";
                 } else
-                    response = "<h3>The email functions are local to the grid or have not yet been set up<h3>Please contact the administrator directly<br>Redirecting to main page</h3>";
+                    response = webInterface.UserMsg("!The email functions are local to the grid or have not yet been set up<br/>Please contact the administrator", true);
+                    //response = "<h3>The email functions are local to the grid or have not yet been set up<h3>Please contact the administrator directly<br>Redirecting to main page</h3>";
 
 
-                response = response +
+                /*response = response +
                     "<script language=\"javascript\">" +
                     "setTimeout(function() {window.location.href = \"index.html\";}, 5000);" +
                         "</script>";
-
+                */
                 return null;
             }
 
 
-            vars.Add ("ErrorMessage", error);
+            //vars.Add ("ErrorMessage", error);
             vars.Add ("ForgotPassword", translator.GetTranslatedString ("ForgotPassword"));
             vars.Add ("UserNameText", translator.GetTranslatedString ("UserName"));
             vars.Add ("UserEmailText", translator.GetTranslatedString ("UserEmailText"));

@@ -69,18 +69,19 @@ namespace WhiteCore.Modules.Web
             vars.Add ("RegionServerURL", webInterface.GridURL);  // This needs to be sorted out for grid regions
 
             #region EditRegion
-            if (requestParameters.ContainsKey ("Submit")) {
+            if (requestParameters.ContainsKey ("update")) {
+                // params
+                var regionID = requestParameters["regionid"].ToString();
+                string regionServerURL = requestParameters ["regionurl"].ToString ();
 
-                string RegionServerURL = requestParameters ["RegionServerURL"].ToString ();
                 // required
-                if (RegionServerURL == "") {
-                    response = "<h3>" + translator.GetTranslatedString ("RegionServerURLError") + "</h3>";
+                if ((regionID == "") || (regionServerURL == "")) {
+                    response = webInterface.UserMsg("!" + translator.GetTranslatedString ("RegionServerURLError"));
                     return null;
                 }
 
-                var regionID = requestParameters ["RegionID"].ToString ();
                 var regionName = requestParameters ["RegionName"].ToString ();
-                //var OwnerUUID = requestParameters["OwnerUUID"].ToString();
+                var OwnerUUID = requestParameters["OwnerUUID"].ToString();
                 var regionLocX = requestParameters ["RegionLocX"].ToString ();
                 var regionLocY = requestParameters ["RegionLocY"].ToString ();
                 var regionSizeX = requestParameters ["RegionSizeX"].ToString ();
@@ -96,11 +97,11 @@ namespace WhiteCore.Modules.Web
 
                 // a bit of idiot proofing
                 if (regionName == "") {
-                    response = "<h3>" + translator.GetTranslatedString ("RegionNameError") + "</h3>";
+                    response = webInterface.UserMsg("!" + translator.GetTranslatedString ("RegionNameError"), false);
                     return null;
                 }
                 if ((regionLocX == "") || (regionLocY == "")) {
-                    response = "<h3>" + translator.GetTranslatedString ("RegionLocationError") + "</h3>";
+                    response = webInterface.UserMsg("!" + translator.GetTranslatedString ("RegionLocationError"), false);
                     return null;
                 }
 
@@ -208,41 +209,32 @@ namespace WhiteCore.Modules.Web
                 if (requestParameters.ContainsKey ("NewRegion")) {
                     ISceneManager scenemanager = webInterface.Registry.RequestModuleInterface<ISceneManager> ();
                     if (scenemanager.CreateRegion (newRegion)) {
-                        response = "<h3>Successfully created region</h3>" +
-                            "<script language=\"javascript\">" +
-                            "setTimeout(function() {window.location.href = \"/?page=region_manager\";}, 2000);" +
-                            "</script>";
+                        response = webInterface.UserMsg("Successfully created region", true);
                         return null;
                     }
-                    response = "<h3>Error creating this region.</h3>";
+                    response = webInterface.UserMsg("!Error creating this region.", false);
                     return null;
                 }
-/* not necessary??
-                     IGridRegisterModule gridRegister = webInterface.Registry.RequestModuleInterface<IGridRegisterModule> ();
-                        if (gridRegister != null) {
-                            if (gridRegister.RegisterRegionWithGrid (null, true, false, null)) {
-                        
-                            }
-                        
+                /* not necessary??
+                                     IGridRegisterModule gridRegister = webInterface.Registry.RequestModuleInterface<IGridRegisterModule> ();
+                                        if (gridRegister != null) {
+                                            if (gridRegister.RegisterRegionWithGrid (null, true, false, null)) {
 
-                        //                        response = "<h3>" + error + "</h3>";
-                        response = "<h3> Error registering region with grid</h3>";
-                }
-*/
+                                            }
+
+
+                                        //                        response = "<h3>" + error + "</h3>";
+                                        response = webInterface.UserMsg("!Error registering region with grid", false);
+                                }
+                */
                 // update region details
                 var infoConnector = Framework.Utilities.DataManager.RequestPlugin<IRegionInfoConnector> ();
                 if (infoConnector != null) {
-                    infoConnector.UpdateRegionInfo (newRegion);
+                    infoConnector.UpdateRegionInfo(newRegion);
 
-                    response = "<h3>Region details updated.</h3>" +
-                    "<script language=\"javascript\">" +
-                    "setTimeout(function() {window.location.href = \"/?page=region_manager\";}, 2000);" +
-                    "</script>";
+                    response = webInterface.UserMsg("Region details updated");
                 } else
-                    response = "<h3>Unable to update Region details!</h3>" +
-                    "<script language=\"javascript\">" +
-                    "setTimeout(function() {window.location.href = \"/?page=region_manager\";}, 2000);" +
-                    "</script>";
+                    response = webInterface.UserMsg("!Unable to update Region details!"); 
                 return null;
 
             }
@@ -324,10 +316,9 @@ namespace WhiteCore.Modules.Web
             else
             #region NewRegion    
             {
-                // default values
-
+                // set some default/suggested values
                 // check for user region name  seed
-                string [] m_regionNameSeed = null;
+                string[] m_regionNameSeed = null;
                 IConfig regionConfig =
                     webInterface.Registry.RequestModuleInterface<ISimulationBase> ().ConfigSource.Configs ["FileBasedSimulationData"];
 
@@ -380,6 +371,9 @@ namespace WhiteCore.Modules.Web
             }
             #endregion
 
+            // required selections
+
+            // get region selection
             vars.Add ("RegionPresets", WebHelpers.RegionSelections (webInterface.Registry));
 
             // Labels
@@ -398,10 +392,7 @@ namespace WhiteCore.Modules.Web
             vars.Add ("RegionInfiniteText", translator.GetTranslatedString ("RegionInfiniteText"));
             vars.Add ("RegionCapacityText", translator.GetTranslatedString ("RegionCapacityText"));
             vars.Add ("Cancel", translator.GetTranslatedString ("Cancel"));
-            vars.Add ("InfoMessage", "");
-
-
-
+            // vars.Add ("InfoMessage", "");
 
             return vars;
         }

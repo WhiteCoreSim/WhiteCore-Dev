@@ -5,92 +5,195 @@
 	<title>{SystemName}: Welcome Screen</title>
 	<meta name="keywords" content="{SystemName}" />
 	<meta name="description" content="{SystemName}"/>
-	<link rel="shortcut icon" href="../images/icons/favicon.ico" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Speaking of Google, don't forget to set your site up:
+       http://google.com/webmasters -->
+  <meta name="google-site-verification" content="" />
 
-	<!-- StyleSwitch TODO -->
-	<link href="../css/styles1.css" rel="stylesheet" type="text/css" media="screen" title="styles1" />
-	<link href="../css/styles2.css" rel="alternate stylesheet" type="text/css" title="styles2" media="screen" />
-	<link href="../css/styles3.css" rel="alternate stylesheet" type="text/css" title="styles3" media="screen" />
-	<link href="../css/styles4.css" rel="alternate stylesheet" type="text/css" title="styles4" media="screen" />
-	<link href="../css/styles5.css" rel="alternate stylesheet" type="text/css" title="styles5" media="screen" />
-	<style type="text/css">#container{display:none;} img#mainImage{display:none;}</style>
+  <link rel="apple-touch-icon" sizes="180x180" href="/static/apple-touch-icon.png?v=20190901">
+  <link rel="icon" type="image/png" sizes="32x32" href="/static/favicon-32x32.png?v=20190901">
+  <link rel="icon" type="image/png" sizes="16x16" href="/static/favicon-16x16.png?v=20190901">
+  <link rel="manifest" href="/static/site.webmanifest">
+
+  <link type="text/css" rel="stylesheet" href="/static/css/bootstrap.min.css?v=20190901">
+  <link type="text/css" rel="stylesheet" href="/static/css/style.css?v=20190904">
+  <link type="text/css" rel="stylesheet" href="/welcomescreen/welcome.css?v=20200823">
+
+
+
+	<style type="text/css">
+		#container{display:none;}
+		img#mainImage{display:none;}
+	</style> 
 </head>
 
 <body class="welcomescreen">
-<div id="container">
-<div align="center"style="padding-top:30px;"><h1><bold>{SystemName}</h1></bold></div>
-<div id=top_image>
-    <a class="logofade" href="" alt="{SystemName}" title="{SystemName}">
-		<img class="logofade" src="../images/logo1.png" alt="{SystemName}" title="{SystemName}" />
-	</a>
-</div>
+	{IfMaintenanceBegin}
+  <section class="hero">
+	  <!--#include file="/maintenance.html" -->
+	</section>
+	{IfMaintenanceEnd}
 
-<div id=bottom_left>
-<iframe class="regionbox" src="region_box.html" scrolling="no" style="overflow:hidden"></iframe>
-<br />
+	{IfNoMaintenanceBegin}
+  <!--#include file="/modal_profile.html" -->
 
-<iframe class="news" src="news.html" scrolling="no" style="overflow:hidden"></iframe>
+  <section>
+    <div class="header-content">
 
-</div>
+      <div class="d-inline text-center" style="padding-top:10px;">
+        <a href="{SystemURL}" alt="{SystemName}" title="{SystemName}">
+          <h1><bold>{SystemName}</bold></h1>
+        </a>
+      </div>
 
-<img id=mainImage src="../images/icons/spacer.gif" alt="" title="" />
+    </div>
 
-<div id=topright>
+    
+    <!-- content -->
+    <div class="container-fluid" id="container">
 
-<iframe class="gridstatus" src="gridstatus.html" scrolling="no" style="overflow:hidden"></iframe>
+      <div class="row" id="content">
+        <div id="loading">
+          <img src="/static/icons/loading.gif" alt="Loading..." />
+        </div>
 
-<br />
-<iframe class="infobox" src="info_box.html" scrolling="no" style="overflow:hidden"></iframe>
-</div>
+        <div class="col-3" id="topleft">
+          <!--#include file="welcomescreen/region_box.html" -->
+          <br />
+          <!--#include file="welcomescreen/news.html" -->
+        </div>
 
-<div id="bottomright">
+        <div class="col"></div>
 
-{IfShowLanguageTranslatorBarBegin}
-	  <div class=languageswitch>
-	    <ul>
-		{StyleSwitcherLanguagesText}:
-		  <li><a href="?language=en" rel="en" class="languageswitch" alt="{en}" title="<img src='../images/flags/flag-en.png' alt='en' /> {en}">en</a></li>
-		  <li><a href="?language=fr" rel="fr" class="languageswitch" alt="{fr}" title="<img src='../images/flags/flag-fr.png' alt='fr' /> {fr}">fr</a></li>
-		  <li><a href="?language=de" rel="de" class="languageswitch" alt="{de}" title="<img src='../images/flags/flag-de.png' alt='de' /> {de}">de</a></li>
-		  <li><a href="?language=it" rel="it" class="languageswitch" alt="{it}" title="<img src='../images/flags/flag-it.png' alt='it' /> {it}">it</a></li>
-		  <li><a href="?language=es" rel="es" class="languageswitch" alt="{es}" title="<img src='../images/flags/flag-es.png' alt='es' /> {es}">es</a></li>
-		  <li><a href="?language=nl" rel="nl" class="languageswitch" alt="{nl}" title="<img src='../images/flags/flag-nl.png' alt='nl' /> {nl}">nl</a></li>
-          <li><a href="?language=ru" rel="ru" class="languageswitch" alt="{ru}" title="<img src='../images/flags/flag-ru.png' alt='ru' /> {ru}">ru</a></li>
-          <li><a href="?language=zh_CN" rel="zh_CN" class="languageswitch" alt="{zh_CN}" title="<img src='../images/flags/flag-zh_CN.png' alt='zh_CN' /> {zh_CN}">zh_CN</a></li>
-		<!--{StyleSwitcherChoiceText}: <span id="lg1">en</span><span id="lg2">fr</span><span id="lg3">de</span><span id="lg4">it</span><span id="lg5">es</span><span id="lg6">nl</span><span id="lg7">ru</span><span id="lg8">zh_CN</span>-->
-		</ul>
-	  </div>
-{IfShowLanguageTranslatorBarEnd}
+        <div class="col-3 pull-right" id="topright">
+          <!--#include file="welcomescreen/gridstatus.html" -->
+          <br />
+          <!--#include file="welcomescreen/info_box.html" -->
+        </div>
+    	</div>  <!-- content -->
+    </div>
 
+  </section>
+  {IfNoMaintenanceEnd}
 
-</div>
-</div>
+  <footer class="footer">
+    <div class="container d-inline">
+      <div class="col" id="bottom_image">
+        <a class="logofade" href="{SystemURL}" alt="{SystemName}" title="{SystemName}">
+          <img src="/static/images/logo.png" width="25" alt="WhiteCore Sim logo">
+          <img class="logofade" height="30" src="/static/images/logo2.png" alt="WhiteCore Sim logo" />
+        </a>
+      </div>
+      
+      <div class="col-2 pull-right" id="language">
+
+        {IfShowLanguageTranslatorBarBegin}
+          <div id="language" class="languageswitch">
+            <a rel="nofollow" id="language-drop" href="javascript:toggleLanguage();">
+              <span>LANGUAGE &#9652;</span>
+            </a>
+            <ul id="languageList" style="display:none;margin-top:-135px;">
+              {LanguagesArrayBegin}
+              <li>
+                <a href="{Href}" rel="{Code}" class="languageswitch" alt="{Code}">
+                  <img src="/static/flags/flag-{Code}.png" alt="{Code}">{Language}
+                </a>
+              </li>
+            {LanguagesArrayEnd}
+            </ul>
+          </div>
+        {IfShowLanguageTranslatorBarEnd}
+
+      </div>
+    </div>
+  </footer>
+
 
 	<!-- Javascript -->
-	<script src="../js/jquery-3.1.1.min.jss" type="text/javascript"></script>
-	<script src="../js/resize.js" type="text/javascript" language="javascript"></script>
-	<script src="../js/randomimageswitch.js" type="text/javascript" language="javascript"></script>
-	<!-- <script src="../js/timeimageswitch.js" type="text/javascript" language="javascript"></script> -->
-	<!--<script src="../js/jquery.tooltip.js" type="text/javascript" language="javascript"></script> -->
+  <script type="text/javascript" src="/static/js/jquery-3.4.1.min.js?v=20190901"></script>
+  <script type="text/javascript" src="/static/js/bootstrap.bundle.min.js?v=20190901"></script>
+  <script type="text/javascript" src="/static/js/randomimageswitch.js?v=20200801"></script>
 
 	<script>
-		$(document).ready(function(){
+    $(window).on("load", function() {
+       $("#loading").fadeOut();
+    });
+
+    function toggleLanguage() {
+      $("#languageList").toggle();
+    }
+
+		$(function(){
 			bgImgRotate();
 			$( '#container, img#mainImage, #footer' ).fadeIn("slow");
+
 		});
 
-	<!-- Tooltips -->
-		$(function() {$('#container *').tooltip({showURL: false});});
+	 // Tooltips
+
+		//$(function() {$('#container *').tooltip({showURL: false});});
 
 	  $('#bottomright, input.languageswitch, .regionbox, .news, .gridstatus, .infobox, a.languageswitch, a.styleswitch, a.welcomescreen, a.world_map, a.copyright, li.fade, a.fade').css('opacity', 0.3);
- 		$("#bottomright, input.languageswitch, .regionbox, .news, .gridstatus, .infobox, a.languageswitch, a.styleswitch, a.welcomescreen, a.world_map, a.copyright, li.fade, a.fade").hover(
-    function() {
-     	$(this).stop().animate({"opacity": "1.0"}, "3.0");},
-		function() {
-	  	$(this).stop().animate({"opacity": "0.3"}, "3.0");
-        });
+ 		$("#bottomright, input.languageswitch, .regionbox, .news, .gridstatus, .infobox, a.languageswitch, a.styleswitch, a.welcomescreen, a.world_map, a.copyright, li.fade, a.fade")
+      .hover(
+        function() {
+          // Mouse over
+     	    $(this).stop().animate({"opacity": "1.0"}, "3.0");
+        },
+		    function() {
+          // Mouse out
+	  	    $(this).stop().animate({"opacity": "0.3"}, "3.0");
+        }
+      );
+  // regions
+  //$(function() {
+    $('a.regionslurl').hover(function() { 
+      //mouse in
+      $(this).animate({ paddingLeft: '5px' }, 400);
+    }, function() {
+      //mouse out
+      $(this).animate({ paddingLeft: 0 }, 400);
+    });        
+  //});
+  	//$("a.logofade").hover(function(){$(this).fadeOut(150);$(this).fadeIn(150);});
 
-  	$("a.logofade").hover(function(){$(this).fadeOut(150);$(this).fadeIn(150);});
+    // fade class
+    $("li.fade, a.fade").hover(function(){
+      $(this).fadeOut(150);
+      $(this).fadeIn(150);
+    });
+    $("a.logofade").hover(function(){
+      $(this).fadeOut(150);
+      $(this).fadeIn(150);
+    });
+    $("a.languageswitch, a.webprofile").hover(function(){
+      $(this).fadeOut(150);
+      $(this).fadeIn(150);
+    });
+
+  /*- load modal content -*/
+  function loadmodalcontent(pageid, params='', title=''){
+
+  var content = $("#modalcontent");
+  if (params!= '') {
+    params = "?" + params;
+  }
+  content.html('');   // clear anything previously loaded
+
+  //load selected page
+  switch(pageid){
+    {ModalItemsArrayBegin}
+    case "{MenuItemID}":
+      content.load("../{MenuItemLocation}" + params);
+      break;
+    {ModalItemsArrayEnd}
+    default:
+      break;
+  }
+
+  $("#profileModal").modal("show");
+};
+
  </script>
 
 </body>

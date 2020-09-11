@@ -71,9 +71,12 @@ namespace WhiteCore.Modules.Web
             var settings = webInterface.GetWebUISettings ();
             var userPages = webInterface.GetUserPages ();
             var userTopPages = webInterface.GetUserTopPages ();
+            var modalPages = webInterface.GetModalPages();
 
             var mainmenu = webInterface.BuildPageMenus (userTopPages, httpRequest, translator);
             vars.Add ("MenuItems", mainmenu);
+            var mdlmenu = webInterface.BuildPageMenus(modalPages, httpRequest, translator);
+            vars.Add("ModalItems", mdlmenu);
 
             var usermenu = webInterface.BuildPageMenus (userPages, httpRequest, translator);
 

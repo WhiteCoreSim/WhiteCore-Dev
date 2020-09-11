@@ -1,60 +1,128 @@
 
 <!-- Edit user event -->
 
+<div class="container-fluid">
   <h2>{EventNameText}:{SimName}</h2>
-  <div id="info_message" class="info"></div>
-  <form id="edit_event_form" action="user/edit_event.html" method="post">
-    <input hidden="true" label="eventid" id="eventid" name="eventid" value="{EventID}"/>
-    <input type="hidden" label="Submit" id="Submit" name="Submit" value="Submit" />
 
-<div class="rTable">
-  <div class="rTableHeading">
-    <div class="rTableRow">
-      <div class="rTableHead">&nbsp;</div>
-      <div class="rTableHead">&nbsp;</div>
-      <div class="rTableHead">&nbsp;</div>
-      <div class="rTableHead">&nbsp;</div>
-    </div>
-  </div>
-  <div class="rTableBody">
-    <div class="rTableRow">
-      <div class="rTableCell">
-        <p>{EventNameText}</p>
+  <form class="form-inline" id="edit_event_form" action="user/event_edit.html" method="post">
+<!--    <input hidden="true" label="eventid" id="eventid" name="eventid" value="{EventID}"/>  -->
+
+    <div class="row w-100">
+      <div class="col-md-8 offset-md-2">
+
+        <div class="form-group">
+          <label for="eventName" class="col-4 col-form-label text-right mr-2">{EventNameText}</label>
+          <input class="form-control" style="width:300px;" id="eventName" require="true" name="eventName" type="text" size="120" value="{EventName}">
+        </div>
+
+        <div class="form-row">
+          <div class="form-group col-2 text-right">{EventDateText}</div>
+          <div class="form-group col-3">
+            <div class="input-group" style="width:180px;">
+              <input class="form-control" type="text" name="eventDate" id="eventDate" value="{EventDate}" />
+              <div class="input-group-append">
+                <span class="input-group-text">
+                  <i class="fa fa-calendar fa-lg" id="eventCalendar" style="height:24px;"></i>
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-3 pull-right">
+            <div class="form-group row">
+              <label for="eventTime" class="col-form-label mr-2">{EventTimeText}</label>
+              <select class="custom-select form-control" style="width:140px;" id="eventTime" name="eventTime">
+                {EventTimesArrayBegin}
+                  <option value="{Index}" {selected}>{Value}</option>
+                {EventTimesArrayEnd}
+              </select>
+            </div>
+            <small class="form-text text-light">{EventTimeInfoText}</small>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group col-2 text-right">{EventDurationText}</div>
+          <div class="form-group col-3">
+            <div class="input-group" style="width:180px">
+              <select class="custom-select form-control" id="eventDuration" name="eventDuration">
+                {EventDurationsArrayBegin}
+                  <option value="{Index}" {selected}>{Value}</option>
+                {EventDurationsArrayEnd}
+              </select>
+            </div>
+          </div>
+          <div class="form-group col">><label>{EventTimeInfoText}</label></div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group col-2 text-right">{EventLocationText}</div>
+          <div class="form-group col-4">
+            <select class="custom-select form-control" id="eventLocation" name="eventLocation">
+              {EventLocationsArrayBegin}
+                <option {disabled} value="{Index}">{Value}</option>
+              {EventLocationsArrayEnd}
+            </select>
+          </div>
+          <div class="form-group col"></div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group col-2 text-right">{EventCategoryText}</div>
+          <div class="form-group col-3">
+            <div class="input-group" style="width:240px;">
+              <select class="custom-select form-control"  id="eventCategory" name="eventCategory">
+                {EventCategoriesArrayBegin}
+                  <option {selected} value="{Index}">{Value}</option>
+                {EventCategoriesArrayEnd}
+              </select>
+            </div>
+          </div>
+
+          <div class="col-4 pull-right">
+            <div class="form-row">
+              <label for="eventCoverCharge" class="col-form-label mr-2">{EventCoverChargeText}</label>
+              <input class="form-control" id="eventCoverCharge" style="width:80px;" name="eventCoverCharge" type="text" value="{EventCoverCharge}" />
+            </div>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group col-2 text-right">{EventDescriptionText}</div>
+          <div class="form-group col" style="height:auto;">
+            <textarea class="form-control" id="eventDescription" name="eventDescription" cols="70" rows="5">
+              {Description}
+            </textarea>
+          </div>
+          <div class="col-2"></div>
+        </div>
+
+        <div class="form-row">
+          <div class="col-2">
+              <a class="btn btn-sm btn-danger" style="width:100px;" 
+                  onclick="submitupdate('edit_event_form', 'eventid={EventID}&deleteitem=true');">
+                {Delete}
+              </a>
+            
+          </div>
+          <div class="col">
+            <div class="pull-right">
+              <a class="btn btn-sm btn-success mr-3" style="width:100px;" onclick="loadusercontent('events-events');">{Cancel}</a>
+              <a class="btn btn-sm btn-warning" style="width:100px;" 
+                  onclick="submitupdate('edit_event_form', 'eventid={EventID}&additem=true');">
+                {Submit}
+              </a>
+            </div>
+          </div>
+          <div class="col-2"></div>
+        </div>
       </div>
-      <div class="rTableCell"><input id="eventName" name="eventName" size="119" type="text" value="{Name}" /></div>
     </div>
-    <div class="rTableRow">
-      <div class="rTableCell"><label class="from" for="eventDate">{EventDateText}</label></div>
-      <div class="rTableCell"><input id="eventDate" style="width: 120px;" name="eventDate" type="text" value="{EventDate}" /></div>
-      <div class="rTableCell"><label class="to" for="eventTime">{EventTimeText}</label></div>
-      <div class="rTableCell"><select id="eventTime" name="eventTime">{EventTimesArrayBegin}
-          <option selected="selected" value="{Index}">{Value}</option>
-          {EventTimesArrayEnd}</select></div>
-    </div>
-    <div class="rTableRow">
-      <div class="rTableCell"><label class="to" for="eventDuration">{EventDurationText}</label></div>
-      <div class="rTableCell"><select id="eventDuration" name="eventDuration">{EventDurationsArrayBegin}
-          <option selected="selected" value="{Index}">{Value}</option>
-          {EventDurationsArrayEnd}</select></div>
-      <div class="rTableCell"><label class="from">{EventTimeInfoText}</label></div>
-    </div>
-    <div class="rTableRow">
-      <div class="rTableCell">
-        <p>{EventLocationText}</p>
-      </div>
-      <div class="rTableCell"><select id="eventLocation" name="eventLocation">{EventLocationsArrayBegin}
-          <option disabled="disabled" selected="selected" value="{Index}">{Value}</option>
-          {EventLocationsArrayEnd}</select></div>
-    </div>
-    <div class="rTableRow">
-      <div class="rTableCell"><label class="to" for="eventDuration">{EventCategoryText}</label></div>
-      <div class="rTableCell"><select id="eventCategory" name="eventCategory">{EventCategoriesArrayBegin}
-          <option selected="selected" value="{Index}">{Value}</option>
-          {EventCategoriesArrayEnd}</select></div>
-      <div class="rTableCell"><label class="to" for="eventCoverCharge">{EventCoverChargeText}</label></div>
-      <div class="rTableCell"><input id="eventCoverCharge" style="width: 80px;" name="eventCoverCharge" type="text" value="{EventCoverCharge}" /></div>
-    </div>
-    <div class="rTableRow">
+  </form>
+</div>
+
+
+<!--    <div class="rTableRow">
       <div class="rTableCell">
         <p>{EventDescriptionText}</p>
       </div>
@@ -154,7 +222,7 @@
   </form>
 -->
   <script>
-    <!--  /* date picker */ -->
+    /* date picker */
     $(function() {
       $( "#eventDate" ).datepick({
         //defaultDate: "-1w",
@@ -165,22 +233,6 @@
           $( "#eventDate" ).datepick( "option", "minDate", selectedDate );
         }
       });
-    });
-
-    /* attach a submit handler to the form */
-    $("#edit_event_form").submit(function(event) {
-
-      /* stop form from submitting normally */
-      event.preventDefault();
-      /* get some values from elements on the page: */
-      var $form = $( this ),
-          url = $form.attr( 'action' );
-      /* Send the data using post and put the results in a div */
-      $.post( url, $form.serialize(),
-        function( data ) {
-          $("#info_message").empty().append(data);
-        }
-      );
     });
   </script>
 

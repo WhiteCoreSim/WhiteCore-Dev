@@ -43,6 +43,7 @@ namespace WhiteCore.Modules.Web
             {
                 return new[]
                            {
+                               "html/webprofile/modal_regions.html",
                                "html/webprofile/regions.html"
                            };
             }
@@ -66,6 +67,11 @@ namespace WhiteCore.Modules.Web
             var vars = new Dictionary<string, object>();
             var regionslist = new List<Dictionary<string, object>>();
             UserAccount userAcct = new UserAccount();
+            var accountservice = webInterface.Registry.RequestModuleInterface<IUserAccountService>();
+
+            if (accountservice is null) {
+                return vars;
+            }
 
             // future use // uint amountPerQuery = 10;
             string noDetails = translator.GetTranslatedString ("NoDetailsText");
@@ -77,8 +83,14 @@ namespace WhiteCore.Modules.Web
                 UUID userUUID = UUID.Parse (userid);
                 scopeUUID.Add (userUUID);
                   
-                userAcct = webInterface.Registry.RequestModuleInterface<IUserAccountService>().
-                    GetUserAccount(null, userUUID);
+                userAcct = accountservice.GetUserAccount(null, userUUID);
+
+                if (!userAcct.Valid)
+                    return vars;
+
+                // User found....
+                vars.Add("UserName", userAcct.Name);
+                vars.Add("UserID", userAcct.PrincipalID);
 
                 IGridService gridService = webInterface.Registry.RequestModuleInterface<IGridService>();
                 IWebHttpTextureService webTextureService = webInterface.Registry.RequestModuleInterface<IWebHttpTextureService>();
@@ -103,7 +115,7 @@ namespace WhiteCore.Modules.Web
                         regionData.Add("RegionLocX", region.RegionLocX / Constants.RegionSize);
                         regionData.Add("RegionLocY", region.RegionLocY / Constants.RegionSize);
                         regionData.Add("RegionInfo", info);
-                        regionData.Add("RegionStatus", region.IsOnline ? "yes" : "no");
+                        regionData.Add("RegionStatus", region.IsOnline ? "Online" : "Offline");
                         regionData.Add("RegionID", region.RegionID);
 
                         if (webTextureService != null && region.TerrainMapImage != UUID.Zero)
@@ -130,8 +142,17 @@ namespace WhiteCore.Modules.Web
                     });
              }
 
+            // Menus
+            vars.Add("MenuProfileTitle", translator.GetTranslatedString("MenuProfileTitle"));
+            vars.Add("TooltipsMenuProfile", translator.GetTranslatedString("TooltipsMenuProfile"));
+            vars.Add("MenuGroupTitle", translator.GetTranslatedString("MenuGroupTitle"));
+            vars.Add("TooltipsMenuGroups", translator.GetTranslatedString("TooltipsMenuGroups"));
+            vars.Add("MenuPicksTitle", translator.GetTranslatedString("MenuPicksTitle"));
+            vars.Add("TooltipsMenuPicks", translator.GetTranslatedString("TooltipsMenuPicks"));
+            //vars.Add("MenuRegionsTitle", translator.GetTranslatedString("MenuRegionsTitle"));
+            //vars.Add("TooltipsMenuRegions", translator.GetTranslatedString("TooltipsMenuRegions"));
+
             vars.Add("NoDetailsText", noDetails);
-            vars.Add ("UserName", userAcct.Name);
 
             vars.Add ("RegionListText", translator.GetTranslatedString ("RegionListText"));
             vars.Add ("RegionList", regionslist);

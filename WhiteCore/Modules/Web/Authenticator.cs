@@ -92,7 +92,7 @@ namespace WhiteCore.Modules.Web
                 if (_authenticatedUsers.ContainsKey (sessionID))
                     return _authenticatedUsers [sessionID];
             }
-            return null;
+            return new UserAccount();
         }
 
         public static UUID GetAuthenticationSession (OSHttpRequest request)

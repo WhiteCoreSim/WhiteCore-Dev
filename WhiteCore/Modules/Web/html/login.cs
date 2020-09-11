@@ -77,13 +77,9 @@ namespace WhiteCore.Modules.Web
                         Expires = DateTime.MinValue,
                         Path = ""
                     });
-
-                    response = "<h3>Successfully logged in, redirecting to main page</h3>" +
-                               "<script language=\"javascript\">" +
-                               "setTimeout(function() {window.location.href = \"index.html\";}, 0);" +
-                               "</script>";
+                    response = webInterface.UserMsg("Successfully logged in", true);
                 } else
-                    response = "<h3>Failed to verify user name and password</h3>";
+                    response = webInterface.UserMsg("!Failed to verify user name and password", false);
                 return null;
             }
 

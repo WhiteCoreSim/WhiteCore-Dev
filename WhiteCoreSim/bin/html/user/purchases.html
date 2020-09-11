@@ -1,23 +1,26 @@
 <!-- User Purchases -->
+<style>
+  .page-link {background-color: transparent !important;}
+</style>
 
-<div id="fullPage">
+<div class="col98" id="purchase_page">
   <div class="container">
     <h2>{UserName}: {PurchasesText}</h2>
-    <legend class="text-left">{DateInfoText}</legend>
+<!--    <legend class="text-left">{DateInfoText}</legend>  -->
 
     <div class="col-12">
       <form class="form form-inline" role="form" id="purchases_search_form" action="user/user_purchases.html" method="post">
 
   			<div class="col-4 form-group">
  				  <label for="date_start">{DateStartText}&nbsp;&nbsp;</label>
-  				  <input class="form-control" type="text" style="width:120px;" name="date_start" id="date_start" value="{DateStart}" />
-            <span class="add-on"><i class="fa fa-calendar fa-lg" style="margin-left:-20px;color:black;" id="cal"></i></span>
+  				  <input class="form-control event-date" type="text" style="width:130px;" name="date_start" id="date_start" value="{DateStart}" />
+            <span class="add-on"><i class="fa fa-calendar fa-lg event-calendar"></i></span>
         </div>
 
         <div class="col-4 form-group">
   				  <label for="date_end">{DateEndText}&nbsp;&nbsp;</label>
-  			  	<input class="form-control" type="text" style="width:120px;" name="date_end" id="date_end" value="{DateEnd}" />
-            <span class="add-on"><i class="fa fa-calendar fa-lg"  style="margin-left:-20px;color:black;"id="cal"></i></span>
+  			  	<input class="form-control event-date" type="text" style="width:130px;" name="date_end" id="date_end" value="{DateEnd}" />
+            <span class="add-on"><i class="fa fa-calendar fa-lg event-calendar"></i></span>
 
         </div>
 
@@ -27,10 +30,12 @@
 
         <div class="col-2 form-group">
 		      <input hidden type="hidden" label="Submit" id="Submit" name="Submit" value="Submit" />
-  				<button class="button" id="Submit"style="float:right;width:200px;" type="Submit" name="Submit">{Search}</button>
+ <!-- 				<button class="button" id="Submit"style="float:right;width:200px;" type="Submit" name="Submit">{Search}</button>  -->
+          <a class="button" id="Submit" style="float:right;width:200px;" 
+              onclick="submitpagesearch('purchases_search_form', 'purchase_page');">
+            {Search}
+          </a>
         </div>
-
-
       </form>
     </div>
   </div>
@@ -70,16 +75,22 @@
 <script>
   $(function() {
     $('#purchases_list').dataTable({
+      dom: 'frtip',
       "order": [[ 0, "asc" ]],
       "aoColumnDefs": [{"bSortable":false,"aTargets":["no-sort"]}],
       /*"aaSorting":[], */
       "oLanguage": {"sSearch": "Filter: "},
+      "pageLength": 10,
+      "fixedHeader": {
+        header: true,
+         //footer: true
+      },
     });
 
     $('#date_start, #date_end').datepicker({
       showTrigger: '<button type="button" class="trigger">...</button>'});
 
-    <!--  /* date pickers */ -->
+    /* date pickers */
 
     $( "#date_start" ).datepicker( {
       orientation: "bottom left",
@@ -100,18 +111,5 @@
     });
   });
 
-  /* attach a submit handler to the form */
-  $("#purchases_search_form").submit(function(event) {
-
-    /* stop form from submitting normally */
-    event.preventDefault();
-    /* get some values from elements on the page: */
-    var $form = $( this ),
-        url = $form.attr( 'action' );
-    /* Send the data using post and put the results in a div */
-    $.post( url, $form.serialize(), function( data ) {
-      $("#fullPage").empty().append(data);
-    });
-  });
 </script>
 

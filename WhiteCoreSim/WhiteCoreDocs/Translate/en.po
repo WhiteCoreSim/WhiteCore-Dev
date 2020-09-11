@@ -3,16 +3,12 @@
 # This file is distributed under the same license as the WhiteCore package.
 # greythane <greythane@gmail.com>, 2016.
 #
-
-
 msgid ""
 msgstr ""
-
 "Project-Id-Version: WhiteCore Version 0.9.5\n"
 "Report-Msgid-Bugs-To: greythane <greythane@gmail.com>\n"
-
 "POT-Creation-Date: 2016-11-23 14:11:31Z\n"
-"PO-Revision-Date: 2016-11-23 14:11:31Z\n"
+"PO-Revision-Date: 2020-07-02 14:33+1000\n"
 "Last-Translator: greythane <greythane@gmail.com>\n"
 "Language-Team: WhiteCore Development <greythane@gmail.com>\n"
 "MIME-Version: 1.0\n"
@@ -20,7 +16,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Language: en\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: WhiteCore V0.9.5 Dev\n"
+"X-Generator: Poedit 2.3.1\n"
 
 msgid "30daysPastText"
 msgstr "Previous 30 days"
@@ -65,37 +61,37 @@ msgid "AddRegionText"
 msgstr "Add Region"
 
 msgid "AdminBanUserInfoText"
-msgstr "This blocks the user from logging in until the user is unbanned."
+msgstr "This blocks the user from logging in until the user is unbanned"
 
 msgid "AdminBanUserText"
 msgstr "Ban User"
 
 msgid "AdminDeleteUserInfoText"
-msgstr "This deletes the account and destroys all information associated with it."
+msgstr "This deletes the account and destroys all information associated with it"
 
 msgid "AdminDeleteUserText"
 msgstr "Delete User"
 
 msgid "AdminLoginInAsUserInfoText"
-msgstr "You will be logged out of your admin account, and logged in as this user, and will see everything as they see it."
+msgstr "You will be logged out of your admin account, and logged in as this user, and will see everything as they see it"
 
 msgid "AdminLoginInAsUserText"
 msgstr "Login as User"
 
 msgid "AdminTempBanUserInfoText"
-msgstr "This blocks the user from logging in for the set amount of time."
+msgstr "This blocks the user from logging in for the set amount of time"
 
 msgid "AdminTempBanUserText"
 msgstr "Temp Ban User"
 
 msgid "AdminUnbanUserInfoText"
-msgstr "Removes temporary and permanent bans on the user."
+msgstr "Removes temporary and permanent bans on the user"
 
 msgid "AdminUnbanUserText"
 msgstr "Unban User"
 
 msgid "AdminUserTypeInfoText"
-msgstr "The type of user (Currently used for periodical stipend payments)."
+msgstr "The type of user (Currently used for periodical stipend payments)"
 
 msgid "AdultText"
 msgstr "Adult"
@@ -134,7 +130,7 @@ msgid "AvatarNameError"
 msgstr "You did not enter an avatar name!"
 
 msgid "AvatarNameSpacingError"
-msgstr "Your avatar name should be "Firstname  Lastname"!"
+msgstr "Your avatar name should be ‘Firstname  Lastname’!"
 
 msgid "AvatarNameText"
 msgstr "Avatar Name"
@@ -161,7 +157,7 @@ msgid "Cancel"
 msgstr "Cancel"
 
 msgid "CannotSetParentToChild"
-msgstr "Cannot set menu item as a child to itself."
+msgstr "Cannot set menu item as a child to itself"
 
 msgid "CatAll"
 msgstr "All"
@@ -215,7 +211,7 @@ msgid "CatPropertyRental"
 msgstr "Property Rental"
 
 msgid "CatSelect"
-msgstr ""
+msgstr "Select category"
 
 msgid "CatService"
 msgstr "Service"
@@ -326,7 +322,7 @@ msgid "December"
 msgstr "December"
 
 msgid "DefaultsUpdated"
-msgstr "defaults updated, go to Factory Reset to update or Settings Manager to disable this warning."
+msgstr "defaults updated, go to Factory Reset to update or Settings Manager to disable this warning"
 
 msgid "DelayedText"
 msgstr "Delayed"
@@ -344,7 +340,7 @@ msgid "DeleteText"
 msgstr "Delete"
 
 msgid "DeleteUserInfoText"
-msgstr "This will remove all information about you in the grid and remove your access to this service. If you wish to continue, enter your name and password and click Delete."
+msgstr "This will remove all information about you in the grid and remove your access to this service. If you wish to continue, enter your name and password, check the confirmation box and click ‘Delete my account’"
 
 msgid "DeleteUserText"
 msgstr "Delete My Account"
@@ -446,7 +442,7 @@ msgid "Flatland"
 msgstr "Flatland"
 
 msgid "ForgotPassword"
-msgstr "Forgot Password?"
+msgstr "Forgot password?"
 
 msgid "FPSText"
 msgstr "Frames / second"
@@ -617,7 +613,7 @@ msgid "LoggedIPText"
 msgstr "Logged IP address"
 
 msgid "LoggedOutSuccessfullyText"
-msgstr "You have been logged out successfully."
+msgstr "You have been logged out successfully"
 
 msgid "Login"
 msgstr "Login"
@@ -1094,7 +1090,7 @@ msgid "RegionVisibilityText"
 msgstr "Visible to neighbours"
 
 msgid "RegistrationsDisabled"
-msgstr "Registrations are currently disabled, please try again soon."
+msgstr "Registrations are currently disabled, please try again soon"
 
 msgid "RegistrationText"
 msgstr "Avatar registration"
@@ -1511,7 +1507,7 @@ msgid "WebRegistrationText"
 msgstr "Web registrations allowed"
 
 msgid "WebsiteDownInfoText"
-msgstr "Website is currently down, please try again soon."
+msgstr "Website is currently down, please try again soon"
 
 msgid "WebsiteDownText"
 msgstr "Website offline"
@@ -1542,4 +1538,3 @@ msgstr "Full Screen"
 
 msgid "Yes"
 msgstr "Yes"
-

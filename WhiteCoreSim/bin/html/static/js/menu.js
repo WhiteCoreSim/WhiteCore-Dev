@@ -1,4 +1,4 @@
-$(document).ready(function(){
+$(function(){
 	// References
 	var topmenu = $("#topmenu li");
 	var members = $("#member-actions li");
@@ -66,17 +66,40 @@ $(document).ready(function(){
 });
 
 // embedded page content
-function loadcontent(pageid){
+function loadcontent(pageid, params=''){
 	var content = $("#content");
-
+	if (params!= '') {
+		params = "?" + params;
+	}
 	//load selected page
 	switch(pageid){
 		{MenuItemsArrayBegin}
 		case "{MenuItemID}":
-	    content.load("{MenuItemLocation}" + window.location.search);
+	    content.load("{MenuItemLocation}" + params + window.location.search);
 			break;
 		{MenuItemsArrayEnd}
 		default:
 			break;
 	}
+};
+
+function loadmodalcontent(pageid, params='', title=''){
+	var content = $("#modalcontent");
+	if (params!= '') {
+		params = "?" + params;
+	}
+	content.html('');		// clear anything previously loaded
+
+	//load selected page
+	switch(pageid){
+		{ModalItemsArrayBegin}
+		case "{MenuItemID}":
+	    content.load("{MenuItemLocation}" + params + window.location.search);
+			break;
+		{ModalItemsArrayEnd}
+		default:
+			break;
+	}
+
+	$("#profileModal").modal("show");
 };

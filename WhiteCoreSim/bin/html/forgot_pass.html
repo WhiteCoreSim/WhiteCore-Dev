@@ -1,7 +1,6 @@
 <!-- forgot password -->
 
 <section class="sign-up  text-center">
-  <div id="error_message" class="error_message"><h3>{ErrorMessage}</h3></div>
   <div class="container">
     <div class="row">
       <div class="col-2">
@@ -18,35 +17,16 @@
             <i class="fa fa-envelope"></i>
             <input type="text" class="" placeholder="{UserEmailText}" required name="UserEmail">
           </div>
-          <input hidden type="hidden" label="Submit" id="Submit" name="Submit" value="Submit" />
-          <button type="submit" class="btn-fill sign-up-btn">{Submit}</button>
+          <button class="btn-fill sign-up-btn" onclick="submitupdate('forgotpass_form');">{Submit}</button>
         </form>
       </div>
     </div>
   </div>
 </section>
 
-
-
 <script>
   $(function() {
     $("#login_input").focus();
-  });
-
-  /* attach a submit handler to the form */
-  $("#forgotpass_form").submit(function(event) {
-
-    /* stop form from submitting normally */
-    event.preventDefault();
-    /* get some values from elements on the page: */
-    var $form = $( this ),
-        url = $form.attr( 'action' );
-    /* Send the data using post and put the results in a div */
-    $.post( url, $form.serialize(),
-      function( data ) {
-		$("#error_message").empty().append(data);
-      }
-    );
   });
 </script>
 

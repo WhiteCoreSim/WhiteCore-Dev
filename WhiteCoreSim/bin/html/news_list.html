@@ -1,5 +1,4 @@
 <!-- params to replace
-
 SystemURL
 SystemName
 News
@@ -9,46 +8,43 @@ NewsTitle
 NewsText
 NewsID
 -->
-<div id="fullPage">
-  <h2>
-    {News}
-    <img alt="{NewsText}" src="static/icons/news.png" />
-  </h2>
-  <div class="container">
-    <div class="row justify-content-center">
-      <div class="col-10">
-              <ul class="event-list">
-                {NewsListArrayBegin}
-                <li>
-                  <time datetime="{NewsDate}">
-                    <span class="day">{NewsDay}</span>
-                    <span class="month">{NewsMonth}</span>
-                    <span class="fullday">{NewsDayName}</span>
-  <!--                   <span class="time">{NewsDate}</span> -->
-                  </time>
-                  <div class="info">
-                    <h2 class="title">{NewsTitle}</h2>
-                    <p class="desc">{NewsText}</p>
-                    <ul>
-                      <li style="width:33%;"><span class="fa fa-calendar"></span> {NewsDate}</li>
-  <!--                    <li style="width:33%;"><span class="fa fa-user"></span>{Maturity}</li>
-                      <li style="width:33%;"><span class="fa fa-money"></span>{CoverCharge}</li>  -->
-                    </ul>
-                  </div>
-                  <div class="social">
-                    <ul>
-                      <li class="facebook" style="width:33%;"><a href="#facebook"><span class="fa fa-facebook"></span></a></li>
-                      <li class="twitter" style="width:34%;"><a href="#twitter"><span class="fa fa-twitter"></span></a></li>
-                      <li class="google-plus" style="width:33%;"><a href="#google-plus"><span><img src="static/icons/mewe.png" style="height:25px;width:25px;"></span></a></li>
-                    </ul>
-                  </div>
-                </li>
-                {NewsListArrayEnd}
+
+<div class="container">
+    <h2>{SystemName}: {News}</h2>
+    <div class="row">
+      <div class="col-2"></div>
+      <div class="col-sm-8">
+        <ul class="event-list">
+      {EventListArrayBegin}
+          <li>
+            <time datetime="{EventDateTimeUTC}">
+              <span class="day">{EventDateTime}</span>
+              <span class="month">{EventHourTime}</span>
+              <span class="year">{EventMinuteTime}</span>
+              <span class="time">{DurationText}</span>
+            </time>
+            <img alt="{SimName}" src="{CategoryImage}" />
+            <div class="info">
+              <h2 class="title">{Name}</h2>
+              <p class="desc">{Description}</p>
+             <ul>
+                <li style="width:33%;"><span class="fa fa-list"></span> {Category}</li>
+                <li style="width:33%;"><span class="fa fa-user"></span>{Maturity}</li>
+                <li style="width:33%;"><span class="fa fa-money"></span>{CoverCharge}</li>
               </ul>
-
-
+            </div>
+            <div class="social">
+              <ul>
+                <li class="facebook" style="width:33%;"><a href="#facebook"><span class="fa fa-facebook"></span></a></li>
+                <li class="twitter" style="width:34%;"><a href="#twitter"><span class="fa fa-twitter"></span></a></li>
+                <li class="google-plus" style="width:33%;"><a href="#mewe"><span img src="static/icons/mewe.png" style="height:25px;width:25px;"></span></a></li>
+              </ul>
+            </div>
+          </li>
+        </ul>
       </div>
+      <div class="col-2"></div>
     </div>
-  </div>
 </div>
+
 

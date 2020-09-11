@@ -82,8 +82,8 @@ namespace WhiteCore.Modules.Web
             rpt = abuseModule.GetAbuseReport (cardID);
             if (rpt == null)
             {
-                vars.Add ("NoDetailsText", noDetails);
-                return vars;
+                response = webInterface.UserMsg("!" + noDetails, false);
+                return null;
             }
 
             // we have the report
@@ -92,7 +92,7 @@ namespace WhiteCore.Modules.Web
                 snapshotURL = webTextureService.GetTextureURL (rpt.ScreenshotID);
 
             // updating?
-            if (requestParameters.ContainsKey ("SubmitUpdates"))
+            if (requestParameters.ContainsKey ("update"))
             {
                 {
                     string newNote = requestParameters ["AbuseNoteText"].ToString ();
@@ -105,7 +105,8 @@ namespace WhiteCore.Modules.Web
 
                     abuseModule.UpdateAbuseReport (rpt);
 
-                    infoMessage = translator.GetTranslatedString ("ChangesSavedSuccessfully");
+                    response = webInterface.UserMsg(translator.GetTranslatedString ("ChangesSavedSuccessfully"), false);
+                    return null;
                 }
 
             }
@@ -132,23 +133,28 @@ namespace WhiteCore.Modules.Web
             vars.Add ("AbuseLocation", rpt.AbuseLocation);
             vars.Add ("Summary", rpt.AbuseSummary);
             vars.Add ("AbuserName", rpt.AbuserName);
-            vars.Add ("IsActive", rpt.Active);
-            vars.Add ("IsNotActive", !rpt.Active);
+            vars.Add("IsActive", WebHelpers.YesNoSelection(translator, rpt.Active));
+            //vars.Add ("IsActive", rpt.Active);
+            //.Add ("IsNotActive", !rpt.Active);
 
             vars.Add ("AssignedTo", rpt.AssignedTo);
             vars.Add ("Category", rpt.Category);
 
-            vars.Add ("IsChecked", rpt.Checked);
-            vars.Add ("IsNotChecked", !rpt.Checked);
+            vars.Add ("IsChecked", WebHelpers.YesNoSelection(translator, rpt.Checked));
+            //vars.Add ("IsNotChecked", !rpt.Checked);
 
             vars.Add ("Notes", rpt.Notes);
             vars.Add ("ObjectName", rpt.ObjectName);
             vars.Add ("ObjectPosition", rpt.ObjectPosition);
             vars.Add ("ObjectUUID", rpt.ObjectUUID);
             vars.Add ("RegionName", rpt.RegionName);
+            vars.Add("HopUrl", webInterface.HopUrl(rpt.RegionName, rpt.ObjectPosition));
+
             vars.Add ("ReporterName", rpt.ReporterName);
+
             vars.Add ("ScreenshotURL", snapshotURL);
-            
+
+            // needed??
             vars.Add ("NoDetailsText", noDetails);
             vars.Add ("InfoMessage", infoMessage);
 
@@ -169,6 +175,8 @@ namespace WhiteCore.Modules.Web
             vars.Add ("AddNotesText", translator.GetTranslatedString ("AddNotesText"));
             vars.Add ("ActiveText", translator.GetTranslatedString ("ActiveText"));
             vars.Add ("CheckedText", translator.GetTranslatedString ("CheckedText"));
+
+            vars.Add("Cancel", translator.GetTranslatedString("Cancel"));
             vars.Add ("AssignedToText", translator.GetTranslatedString ("AssignedToText"));
             vars.Add ("Submit", translator.GetTranslatedString ("SaveUpdates"));
             vars.Add ("Yes", translator.GetTranslatedString ("Yes"));

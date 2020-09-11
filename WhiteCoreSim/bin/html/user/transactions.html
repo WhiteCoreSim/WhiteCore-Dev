@@ -1,10 +1,13 @@
 <!-- User Transactions -->
+<style>
+  .page-link {background-color: transparent !important;}
+</style>
 
-<div id="fullPage">
+<div class="col98" id="transpage">
 
   <div class="container">
     <h2>{UserName}: {TransactionsText}</h2>
-    <legend class="text-left">{DateInfoText}</legend>
+<!--    <legend class="text-left">{DateInfoText}</legend>  -->
 
     <div class="col-12">
       <form class="form form-inline" role="form" id="transactions_search_form" action="user/user_transactions" method="post">
@@ -12,18 +15,22 @@
         <div class="col-4 form-group" data-date-format="dd-mm-yyyy">
           <label for="date_start">{DateStartText}&nbsp;&nbsp;</label>
             <input class="form-control" type="text" style="width:120px;" name="date_start" id="date_start" value="{DateStart}" />
-            <span class="add-on"><i class="fa fa-calendar fa-lg" style="margin-left:-20px;color:black;" id="cal"></i></span>
+            <span class="add-on"><i class="fa fa-calendar fa-lg event-calendar"></i></span>
         </div>
 
         <div class="col-4 form-group">
             <label for="date_end">{DateEndText}&nbsp;&nbsp;</label>
             <input class="form-control" type="text" style="width:120px;" name="date_end" id="date_end" value="{DateEnd}" />
-            <span class="add-on"><i class="fa fa-calendar fa-lg" style="margin-left:-20px;color:black;" id="cal"></i></span>
+            <span class="add-on"><i class="fa fa-calendar fa-lg event-calendar"></i></span>
         </div>
 
         <div class="col-2 form-group">
           <input hidden type="hidden" label="Submit" id="Submit" name="Submit" value="Submit" />
-          <button class="button" style="float:right;width:200px;" id="Submit" type="Submit" name="Submit">{Search}</button>
+<!--          <button class="button" style="float:right;width:200px;" id="Submit" type="Submit" name="Submit">{Search}</button>  -->
+          <a class="button" style="float:right;width:200px;" 
+              onclick="submitpagesearch('transactions_search_form', 'transpage');">
+            {Search}
+          </a>
         </div>
 
       </form>
@@ -51,7 +58,7 @@
      	{TransactionsListArrayBegin}
         <tr>
           <td>{Date}</td>
-          <td><p>{FromAgent}</td>
+          <td>{FromAgent}</td>
           <td>{ToAgent}</td>
           <td>{Description}</td>
           <td>{Amount}</td>
@@ -64,20 +71,23 @@
 </div>
 
 <script>
-  $(document).ready(function() {
+  $(function() {
     $('#transactions_list').dataTable({
-      "order": [[ 0, "asc" ]]
+      dom: 'frtip',
+      "order": [[ 0, "asc" ]],
+      "aoColumnDefs": [{"bSortable":false,"aTargets":["no-sort"]}],
+      /*"aaSorting":[], */
+      "oLanguage": {"sSearch": "Filter: "},
+      "pageLength": 10,
+      "fixedHeader": {
+        header: true,
+         //footer: true
+      },
     });
-  });
 
-  $(function() {
-    $('#date_start,#date_end').datepicker({
-      showTrigger: '<button type="button" class="trigger">...</button>'});
-  });
-
-  <!--  /* date pickers */ -->
-  $(function() {
+    <!--  /* date pickers */ -->
     $( "#date_start" ).datepicker({
+      showTrigger: '<button type="button" class="trigger">...</button>',
       defaultDate: "-1w",
       changeMonth: true,
       numberOfMonths: 3,
@@ -85,27 +95,33 @@
         $( "#to" ).datepick( "option", "minDate", selectedDate );
       }
     });
+
     $( "#date_end" ).datepicker({
       //defaultDate: "+1w",
+      showTrigger: '<button type="button" class="trigger">...</button>',
       changeMonth: true,
       numberOfMonths: 3,
       onClose: function( selectedDate ) {
         $( "#from" ).datepick( "option", "maxDate", selectedDate );
       }
     });
+
+    //$('#date_start,#date_end').datepicker({
+    //  showTrigger: '<button type="button" class="trigger">...</button>'});
+
   });
 
   /* attach a submit handler to the form */
-  $("#transactions_search_form").submit(function(event) {
+//  $("#transactions_search_form").submit(function(event) {
 
     /* stop form from submitting normally */
-    event.preventDefault();
+//    event.preventDefault();
     /* get some values from elements on the page: */
-    var $form = $( this ),
-        url = $form.attr( 'action' );
+//    var $form = $( this ),
+//        url = $form.attr( 'action' );
     /* Send the data using post and put the results in a div */
-    $.post( url, $form.serialize(), function( data ) {
-      $("#fullPage").empty().append(data);
-    });
-  });
+//    $.post( url, $form.serialize(), function( data ) {
+//      $("#fullPage").empty().append(data);
+//    });
+//  });
 </script>

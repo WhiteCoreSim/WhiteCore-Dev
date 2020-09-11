@@ -1,0 +1,171 @@
+
+<div class="container-fluid">
+
+  <h2>{AddClassifiedtText}</h2>
+
+  <div class="col98">
+  <form id="add_classified_form" action="classifieds/add_classified.html" method="post">
+        <div class="form-row">
+          <div class="form-group col-2 text-right">{ClassifiedNameText}</div>
+          <div class="form-group col">
+            <input class="form-control" id="classifiedName" name="classifiedName" size="60" type="text" />
+          </div>
+          <div class="col-2"></div>
+        </div>
+
+        <div class="form-row">
+          <div class="col-4 pull-right">
+            <div class="form-row">
+              <label for="classifiedPrice" class="col-form-label mr-2">{ClassifiedPriceText}</label>
+              <input class="form-control" id="classifiedPrice" style="width:80px;" name="classifiedPrice" type="text" value="{ClassifiedPrice}" />
+            </div>
+          </div>
+        </div>
+
+<!--        <div class="form-row">
+          <div class="form-group col-2 text-right">{EventDateText}</div>
+          <div class="form-group col-3">
+            <div class="input-group" style="width:180px;">
+              <input class="form-control" type="text" name="eventDate" id="eventDate" value="{EventDate}" />
+              <div class="input-group-append">
+                <span class="input-group-text">
+                  <i class="fa fa-calendar fa-lg event-calendar" style="height:24px;"></i>
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-3 pull-right">
+            <div class="form-group row">
+              <label for="eventTime" class="col-form-label mr-2">{EventTimeText}</label>
+              <select class="custom-select form-control" style="width:140px;" id="eventTime" name="eventTime">
+                {EventTimesArrayBegin}
+                  <option value="{Index}" {selected}>{Value}</option>
+                {EventTimesArrayEnd}
+              </select>
+            </div>
+            <small class="form-text text-light">{EventTimeInfoText}</small>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group col-2 text-right">{EventDurationText}</div>
+          <div class="form-group col-3">
+            <div class="input-group" style="width:180px">
+              <select class="custom-select form-control" id="eventDuration" name="eventDuration">
+                {EventDurationsArrayBegin}
+                  <option value="{Index}" {selected}>{Value}</option>
+                {EventDurationsArrayEnd}
+              </select>
+            </div>
+          </div>
+          <div class="form-group col"></div>
+        </div>
+-->
+        <div class="form-row">
+          <div class="form-group col-2 text-right">{ClassifiedLocationText}</div>
+          <div class="form-group col-4">
+            <select class="custom-select form-control" id="classifiedLocation" name="classifiedLocation">
+              {ClassifiedLocationsArrayBegin}
+                <option {disabled} value="{Index}">{Value}</option>
+              {ClassifiedLocationsArrayEnd}
+            </select>
+          </div>
+          <div class="form-group col"></div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group col-2 text-right">{ClassifiedCategoryText}</div>
+          <div class="form-group col-3">
+            <div class="input-group" style="width:240px;">
+              <select class="custom-select form-control"  id="eventCategory" name="eventCategory">
+                {ClassifiedCategoriesArrayBegin}
+                  <option {selected} value="{Index}">{Value}</option>
+                {ClassifiedCategoriesArrayEnd}
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group col-3">
+            <div class="form-group row">
+              <label for="maturityLevel" class="col-form-label mr-2">{MaturityText}</label>
+              <div class="input-group" style="width:240px;">
+                <select class="custom-select form-control"  id="maturityLevel" name="maturityLevel">
+                  {MaturityArrayBegin}
+                    <option {selected} value="{Index}">{Value}</option>
+                  {MaturityArrayEnd}
+                </select>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="form-row">
+          <div class="form-group col-2 text-right">{ClassifiedDescriptionText}</div>
+          <div class="form-group col" style="height:auto;">
+            <textarea class="form-control" id="classifiedDescription" name="classifiedDescription" cols="70" rows="5"></textarea>
+          </div>
+          <div class="col-2"></div>
+        </div>
+
+        <div class="form-row">
+          <div class="col-3"></div>
+          <div class="col-6 text-right">
+            {AutoRelistText}
+          </div>
+          <div class="col-3">
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" id="classifiedAutoRelist" name="classifiedAutoRelist" type="checkbox" value="Yes" />
+              <label class="form-check-label" for="classifiedAutoRelist">{YesText}</label>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="form-row">
+          <div class="form-group col-2 text-right">{ClassifiedTagsText}</div>
+          <div class="form-group col">
+            <input class="form-control" id="classifiedTags" name="classifiedTags" size="60" type="text" />
+          </div>
+          <div class="col-2"></div>
+        </div>
+
+        <div class="form-row">
+          <div class="col-2"></div>
+          <div class="col">
+            <div class="pull-right">
+              <a class="btn btn-sm btn-success mr-3" style="width:100px;" onclick="gohome();">{Cancel}</a>
+              <a class="btn btn-sm btn-warning" style="width:100px;" 
+                  onclick="submitupdate('add_classified_form', 'additem=true');">
+                {Submit}
+              </a>
+            </div>
+          </div>
+          <div class="col-2"></div>
+        </div>
+
+  </form>
+</div>
+</div>
+
+<script>
+  /* date picker */
+  $(function() {
+    $("#eventDate").datepicker({
+      orientation: "bottom left",
+      defaultDate: "+1d",
+      changeMonth: true,
+      numberOfMonths: 3,
+      onClose: function( selectedDate ) {
+        $( "#eventDate" ).datepicker( "option", "minDate", selectedDate );
+      }
+    });
+  });
+
+  $('.event-calendar').on('click',function(){
+    $('#eventDate').datepicker("show");
+  });
+
+</script>
+

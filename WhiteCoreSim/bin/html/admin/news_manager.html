@@ -1,48 +1,73 @@
-<!-- params to replace
-SystemURL
-SystemName
-NewsManager
-News
--->
+<!-- NewsManager -->
+
+<style>
+  .page-link {background-color: transparent !important;}
+</style>
 
 {IsNotAdminAuthenticatedBegin}
-<meta http-equiv="REFRESH" content="0;url={SystemURL}">
+  <meta http-equiv="REFRESH" content="0;url={SystemURL}">
 {IsNotAdminAuthenticatedEnd}
 
 {IsAdminAuthenticatedBegin}
-<h2>{SystemName}: {NewsManager}</h3>
-<div id="info_message" class="info_message"><p>{Success}</p></div>
-<div>
-  <button id="add_news" onClick="window.location.href='index.html?page=add_news';" id="add_news"><p>{AddNewsItem}</p></button>
-  <table id="news_manager_list" class="display">
-    <thead class="listhead">
-      <tr>
-        <th class="news_manager_left">{NewsTitleText}</th>
-        <th class="news_manager_right">{NewsDateText}</th>
-        <th class="news_manager_right"></th>
-        <th class="news_manager_right"></th>
-      </tr>
-    </thead>
+<div class="col98">
+  <h2>{SystemName}: {NewsManager}</h2>
 
-    <tbody>
-      {NewsArrayBegin}
-      <tr onclick="document.location = 'index.html?page=edit_news&newsid={NewsID}';">
-        <td class="news_manager_left"><p>{NewsTitle}</p></td>
-        <td class="news_manager_right"><p>{NewsDate}</p></td>
-	    <td class="news_manager_right"><a href="index.html?page=edit_news&newsid={NewsID}"><p>{EditNewsItem}</p></a></td>
-	    <td class="news_manager_right"><a href="index.html?page=news_manager&delete={NewsID}"><p>{DeleteNewsItem}</p></a></td>
-      </tr>
-      {NewsArrayEnd}
-    </tbody>
-  </table>
+  <div class="row w-100 mb-3">
+    <div class="col"></div>
+    <div class="col-4 pull-right">
+      <button id="add_news" onClick="loadusercontent('admin-news_add');">{AddNewsItem}</button>
+    </div>
+  </div>
 
+  <div class="row w-100">
+    <div class="col">
+      <table class="table-compact table-hover" id="news_manager_list" class="display">
+        <thead>
+          <tr class="tablehead">
+            <th>{NewsTitleText}</th>
+            <th>{NewsDateText}</th>
+            <th></th>
+            <th class="no-sort" style="width:80px;"></th>
+            <th class="no-sort" style="width:80px;"></th>
+          </tr>
+        </thead>
 
-  <script type="text/javascript">
-    $(document).ready(function() {
-      $('#news_manager_list').dataTable( {
-     	  "order": [[ 0, "asc" ]]
-      });
-	 });
-  </script>
+        <tbody>
+          {NewsArrayBegin}
+          <tr onclick="loadusercontent('admin-news_edit', 'newsid={NewsID}');">
+            <td>{NewsTitle}</td>
+            <td>{NewsDate}</td>
+            <td>{NewsText}</td>
+            <td class="text-centered">
+              <a href="#" title="{EditText}">
+                <i class="fa fa-edit fa-lg"></i>
+              </a>
+            </td>
+            <td class="text-center">
+              <a title="{DeleteNewsItem}" href="#" onclick="loadusercontent('admin-news_manager', 'delete={NewsID}');">
+                <i class="fa fa-trash fa-red fa-lg"></i>
+              </a>
+            </td>
+          </tr>
+          {NewsArrayEnd}
+        </tbody>
+      </table>
+    </div>
+  </div>
 </div>
+
+<script>
+  $(function() {
+    $('#news_manager_list').dataTable( {
+   	  "order": [[ 0, "asc" ]],
+      "aoColumnDefs": [{"bSortable":false,"aTargets":["no-sort"]}],
+      "fixedHeader": {
+        header: true,
+       //footer: true
+      },
+    });
+});
+</script>
+
 {IsAdminAuthenticatedEnd}
+

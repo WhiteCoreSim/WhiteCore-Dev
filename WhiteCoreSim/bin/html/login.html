@@ -1,6 +1,5 @@
 <!-- Main non logged in template -->
 <section class="sign-up text-center">
-  <div id="error_message" class="error_message"><h3>{ErrorMessage}</h3></div>
   <div class="container">
     <div class="row">
       <div class="col-2">
@@ -17,8 +16,14 @@
             <i class="fa fa-lock"></i>
             <input type="password" class="" placeholder="{PasswordText}" required name="password">
           </div>
-          <button type="submit" class="btn-fill sign-up-btn">{Submit}</button>
-          <a id="forgotpass" href="#" onclick="loadcontent('forgot_pass');"><h5>{ForgotPassword}</h5></a>
+          <button class="btn-fill sign-up-btn" onclick="submitupdate('login_form');">
+            {Submit}
+          </button>
+            <a id="forgotpass" href="#" onclick="loadcontent('forgotpass');">
+              <h5>{ForgotPassword}</h5>
+            </a>
+<!--            <a onclick="gohome();">{CancelText}</a>  -->
+
         </form>
       </div>
     </div>
@@ -27,22 +32,6 @@
 
 <script>
   $(function() {
-    document.getElementById("login_input").focus(); }
-    );
-
-  /* attach a submit handler to the form */
-  $("#login_form").submit(function(event) {
-
-    /* stop form from submitting normally */
-    event.preventDefault();
-    /* get some values from elements on the page: */
-    var $form = $( this ),
-        url = $form.attr( 'action' );
-    /* Send the data using post and put the results in a div */
-    $.post( url, $form.serialize(),
-      function( data ) {
-		$("#error_message").empty().append(data);
-      }
-    );
+    $("#login_input").focus();
   });
 </script>

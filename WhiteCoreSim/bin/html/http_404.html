@@ -4,11 +4,13 @@
 	 	<h2>{SystemName}</h2>
 	</div>
 	<div id="error404" align="center">
-		<p class="error404">Looks like we lost something!</p>
-		<h4>{Error404Text}: {Error404InfoText}</h4>
-		<div class="error404">
+		<h4 class="error404">
+			Looks like we lost something!
+			<p>{Error404Text}: {Error404InfoText}</p>
+		</h4>
+		<div class="error404" style="cursor:pointer;">
 			<a href="{SystemURL}">
-			    <img src="/static/images/lost.jpg" alt="{Error404InfoText}" title="Go home..." /><br />
+			    <img src="/static/images/lost.jpg" width="50%" height="auto" alt="{Error404InfoText}" title="Go home..." /><br />
 			</a>
 		</div>
 	</div>

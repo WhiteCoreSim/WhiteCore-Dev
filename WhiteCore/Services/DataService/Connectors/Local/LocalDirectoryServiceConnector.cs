@@ -899,12 +899,13 @@ namespace WhiteCore.Services.DataService
         }
 
         /// <summary>
-        /// Gets a list of all classifieds.
+        /// Gets a list of user classifieds.
         /// </summary>
         /// <returns>The classifieds.</returns>
+        /// <param name="userId">Ovner.</param>
         /// <param name="category">Category.</param>
         /// <param name="classifiedFlags">Query flags.</param>
-        public List<Classified> GetAllClassifieds (int category, uint classifiedFlags)
+        public List<Classified> GetUserClassifieds (string userId, int category, uint classifiedFlags)
         {
             List<Classified> classifieds = new List<Classified> ();
 
@@ -914,10 +915,13 @@ namespace WhiteCore.Services.DataService
             }
 
             QueryFilter filter = new QueryFilter ();
+            if (userId != null)
+                filter.andLikeFilters["OwnerUUID"] = userId;
 
             // filter.andLikeFilters ["Name"] = "%" + queryText + "%";
             if (category != (int)DirectoryManager.ClassifiedCategories.Any) // Check the category
                 filter.andFilters ["Category"] = category.ToString ();
+
             // if (scopeID != UUID.Zero)
             //    filter.andFilters ["ScopeID"] = scopeID;
 
@@ -941,6 +945,51 @@ namespace WhiteCore.Services.DataService
 
             return classifieds;
         }
+
+
+        /// <summary>
+        /// Gets a list of all classifieds.
+        /// </summary>
+        /// <returns>The classifieds.</returns>
+        /// <param name="category">Category.</param>
+        /// <param name="classifiedFlags">Query flags.</param>
+        public List<Classified> GetAllClassifieds(int category, uint classifiedFlags) {
+            List<Classified> classifieds = new List<Classified>();
+
+            if (m_doRemoteOnly) {
+                object remoteValue = DoRemote(category, classifiedFlags);
+                return remoteValue != null ? (List<Classified>)remoteValue : classifieds;
+            }
+
+            QueryFilter filter = new QueryFilter();
+
+            // filter.andLikeFilters ["Name"] = "%" + queryText + "%";
+            if (category != (int)DirectoryManager.ClassifiedCategories.Any) // Check the category
+                filter.andFilters["Category"] = category.ToString();
+            // if (scopeID != UUID.Zero)
+            //    filter.andFilters ["ScopeID"] = scopeID;
+
+            List<string> retVal = genData.Query(new[] { "*" }, m_userClassifiedsTable, filter, null, null, null);
+
+            if (retVal.Count != 0) {
+                for (int i = 0; i < retVal.Count; i += 9) {
+                    Classified classified = new Classified();
+                    // Pull the classified out of OSD
+                    classified.FromOSD((OSDMap)OSDParser.DeserializeJson(retVal[i + 6]));
+
+                    // Check maturity levels
+                    if (classifiedFlags != (uint)DirectoryManager.ClassifiedQueryFlags.All) {
+                        if ((classifiedFlags & classified.ClassifiedFlags) != 0) // required rating All, PG, Mature ( Adult )
+                            classifieds.Add(classified);
+                    } else
+                        // add all
+                        classifieds.Add(classified);
+                }
+            }
+
+            return classifieds;
+        }
+
 
         /// <summary>
         ///     Gets all classifieds in the given region

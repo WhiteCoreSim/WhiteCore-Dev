@@ -38,9 +38,9 @@ namespace WhiteCore.Modules.Web
 {
     public class EventsAddMain : IWebInterfacePage
     {
-        public string [] FilePath {
+        public string[] FilePath {
             get {
-                return new [] {
+                return new[] {
                     "html/events/add_event.html"
                 };
             }
@@ -54,61 +54,62 @@ namespace WhiteCore.Modules.Web
             get { return false; }
         }
 
-        public Dictionary<string, object> Fill (WebInterface webInterface, string filename, OSHttpRequest httpRequest,
+        public Dictionary<string, object> Fill(WebInterface webInterface, string filename, OSHttpRequest httpRequest,
                                                OSHttpResponse httpResponse, Dictionary<string, object> requestParameters,
-                                               ITranslator translator, out string response)
-        {
-            UserAccount ourAccount = Authenticator.GetAuthentication (httpRequest);
-            IMoneyModule moneyModule = webInterface.Registry.RequestModuleInterface<IMoneyModule> ();
+                                               ITranslator translator, out string response) {
+            UserAccount ourAccount = Authenticator.GetAuthentication(httpRequest);
+            IMoneyModule moneyModule = webInterface.Registry.RequestModuleInterface<IMoneyModule>();
             var currencySymbol = "$";
             if (moneyModule != null)
                 currencySymbol = moneyModule.InWorldCurrencySymbol;
 
             response = null;
-            var vars = new Dictionary<string, object> ();
+            var vars = new Dictionary<string, object>();
             var duration = 10;
 
-            if (requestParameters.ContainsKey ("Submit")) {
-                string eventName = requestParameters ["eventName"].ToString ();
-                string eventDate = requestParameters ["eventDate"].ToString ();
-                string eventTime = requestParameters ["eventTime"].ToString ();
-                string eventDuration = requestParameters ["eventDuration"].ToString ();
-                string eventLocation = requestParameters ["eventLocation"].ToString ();
-                string eventCategory = requestParameters ["eventCategory"].ToString ();
-                string eventCoverCharge = requestParameters ["eventCoverCharge"].ToString ();
-                string eventDescription = requestParameters ["eventDescription"].ToString ();
+            if (requestParameters.ContainsKey("additem")) {
+                string eventName = requestParameters["eventName"].ToString();
+                string eventDate = requestParameters["eventDate"].ToString();
+                string eventTime = requestParameters["eventTime"].ToString();
+                string eventDuration = requestParameters["eventDuration"].ToString();
+                string eventLocation = requestParameters["eventLocation"].ToString();
+                string eventCategory = requestParameters["eventCategory"].ToString();
+                string eventCoverCharge = requestParameters["eventCoverCharge"].ToString();
+                string eventDescription = requestParameters["eventDescription"].ToString();
 
-                var directoryService = Framework.Utilities.DataManager.RequestPlugin<IDirectoryServiceConnector> ();
-                var regionData = Framework.Utilities.DataManager.RequestPlugin<IRegionData> ();
+                var directoryService = Framework.Utilities.DataManager.RequestPlugin<IDirectoryServiceConnector>();
+                var regionData = Framework.Utilities.DataManager.RequestPlugin<IRegionData>();
 
-                var selParcel = eventLocation.Split (',');
+                var selParcel = eventLocation.Split(',');
                 // Format: parcelLocationX, parcelLocationY, parcelLandingX, parcelLandingY, parcelLandingZ, parcelUUID
                 // "1020,995,128,28,25,d436261b-7186-42a6-dcd3-b80c1bcafaa4"
 
                 Framework.Services.GridRegion region = null;
-                var parcel = directoryService.GetParcelInfo ((UUID)selParcel [5]);
+                var parcel = directoryService.GetParcelInfo((UUID)selParcel[5]);
                 if (parcel != null)
-                    region = regionData.Get (parcel.RegionID, null);
+                    region = regionData.Get(parcel.RegionID, null);
                 if (region == null) {
-                    var error = "Parcel details not found!";
-                    vars.Add ("ErrorMessage", "<h3>" + error + "</h3>");
-                    response = "<h3>" + error + "</h3>";
+                    response = webInterface.UserMsg("!Location details not found", false);
+
+                    //var error = "Parcel details not found!";
+                    //vars.Add("ErrorMessage", "<h3>" + error + "</h3>");
+                    //response = "<h3>" + error + "</h3>";
                     return null;
                 }
 
                 // we have details...
-                var eventDT = DateTime.Parse (eventDate + " " + eventTime);
-                var localPos = new Vector3 (int.Parse (selParcel [0]), int.Parse (selParcel [0]), 0);
+                var eventDT = DateTime.Parse(eventDate + " " + eventTime);
+                var localPos = new Vector3(int.Parse(selParcel[0]), int.Parse(selParcel[0]), 0);
 
-                var nEvent = directoryService.CreateEvent (
+                var nEvent = directoryService.CreateEvent(
                     ourAccount.PrincipalID,
                     region.RegionID,
-                    (UUID)selParcel [5],
+                    (UUID)selParcel[5],
                     eventDT,
-                    uint.Parse (eventCoverCharge),
-                    (DirectoryManager.EventFlags)Util.ConvertAccessLevelToMaturity (region.Access),
+                    uint.Parse(eventCoverCharge),
+                    (DirectoryManager.EventFlags)Util.ConvertAccessLevelToMaturity(region.Access),
                     region.Access,
-                    uint.Parse (eventDuration),
+                    uint.Parse(eventDuration),
                     localPos,
                     eventName,
                     eventDescription,
@@ -116,49 +117,51 @@ namespace WhiteCore.Modules.Web
                 );
 
                 if (nEvent != null)
-                    response = "<h3>Event added successfully, redirecting to main page</h3>" +
-                        "<script language=\"javascript\">" +
-                        "setTimeout(function() {window.location.href = \"/?page=events\";}, 0);" +
-                        "</script>";
+                    response = webInterface.UserMsg("Event added successfully", true);
+
+                    //response = "<h3>Event added successfully, redirecting to main page</h3>" +
+                    //    "<script language=\"javascript\">" +
+                    //    "setTimeout(function() {window.location.href = \"/?page=events\";}, 0);" +
+                    //    "</script>";
 
                 return null;
             }
 
             // Time selections
-            var nearestHalf = Utilities.RoundUp (DateTime.Now, TimeSpan.FromMinutes (30)).ToString ("HH\\:mm\\:ss");
-            vars.Add ("EventDate", DateTime.Now.AddDays (1).ToShortDateString ());
-            vars.Add ("EventTimes", WebHelpers.EventTimeSelections (nearestHalf));
+            var nearestHalf = Utilities.RoundUp(DateTime.Now, TimeSpan.FromMinutes(30)).ToString("HH\\:mm\\:ss");
+            vars.Add("EventDate", DateTime.Now.AddDays(1).ToShortDateString());
+            vars.Add("EventTimes", WebHelpers.EventTimeSelections(nearestHalf));
 
             // event durations
-            vars.Add ("EventDurations", WebHelpers.EventDurationSelections (duration));
+            vars.Add("EventDurations", WebHelpers.EventDurationSelections(duration));
 
             // event locations
-            vars.Add ("EventLocations", WebHelpers.EventLocations (ourAccount, webInterface.Registry, ""));
+            vars.Add("EventLocations", WebHelpers.UserLocations(ourAccount, webInterface.Registry, ""));
 
-            vars.Add ("EventCategories", WebHelpers.EventCategorySelections (-1, translator));
-            vars.Add ("EventCoverCharge", "0");
+            vars.Add("EventCategories", WebHelpers.EventCategorySelections(-1, translator));
+            vars.Add("EventCoverCharge", "0");
 
             // labels
-            vars.Add ("AddEventText", translator.GetTranslatedString ("AddEventText"));
-            vars.Add ("EventNameText", translator.GetTranslatedString ("EventNameText"));
-            vars.Add ("EventDateText", translator.GetTranslatedString ("EventDateText"));
-            vars.Add ("EventTimeText", translator.GetTranslatedString ("TimeText"));
-            vars.Add ("EventTimeInfoText", translator.GetTranslatedString ("EventTimeInfoText"));
-            vars.Add ("EventDurationText", translator.GetTranslatedString ("DurationText"));
-            vars.Add ("EventLocationText", translator.GetTranslatedString ("EventLocationText"));
-            vars.Add ("EventCategoryText", translator.GetTranslatedString ("CategoryText"));
-            vars.Add ("EventCoverChargeText", translator.GetTranslatedString ("CoverChargeText") + " " + currencySymbol);
-            vars.Add ("EventDescriptionText", translator.GetTranslatedString ("DescriptionText"));
+            vars.Add("AddEventText", translator.GetTranslatedString("AddEventText"));
+            vars.Add("EventNameText", translator.GetTranslatedString("EventNameText"));
+            vars.Add("EventDateText", translator.GetTranslatedString("EventDateText"));
+            vars.Add("EventTimeText", translator.GetTranslatedString("TimeText"));
+            vars.Add("EventTimeInfoText", translator.GetTranslatedString("EventTimeInfoText"));
+            vars.Add("EventDurationText", translator.GetTranslatedString("DurationText"));
+            vars.Add("EventLocationText", translator.GetTranslatedString("EventLocationText"));
+            vars.Add("EventCategoryText", translator.GetTranslatedString("CategoryText"));
+            vars.Add("EventCoverChargeText", translator.GetTranslatedString("CoverChargeText") + " " + currencySymbol);
+            vars.Add("EventDescriptionText", translator.GetTranslatedString("DescriptionText"));
 
 
-            vars.Add ("ErrorMessage", "");
-            vars.Add ("Submit", translator.GetTranslatedString ("AddEventText"));
+            vars.Add("ErrorMessage", "");
+            vars.Add("Cancel", translator.GetTranslatedString("Cancel"));
+            vars.Add("Submit", translator.GetTranslatedString("AddEventText"));
 
             return vars;
         }
 
-        public bool AttemptFindPage (string filename, ref OSHttpResponse httpResponse, out string text)
-        {
+        public bool AttemptFindPage(string filename, ref OSHttpResponse httpResponse, out string text) {
             text = "";
             return false;
         }

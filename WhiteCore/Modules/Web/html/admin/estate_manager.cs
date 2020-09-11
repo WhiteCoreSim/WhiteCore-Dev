@@ -62,9 +62,25 @@ namespace WhiteCore.Modules.Web
             var estateConnector = Framework.Utilities.DataManager.RequestPlugin<IEstateConnector> ();
             var accountService = webInterface.Registry.RequestModuleInterface<IUserAccountService> ();
 
+            if (requestParameters.ContainsKey("delete"))
+            {
+                //var estateID = httpRequest.Query ["delete"].ToString ();
+                //if (estateConnector.DeleteEstate (estateID))
+                //    response = "<h3>Estate details have been deleted</h3>" +
+                //        "<script>" +
+                //        "setTimeout(function() {window.location.href = \"/?page=estate_manager\";}, 1000);" +
+                //        "</script>";
+                //else
+                response = webInterface.UserMsg("Estate details would have been deleted... but not yet", false);
+                //response = "Estate details would have been deleted (but not yet).";
+                return null;
+            }
+
             var estates = estateConnector.GetEstateNames ();
 
             if (estates.Count > 0) {
+                vars.Add("HaveData", true);
+                vars.Add("NoData", false);
 
                 foreach (var estate in estates) {
                     var estateID = estateConnector.GetEstateID (estate);
@@ -86,6 +102,10 @@ namespace WhiteCore.Modules.Web
                         });
                     }
                 }
+            } else {
+                vars.Add("HaveData", true);
+                vars.Add("NoData", false);
+                vars.Add("NoDetails", translator.GetTranslatedString("NoDetailsText"));
             }
 
             vars.Add ("EstateList", estateListVars);

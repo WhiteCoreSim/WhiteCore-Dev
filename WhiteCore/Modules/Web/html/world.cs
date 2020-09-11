@@ -74,6 +74,8 @@ namespace WhiteCore.Modules.Web
             var regionData = Framework.Utilities.DataManager.RequestPlugin<IRegionData>();
             var regions = regionData.GetList(0, RegionFlags.Hyperlink | RegionFlags.Foreign | RegionFlags.Hidden,
                                               null, 10, sortBy);
+            var default_landing = new OpenMetaverse.Vector3(128, 128, 40);
+
             foreach (var region in regions) {
                 string info;
                 info = (region.RegionArea < 1000000) ? region.RegionArea + " m2" : (region.RegionArea / 1000000) + " km2";
@@ -97,6 +99,7 @@ namespace WhiteCore.Modules.Web
                     { "RegionStatus", region.IsOnline ? "Online" : "Offline"},
                     { "RegionID", region.RegionID },
                     { "RegionURI", region.RegionURI },
+                    {"HopUrl", webInterface.HopVectorUrl(region.RegionName, default_landing) },
                     { "RegionWorldViewURL", regionviewURL}
                 });
             }

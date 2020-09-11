@@ -57,10 +57,9 @@ namespace WhiteCore.Modules.Web
             response = null;
             var vars = new Dictionary<string, object>();
 
-            string error = "";
             UserAccount user = Authenticator.GetAuthentication(httpRequest);
             if (user == null) {
-                response = "No authentication service was available to change user details";
+                response = webInterface.UserMsg("!No authentication service was available to change user details", true);
                 return null;
             }
 
@@ -68,32 +67,38 @@ namespace WhiteCore.Modules.Web
             vars.Add("UserName", user.Name);
 
             // Delete User
-            if (requestParameters.ContainsKey("Submit") &&
-                     requestParameters["Submit"].ToString() == "SubmitDeleteUser") {
+            if (requestParameters.ContainsKey("delete")) {  // && requestParameters["Submit"].ToString() == "SubmitDeleteUser") {
                 string username = requestParameters["username"].ToString();
                 string password = requestParameters["password"].ToString();
+                bool delconf = requestParameters.ContainsKey("deleteuserconf") && requestParameters["deleteuserconf"].ToString() == "Accepted";
 
-                ILoginService loginService = webInterface.Registry.RequestModuleInterface<ILoginService>();
-                if (loginService.VerifyClient(UUID.Zero, username, "UserAccount", password)) {
-                    IUserAccountService userService =
-                        webInterface.Registry.RequestModuleInterface<IUserAccountService>();
-                    if (userService != null) {
-                        userService.DeleteUser(user.PrincipalID, user.Name, password, true, false);
-                        response = "Successfully deleted account.";
+                if (delconf) {
+
+                    ILoginService loginService = webInterface.Registry.RequestModuleInterface<ILoginService>();
+                    if (loginService.VerifyClient(UUID.Zero, username, "UserAccount", password)) {
+                        IUserAccountService userService =
+                            webInterface.Registry.RequestModuleInterface<IUserAccountService>();
+                        if (userService != null) {
+                            userService.DeleteUser(user.PrincipalID, user.Name, password, true, false);
+                            response = webInterface.UserMsg("Successfully deleted account", true);
+                        } else
+                            response = webInterface.UserMsg("!User service unavailable, please try again later", true);
                     } else
-                        response = "User service unavailable, please try again later";
-                } else
-                    response = "Wrong username or password";
-                return null;
+                        response = webInterface.UserMsg("!Incorrect username or password", false);
+                    return null;
+                } else {
+                    response = webInterface.UserMsg("!You did not confirm deletion of your account!", false);
+                    return null;
+                }
             }
 
             // Page variables
-            vars.Add("ErrorMessage", error);
-            vars.Add("ChangeUserInformationText", translator.GetTranslatedString("ChangeUserInformationText"));
-            vars.Add("DeleteUserText", translator.GetTranslatedString("DeleteUserText"));
-            vars.Add("DeleteText", translator.GetTranslatedString("DeleteText"));
+            vars.Add("DeleteUserNameText", translator.GetTranslatedString("DeleteUserNameText"));
+            vars.Add("EnterPasswordText", translator.GetTranslatedString("EnterPasswordText"));
             vars.Add("DeleteUserInfoText", translator.GetTranslatedString("DeleteUserInfoText"));
-            vars.Add("Submit", translator.GetTranslatedString("Submit"));
+            vars.Add("DeleteUserConfirmationText", translator.GetTranslatedString("DeleteUserConfirmationText"));
+            vars.Add("CancelText", translator.GetTranslatedString("Cancel"));
+            vars.Add("DeleteUserText", translator.GetTranslatedString("DeleteUserText"));
 
             return vars;
         }

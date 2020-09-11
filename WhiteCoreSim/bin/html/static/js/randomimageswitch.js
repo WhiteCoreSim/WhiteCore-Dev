@@ -1,28 +1,31 @@
 function bgImgRotate()
 {
-	var images = new Array(
-  "../images/screenshots/welcome1.jpg",
-  "../images/screenshots/welcome2.jpg",
-  "../images/screenshots/welcome3.jpg",
-  "../images/screenshots/welcome4.jpg",
-  "../images/screenshots/welcome5.jpg",
-  "../images/screenshots/welcome6.jpg",
-  "../images/screenshots/welcome7.jpg",
-  "../images/screenshots/welcome8.jpg",
-  "../images/screenshots/welcome9.jpg",
-  "../images/screenshots/welcome10.jpg"
+  var images = new Array(
+  	"/static/screenshots/welcome1.jpg",
+  	"/static/screenshots/welcome2.jpg",
+  	"/static/screenshots/welcome3.jpg",
+  	"/static/screenshots/welcome4.jpg",
+  	"/static/screenshots/welcome5.jpg",
+  	"/static/screenshots/welcome6.jpg",
+  	"/static/screenshots/welcome7.jpg",
+  	"/static/screenshots/welcome8.jpg",
+  	"/static/screenshots/welcome9.jpg",
+  	"/static/screenshots/welcome10.jpg"
   );
 
   var len = images.length;
   var img_no = Math.floor(Math.random());
   img_no = Math.floor(Math.random()*len);
 
-	document.getElementById('mainImage').src = images[img_no];
+  var imageurl = "url(" + images[img_no] + ")";
+
+  $(".welcomescreen").css("background-image", imageurl);
+  $(".welcomescreen").css("background-size", "120%");
 }
 
 function closeSurvey(div_id)
 {
-	document.getElementById(div_id).style.display = "none";
+  document.getElementById(div_id).style.display = "none";
 }
 
 function locationTextColor(){
@@ -55,4 +58,5 @@ function CheckFieldsNotEmpty(){
 	}
 }
 
-// disable backgroud image //window.onload=bgImgRotate;
+// disable backgroud image 
+//window.onload=bgImgRotate();

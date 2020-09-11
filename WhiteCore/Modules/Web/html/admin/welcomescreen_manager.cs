@@ -64,7 +64,7 @@ namespace WhiteCore.Modules.Web
             var vars = new Dictionary<string, object>();
             IGenericsConnector connector = Framework.Utilities.DataManager.RequestPlugin<IGenericsConnector>();
 
-            if (requestParameters.ContainsKey("Submit"))
+            if (requestParameters.ContainsKey("update"))
             {
                 GridWelcomeScreen submittedInfo = new GridWelcomeScreen();
                 submittedInfo.SpecialWindowMessageTitle = requestParameters["SpecialWindowTitle"].ToString();
@@ -75,7 +75,7 @@ namespace WhiteCore.Modules.Web
 
                 connector.AddGeneric(UUID.Zero, "GridWelcomeScreen", "GridWelcomeScreen", submittedInfo.ToOSD());
 
-                response = "Successfully saved data";
+                response = webInterface.UserMsg("Successfully saved data");
                 return null;
             }
 
@@ -83,6 +83,7 @@ namespace WhiteCore.Modules.Web
                                                                                     "GridWelcomeScreen");
             if (welcomeInfo == null)
                 welcomeInfo = GridWelcomeScreen.Default;
+
             vars.Add("OpenNewsManager", translator.GetTranslatedString("OpenNewsManager"));
             vars.Add("SpecialWindowTitleText", translator.GetTranslatedString("SpecialWindowTitleText"));
             vars.Add("SpecialWindowTextText", translator.GetTranslatedString("SpecialWindowTextText"));
