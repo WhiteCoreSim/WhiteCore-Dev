@@ -73,7 +73,7 @@ namespace WhiteCore.Modules.Web
             UserAccount userAcct = new UserAccount ();
             var accountservice = webInterface.Registry.RequestModuleInterface<IUserAccountService>();
 
-            if (accountservice is null) {
+            if (accountservice == null) {
                 return vars;
             }
 
