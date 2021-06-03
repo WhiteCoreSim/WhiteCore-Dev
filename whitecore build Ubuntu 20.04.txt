@@ -1,0 +1,102 @@
+WhiteCore build - Ubuntu 20.04
+Greythane
+June 2021
+
+
+Clean install on a new VM of Ubuntu server 20.04 LTS
+Single user entered at creation
+
+# install build environment
+sudo apt install mono-complete
+
+# Copy/get WhiteCore repository 
+# The code used for testing is the current latest development code at 
+#    https://github.com/greythane/WhiteCore-Dev.git
+# Clone if required  
+# git clone https://github.com/greythane/WhiteCore-Dev.git
+# 
+# Note: This is still development code so some new functionality make be missing
+# All existing functionality as per the main repo exists
+#
+# Procedures shown should also be the same for the main repository
+# git clone https://github.com/WhiteCoreSim/WhiteCore-Dev.git
+# Note: the main repo does not yet contain all updates as of June 2021 
+
+# change to the code main directory for building
+cd WhiteCore-Dev
+
+# Note msbuild is not included in the focal repos yet so xbuild is needed
+... edit 'autobuild.sh' and replace 'msbuild' with 'xbuild' or comment/uncomment the appropriate compile option
+    ( Line 104 in the BUILD section at the bottom )
+
+# make scripts executable if necessary
+chmod +x *.sh
+
+# build WhiteCoreSim  
+# Note:  This should be executed as a (normal) user, NOT sudo or the root user
+./autobuild.sh
+
+... complie output
+... probable warnings but there should be no errors
+
+# Copy entire WhiteCoreSim directory to the home directory
+cp -r WhiteCoreSim ~/WhiteCoreSim
+
+# change to the copied WhiteCoreSim directory
+cd ~/WhiteCoreSim
+
+# If the scripts are NOT executable, then update
+chmod +x *.sh
+
+# Execute the 'run_standalone.sh' script to start WhiteCore
+./run_standalone.sh
+
+# Access the screen session to configure
+screen -r Sim
+
+# Initial startup and loading will be shown
+# Note: 
+   If WhiteCore has ben configured previously then the new startup options will be shown
+   If no configuration has been done, the the 'configurator' will be run to specify database, address etc.
+   The trial instance was installed on a virtual machine and uses the SqLite database
+
+# Initial input requiring user input
+
+Enter the user name of the grid owner - suggested or input as required
+... enter password and confirmation...
+... enter an email for password recovery (if desired)
+... Select an avatar or none (for the default)
+... The UID of the grid owner will be shown,
+   ... accept or enter a specific UUID if required
+
+.. Enter the name of the grid owners' estate 
+(a suggested default will be shown but it's a good idea to create the inital 'grid' estate that will be used - eg. MyGridEstate etc)
+
+# Further output as the system users are created
+
+# First region setup (home landing region)
+... enter the region's name
+... enter the region's X  and Y location (default 1000,1000)
+... enter the region's size (default 256, 256)
+... select the region type (default Estate)
+... select the region type (default Full Region)
+... select the region's terrain (default grassland)
+
+# Region creation info...
+
+>Your region '<region name>' is not part of an estate
+... enter the owner of an estate (default RealEstate owner)
+    ... use the grid owner's user name as created prior to this
+   (The only user (other then system users) is the grid owner that was created before)
+
+# further system output as the region is created and assigned to the <grid owner's> estate
+
+# Login to the WhiteCore sim is now possible
+
+
+#  If using SQLite, removing all the *.db files in Data/SQLite/ will reset so that the next time WhiteCore is run, the initial startup details will be requested.
+i.e.  Removing the database will re-initialise the Sim to a 'clean' state
+
+
+
+ 
