@@ -1,8 +1,8 @@
 #!/bin/bash
 # Start the WhiteCore-Sim Grid server
-# Version 0.9.5+
+# Version 0.9.6+
 #
-# August 2019 - Always run config at startup
+# June 2021 - Always run config at startup
 # greythane @ gmail.com
 
 WOASDIR="${0%/*}"

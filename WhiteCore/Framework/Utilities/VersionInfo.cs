@@ -45,7 +45,7 @@ namespace WhiteCore.Framework.Utilities
 
         #endregion
 
-        public const string VERSION_NUMBER = "0.9.5";
+        public const string VERSION_NUMBER = "0.9.6";
         public const Flavour VERSION_FLAVOUR = Flavour.Development;
         public const string VERSION_NAME = "WhiteCore";
 

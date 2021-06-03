@@ -1,6 +1,6 @@
-WhiteCore-Dev 0.9.5+ (git)
+WhiteCore-Dev 0.9.6+ (git)
 Rowan Deppeler <greythane@gmail.com>
-August 2019
+June 2021
 ===============================================
 
 ** The default configuration **
@@ -82,7 +82,7 @@ or check into the MeWe community for WhiteCore
 Rowan Deppeler
 <greythane @ gmail.com>
 
-August 2019
+June 2021
 =======================
 
 For licensing information, please see the relevant licenses.

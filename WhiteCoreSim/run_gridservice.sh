@@ -1,8 +1,8 @@
 #!/bin/bash
 # Startup script for WhiteCore-Sim grid server service
-# Versions 0.9.5+
+# Versions 0.9.6+
 #
-# August 2019 - Always run config at startup - will pass through after initial setup
+# June 2021 - Always run config at startup - will pass through after initial setup
 # greythane @ gmail.com
 #
 

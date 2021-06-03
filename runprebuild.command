@@ -2,7 +2,7 @@
 # Run prebuild to configure and create the appropriate Solution and Project files for building WhiteCore-Sim
 #  Default is to prompt for configuration
 #
-# May 2016
+# June 2021
 # Rowan Deppeler <greythane@gmail.com>
 #
 # Updated Dec 2018 to use NET 4.6 framework and msbuild (included in Mono V5+)
@@ -101,7 +101,7 @@ fi
 
 # Update version info
 if [ -d ".git" ]; then
-  git log --pretty=format:"WhiteCore 0.9.5 Dev (%cd.%h)" --date=short -n 1 > WhiteCoreSim/bin/.version
+  git log --pretty=format:"WhiteCore 0.9.6 Dev (%cd.%h)" --date=short -n 1 > WhiteCoreSim/bin/.version
   echo "Version info updated"
 fi
 

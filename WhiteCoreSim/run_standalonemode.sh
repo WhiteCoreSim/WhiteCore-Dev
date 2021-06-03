@@ -1,8 +1,8 @@
 #!/bin/bash
 # startup script for WhiteCore-Sim standalone
-# Versions 0.9.5+
+# Versions 0.9.6+
 #
-# August 2019 - Always run config at startup - will pass through after initial setup
+# June 2021 - Always run config at startup - will pass through after initial setup
 # greythane @ gmail.com
 #
 

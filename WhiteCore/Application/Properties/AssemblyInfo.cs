@@ -35,7 +35,7 @@ using System.Resources;
 
 [assembly: AssemblyCompany("WhiteCore Development Team")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCopyright("Copyright © 2014-2018")]
+[assembly: AssemblyCopyright("Copyright © 2014-2021")]
 [assembly: AssemblyCulture("")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyTitle("WhiteCore")]
@@ -62,5 +62,5 @@ using System.Resources;
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
 
-[assembly: AssemblyVersion("0.9.5.*")]
+[assembly: AssemblyVersion("0.9.6.*")]
 [assembly: NeutralResourcesLanguageAttribute("en")]

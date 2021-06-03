@@ -1,9 +1,9 @@
 <Updater>
 	<MinSupReleaseVersion>0.9.2</MinSupReleaseVersion>
 	<MinSupReleaseDate>Oct 16, 2014</MinSupReleaseDate>
-	<NewReleaseVersion>0.9.5</NewReleaseVersion>
+	<NewReleaseVersion>0.9.6</NewReleaseVersion>
 	<NewReleaseDate>Oct 18, 2016</NewReleaseDate>
-	<ReleaseNotes>https://github.com/WhiteCoreSim/WhiteCore-Dev/releases/tag/0.9.5</ReleaseNotes>
+	<ReleaseNotes>https://github.com/WhiteCoreSim/WhiteCore-Dev/releases/tag/0.9.6</ReleaseNotes>
 	<DownloadWinLink>https://docs.google.com/uc?id=0B2u55gI751a8U0ozbXVVM3ZuZ1k&export=download</DownloadWinLink>
 	<DownloadMono32Link>https://docs.google.com/uc?id=0B2u55gI751a8dVppU0JkUnhKcWc&export=download</DownloadMono32Link>
 	<DownloadMono64Link>https://docs.google.com/uc?id=0B2u55gI751a8VTR1cHZ0Z0pSOWM&export=download</DownloadMono64Link>

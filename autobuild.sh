@@ -1,10 +1,11 @@
 #!/bin/bash
 # Run prebuild to configure and create the appropriate Solution and Project files for building WhiteCore-Sim
 #
-# March 2016
+# June 2021
 # Rowan Deppeler <greythane@gmail.com>
 #
 # Updated Dec 2018 to use NET 4.6 framework and msbuild (included in Mono V5+)
+# Updated June 2012 to provide xbuild option
 
 ARCH="x64"
 CONFIG="Debug"
@@ -94,7 +95,7 @@ fi
 
 # Update version info
 if [ -d ".git" ]; then
-  git log --pretty=format:"WhiteCore 0.9.5 Dev (%cd.%h)" --date=short -n 1 > WhiteCoreSim/bin/.version;
+  git log --pretty=format:"WhiteCore 0.9.6 Dev (%cd.%h)" --date=short -n 1 > WhiteCoreSim/bin/.version;
   echo "Version info updated"
 fi
 
@@ -102,6 +103,7 @@ fi
 if $BUILD ; then
   echo Building WhiteCore-Sim
   msbuild WhiteCore.sln /property:Configuration="$CONFIG" /property:Platform="$ARCH"
+  # xbuild WhiteCore.sln /property:Configuration="$CONFIG" /property:Platform="$ARCH"
   echo Finished Building WhiteCore
   echo Thank you for choosing WhiteCore-Sim
   echo Please report any errors to our Github Issue Tracker https://github.com/WhiteCoreSim/WhiteCore-Dev/issues

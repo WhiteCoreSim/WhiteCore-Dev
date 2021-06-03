@@ -1,4 +1,4 @@
-As of Version 0.9.5 the initial starting default avatar has been updated.
+As of Version 0.9.6 the initial starting default avatar has been updated.
 The starter avatar IAR was created by Beebo Brink.
 
 The avatar comprises of:

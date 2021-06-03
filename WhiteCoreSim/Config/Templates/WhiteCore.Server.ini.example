@@ -1,10 +1,10 @@
 ;; This file is the setup template for the WhiteCore Grid server
 ;;   when the configurator is used
 ;;
-;;  ##  You SHOUL NOT change anything here  ##
+;;  ##  You SHOULD NOT change anything here  ##
 ;;
 ;;
-;; WhiteCore 0.9.5, August 2019
+;; WhiteCore 0.9.6, June 2021
 
 [Network]
 ;; Advanced configs

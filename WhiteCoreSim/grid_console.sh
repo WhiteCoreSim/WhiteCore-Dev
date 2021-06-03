@@ -1,8 +1,8 @@
 #!/bin/bash
 # Start WhiteCore-Sim grid server only
-# Versions 0.9.5+
+# Versions 0.9.6+
 #
-# August 2019 - Always run config at startup
+# June 2021 - Always run config at startup
 # greythane @ gmail.com
 
 cd ./bin

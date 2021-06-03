@@ -1,7 +1,7 @@
-WhiteCore-Dev 0.9.5+ (git)
+WhiteCore-Dev 0.9.6+ (git)
 Rowan Deppeler <greythane@gmail.com>
 Fly-Man-
-July 2019
+June 2021
 ===============================================
 
 ** Simplified startup scripts **
@@ -23,8 +23,8 @@ Note:
    Linux (ubuntu variations) >> apt-get install screen;
    Mac >> already available
   
-run_standalonemode.sh       	: Run WhiteCore standalone mode in background
-run_gridmode.sh             	: Run WhiteCore grid mode in background
+run_standalonemode.sh     : Run WhiteCore standalone mode in background
+run_gridmode.sh           : Run WhiteCore grid mode in background
 
 
 GUI scripts for Windows and Mac
@@ -34,9 +34,9 @@ GUI scripts for Windows and Mac
 The same commands are available as gui scripts, <double_click> to execute
 
 sim_console.command				: Mac
-sim_console.bat					: Windows
+sim_console.bat					  : Windows
 grid_console.command			: Mac
-grid_console.bat				: Windows
+grid_console.bat				  : Windows
 
 
 ** The default configuration **
@@ -91,7 +91,7 @@ or check into the MeWe community for WhiteCore https://mewe.com/group/5cb284545d
 Rowan Deppeler
 <greythane @ gmail.com>
 
-July 2019
+June 2021
 =======================
 
 For licensing information, please see the relevant licenses.
