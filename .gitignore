@@ -67,6 +67,9 @@ WhiteCoreSim/bin/.version
 WhiteCoreSim/bin/WhiteCore.*.dll
 WhiteCoreSim/bin/WhiteCore.*.exe
 WhiteCoreSim/bin/WhiteCore.exe
+WhiteCoreSim/bin/.whitecore.config
+WhiteCoreSim/bin/.whitecoregrid.config
+
 
 # This is dependant upon x86/x64 and created at runtime
 WhiteCoreSim/bin/ode.dll
