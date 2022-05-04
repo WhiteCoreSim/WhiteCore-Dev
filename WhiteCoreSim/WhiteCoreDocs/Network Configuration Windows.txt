@@ -91,7 +91,7 @@ is set for Windows Firewall.  On to the Gateway stuff.......
   Q: I followed these instructions and the instructions in my modem's user manual but it still doesn't connect, Why?
   A: First double check you didn't mistype something or get the wrong setting.  If this does not work you can ask
      for assistance.  I am happy to help.  Just email your issue to secondgalaxy2013@gmail.com or you can often
-     find me in #whitecore-support on Freenode.
+     find me in #whitecore-support on Libera.chat.
 
 ##
 ## About this tutorial

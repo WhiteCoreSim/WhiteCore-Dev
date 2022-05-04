@@ -43,9 +43,8 @@ More information can be found here:
 ## Support
 Support is available from various sources.
 
-* IRC channel #whitecore-support on freenode  
- <http://webchat.freenode.net?channels=%23whitecore-support>
- 
+* IRC channel #whitecore-support on Libera.Chat  
+ <https://web.libera.chat/gamja/#whitecore-support> 
  *The IRC channel is monitored continuously by the developers but there may not be someone to answer you question immediately (different timezones), but it will be answered if you are patient.*
 
 * Check out <http://whitecore-sim.org> for the latest developments, downloads and forum

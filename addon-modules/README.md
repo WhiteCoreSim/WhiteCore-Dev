@@ -42,8 +42,9 @@ The `<?xml>, <Prebuild>, <Solution> and <Configuration>` tags should not be incl
 ## Support
 Support is available from various sources.
 
-* IRC channel #whitecore-support on freenode.  Use your favourite IRC client or the simple web interface available at
- <http://webchat.freenode.net?channels=%23whitecore-support>
+* IRC channel #whitecore-support on Libera.Chat.  
+Use your favourite IRC client or the simple web interface available at
+ <https://web.libera.chat/gamja/#whitecore-support>
  
  *The IRC channel is monitored continuously by the developers but there may not be someone to answer you question immediately (different timezones), but it will be answered if you are patient.*
 
@@ -51,4 +52,5 @@ Support is available from various sources.
 
 * If you find a problem please log an issue on the repository issue tracker [WhiteCore-Optional-Modules issues](https://github.com/WhiteCoreSim/WhiteCore-Optional-Modules/issues)
 
-*Greythane - March 2019*
+*Greythane - AUgust 2021*
+ 

@@ -85,8 +85,12 @@ re-start..
 
 Questions?
 ==========
-Checkout the #whitecore-support irc channel on freenode,
-or check into the MeWe community for WhiteCore https://mewe.com/group/5cb284545da1780ba88ca30d where a friendly group is happy to answer questions.
+Checkout the #whitecore-support irc channel on Libera.Chat.
+Use your favourite IRC client or the simple web interface available at
+    https://web.libera.chat/gamja/#whitecore-support
+or check into the MeWe community for WhiteCore 
+    https://mewe.com/group/5cb284545da1780ba88ca30d 
+where a friendly group is happy to answer questions.
 
 Rowan Deppeler
 <greythane @ gmail.com>

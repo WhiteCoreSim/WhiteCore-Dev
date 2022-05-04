@@ -7,7 +7,7 @@ script:
 notifications:
   irc:
     channels:
-      - "chat.freenode.net#whitecore-dev"
+      - "irc.libera.chat#whitecore-dev"
     on_success: always
     on_failure: always
     use_notice: true
