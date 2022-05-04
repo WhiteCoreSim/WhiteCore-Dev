@@ -3,6 +3,9 @@ Greythane
 June 2021
 
 
+These details are for a grid connected region setup - separate grid and region servers
+
+
 Clean install on a new VM of Ubuntu server 20.04 LTS
 Single user entered at creation
 
@@ -25,7 +28,7 @@ sudo apt install mono-complete
 # change to the code main directory for building
 cd WhiteCore-Dev
 
-# Important!! - Ensure that the submodules are present and the latest
+# !!Important!! - Ensure that the library submodules are present and the latest
 git submodule update --init --recursive
 
 # Note msbuild is not included in the focal repos yet so xbuild is needed
@@ -51,11 +54,15 @@ cd ~/WhiteCoreSim
 # If the scripts are NOT executable, then update
 chmod +x *.sh
 
-# Execute the 'run_standalone.sh' script to start WhiteCore
-./run_standalone.sh
+##  Setup of the individual servers ##
+--------------------------------------
+# change to the 'bin' directory for the initial setup
+cd ./bin
 
-# Access the screen session to configure
-screen -r Sim
+# Configure the WhiteCore grid server
+mono WhiteCore.Server.exe --reconfigure
+
+
 
 # Initial startup and loading will be shown
 # Note: 
@@ -64,8 +71,31 @@ screen -r Sim
    The trial instance was installed on a virtual machine and uses the SqLite database
 
 # Initial input requiring user input
+... Do you want to configure WhiteCore-Sim now  -   yes
+... make sure  - yes
 
-Enter the user name of the grid owner - suggested or input as required
+... select the database to use
+# if MySql is chosen, some additional questions need details
+... enter the MySQl server address
+... database port - accept the default unless another port is used
+... enter the database name
+... enter the database user
+... enter the db user password
+
+... enter the grid name
+... accept/modify the greeting message
+... create accounts automatically  y/n
+... choose asset service - accept the default - File based  [1]
+... enter sim access address
+...  server port - accept the default
+
+# the grid server configuration is now complete
+# Re run the server to setup required data and assets
+mono WhiteCore.Server.exe
+
+# The grid server will run, create and install the default assets into the database
+ 
+... enter the user name of the grid owner - suggested or input as required
 ... enter password and confirmation...
 ... enter an email for password recovery (if desired)
 ... Select an avatar or none (for the default)
@@ -76,6 +106,34 @@ Enter the user name of the grid owner - suggested or input as required
 (a suggested default will be shown but it's a good idea to create the inital 'grid' estate that will be used - eg. MyGridEstate etc)
 
 # Further output as the system users are created
+# Wait until initial setup has been completed and the 'quit' the server
+... quit
+
+Restart the grid server in a screen session ready for configuring the region server next
+cd ..
+./run_gridservice.sh          (executed from the'bin' directory)
+
+# Output indicating screen session is running
+
+
+
+##  Configure the region server ##
+__________________________________
+
+# Continue in the 'bin' directory
+cd ./bin
+mono WhiteCore.exe --reconfigure
+
+# Check and confirm re-configure
+... select standalone or grid operation - 2 (grid operation)
+... address of the grid server (set as per above)
+... access port - accept default
+... access address of the sim
+
+# Region server configuration is complete
+
+# Restart region server to complete configuration
+mono WhiteCore.exe
 
 # First region setup (home landing region)
 ... enter the region's name
@@ -85,7 +143,7 @@ Enter the user name of the grid owner - suggested or input as required
 ... select the region type (default Full Region)
 ... select the region's terrain (default grassland)
 
-# Region creation info...
+# The region will be created ... region info...
 
 >Your region '<region name>' is not part of an estate
 ... enter the owner of an estate (default RealEstate owner)
@@ -94,39 +152,36 @@ Enter the user name of the grid owner - suggested or input as required
 
 # further system output as the region is created and assigned to the <grid owner's> estate
 
-# Note:   If using SQLite, removing all the *.db files in Data/SQLite/ will reset so that the next time WhiteCore is run, the initial startup details will be requested.
-i.e.  Removing the database will re-initialise the Sim to a 'clean' state
+# Exit the region
+... quit
+
+# restart the region server in a 'screen' session
+cd ..     (change back to the main WhiteCoreSim directory)
+
+# startup the region server in a sesion
+./run_simservice.sh
+
+# Output indicating screen session is running
+
+# Login to the WhiteCore sim is now possible
+You should now be able to use your favourite client to login with the user and password you set in the region setup.
+Note: You will need to add your new grid to the client's grid options
 
 
 
- You will need to do these things before you have a full running setup….
+You can check that the servers are up and running correctly by accessing the appropriate screen session  
+screen -r Grid
+screen -r Sim
 
->  cd WhiteCoreSim
-> ./grid_console.sh
-This will ask for you grid owner name etc.   This is only setting up the grid server
-When completed, quit the grid server.
 
-> ./run_gridservice.sh
-This will restart the grid server in a screen session ready for configuring the region server next
 
-You can check that the server is up and running correctly by accessing the screen session  
->screen -r Grid
-You should have no errors , exist with   ctrl+a d 
-
->./sim_console.sh
-This will start the configuration of the region server
-You will need to specify the details as per your setup, using the grid service at localhost, port 8002
-Once completed quit the region server
-
-Stop the grid server
->screen -r Grid   and quit to shutdown
-
-You are now ready to run the full setup
+You can use the combined startup script to run both the grid and region server
 > ./run_gridmode.sh
 
 This will run the grid server and the region server in seperate sessions
 
-You can check each session using the  screen - r Grid or screen -r Sim command
 
-# Login to the WhiteCore sim is now possible
-You should now be able to login with the user and password you set in the region setup.
+# Note:   If using SQLite, removing all the *.db files in Data/SQLite/ will reset so that the next time WhiteCore is run, the initial startup details will be requested.
+i.e.  Removing the database will re-initialise the Sim to a 'clean' state
+
+

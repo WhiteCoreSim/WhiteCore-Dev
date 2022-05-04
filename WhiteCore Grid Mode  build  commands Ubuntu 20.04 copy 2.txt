@@ -1,0 +1,99 @@
+#!/bin/bash
+# WhiteCore linux auto build and configure
+# tested on Ubuntu 20.04
+# Greythane
+# June 2021
+
+# Clean install on a new VM of Ubuntu server 20.04 LTS
+# Single user entered at creation
+# requies the autobuild.sh to be edited as msbuild is not included with the
+# latest mono so use xbuild is needed 
+# This needs to be done prior to running this script
+
+nano ./autobuild.sh
+
+Comment msbuild line # 105
+Uncomment xbuild line # 106
+
+Save   ctl+o   ctrl+x
+
+
+sudo apt install mono-complete
+git clone https://github.com/greythane/WhiteCore-Dev.git
+cd WhiteCore-Dev
+git submodule update --init --recursive
+
+
+./autobuild.sh
+
+# ... complie output
+# ... probable warnings but there should be no errors
+
+cp -R WhiteCoreSim ~/WhiteCoreSim
+cd ~/WhiteCoreSim
+cd ./bin
+mono WhiteCore.Server.exe --reconfigure
+
+# Enter configuration details as prompted
+
+# re run the grid server to install assets and complete configurtion
+mono WhiteCore.Server.exe
+
+# The grid server will run, create and install the default assets into the database
+# Wait until initial setup has been completed and the 'quit' the server
+quit
+
+# Restart the grid server in a screen session ready for configuring the region server next
+cd ..
+./run_gridservice.sh
+
+# Output indicating screen session is running
+
+
+
+##  Configure the region server ##
+__________________________________
+
+# Continue in the 'bin' directory
+cd ./bin
+mono WhiteCore.exe --reconfigure
+
+# Check and confirm configuration
+# Region server configuration is complete
+#  Restart region server to complete configuration
+
+mono WhiteCore.exe
+
+# First region setup (home landing region)
+...
+# Exit the region
+... quit
+
+# restart the region server in a 'screen' session
+cd ..     
+./run_simservice.sh
+
+# Output indicating screen session is running
+
+# Login to the WhiteCore sim is now possible
+You should now be able to use your favourite client to login with the user and password you set in the region setup.
+Note: You will need to add your new grid to the client's grid options
+
+
+
+You can check that the servers are up and running correctly by accessing the appropriate screen session  
+screen -r Grid
+screen -r Sim
+
+
+
+You can use the combined startup script to run both the grid and region server
+./run_gridmode.sh
+
+This will run the grid server and the region server in seperate sessions
+
+
+# Note:   If using SQLite, removing all the *.db files in Data/SQLite/ will reset so that the next time WhiteCore is run, the initial startup details will be requested.
+i.e.  Removing the database will re-initialise the Sim to a 'clean' state
+
+

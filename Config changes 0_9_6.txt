@@ -1,0 +1,92 @@
+WhiteCore 0.9.6
+Migrating configuration to updated format
+
+Rowan Deppeler <greythane@gmail.com>
+June 2021
+
+
+The underlying configuration between older versions and 0.9.6 is essentially
+the same, just linked differently to (hopefully) ease manual setup
+
+Migrating the Grid server configuration
+Unchanged files, different locations
+ 
+pre 0.9.6                                       0.9.6 config
+MyWorld.ini                         ==          MyWorld.ini
+WhiteCore.ini.example                           Removed
+WhiteCore.Server.ini.example                    Removed
+
+Grid/IndividualServers/ 
+        Moved to    >>    WhiteCoreDocs/SampleConfig/IndividualServers
+Grid/ServerConfiguration/ 
+        Moved to    >>    Grid/
+   GridInfoService.ini              ==             GridInfoService.ini
+   GridSetup.ini                    ==             GridSetup.ini
+   Login.ini                        ==             Login.ini
+   Login.ini.example                             Removed
+   Services.ini                     ==             Services.ini
+
+Grid/ServerConfiguration/Data/
+        Moved to    >>    Grid/Data/
+   Data.ini                         ==             Data.ini
+   MySql.ini                        ==             MySql.ini
+   MySql.ini.example                             Removed
+
+Grid/ServerConfiguration/Modules/
+        Moved to    >>    Grid/Modules/
+   AssetCache.ini          >  !! Do not change the supplied file !!
+   Economy.ini             > Edit settings if required  (Do not change port or URL's) 
+   SMTPEmail.ini           > Edit settings if required 
+   VoiceModules.ini        > Edit settings if required
+   WebInterface.ini        >  !! Do not change the supplied file !!
+
+
+Sim/Included.ini                                 Removed
+Sim/Main.ini                                     Removed
+
+Sim/Data/FileBased.ini              ==           No change
+Sim/Data/Data.ini
+        Moved to    >>    Standalone/Data/
+        If using a standalone system comment/uncomment 'Include-... line'
+Sim/Data/MySql.ini.example                       Removed
+
+Sim/Modules/
+        Moved to    >>    Standalone/Modules
+    Economy.ini             > Edit settings if required  (Do not change port or URL's)  
+    Nature.ini              > Edit settings if required    
+    VoiceModules.ini        > Edit settings if required    
+    WhiteCoreModules.ini    > Edit settings if required    
+                                       
+Sim/Physics/
+        Moved to    >>    Standalone/Physics          
+    DotNetEngine.ini        > Edit settings if required    
+
+Sim/Standalone/
+        Moved to    >>    Standalone/
+    GridInfoService.ini             >  No changes necessary
+    Standalone.ini                  >  !! Do NOT change the supplied file  !!
+    StandaloneCommon.ini            >  Edit supplied file if required
+    StandaloneCommon.ini.example    >  Removed
+    WebInterface.ini                > !! Do NOT change the supplied file  !!
+    
+    
+Updated files - !! do not overwrite !!
+Grid/ServerConfiguration/Modules/
+    AssetCache.ini                  !=           No user modification needed
+
+Sim/Grid/
+        Moved to    >>    GridRegion/
+   Grid.ini                         ==             Grid.ini
+   GridCommon.ini                   ==             GridCommon.ini
+
+
+
+Files requiring user modification
+WhiteCore.ini          > Select WhiteCore system, comment/uncomment line
+                           Include-Standalone = ...   (Single grid/region server)
+                         OR
+                           Include-Grid = ...         (Separate Grid and region servers)
+                       > Set Hostname to IP address or URL
+
+WhiteCore.Server.ini   > Set Hostname to IP address or URL
+                                
