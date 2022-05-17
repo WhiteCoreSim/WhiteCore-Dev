@@ -340,8 +340,7 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
             AppDomainStructure FreeAppDomain = GetFreeAppDomain();
             lock (m_appDomainLock) {
                 IScript mbrt = (IScript)
-                           FreeAppDomain.CurrentAppDomain.CreateInstanceFromAndUnwrap (
-                               fileName, typeName);
+                           FreeAppDomain.CurrentAppDomain.CreateInstanceFromAndUnwrap(fileName, typeName);
                 FreeAppDomain.ScriptsLoaded++;
                 ad = FreeAppDomain.CurrentAppDomain;
 

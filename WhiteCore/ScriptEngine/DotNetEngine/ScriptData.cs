@@ -731,6 +731,12 @@ namespace WhiteCore.ScriptEngine.DotNetEngine
             //Create the app domain if needed.
             try
             {
+                if (AssemblyName == null) {
+                    MainConsole.Instance.Error("[" + m_ScriptEngine.ScriptEngineName +
+                           "]: Null AssemblyName. Maybe corrupt state?! ");
+                    return false;
+                }
+
                 Script = m_ScriptEngine.AppDomainManager.LoadScript(AssemblyName, "Script.ScriptClass", out AppDomain);
                 if (Script == null)
                     return false;

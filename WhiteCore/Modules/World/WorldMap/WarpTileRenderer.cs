@@ -597,12 +597,20 @@ namespace WhiteCore.Modules.WorldMap
             if (id == UUID.Zero)
                 id = (UUID)Constants.MISSING_TEXTURE_ID;
 
-            byte [] assetData = m_scene.AssetService.GetData (id.ToString (), false);       // suppress warnings here
+            byte [] assetData = m_scene.AssetService.GetData (id.ToString(), false);       // suppress warnings here
             if (assetData == null || assetData.Length == 0)
                 assetData = m_scene.AssetService.GetData (Constants.MISSING_TEXTURE_ID);    // not found, replace with something identifable
             if (assetData != null && assetData.Length > 0) {
                 IJ2KDecoder imgDecoder = m_scene.RequestModuleInterface<IJ2KDecoder> ();
-                Bitmap img = (Bitmap)imgDecoder.DecodeToImage (assetData);
+                Bitmap img = null;
+
+                try {
+                    img = (Bitmap)imgDecoder.DecodeToImage(assetData);
+                } catch {
+                    MainConsole.Instance.DebugFormat("[WarpTile generator]: Unable to decode texture {0}", id.ToString());
+                    assetData = m_scene.AssetService.GetData(Constants.MISSING_TEXTURE_ID);    // decode problem, replace with something identifable
+                    img = (Bitmap)imgDecoder.DecodeToImage(assetData);
+                }
 
                 if (img != null) {
                     ret = new warp_Texture (img);
@@ -610,7 +618,7 @@ namespace WhiteCore.Modules.WorldMap
                     return ret;
                 }
             }
-            MainConsole.Instance.Debug ("[WarpTile generator]: Gettexture returning null, asset id: " + id);
+            MainConsole.Instance.Debug ("[WarpTile generator]: Gettexture returned null, asset id: " + id.ToString());
             return ret;
         }
 
