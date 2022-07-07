@@ -119,8 +119,10 @@ namespace WhiteCore.Simulation.Base
             configSource.AddSwitch ("Network", "http_listener_port");
 
             IConfigSource m_configSource = Configuration (configSource, defaultIniFile);
-            if (m_configSource == null)
-                Environment.Exit (0);            // No configuration.. exit
+            if (m_configSource == null) {
+                MainConsole.Instance.Error("[Startup]: Configuration not found - Aborting!");
+                Environment.Exit(0);            // No configuration.. exit
+            }
 
             // Check if we're saving crashes
             m_saveCrashDumps = m_configSource.Configs ["Startup"].GetBoolean ("save_crashes", m_saveCrashDumps);

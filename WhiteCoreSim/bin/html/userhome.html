@@ -1,622 +1,74 @@
-<div id="main-content" class="">
+<!-- Userhome -->
 
-      <div class="main-content-t"><span class="l"></span><span class="r"></span></div>
-
-      <div class="main-content-body">
-        <h1>
-         {UserName} - Dashboard
-        </h1>
-</div>
-
-
-<!--
-<div id="billingNotification" class="error" style="display:none">
-  <div id="widget-billingnotification" class="widget">
-  <div class="widget-head">
-    <h3>There is a problem with your account</h3>
+<div class="container">
+  <div class="row justify-content-center">
+    <h1>{UserName} - {Dashboard}</h1>
   </div>
 
-  <div class="widget-content" id="widgetBillingNotificationBody">
-          </div>
-</div>
-</div>
-
-<div class="span-18 last">
-  <div id="dashboard-feeds" class="span-10">
-
-<div id="widget-blog-feeds" class="widget clear">
-    <div class="widget-head">
-        <h3>Blog Feeds</h3>
-    </div>
-
-    <div class="widget-content" id="widgetBlogFeedsBody">
-        <img style="display: none;" class="ajax-loader" src="xxhttps://secondlife.com/my/_img/ajax-loader.gif" width="32" height="32" alt="Loading... please wait">
-
-        <form id="selectParser" action="">
-        <label>Select a feed:</label>
-        <select id="widgetBlogFeedsSelector" onchange="updateBlogFeeds();">
-            <option selected="selected" value="http://feeds2.feedburner.com/secondlife/featured-news">Featured News</option>
-            <option value="http://feeds2.feedburner.com/secondlife/inworld">Inworld</option>
-            <option value="http://feeds2.feedburner.com/secondlife/tools-and-technology">Tools and Technology</option>
-            <option value="http://feeds2.feedburner.com/secondlife/tips-and-tricks">Tips and Tricks</option>
-            <option value="http://feeds2.feedburner.com/secondlife/land-and-business">Land and Business</option>
-        </select>
-        </form>
-
-        <div id="widgetBlogFeedsContent">
-        <div class="entry">
-                <h4 class="postTitle">
-                    <a target="_blank" href="https://community.secondlife.com/blogs/entry/2347-town-hall-event-with-linden-lab-ceo-ebbe-altberg-april-20/">Town Hall Event with Linden Lab CEO Ebbe Altberg - April 20</a>
-                </h4>
-                <em class="date">Friday, April 13th, 2018, 4:06:00 PM (UTC)</em>
-            </div>
-            <div class="entry">
-                <h4 class="postTitle">
-                    <a target="_blank" href="https://community.secondlife.com/blogs/entry/2330-it%E2%80%99s-never-been-a-better-time-to-be-a-premium-member/">It’s Never Been a Better Time to Be a Premium Member!</a>
-                </h4>
-                <em class="date">Sunday, April 1st, 2018, 3:10:23 PM (UTC)</em>
-            </div>
-            <div class="entry">
-                <h4 class="postTitle">
-                    <a target="_blank" href="https://community.secondlife.com/blogs/entry/2328-happy-15th-birthday-second-life-fifteen-reasons-to-celebrate/">HAPPY 15th BIRTHDAY, SECOND LIFE! FIFTEEN REASONS TO CELEBRATE</a>
-                </h4>
-                <em class="date">Wednesday, March 21st, 2018, 5:00:00 PM (UTC)</em>
-            </div>
-            <div class="entry">
-                <h4 class="postTitle">
-                    <a target="_blank" href="https://community.secondlife.com/blogs/entry/2319-the-adventure-continues-in-linden-realms-the-wrath-of-ruth/">The Adventure Continues in Linden Realms: The Wrath of Ruth</a>
-                </h4>
-                <em class="date">Thursday, March 15th, 2018, 6:59:53 PM (UTC)</em>
-            </div>
-            <div class="entry">
-                <h4 class="postTitle">
-                    <a target="_blank" href="https://community.secondlife.com/blogs/entry/2318-more-land-for-less-money-yes-please-lower-prices-and-double-tier-allotment-on-mainland/">MORE LAND FOR LESS MONEY? YES, PLEASE! Lower Prices and Double Tier Allotment on Mainland</a>
-                </h4>
-                <em class="date">Wednesday, March 14th, 2018, 4:39:00 PM (UTC)</em>
-            </div>
-            <div class="entry" style="display: none;">
-                <h4 class="postTitle">
-                    <a target="_blank" href="https://community.secondlife.com/blogs/entry/2311-get-more-out-of-second-life-save-50-on-premium/">Get more out of Second Life - Save 50% on Premium*</a>
-                </h4>
-                <em class="date">Friday, February 23rd, 2018, 4:00:46 PM (UTC)</em>
-            </div>
-            <div class="entry" style="display: none;">
-                <h4 class="postTitle">
-                    <a target="_blank" href="https://community.secondlife.com/blogs/entry/2295-shop-your-heart-out-hug-or-dunk-a-linden-and-amazing-v-day-gifts/">Shop Your Heart Out, Hug or Dunk a Linden, and Amazing V-Day Gifts</a>
-                </h4>
-                <em class="date">Thursday, February 8th, 2018, 6:13:03 PM (UTC)</em>
-            </div>
-            <div class="entry" style="display: none;">
-                <h4 class="postTitle">
-                    <a target="_blank" href="https://community.secondlife.com/blogs/entry/2287-unboxing-2017-and-looking-towards-2018-in-second-life/">Unboxing 2017 and Looking towards 2018 in Second Life!</a>
-                </h4>
-                <em class="date">Friday, December 22nd, 2017, 9:33:00 PM (UTC)</em>
-            </div>
-            <div class="entry" style="display: none;">
-                <h4 class="postTitle">
-                    <a target="_blank" href="https://community.secondlife.com/blogs/entry/2285-shop-and-hop-is-open-60-merchants-60-gifts-3-regions-and-too-many-deals-to-count/">Shop and Hop is Open! 60 Merchants, 60 Gifts, 3 Regions and Too Many Deals to Count!</a>
-                </h4>
-                <em class="date">Friday, December 15th, 2017, 9:06:32 PM (UTC)</em>
-            </div>
-            <div class="entry" style="display: none;">
-                <h4 class="postTitle">
-                    <a target="_blank" href="https://community.secondlife.com/blogs/entry/2282-highlights-from-the-second-life-destination-guide-12152017/">Highlights from the Second Life Destination Guide 12/15/2017</a>
-                </h4>
-                <em class="date">Friday, December 15th, 2017, 5:05:24 PM (UTC)</em>
-            </div>
-            <div class="entry" style="display: none;">
-                <h4 class="postTitle">
-                    <a target="_blank" href="https://community.secondlife.com/blogs/entry/2284-an-apology-to-strawberry-singh-a-call-to-youtubers-%E2%80%9Cun-cease-desist%E2%80%9D/">An Apology to Strawberry Singh &amp; A Call to YouTubers: “Un-Cease &amp; Desist”</a>
-                </h4>
-                <em class="date">Thursday, December 14th, 2017, 9:53:01 PM (UTC)</em>
-            </div>
-            <div class="entry" style="display: none;">
-                <h4 class="postTitle">
-                    <a target="_blank" href="https://community.secondlife.com/blogs/entry/2283-winter-treats-plus-50-off-your-first-premium-subscription-payment/">Winter Treats Plus 50% Off Your First Premium Subscription Payment*</a>
-                </h4>
-                <em class="date">Thursday, December 14th, 2017, 7:24:12 PM (UTC)</em>
-            </div>
-            <div class="entry" style="display: none;">
-                <h4 class="postTitle">
-                    <a target="_blank" href="https://community.secondlife.com/blogs/entry/2281-second-life-supports-net-neutrality/">Second Life Supports Net Neutrality</a>
-                </h4>
-                <em class="date">Tuesday, December 12th, 2017, 7:14:00 PM (UTC)</em>
-            </div>
-            <div class="entry" style="display: none;">
-                <h4 class="postTitle">
-                    <a target="_blank" href="https://community.secondlife.com/blogs/entry/2280-highlights-from-the-second-life-destination-guide-1282017/">Highlights from the Second Life Destination Guide 12/8/2017</a>
-                </h4>
-                <em class="date">Friday, December 8th, 2017, 5:02:55 PM (UTC)</em>
-            </div>
-            <div class="entry" style="display: none;">
-                <h4 class="postTitle">
-                    <a target="_blank" href="https://community.secondlife.com/blogs/entry/2277-highlights-from-the-second-life-destination-guide-1212017/">Highlights from the Second Life Destination Guide 12/1/2017</a>
-                </h4>
-                <em class="date">Friday, December 1st, 2017, 5:04:36 PM (UTC)</em>
-            </div>
-            <div class="entry" style="display: none;">
-                <h4 class="postTitle">
-                    <a target="_blank" href="https://community.secondlife.com/blogs/entry/2276-joy-to-the-grid-winter-wonderland-returns-a-snowball-fight-cometh/">Joy to the Grid! Winter Wonderland Returns &amp; A Snowball Fight Cometh!</a>
-                </h4>
-                <em class="date">Wednesday, November 29th, 2017, 5:38:00 PM (UTC)</em>
-            </div>
-            <div class="entry" style="display: none;">
-                <h4 class="postTitle">
-                    <a target="_blank" href="https://community.secondlife.com/blogs/entry/2274-highlights-from-the-second-life-destination-guide-11102017/">Highlights from the Second Life Destination Guide 11/10/2017</a>
-                </h4>
-                <em class="date">Friday, November 17th, 2017, 5:05:25 PM (UTC)</em>
-            </div>
-            <div class="entry" style="display: none;">
-                <h4 class="postTitle">
-                    <a target="_blank" href="https://community.secondlife.com/blogs/entry/2273-sign-up-to-participate-in-an-official-inworld-shopping-event-this-holiday-season/">Sign Up to Participate in an Official Inworld Shopping Event this Holiday Season!</a>
-                </h4>
-                <em class="date">Tuesday, November 14th, 2017, 5:00:10 PM (UTC)</em>
-            </div>
-            <div class="entry" style="display: none;">
-                <h4 class="postTitle">
-                    <a target="_blank" href="https://community.secondlife.com/blogs/entry/2272-highlights-from-the-second-life-destination-guide-11102017/">Highlights from the Second Life Destination Guide 11/10/2017</a>
-                </h4>
-                <em class="date">Friday, November 10th, 2017, 5:04:44 PM (UTC)</em>
-            </div>
-            <div class="entry" style="display: none;">
-                <h4 class="postTitle">
-                    <a target="_blank" href="https://community.secondlife.com/blogs/entry/2268-new-for-premium-subscribers-90-day-l-transaction-history/">New for Premium Subscribers: 90-Day L$ Transaction History</a>
-                </h4>
-                <em class="date">Monday, November 6th, 2017, 8:03:00 PM (UTC)</em>
-            </div>
-            <div class="entry" style="display: none;">
-                <h4 class="postTitle">
-                    <a target="_blank" href="https://community.secondlife.com/blogs/entry/2267-highlights-from-the-second-life-destination-guide-1132017/">Highlights from the Second Life Destination Guide 11/3/2017</a>
-                </h4>
-                <em class="date">Friday, November 3rd, 2017, 4:00:21 PM (UTC)</em>
-            </div>
-            <div class="entry" style="display: none;">
-                <h4 class="postTitle">
-                    <a target="_blank" href="https://community.secondlife.com/blogs/entry/2265-exciting-improvements-to-sl-fee-updates-to-enable-even-more/">Exciting Improvements to SL &amp; Fee Updates to Enable Even More</a>
-                </h4>
-                <em class="date">Thursday, November 2nd, 2017, 5:00:00 PM (UTC)</em>
-            </div>
-            <div class="entry" style="display: none;">
-                <h4 class="postTitle">
-                    <a target="_blank" href="https://community.secondlife.com/blogs/entry/2266-support-site-upgrade-scheduled-for-tuesday-nov-7th-2017/">Support Site Upgrade Scheduled for Tuesday, Nov. 7th, 2017</a>
-                </h4>
-                <em class="date">Tuesday, October 31st, 2017, 10:15:49 PM (UTC)</em>
-            </div>
-            <div class="entry" style="display: none;">
-                <h4 class="postTitle">
-                    <a target="_blank" href="https://community.secondlife.com/blogs/entry/2264-it%E2%80%99s-time-to-get-creepy-creepy-crawl-gift-and-costume-contest/">It’s Time to Get Creepy! Creepy Crawl, Gift, and Costume Contest!</a>
-                </h4>
-                <em class="date">Monday, October 30th, 2017, 5:37:14 PM (UTC)</em>
-            </div>
-            <div class="entry" style="display: none;">
-                <h4 class="postTitle">
-                    <a target="_blank" href="https://community.secondlife.com/blogs/entry/2263-highlights-from-the-second-life-destination-guide-10272017/">Highlights from the Second Life Destination Guide 10/27/2017</a>
-                </h4>
-                <em class="date">Friday, October 27th, 2017, 4:01:48 PM (UTC)</em>
-            </div>
-            </div>
-
-        <div id="widgetBlogFeedsPagination">&nbsp;<a class="qp_next qp_disabled" href="#">« Prev</a><span class="qp_counter"><span class="qp_pagenumber">1</span> / <span class="qp_totalnumber">5</span></span><a class="qp_prev" href="#">Next »</a></div>
-
-        <script type="text/javascript">
-            $(document).ready(function(){
-               // $('#widgetBlogFeedsContent .entry').quickpaginate({ perpage: 5, showcounter: true, pager : $("#widgetBlogFeedsPagination")});
-            });
-
-            function updateBlogFeeds() {
-                $("#widgetBlogFeedsBody .ajax-loader").show();
-                // Get the RSS feed and auto-paginate
-                get_rss_feed_from_selector_and_paginate('#widgetBlogFeedsContent','#widgetBlogFeedsSelector', 'null', '#widgetBlogFeedsPagination', 5);
-            }
-        </script>
-    </div>
-
-    <div class="clear space"></div>
-</div>
-
-
-<div id="widget-grid-status" class="widget">
-    <div class="widget-head">
-        <h3>Grid Status</h3>
-    </div>
-
-    <div class="widget-content" id="widgetGridStatusBody">
-        <div id="widgetGridStatusContent">
-        <div class="entry" style="display: block;">
-                <h4 class="postTitle">
-                    <a target="_blank" href="https://secondlife-status.statuspage.io/incidents/q6smlmzw5ksx">Billing phone support unavailable</a>
-                </h4>
-                <em class="date">Saturday, April 14th, 2018, 3:29:31 AM (UTC)</em>
-            </div>
-            <div class="entry" style="display: block;">
-                <h4 class="postTitle">
-                    <a target="_blank" href="https://secondlife-status.statuspage.io/incidents/lm3nyq3s3t58">Concierge phone and Premium chat support unavailable</a>
-                </h4>
-                <em class="date">Friday, April 13th, 2018, 6:08:45 PM (UTC)</em>
-            </div>
-            <div class="entry" style="display: block;">
-                <h4 class="postTitle">
-                    <a target="_blank" href="https://secondlife-status.statuspage.io/incidents/s0xh89yjt6ft">Concierge phone and Premium chat support unavailable</a>
-                </h4>
-                <em class="date">Thursday, April 12th, 2018, 9:19:06 PM (UTC)</em>
-            </div>
-            <div class="entry" style="display: block;">
-                <h4 class="postTitle">
-                    <a target="_blank" href="https://secondlife-status.statuspage.io/incidents/tlmgdtqp34hx">Concierge phone and Premium chat support unavailable</a>
-                </h4>
-                <em class="date">Thursday, April 12th, 2018, 7:54:49 PM (UTC)</em>
-            </div>
-            <div class="entry" style="display: block;">
-                <h4 class="postTitle">
-                    <a target="_blank" href="https://secondlife-status.statuspage.io/incidents/1br0fgh0y6jw">Rolling Restarts RC Snack</a>
-                </h4>
-                <em class="date">Thursday, April 12th, 2018, 3:03:53 PM (UTC)</em>
-            </div>
-            <div class="entry" style="display: none;">
-                <h4 class="postTitle">
-                    <a target="_blank" href="https://secondlife-status.statuspage.io/incidents/ht2hdfpkqkks">Rolling Restarts RC BlueSteel, LeTigre, Magnum, and Snack</a>
-                </h4>
-                <em class="date">Wednesday, April 11th, 2018, 4:12:48 PM (UTC)</em>
-            </div>
-            <div class="entry" style="display: none;">
-                <h4 class="postTitle">
-                    <a target="_blank" href="https://secondlife-status.statuspage.io/incidents/mhp9v461t380">Weekly Premium Stipends Delayed</a>
-                </h4>
-                <em class="date">Tuesday, April 10th, 2018, 5:14:14 PM (UTC)</em>
-            </div>
-            <div class="entry" style="display: none;">
-                <h4 class="postTitle">
-                    <a target="_blank" href="https://secondlife-status.statuspage.io/incidents/nbs69ygtgrlj">Unscheduled Maintenance</a>
-                </h4>
-                <em class="date">Tuesday, April 10th, 2018, 4:05:49 PM (UTC)</em>
-            </div>
-            <div class="entry" style="display: none;">
-                <h4 class="postTitle">
-                    <a target="_blank" href="https://secondlife-status.statuspage.io/incidents/nbpzpz4t966n">Concierge phone and Premium chat support unavailable</a>
-                </h4>
-                <em class="date">Friday, April 6th, 2018, 8:00:13 PM (UTC)</em>
-            </div>
-            <div class="entry" style="display: none;">
-                <h4 class="postTitle">
-                    <a target="_blank" href="https://secondlife-status.statuspage.io/incidents/wskmw99p25mr">Unscheduled Ticket System Maintenance</a>
-                </h4>
-                <em class="date">Thursday, April 5th, 2018, 8:57:25 PM (UTC)</em>
-            </div>
-            <div class="entry" style="display: none;">
-                <h4 class="postTitle">
-                    <a target="_blank" href="https://secondlife-status.statuspage.io/incidents/3lh2858trtky">Rolling Restarts RC BlueSteel and LeTigre</a>
-                </h4>
-                <em class="date">Wednesday, April 4th, 2018, 4:14:40 PM (UTC)</em>
-            </div>
-            <div class="entry" style="display: none;">
-                <h4 class="postTitle">
-                    <a target="_blank" href="https://secondlife-status.statuspage.io/incidents/0s1hwrh5jv5m">Rolling Restarts Main Channel Roll</a>
-                </h4>
-                <em class="date">Tuesday, April 3rd, 2018, 2:24:02 PM (UTC)</em>
-            </div>
-            <div class="entry" style="display: none;">
-                <h4 class="postTitle">
-                    <a target="_blank" href="https://secondlife-status.statuspage.io/incidents/6kdhjtc9dc27">Support closed for Easter Sunday</a>
-                </h4>
-                <em class="date">Monday, April 2nd, 2018, 1:00:05 PM (UTC)</em>
-            </div>
-            <div class="entry" style="display: none;">
-                <h4 class="postTitle">
-                    <a target="_blank" href="https://secondlife-status.statuspage.io/incidents/r2dx33zyd5j4">Concierge phone and Premium chat support unavailable</a>
-                </h4>
-                <em class="date">Friday, March 30th, 2018, 8:10:20 PM (UTC)</em>
-            </div>
-            <div class="entry" style="display: none;">
-                <h4 class="postTitle">
-                    <a target="_blank" href="https://secondlife-status.statuspage.io/incidents/ts8kyf6h08td">Rolling Restarts RC BlueSteel and Snack</a>
-                </h4>
-                <em class="date">Thursday, March 29th, 2018, 3:21:41 PM (UTC)</em>
-            </div>
-            <div class="entry" style="display: none;">
-                <h4 class="postTitle">
-                    <a target="_blank" href="https://secondlife-status.statuspage.io/incidents/hwsgd800rjnk">Rolling Restarts RC Channel Roll</a>
-                </h4>
-                <em class="date">Wednesday, March 28th, 2018, 4:09:50 PM (UTC)</em>
-            </div>
-            <div class="entry" style="display: none;">
-                <h4 class="postTitle">
-                    <a target="_blank" href="https://secondlife-status.statuspage.io/incidents/z721q28jrrfl">Investigating Process Credit Request Issue</a>
-                </h4>
-                <em class="date">Wednesday, March 28th, 2018, 1:34:49 AM (UTC)</em>
-            </div>
-            <div class="entry" style="display: none;">
-                <h4 class="postTitle">
-                    <a target="_blank" href="https://secondlife-status.statuspage.io/incidents/lx8ldwg2m9c4">Weekly Premium Stipends Delayed</a>
-                </h4>
-                <em class="date">Tuesday, March 27th, 2018, 6:45:09 PM (UTC)</em>
-            </div>
-            <div class="entry" style="display: none;">
-                <h4 class="postTitle">
-                    <a target="_blank" href="https://secondlife-status.statuspage.io/incidents/srsmmmx2vbhw">Rolling Restarts Main Channel Roll</a>
-                </h4>
-                <em class="date">Tuesday, March 27th, 2018, 2:46:32 PM (UTC)</em>
-            </div>
-            <div class="entry" style="display: none;">
-                <h4 class="postTitle">
-                    <a target="_blank" href="https://secondlife-status.statuspage.io/incidents/s3wryq15lqpg">New Support Hours Beginning Monday, February 26, 2018</a>
-                </h4>
-                <em class="date">Monday, March 26th, 2018, 7:40:39 PM (UTC)</em>
-            </div>
-            <div class="entry" style="display: none;">
-                <h4 class="postTitle">
-                    <a target="_blank" href="https://secondlife-status.statuspage.io/incidents/m41ng2l057qk">Concierge phone and Premium chat support unavailable</a>
-                </h4>
-                <em class="date">Friday, March 23rd, 2018, 8:00:46 PM (UTC)</em>
-            </div>
-            <div class="entry" style="display: none;">
-                <h4 class="postTitle">
-                    <a target="_blank" href="https://secondlife-status.statuspage.io/incidents/280bjnb456ys">Unscheduled Billing Maintenance</a>
-                </h4>
-                <em class="date">Wednesday, March 21st, 2018, 11:16:28 PM (UTC)</em>
-            </div>
-            <div class="entry" style="display: none;">
-                <h4 class="postTitle">
-                    <a target="_blank" href="https://secondlife-status.statuspage.io/incidents/2ksxk0s1y1zh">Unscheduled Support Website Maintenance</a>
-                </h4>
-                <em class="date">Wednesday, March 21st, 2018, 7:16:22 PM (UTC)</em>
-            </div>
-            <div class="entry" style="display: none;">
-                <h4 class="postTitle">
-                    <a target="_blank" href="https://secondlife-status.statuspage.io/incidents/xdzs0hfvgpvx">Rolling Restarts RC Channel Roll</a>
-                </h4>
-                <em class="date">Wednesday, March 21st, 2018, 5:27:51 PM (UTC)</em>
-            </div>
-            <div class="entry" style="display: none;">
-                <h4 class="postTitle">
-                    <a target="_blank" href="https://secondlife-status.statuspage.io/incidents/3f6npk893l97">[Scheduled] Linden Realms Maintenance</a>
-                </h4>
-                <em class="date">Thursday, March 15th, 2018, 5:45:14 PM (UTC)</em>
-            </div>
-            </div>
-
-        <div id="widgetGridStatusPagination" class="pagination" align="center">&nbsp;<a class="qp_next qp_disabled" href="#">« Prev</a><span class="qp_counter"><span class="qp_pagenumber">1</span> / <span class="qp_totalnumber">5</span></span><a class="qp_prev" href="#">Next »</a></div>
-
-        <script type="text/javascript">
-        $(document).ready(function(){
-            $('#widgetGridStatusContent .entry').quickpaginate({ perpage: 5, showcounter: true, pager : $("#widgetGridStatusPagination")});
-        });
-        </script>
-    </div>
-
-    <div class="clear space"></div>
-</div>
-
-    <div id="widget-upcoming-events" class="widget">
-  <div class="widget-head">
-        <h3>Upcoming Events</h3>
-  </div>
-
-  <div class="widget-content" id="widgetUpcomingEventsBody">
-
-<div id="widgetUpcomingEventsContent">
-
--->
-
-
-
-    <script type="text/javascript">
-
-      /*
-
-        var selected_date = '2018-04-15';
-
-        var event_offset=0;
-        var selected_event_id=null;
-        $(function(){
-
-            filters_loaded();
-            filters_changed();
-        });
-        function dp_changed(date_text) {
-            $("#event-results-list").toggle();
-            $("#event-results-loader").toggle();
-            var cat_id=$("#category").val();
-            if (!cat_id)
-                cat_id = 0;
-
-            var timeband=$("#timefilter").val();
-            var tb;
-            if (timeband)
-                tb = '&mins='+timeband;
-            else
-                tb = '';
-
-                tb = tb + '&upcoming=1';
-
-            proxy_load("#event-results",'/events/fordate/'+date_text+'/?lang=en&q=&p=&cat='+cat_id+tb+'&start='+event_offset, null, filters_loaded);
-        }
-
-function proxy_load(target_div,url,p1,after) {
-
-        var url = 'https://secondlife.com/layout/_ajax/htmlProxy.php?url=http%3A%2F%2Fevents.secondlife.com'+escape(url);
-
-    $(target_div).load(url, p1, after);
-}
-
-        function filters_loaded() {
-            $("#category").add("#timefilter").change(filters_changed);
-            $("#event_table tbody tr").click(function(sel){
-                var event_id=$(this).attr("event_id");
-                event_detail(event_id);
-            });
-
-
-        }
-        function filters_changed() {
-
-            event_offset=0;
-            reload();
-        }
-        function reload() {
-            dp_changed(selected_date);
-        }
-        function paginate(offset) {
-            event_offset=offset;
-            reload();
-        }
-        function event_detail(event_id) {
-            var ev_url="/embed/event/"+event_id+"/details/?lang=en";
-
-
-                window.location.href = '/my/community/events/event.php?id='+event_id;
-
-        }
-    */
-    </script>
-<!--
-
-
-    <div id="event-results" class="clear">
-
-<div>
-    <div style="float: right">
-    <select name="category" id="category">
-<option value="0" selected="selected">All Categories</option>
-<option value="27">Arts and Culture  (1)</option>
-<option value="28" disabled="disabled">Charity/Support Groups  (0)</option>
-<option value="22" disabled="disabled">Commercial  (0)</option>
-<option value="18" disabled="disabled">Discussion  (0)</option>
-<option value="26">Education  (3)</option>
-<option value="24">Games/Contests  (3)</option>
-<option value="20">Live Music  (7)</option>
-<option value="29">Miscellaneous  (1)</option>
-<option value="23">Nightlife/Entertainment  (13)</option>
-<option value="25" disabled="disabled">Pageants  (0)</option>
-<option value="19" disabled="disabled">Sports  (0)</option>
-</select>
-    <select name="timefilter" id="timefilter">
-<option value="120">Show next 2 hours</option>
-<option value="240">Show next 4 hours</option>
-<option value="600">Show next 10 hours</option>
-<option value="1440" selected="selected">Show next 24 hours</option>
-</select>
-    </div>
-</div>
-
-<div id="event-results-loader" style="display: none">
-<img src="/my/_img/ajax-loader.gif" class="ajax-loader">
-</div>
-
-<div id="event-results-list">
-
-        <table id="event_table" class="border_gry">
-            <tbody>
-
-                    <tr id="event_row_7415717" event_id="7415717" category_id="27" timebands=":240:600:1440:">
-                        <td class="event_date">4:00 AM</td>
-                        <td><a href="javascript:event_detail(7415717)">**TREKKIE TREASURE HUNT - at the Star Trek Museum</a></td>
-                    </tr>
-
-                    <tr id="event_row_7416246" event_id="7416246" category_id="26" timebands=":600:1440:" class="alt">
-                        <td class="event_date">6:00 AM</td>
-                        <td><a href="javascript:event_detail(7416246)">English Class. VOICE. Pronunciation Practice</a></td>
-                    </tr>
-
-                    <tr id="event_row_7414658" event_id="7414658" category_id="26" timebands=":600:1440:">
-                        <td class="event_date">7:00 AM</td>
-                        <td><a href="javascript:event_detail(7414658)">Scripting Class-Particles 1 at Helping Haven Gateway</a></td>
-                    </tr>
-
-                    <tr id="event_row_7414660" event_id="7414660" category_id="23" timebands=":600:1440:" class="alt">
-                        <td class="event_date">8:00 AM</td>
-                        <td><a href="javascript:event_detail(7414660)">Breakfast Club at Helping Haven Gateway</a></td>
-                    </tr>
-
-                    <tr id="event_row_7415710" event_id="7415710" category_id="29" timebands=":600:1440:">
-                        <td class="event_date">10:00 AM</td>
-                        <td><a href="javascript:event_detail(7415710)">**SCUBA WITH OUR WHALES - at the Star Trek Museum</a></td>
-                    </tr>
-
-            </tbody>
-        </table>
-
-<span style="float: right">
-
-<span id="WidgetUpcomingEventsPagination">
-<span class="qp_next qp_disabled"></span>
-<span class="qp_counter">
-    <span class="qp_pagenumber">1</span>
-    /
-    <span class="qp_totalnumber">6</span>
-</span>
-<a href="javascript:paginate(5)" class="qp_prev"><span>Next</span></a>
-</span></span>
-
-
-
-
-
-
-
-</div>
-</div>
-
-</div>
-
-<script type="text/javascript">
-    $(document).ready(function() {
-        $("#widgetUpcomingEvents .ajax-loader").hide();
-        dashStartwatch( 'widgetUpcomingEventsAjax' );
-        $('#widgetUpcomingEventsContent').load('https://secondlife.com/layout/_ajax/htmlProxy.php?url=http://events.secondlife.com/embed/events/upcoming/%3Flang=en-US%26proxy=https://secondlife.com/layout/_ajax/htmlProxy.php%26e=1', undefined, function() {
-            dashStopwatch( 'widgetUpcomingEventsAjax' );
-        });
-    });
-</script>
-  </div>
-
-  <div class="clear space"></div>
-</div>
-  </div>
-
-  <div id="dashboard-widgets" class="span-8 last">
-            <div id="upgrade-promo" style="margin-bottom: 12px;">
-            <a href="/my/account/membership.php">
-              <img src="_img/promos/upgrade.gif" alt="Upgrade to Premium">            </a>
-        </div>
-
-    <div id="viewer2-promo">
-      <a href="/beta-viewer/">
-        <h3>Download <strong>SL Viewer</strong></h3>
-        <p>Experience the next generation Second Life Viewer</p>
+  <div class="row justify-content-center">
+    <div class="col-4">
+      <a href="#">
+        <img class="rounded" title="{UserName} ({UserType})" src="{UserPictureURL}" alt="{UserProfileFor}: {UserName} ({UserType})" height="256" />
       </a>
     </div>
 
-                <script type="text/javascript">
-                var readyfuncs = readyfuncs || [];
-                readyfuncs.push( function() {
-                dashStartwatch( 'widgetGroupsBody' );
-                getWidget( 'https://secondlife.com/my/loadWidgetContent.php?widget=widgetGroups&CSRFToken=bbefac79474ef6f06cd4d49a87b0cfcd', 'widgetGroupsBody' );
-                });
-            </script>
-            <div id="widget-groups" class="widget">
-  <div class="widget-t"><span class="l"></span><span class="r"></span></div>
+    <div>
+      <div class="row">
+        <div class="col"><p>{ResidentSince}</p></div>
+        <div class="col"><p>{UserBorn}</p></div>
+      </div>
+      <div class="row">
+        <div class="col"><p>{AccountType}</p></div>
+        <div class="col"><p>{UserType}</p></div>
+      </div>
+      <div class="row">
+        <div class="col"><p>{PartnersName}</p></div>
+        <div class="col"><p>{UserPartner}</p></div>
+      </div>
+      <div class="row">
+        <div class="col"><p>{AboutMe}</p></div>
+        <div class="col"><p>{UserAboutMe}</p></div>
+      </div>
+    </div>
+  </div>
+</div>
 
-  <div class="widget-head">
-    <h3>My Groups</h3>
+<div class="containter">
+  <div class="row justify-content-center">
+    <h4>{UsersGroupsText} by {UserName} ({GroupsJoined})</h4>
   </div>
 
-  <div class="widget-content" id="widgetGroupsBody"><div style="padding:10px;"><p class="notice">You don't appear to be associated with any groups. Please contact us if you are in a group and it isn't listed here.</p><h6><a href="http://wiki.secondlife.com/wiki/How_do_I_join_a_group">How do I join a group?</a></h6></div>
-<script type="text/javascript">
-$(document).ready(function(){
-  $("#widgetGroupsBody table tr.group-status").quickpaginate({ perpage: 5, showcounter: true, pager : $("#widgetGroupPagination") });
-});
+  <div class="row justify-content-center">
+    <div class="col"></div>
+    <div class="col-6">
+      <div class="avatar-contain">
+        {GroupsArrayBegin}
+        <div class="profile_picture_small" id="group_picture">
+          <a href="#">
+            <img class="rounded" height="128"
+                 src="{GroupPictureURL}"
+                 alt="{GroupNameText}: {GroupName}"
+                 title="{GroupNameText}: {GroupName}" />
+          </a>
+          <p class="group_profile_picture_text">{GroupNameText}: {GroupName}</p>
+        </div>
+        {GroupsArrayEnd}
+      </div>
+    </div>
+
+    <div class="col"></div>
+  </div>
+
+</div>
+
+
+<script>
+  $(function() {
+    $('.avatar-contain').slick({
+      infinite: true,
+      slidesToShow: 3,
+      slidesToScroll: 1
+    });
+  
+  });
 </script>
-</div>
-
-  <div class="widget-b"><span class="l"></span><span class="r"></span></div>
-</div>
-  </div>
-</div>
-
-    </div>
-
-    <div class="main-content-b"><span class="l"></span><span class="r"></span></div>
-
-    </div>
-
--->
