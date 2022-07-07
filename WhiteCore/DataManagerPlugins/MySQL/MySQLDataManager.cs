@@ -50,6 +50,12 @@ namespace WhiteCore.DataManager.MySQL
         public override void ConnectToDatabase (string connectionString, string migratorName, bool validateTables)
         {
             m_connectionString = connectionString;
+            if (string.IsNullOrWhiteSpace(connectionString)) {
+                MainConsole.Instance.Error("[MySQL]: Database and connection details not supplied - Aborting!");
+                MainConsole.Instance.Error("[MySQL]: Please restart in configuration mode - eg. 'whitecore -config'");
+                Environment.Exit(0);            // Invalid configuration.. exit
+            }
+
             MySqlConnection c = new MySqlConnection (connectionString);
             int subStrA = connectionString.IndexOf ("Database=", StringComparison.Ordinal);
             int subStrB = connectionString.IndexOf (";", subStrA, StringComparison.Ordinal);
