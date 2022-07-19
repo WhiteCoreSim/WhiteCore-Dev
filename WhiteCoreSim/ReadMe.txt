@@ -1,7 +1,7 @@
-WhiteCore-Dev 0.9.5+ (git)
+WhiteCore-Dev 0.9.6+ (git)
 Rowan Deppeler <greythane@gmail.com>
 Fly-Man-
-July 2019
+July 2022
 ===============================================
 
 ** Simplified startup scripts **
@@ -23,8 +23,8 @@ Note:
    Linux (ubuntu variations) >> apt-get install screen;
    Mac >> already available
   
-run_standalonemode.sh       	: Run WhiteCore standalone mode in background
-run_gridmode.sh             	: Run WhiteCore grid mode in background
+run_standalonemode.sh     : Run WhiteCore standalone mode in background
+run_gridmode.sh           : Run WhiteCore grid mode in background
 
 
 GUI scripts for Windows and Mac
@@ -85,13 +85,17 @@ re-start..
 
 Questions?
 ==========
-Checkout the #whitecore-support irc channel on freenode,
-or check into the MeWe community for WhiteCore https://mewe.com/group/5cb284545da1780ba88ca30d where a friendly group is happy to answer questions.
+Checkout the #whitecore-support irc channel on Libera.Chat.
+Use your favourite IRC client or the simple web interface available at
+    https://web.libera.chat/gamja/#whitecore-support
+or check into the MeWe community for WhiteCore 
+    https://mewe.com/group/5cb284545da1780ba88ca30d 
+where a friendly group is happy to answer questions.
 
 Rowan Deppeler
 <greythane @ gmail.com>
 
-July 2019
+July 2022
 =======================
 
 For licensing information, please see the relevant licenses.

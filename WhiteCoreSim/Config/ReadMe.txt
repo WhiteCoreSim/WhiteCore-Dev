@@ -1,6 +1,6 @@
-WhiteCore-Dev 0.9.5+ (git)
+WhiteCore-Dev 0.9.6+ (git)
 Rowan Deppeler <greythane@gmail.com>
-August 2019
+July 2022
 ===============================================
 
 ** The default configuration **
@@ -74,15 +74,17 @@ These files configure how the WhiteCore Grid Server will perform and what
 
 Questions?
 ==========
-Checkout the #whitecore-support irc channel on freenode,
+Checkout the #whitecore-support irc channel on Libera.Chat.
+Use your favourite IRC client or the simple web interface available at
+    https://web.libera.chat/gamja/#whitecore-support
 or check into the MeWe community for WhiteCore 
-  https://mewe.com/group/5cb284545da1780ba88ca30d 
-  where a friendly group is happy to answer questions.
+    https://mewe.com/group/5cb284545da1780ba88ca30d 
+where a friendly group is happy to answer questions.
 
 Rowan Deppeler
 <greythane @ gmail.com>
 
-August 2019
+July 2022
 =======================
 
 For licensing information, please see the relevant licenses.
