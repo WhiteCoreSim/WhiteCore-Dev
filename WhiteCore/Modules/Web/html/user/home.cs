@@ -174,6 +174,7 @@ namespace WhiteCore.Modules.Web
 
             vars.Add ("GroupNameText", translator.GetTranslatedString ("GroupNameText"));
             vars.Add ("Groups", groups);
+            vars.Add ("UsersGroupsText", translator.GetTranslatedString("UsersGroupsText"));
             vars.Add ("GroupsJoined", groupCount);
 
             // Menus

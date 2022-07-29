@@ -103,8 +103,8 @@ namespace WhiteCore.Modules.Web
                     }
                 }
             } else {
-                vars.Add("HaveData", true);
-                vars.Add("NoData", false);
+                vars.Add("HaveData", false);
+                vars.Add("NoData", true);
                 vars.Add("NoDetails", translator.GetTranslatedString("NoDetailsText"));
             }
 

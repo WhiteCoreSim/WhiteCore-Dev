@@ -42,7 +42,7 @@ using RegionFlags = WhiteCore.Framework.Services.RegionFlags;
 
 namespace WhiteCore.Modules.Web
 {
-    public class RegisterPage : IWebInterfacePage
+    public class AdminRegisterPage : IWebInterfacePage
     {
 
         public string[] FilePath
@@ -51,19 +51,19 @@ namespace WhiteCore.Modules.Web
             {
                 return new[]
                            {
-                               "html/register.html"
+                               "html/admin/user_register.html"
                            };
             }
         }
 
         public bool RequiresAuthentication
         {
-            get { return false; }
+            get { return true; }
         }
 
         public bool RequiresAdminAuthentication
         {
-            get { return false; }
+            get { return true; }
         }
 
         string ShortMonthToNumber(string key)
@@ -108,27 +108,20 @@ namespace WhiteCore.Modules.Web
             var vars = new Dictionary<string, object>();
             var settings = webInterface.GetWebUISettings();
 
-            bool adminUser = Authenticator.CheckAdminAuthentication(httpRequest, Constants.USER_GOD_CUSTOMER_SERVICE);
-            bool allowRegistration = settings.WebRegistration;
-            bool anonymousLogins;
+            // bool adminUser = Authenticator.CheckAdminAuthentication(httpRequest, Constants.USER_GOD_CUSTOMER_SERVICE);
+            //bool allowRegistration = settings.WebRegistration;
+            //bool anonymousLogins;
 
             // allow configuration to override the web settings
+
             var simBase = webInterface.Registry.RequestModuleInterface<ISimulationBase>();
             IConfig loginServerConfig = simBase.ConfigSource.Configs["LoginService"];
             if (loginServerConfig != null)
             {
+                /* admin can register always
                 anonymousLogins = loginServerConfig.GetBoolean("AllowAnonymousLogin", allowRegistration);
                 allowRegistration = (allowRegistration || anonymousLogins);
-            }
-
-            if (!adminUser && !allowRegistration)
-            {
-                // vars.Add("ErrorMessage", "");
-                vars.Add("RegistrationText", translator.GetTranslatedString("RegistrationText"));
-                vars.Add("RegistrationsDisabled", translator.GetTranslatedString("RegistrationsDisabled"));
-                vars.Add("Registrations", false);
-                vars.Add("NoRegistrations", true);
-                return vars;
+                */
             }
 
             if (requestParameters.ContainsKey("Submit"))
@@ -150,12 +143,14 @@ namespace WhiteCore.Modules.Web
                 string AvatarArchive = requestParameters.ContainsKey("AvatarArchive")
                                            ? requestParameters["AvatarArchive"].ToString()
                                            : "";
+                bool ToSAccept = true;                      /* Assumed accepted for admin registrations
                 bool ToSAccept = requestParameters.ContainsKey("ToSAccept") &&
                                  requestParameters["ToSAccept"].ToString() == "Accepted";
+                */
 
                 string UserType = requestParameters.ContainsKey("UserType")         // only admins can set membership
                     ? requestParameters["UserType"].ToString()
-                    : "Resident";                                                   // TODO: should be set to a default for anonmous registrations
+                    : "Resident";
 
                 // revise UserDOBMonth to a number
                 UserDOBMonth = ShortMonthToNumber(UserDOBMonth);
@@ -191,7 +186,7 @@ namespace WhiteCore.Modules.Web
                     return null;
                 }
 
-                // so far so good...
+                // so far so good...   // TODO:  Remove test when checked
                 if (ToSAccept)
                 {
                     AvatarPassword = Util.Md5Hash(AvatarPassword);
@@ -199,9 +194,9 @@ namespace WhiteCore.Modules.Web
                     IUserAccountService accountService =
                         webInterface.Registry.RequestModuleInterface<IUserAccountService>();
                     UUID userID = UUID.Random();
-                    string error = accountService.CreateUser(userID, settings.DefaultScopeID, AvatarName, AvatarPassword,
+                    string create_error = accountService.CreateUser(userID, settings.DefaultScopeID, AvatarName, AvatarPassword,
                                                              UserEmail);
-                    if (error == "")
+                    if (create_error == "")
                     {
                         // set the user account type
                         UserAccount userAcct = accountService.GetUserAccount(null, userID);
@@ -285,7 +280,7 @@ namespace WhiteCore.Modules.Web
                     }
                     else
                     {
-                        response = webInterface.UserMsg("!" + error, false);
+                        response = webInterface.UserMsg("!" + create_error, false);
                     }
                 }
                 else
@@ -324,18 +319,20 @@ namespace WhiteCore.Modules.Web
             }
 
             vars.Add("RegionList", RegionListVars);
-            vars.Add("UserType", WebHelpers.UserTypeSelections(translator, 0));             // TODO: should be set to a default for anonmous registrations
+            vars.Add("UserType", WebHelpers.UserTypeSelections(translator, 0));
 
             //vars.Add("AvatarDefault", WebHelpers.AvatarDefaultSelection());
             vars.Add("AvatarArchive", WebHelpers.AvatarSelections(webInterface.Registry));
 
+            string ToS = "Terms of Service are assumed to be accepted for admin registrations.";
+            // TODO: Change this - ignore??
+            /*
             string tosLocation = "";
             if (loginServerConfig != null && loginServerConfig.GetBoolean("UseTermsOfServiceOnFirstLogin", false))
             {
                 tosLocation = loginServerConfig.GetString("FileNameOfTOS", "");
                 tosLocation = PathHelpers.VerifyReadFile(tosLocation, ".txt", simBase.DefaultDataPath);
             }
-            string ToS = "There are no Terms of Service currently. This may be changed at any point in the future.";
 
             if (tosLocation != "")
             {
@@ -349,6 +346,7 @@ namespace WhiteCore.Modules.Web
                     reader.Close();
                 }
             }
+            */
 
             // check for user name seed
             string[] m_userNameSeed = null;
@@ -369,10 +367,10 @@ namespace WhiteCore.Modules.Web
 
             vars.Add("AvatarName", enteredName);
             vars.Add("ToSMessage", ToS);
-            vars.Add("TermsOfServiceAccept", translator.GetTranslatedString("TermsOfServiceAccept"));
+            // vars.Add("TermsOfServiceAccept", translator.GetTranslatedString("TermsOfServiceAccept"));
             vars.Add("TermsOfServiceText", translator.GetTranslatedString("TermsOfServiceText"));
-            vars.Add("RegistrationsDisabled", "");
-            //vars.Add("RegistrationsDisabled", translator.GetTranslatedString("RegistrationsDisabled"));
+            // vars.Add("RegistrationsDisabled", "");
+            // vars.Add("RegistrationsDisabled", translator.GetTranslatedString("RegistrationsDisabled"));
             vars.Add("RegistrationText", translator.GetTranslatedString("RegistrationText"));
             vars.Add("AvatarNameText", translator.GetTranslatedString("AvatarNameText"));
             vars.Add("AvatarPasswordText", translator.GetTranslatedString("Password"));
@@ -390,10 +388,10 @@ namespace WhiteCore.Modules.Web
             vars.Add("UserTypeText", translator.GetTranslatedString("UserTypeText"));
             vars.Add("Accept", translator.GetTranslatedString("Accept"));
             vars.Add("Submit", translator.GetTranslatedString("Submit"));
-            vars.Add("SubmitURL", "register.html");
-            // vars.Add("ErrorMessage", "");
-            vars.Add("Registrations", true);
-            vars.Add("NoRegistrations", false);
+            vars.Add("SubmitURL", "admin/register.html");
+            //vars.Add("ErrorMessage", "");
+            //vars.Add("Registrations", true);
+            //vars.Add("NoRegistrations", false);
 
             return vars;
         }

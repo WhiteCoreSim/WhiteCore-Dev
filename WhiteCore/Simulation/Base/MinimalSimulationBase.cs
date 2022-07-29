@@ -272,7 +272,7 @@ namespace WhiteCore.Simulation.Base
 			            			  AppDomain.CurrentDomain.FriendlyName == "WhiteCore.vshost.exe";
             string configrun = BaseApplication.CheckConfigStamp (isWhiteCoreExe);
             if (configrun != "")
-                MainConsole.Instance.Info ("Using the configuration of " + configrun);
+                MainConsole.Instance.Info ("Using the configuration - " + configrun);
 
             PrintStartupLogo ();
 

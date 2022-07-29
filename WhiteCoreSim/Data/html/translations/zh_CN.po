@@ -1,11 +1,14 @@
-﻿#
+#
 # SimpleChinese translation for WhiteCore.
 # This file is distributed under the same license as the WhiteCore package.
 # toweiyg <toweiyg@bnu.edu.cn>, 2016.
+# Updated for v0.9.6 - Greythane <greythane@gmail.com>, July 2022
 #
+
 msgid ""
 msgstr ""
-"Project-Id-Version: WhiteCore Version 0.9.5\n"
+
+"Project-Id-Version: WhiteCore Version 0.9.6\n"
 "Report-Msgid-Bugs-To: Yungang Wei <toweiyg@bnu.edu.cn>\n"
 "POT-Creation-Date: 2016-11-23 14:11:31Z\n"
 "PO-Revision-Date: 2017-01-02 15:57+1100\n"
@@ -147,6 +150,9 @@ msgstr "背部"
 msgid "BankerNameText"
 msgstr "系统银行家"
 
+msgid "BankBalanceText"
+msgstr "银行存款余额"
+
 msgid "BannedUntilText"
 msgstr "用户被禁止直到："
 
@@ -243,6 +249,12 @@ msgstr "更改已成功保存"
 msgid "ChangeUserInformationText"
 msgstr "更改用户信息"
 
+msgid "ChangeContactText"
+msgstr "更改联系方式"
+
+msgid "UpdateContactText"
+msgstr "更新联系人"
+
 msgid "Charter_Member"
 msgstr "宪章会员"
 
@@ -256,7 +268,13 @@ msgid "ClassifiedsText"
 msgstr "公告"
 
 msgid "ClassifiedText"
-msgstr "分类"
+msgstr "广告"
+
+msgid "ClassifiedNewText"
+msgstr "新广告"
+
+msgid "ClassifiedRelistText"
+msgstr "自动重新列出"
 
 msgid "ClearStatsText"
 msgstr "清除统计资料"
@@ -300,6 +318,9 @@ msgstr "当前页面"
 msgid "Custom"
 msgstr "习惯"
 
+msgid "DashboardNameText"
+msgstr "仪表板"
+
 msgid "DateEndText"
 msgstr "结束日期"
 
@@ -311,6 +332,9 @@ msgstr "开始日期"
 
 msgid "DateText"
 msgstr "日期"
+
+msgid "DaysText"
+msgstr "天"
 
 msgid "de"
 msgstr "德语"
@@ -344,6 +368,12 @@ msgstr "这将删除您在网格中的所有信息，并删除您对此服务的
 
 msgid "DeleteUserText"
 msgstr "删除我的账户"
+
+msgid "DeleteUserNameText"
+msgstr "删除账户名"
+
+msgid "DeleteUserConfirmationText"
+msgstr "确认删除我的帐户"
 
 msgid "DescriptionText"
 msgstr "描述"
@@ -768,6 +798,45 @@ msgstr "卷筒纸UI设置"
 msgid "MenuStatistics"
 msgstr "查看器统计"
 
+msgid "MenuShopping"
+msgstr "购物"
+
+msgid "MenuMarketplace"
+msgstr "市场"
+
+msgid "MenuUserLand"
+msgstr "地区"
+
+msgid "MenuUserBuyLand"
+msgstr "买地"
+
+msgid "MenuUserFriends"
+msgstr "朋友们"
+
+msgid "MenuUserGroupLand"
+msgstr "集团土地"
+
+msgid "MenuUserLandfees"
+msgstr "土地费"
+
+msgid "MenuUserMainland"
+msgstr "大陆"
+
+msgid "MenuUserProfile"
+msgstr "轮廓"
+
+msgid "MenuDeleteAccount"
+msgstr "删除帐户"
+
+msgid "MenuContactInfo"
+msgstr "接触"
+
+msgid "MenuEmail"
+msgstr "电子邮件"
+
+msgid "MenuPartners"
+msgstr "伙伴
+
 msgid "MenuTransactions"
 msgstr "用户交易"
 
@@ -825,11 +894,17 @@ msgstr "名称"
 msgid "NewEmailText"
 msgstr "新电子邮件地址"
 
+msgid "NewEmailConfirmationText"
+msgstr "确认电邮地址"
+
 msgid "NewPasswordConfirmationText"
 msgstr "新密码（确认）"
 
 msgid "NewPasswordText"
 msgstr "新密码"
+
+msgid "EnterPasswordText"
+msgstr "输入密码"
 
 msgid "News"
 msgstr "新闻"
@@ -984,6 +1059,12 @@ msgstr "伙伴"
 msgid "PartnersName"
 msgstr "合作伙伴姓名"
 
+msgid "PartnerProposalText"
+msgstr "提议"
+
+msgid "SendProposalText"
+msgstr "发送提案"
+
 msgid "Password"
 msgstr "密码"
 
@@ -995,6 +1076,9 @@ msgstr "密码"
 
 msgid "PerformanceText"
 msgstr "表现平均值"
+
+msgid "PGText"
+msgstr "PG"
 
 msgid "PickNameText"
 msgstr "选择名称"
@@ -1257,6 +1341,9 @@ msgstr "星期日"
 msgid "SystemEstateNameText"
 msgstr "系统地产"
 
+msgid "TagsText"
+msgstr "标签"
+
 msgid "TaxFreeText"
 msgstr "免税"
 
@@ -1277,6 +1364,9 @@ msgstr "时间"
 
 msgid "TimeUntilUnbannedText"
 msgstr "直到用户不被禁止的时间"
+
+msgid "TitleText"
+msgstr "标题"
 
 msgid "TooltipsMenuAbuse"
 msgstr "用户滥用报告"

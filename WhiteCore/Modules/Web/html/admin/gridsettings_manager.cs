@@ -103,7 +103,7 @@ namespace WhiteCore.Modules.Web
             vars.Add("SystemEstateNameText", translator.GetTranslatedString("SystemEstateNameText"));
 
 
-
+            vars.Add("Cancel", translator.GetTranslatedString("Cancel"));
             vars.Add("Save", translator.GetTranslatedString("Save"));
             // vars.Add("No", translator.GetTranslatedString("No"));
             // vars.Add("Yes", translator.GetTranslatedString("Yes"));

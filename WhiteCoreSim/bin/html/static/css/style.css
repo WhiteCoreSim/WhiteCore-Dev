@@ -120,8 +120,8 @@ section.features, section.blog-intro, section.blog {
 }
 
 .error_content {
-  background: url("../images/slideshow_bg.jpg") no-repeat center center;
-  background-size: cover;
+  /*background: url("../images/slideshow_bg.jpg") no-repeat center center;
+  background-size: cover; */
 }
 
 .text-center {
@@ -169,7 +169,9 @@ body {
   font-family: "Open Sans", sans-serif;
   font-weight: 300;
   color: #8cbdf3; //rgba(28, 54, 83, 0.6);
-  -webkit-text-size-adjust: 100%; }
+  -webkit-text-size-adjust: 100%;
+  background-color: #373d49;
+}
 
 ul, ol {
   margin: 0;
@@ -341,6 +343,7 @@ Navigation
 ========================================================================== */
 .navbar {
   margin-bottom:0px;
+  font-size: 13px;
 }
 .header-nav.open {
   visibility: visible;

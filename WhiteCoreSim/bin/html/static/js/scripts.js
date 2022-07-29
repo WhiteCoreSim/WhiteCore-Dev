@@ -1,23 +1,5 @@
-$(document).ready(function() {
+$(function() {
 
-	/***************** Waypoints ******************/
-/*
-	$('.wp1').waypoint(function() {
-		$('.wp1').addClass('animated fadeInUp');
-	}, {
-		offset: '75%'
-	});
-	$('.wp2').waypoint(function() {
-		$('.wp2').addClass('animated fadeInUp');
-	}, {
-		offset: '75%'
-	});
-	$('.wp3').waypoint(function() {
-		$('.wp3').addClass('animated fadeInRight');
-	}, {
-		offset: '75%'
-	});
-*/
 
 	/***************** Tooltips ******************/
     $('[data-toggle="tooltip"]').tooltip();
@@ -45,43 +27,43 @@ $(document).ready(function() {
 
 	/***************** Header BG Scroll ******************/
 
-	$(function() {
-		$(window).scroll(function() {
-			var scroll = $(window).scrollTop();
 
-			if (scroll >= 20) {
-				$('section.navigation').addClass('fixed');
-				$('section.top-navigation').addClass('fixed');
-				$('header').css({
-					"border-bottom": "none",
-					"background-color": "rgba(34, 34, 34, 0.55)"
-					//"padding": "35px 0px 5px"
-				});
-				$('header .member-actions').css({
-					"top": "5px",
-				});
-				$('header .navicon').css({
-					"top": "34px",
-				});
-			} else {
-				$('section.navigation').removeClass('fixed');
-				$('section.top-navigation').removeClass('fixed');
-				$('header').css({
-					"border-bottom": "solid 1px rgba(255, 255, 255, 0.2)",
-					"background-color": "transparent"
-					//"padding": "40px 0px 5px 0px"
-				});
-				$('header .member-actions').css({
-					"top": "5px",
-				});
-				$('header .navicon').css({
-					"top": "48px",
-				});
-			}
-		});
+	$(window).scroll(function() {
+		var scroll = $(window).scrollTop();
+
+		if (scroll >= 20) {
+			$('section.navigation').addClass('fixed');
+			$('section.top-navigation').addClass('fixed');
+			$('header').css({
+				"border-bottom": "none",
+				"background-color": "rgba(34, 34, 34, 0.55)"
+				//"padding": "35px 0px 5px"
+			});
+			$('header .member-actions').css({
+				"top": "5px",
+			});
+			$('header .navicon').css({
+				"top": "34px",
+			});
+		} else {
+			$('section.navigation').removeClass('fixed');
+			$('section.top-navigation').removeClass('fixed');
+			$('header').css({
+				"border-bottom": "solid 1px rgba(255, 255, 255, 0.2)",
+				"background-color": "transparent"
+				//"padding": "40px 0px 5px 0px"
+			});
+			$('header .member-actions').css({
+				"top": "5px",
+			});
+			$('header .navicon').css({
+				"top": "48px",
+			});
+		}
 	});
+	
 	/***************** Smooth Scrolling ******************/
-/*
+	/*
 	$(function() {
 
 		$('a[href*=\\#]:not([href=\\#])').click(function() {
@@ -99,7 +81,7 @@ $(document).ready(function() {
 		});
 
 	});
-*/
+	*/
 });
 
 
@@ -126,7 +108,7 @@ function submitupdate(formname, parms="", menuid="") {
       if (menuid != "") {
       	setTimeout(function() {
       		loadusercontent(menuid);
-      	}, 3100);
+      	}, 1000);
       }
     }
   });
@@ -162,5 +144,5 @@ function submitpagesearch(formname, destdiv) {
 /* go to user home/dashboard */
 function gohome() {
   //event.stopPropagation();
-  window.location.href = "/";
+  loadusercontent('user-userhome');
 }

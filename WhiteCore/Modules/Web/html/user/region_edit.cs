@@ -78,7 +78,7 @@ namespace WhiteCore.Modules.Web
                     return null;
                 }
 
-                var regionID = requestParameters ["RegionID"].ToString ();
+                var regionID = requestParameters ["regionid"].ToString ();
                 var regionName = requestParameters ["RegionName"].ToString ();
                 //var OwnerUUID = requestParameters["OwnerUUID"].ToString();
                 var regionLocX = requestParameters ["RegionLocX"].ToString ();
@@ -246,20 +246,12 @@ namespace WhiteCore.Modules.Web
                 // update region details
                 var infoConnector = Framework.Utilities.DataManager.RequestPlugin<IRegionInfoConnector> ();
                 if (infoConnector != null) {
-                    infoConnector.UpdateRegionInfo (newRegion);
+                    infoConnector.UpdateRegionInfo(newRegion);
                     response = webInterface.UserMsg("Region details updated", true);
+                } else {
+                    response = webInterface.UserMsg("!Sorry - Not implemented yet", true);
+                }
 
-                    //response = "<h3>Region details updated.</h3>" +
-                    //"<script language=\"javascript\">" +
-                    //"setTimeout(function() {window.location.href = \"/?page=region_manager\";}, 2000);" +
-                    //"</script>";
-                } else
-                    response = webInterface.UserMsg("!Unable to update region details", true);
-
-                    //response = "<h3>Unable to update Region details!</h3>" +
-                    //"<script language=\"javascript\">" +
-                    //"setTimeout(function() {window.location.href = \"/?page=region_manager\";}, 2000);" +
-                    //"</script>";
                 return null;
 
             }

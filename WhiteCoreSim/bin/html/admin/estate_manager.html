@@ -6,65 +6,79 @@
 <div class="col98">
   <h2>{SystemName} {EstateManagerText}</h2>
   {IsAdminAuthenticatedBegin}
+    {IfHaveDataBegin}
 
-  <div class="row w-100 mb-3">
-    <div class="col"></div>
-    <div class="col-3 pull-right">
-      <button onClick="loadusercontent('admin-estate_edit','newestate=true');">{AddEstateText}</button>
-    </div>
-  </div>
+      <div class="row w-100 mb-3">
+        <div class="col"></div>
+        <div class="col-3 pull-right">
+          <button onClick="loadusercontent('admin-estate_edit','newestate=true');">{AddEstateText}</button>
+        </div>
+      </div>
 
-  <div class="row w-100">
-    <div class="col">
-      <table class="table-compact table-hover" id="estatelist" class="display" cellspacing="0" width="100%">
-        <thead>
-          <tr class="tablehead">
-            <th class="text-center" style="width:180px">{EstateText}</th>
-            <th class="text-center" style="width:200px">{EstateOwnerText}</th>
-            <th class="text-center" style="width:50px">{PublicAccessText}</th>
-            <th class="text-center" style="width:50px">{AllowVoiceText}</th>
-            <th class="text-center" style="width:50px">{TaxFreeText}</th>
-            <th class="text-center" style="width:50px">{AllowDirectTeleportText}</th>
-            <th class="text-center" style="width:50px">{RegionsText}</th>
-            <th class="no-sort" style="width:80px"></th>
-          </tr>
-        </thead>
+      <div class="row w-100">
+        <div class="col">
+          <table class="table-compact table-hover" id="estatelist" class="display" cellspacing="0" width="100%">
+            <thead>
+              <tr class="tablehead">
+                <th class="text-center" style="width:180px">{EstateText}</th>
+                <th class="text-center" style="width:200px">{EstateOwnerText}</th>
+                <th class="text-center" style="width:50px">{PublicAccessText}</th>
+                <th class="text-center" style="width:50px">{AllowVoiceText}</th>
+                <th class="text-center" style="width:50px">{TaxFreeText}</th>
+                <th class="text-center" style="width:50px">{AllowDirectTeleportText}</th>
+                <th class="text-center" style="width:50px">{RegionsText}</th>
+                <th class="no-sort" style="width:80px"></th>
+              </tr>
+            </thead>
 
-        <tbody>
+            <tbody>
 
-          {EstateListArrayBegin}
-          <tr onclick="loadusercontent('admin-estate_edit', 'estateid={EstateID}');">
-            <td class="text-left">{EstateName}</td>
-            <td class="text-left">{EstateOwner}</td>
-            <td class="text-center">{PublicAccess}</td>
-      	    <td class="text-center">{AllowVoice}</td>
-      	    <td class="text-center">{TaxFree}</td>
-      	    <td class="text-center">{AllowDirectTeleport}</td>
-            <td class="text-center">{RegionCount}</td>
-            <td class="text-center">
-              <a title="{EditEstateText}" href="#">
-                <i class="fa fa-edit"></i>
-              </a>
-            </td>
-          </tr>
-          {EstateListArrayEnd}
+              {EstateListArrayBegin}
+              <tr onclick="loadusercontent('admin-estate_edit', 'estateid={EstateID}');">
+                <td class="text-left">{EstateName}</td>
+                <td class="text-left">{EstateOwner}</td>
+                <td class="text-center">{PublicAccess}</td>
+          	    <td class="text-center">{AllowVoice}</td>
+          	    <td class="text-center">{TaxFree}</td>
+          	    <td class="text-center">{AllowDirectTeleport}</td>
+                <td class="text-center">{RegionCount}</td>
+                <td class="text-center">
+                  <a title="{EditEstateText}" href="#">
+                    <i class="fa fa-edit"></i>
+                  </a>
+                </td>
+              </tr>
+              {EstateListArrayEnd}
 
-        </tbody>
-      </table>
-    </div>
-  </div>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <script>
+        $(function() {
+          $('#estatelist').dataTable( {
+            "order": [[ 0, "asc" ]],
+            "aoColumnDefs": [{"bSortable":false,"aTargets":["no-sort"]}],
+            "fixedHeader": {
+              header: true,
+             //footer: true
+            },
+          });
+        });
+      </script>
+    {IfHaveDataEnd}
+
+    {IfNoDataBegin}
+      <div id="error404" align="center">
+        <h4 class="error404">
+          {NoDetails}?
+        </h4>
+        <div class="error404" style="cursor:pointer;">
+          <img src="/static/images/land_for_rent.jpg"/>
+        </div>
+      </div>
+    {IfNoDataEnd}
   {IsAdminAuthenticatedEnd}
 </div>
-<script>
-  $(function() {
-    $('#estatelist').dataTable( {
-      "order": [[ 0, "asc" ]],
-      "aoColumnDefs": [{"bSortable":false,"aTargets":["no-sort"]}],
-      "fixedHeader": {
-        header: true,
-       //footer: true
-      },
-    });
-  });
-</script>
 

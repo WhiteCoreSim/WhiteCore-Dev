@@ -3,63 +3,79 @@
   .page-link {background-color: transparent !important;}
 </style>
 
-{IsAdminAuthenticatedBegin}
 <div class="col98">
   <h2>{SystemName} {RegionListText}</h2>
-  <div class="row w-100 mb-3">
-    <div class="col"></div>
-    <div class="col-3 pull-right">
-      <button onClick="loadusercontent('admin-region_edit','addregion=true');">{AddRegionText}</button>
-    </div>
-  </div>
 
-  <div class="row w-100">
-    <div class="col">
-      <table class="table-compact table-hover" id="regionlist" class="display" cellspacing="0" width="100%">
-        <thead>
-          <tr class="tablehead">
-            <th class="text-left" style="width:200px;">{RegionText}</th>
-            <th class="text-center" style="width:100px;">{RegionLocXText}</th>
-            <th class="text-center" style="width:100px;">{RegionLocYText}</th>
-            <th class="no-sort"></th>
-            <th class="text-center" style="width:50px;">{RegionOnlineText}</th>
-            <th class="no-sort" style="width:80px;"></th>
-          </tr>
-        </thead>
+  {IsAdminAuthenticatedBegin}
+    {IfHaveDataBegin}
 
-        <tbody>
+      <div class="row w-100 mb-3">
+        <div class="col"></div>
+        <div class="col-3 pull-right">
+          <button onClick="loadusercontent('admin-region_edit.html','addregion=true');">{AddRegionText}</button>
+        </div>
+      </div>
 
-          {RegionListArrayBegin}
-          <tr onclick="loadusercontent('admin-region_edit', 'regionid={RegionID}');">
-            <td class="text-left">{RegionName}</td>
-            <td class="text-center">{RegionLocX}</td>
-      	    <td class="text-center">{RegionLocY}</td>
-      	    <td class="text-left">{RegionInfo}</td>
-      	    <td class="text-center">{RegionStatus}</td>
-            <td class="text-center">
-              <a href="#" title="{EditText}">
-                <i class="fa fa-edit"></i>
-              </a>
-            </td>
-          </tr>
-          {RegionListArrayEnd}
+      <div class="row w-100">
+        <div class="col">
+          <table class="table-compact table-hover" id="regionlist" class="display" cellspacing="0" width="100%">
+            <thead>
+              <tr class="tablehead">
+                <th class="text-left" style="width:200px;">{RegionText}</th>
+                <th class="text-center" style="width:100px;">{RegionLocXText}</th>
+                <th class="text-center" style="width:100px;">{RegionLocYText}</th>
+                <th class="no-sort"></th>
+                <th class="text-center" style="width:50px;">{RegionOnlineText}</th>
+                <th class="no-sort" style="width:80px;"></th>
+              </tr>
+            </thead>
 
-        </tbody>
-      </table>
-    </div>
-  </div>
+            <tbody>
+
+              {RegionListArrayBegin}
+              <tr onclick="loadusercontent('admin-region_edit', 'regionid={RegionID}');">
+                <td class="text-left">{RegionName}</td>
+                <td class="text-center">{RegionLocX}</td>
+          	    <td class="text-center">{RegionLocY}</td>
+          	    <td class="text-left">{RegionInfo}</td>
+          	    <td class="text-center">{RegionStatus}</td>
+                <td class="text-center">
+                  <a href="#" title="{EditText}">
+                    <i class="fa fa-edit"></i>
+                  </a>
+                </td>
+              </tr>
+              {RegionListArrayEnd}
+
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <script>
+        $(function() {
+          $('#regionlist').dataTable( {
+            "order": [[ 0, "asc" ]],
+            "aoColumnDefs": [{"bSortable":false,"aTargets":["no-sort"]}],
+            "fixedHeader": {
+              header: true,
+             //footer: true
+            },    });
+        });
+      </script>
+    {IfHaveDataEnd}
+
+    {IfNoDataBegin}
+      <div id="error404" align="center">
+        <h4 class="error404">
+          No regions found?
+        </h4>
+        <div class="error404" style="cursor:pointer;">
+          <img src="/static/images/land_for_rent.jpg"/>
+        </div>
+      </div>
+    {IfNoDataEnd}
+
+  {IsAdminAuthenticatedEnd}
+
 </div>
-
-<script>
-  $(function() {
-    $('#regionlist').dataTable( {
-      "order": [[ 0, "asc" ]],
-      "aoColumnDefs": [{"bSortable":false,"aTargets":["no-sort"]}],
-      "fixedHeader": {
-        header: true,
-       //footer: true
-      },    });
-  });
-</script>
-
-{IsAdminAuthenticatedEnd}

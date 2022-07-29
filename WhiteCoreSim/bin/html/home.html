@@ -1,47 +1,55 @@
 
 <!-- Home page info -->
 
-  <div class="row">
-    <div class="col-6">
-      <img class="logo" src="../static/images/WhiteCore_logo.png" alt="WhiteCore">
-      <div class="hero-content text-center" style="padding-top:0;">
-        <h1>Your own virtual world</h1>
-        <a href="#" class="btn btn-green btn-large btn-margin-right" onclick="loadcontent('register');">Get Started</a>
-        <a href="#localcontent" class="btn btn-green btn-large">Learn more</a>
-        <p class="intro" style="margin-top:20px;">Design, build and explore your own virtual world</p>
-      </div>
+<div class="row">
+  <div class="col-6">
+    <img class="logo" src="../static/images/WhiteCore_logo.png" alt="WhiteCore">
+    <div class="hero-content text-center" style="padding-top:0;">
+      <h1>Your own virtual world</h1>
+      <a href="#" class="btn btn-green btn-large btn-margin-right" onclick="loadcontent('register');">Get Started</a>
+      <a href="#localcontent" class="btn btn-green btn-large">Learn more</a>
+      <p class="intro" style="margin-top:20px;">Design, build and explore your own virtual world</p>
     </div>
   </div>
-
+</div>
 
 
 {IfShowSlideshowBarBegin}
 <!-- <section class="blog text-center"> -->
 <div class="container-fluid blog text-center">
-    <div class="row">
-        {GalleryImagesArrayBegin}
-        <div class="col-4">
-            <article class="blog-post">
-                <figure>
-                    <a href="{ImageSRC}" data-width="800" data-height="600" data-fancybox="images">
-                        <div class="blog-img-wrap">
-                            <div class="overlay">
-                                <i class="fa fa-search"></i>
-                            </div>
-                            <img class="single_image" src="{ImageSRC}" alt="{ImageTitle}"/>
-                        </div>
-                    </a>
-                    <figcaption>
-                      <h2><a href="#" class="blog-category" data-toggle="tooltip" data-placement="top" data-original-title="See more posts">{ImageTitle}</a></h2>
-                      <p><a href="#" class="blog-post-title">{ImageInfo} <i class="fa fa-angle-right"></i></a></p>
-                    </figcaption>
-                </figure>
-            </article>
-        </div>
-       {GalleryImagesArrayEnd}
-
-        <a href="#" class="btn btn-ghost btn-accent btn-small">More images</a>
+  <div class="row">
+    {GalleryImagesArrayBegin}
+    <div class="col-4">
+      <article class="blog-post">
+        <figure>
+          <a href="{ImageSRC}" data-width="800" data-height="600" data-fancybox="images">
+            <div class="blog-img-wrap">
+              <div class="overlay">
+                <i class="fa fa-search"></i>
+              </div>
+              <img class="single_image" src="{ImageSRC}" alt="{ImageTitle}"/>
+            </div>
+          </a>
+          <figcaption>
+            <h2>
+              <a href="#" class="blog-category" data-toggle="tooltip" 
+                 data-placement="top" data-original-title="See more posts">
+                {ImageTitle}
+              </a>
+            </h2>
+            <p>
+              <a href="#" class="blog-post-title">
+                {ImageInfo}<i class="fa fa-angle-right"></i>
+              </a>
+            </p>
+          </figcaption>
+        </figure>
+      </article>
     </div>
+   {GalleryImagesArrayEnd}
+
+    <a href="#" class="btn btn-ghost btn-accent btn-small">More images</a>
+  </div>
 </div>
 <script>
   $('[data-fancybox="images"]').fancybox({

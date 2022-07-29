@@ -2,25 +2,23 @@
 # Deutsch translation for WhiteCore.
 # This file is distributed under the same license as the WhiteCore package.
 # greythane <greythane@gmail.com>, 2016.
+# Updated for v0.9.6 - greythane, 2022
 #
-
-
 msgid ""
 msgstr ""
 
-"Project-Id-Version: WhiteCore Version 0.9.5\n"
+"Project-Id-Version: WhiteCore Version 0.9.6\n"
 "Report-Msgid-Bugs-To: greythane <greythane@gmail.com>\n"
-
 "POT-Creation-Date: 2016-11-23 14:11:31Z\n"
-"PO-Revision-Date: 2016-11-23 14:11:31Z\n"
+"PO-Revision-Date: 2022-07-18 14:43+1000\n"
 "Last-Translator: greythane <greythane@gmail.com>\n"
 "Language-Team: WhiteCore Development <greythane@gmail.com>\n"
+"Language: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: de\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: WhiteCore V0.9.5 Dev\n"
+"X-Generator: WhiteCore V0.9.6 Dev\n"
 
 msgid "30daysPastText"
 msgstr "Letzten 30 Tagen"
@@ -151,6 +149,9 @@ msgstr "Zurück"
 msgid "BankerNameText"
 msgstr "System banker"
 
+msgid "BankBalanceText"
+msgstr "Kontostand"
+
 msgid "BannedUntilText"
 msgstr "Benutzer gesperrt bis:"
 
@@ -215,7 +216,7 @@ msgid "CatPropertyRental"
 msgstr "Eigentums Miete"
 
 msgid "CatSelect"
-msgstr ""
+msgstr "Kategorie"
 
 msgid "CatService"
 msgstr "Service"
@@ -247,6 +248,12 @@ msgstr "Änderungen erfolgreich gespeichert"
 msgid "ChangeUserInformationText"
 msgstr "Ändere Benutzer Informationen"
 
+msgid "ChangeContactText"
+msgstr "Kontaktdaten ndern"
+
+msgid "UpdateContactText"
+msgstr "Kontakt aktualisieren"
+
 msgid "Charter_Member"
 msgstr "Charter-Mitglied"
 
@@ -257,10 +264,16 @@ msgid "CheckedText"
 msgstr "Geprüft"
 
 msgid "ClassifiedsText"
-msgstr "Rubriksanzeige"
+msgstr "Anzeige"
 
 msgid "ClassifiedText"
-msgstr "Classified"
+msgstr "Anzeige"
+
+msgid "ClassifiedNewText"
+msgstr "Neue Anzeige"
+
+msgid "ClassifiedRelistText"
+msgstr "Automatisch neu einstellen"
 
 msgid "ClearStatsText"
 msgstr "Klare Statistiken über"
@@ -304,6 +317,9 @@ msgstr "Aktuelle Seite"
 msgid "Custom"
 msgstr "Brauch"
 
+msgid "DashboardNameText"
+msgstr "Armaturenbrett"
+
 msgid "DateEndText"
 msgstr "Ende"
 
@@ -315,6 +331,9 @@ msgstr "Beginn Datum"
 
 msgid "DateText"
 msgstr "Datum"
+
+msgid "DaysText"
+msgstr "Tage"
 
 msgid "de"
 msgstr "Deutsch"
@@ -348,6 +367,12 @@ msgstr "Das wird alle Informationen im Grid über dich und deinen Zugang zu dies
 
 msgid "DeleteUserText"
 msgstr "Meinen Account löschen"
+
+msgid "DeleteUserNameText"
+msgstr "Kontoname lschen"
+
+msgid "DeleteUserConfirmationText"
+msgstr "Besttigen Sie das Lschen meines Kontos"
 
 msgid "DescriptionText"
 msgstr "Beschreibung"
@@ -772,6 +797,45 @@ msgstr "Einstellungsmanager"
 msgid "MenuStatistics"
 msgstr "Viewer-Statistiken"
 
+msgid "MenuShopping"
+msgstr "Das Einkaufen"
+
+msgid "MenuMarketplace"
+msgstr "Marktplatz"
+
+msgid "MenuUserLand"
+msgstr "Regionen"
+
+msgid "MenuUserBuyLand"
+msgstr "Land kaufen"
+
+msgid "MenuUserFriends"
+msgstr "Freundinnen"
+
+msgid "MenuUserGroupLand"
+msgstr "Land der Gruppe"
+
+msgid "MenuUserLandfees"
+msgstr "Grundstcksgebhren"
+
+msgid "MenuUserMainland"
+msgstr "Festland"
+
+msgid "MenuUserProfile"
+msgstr "Profil"
+
+msgid "MenuDeleteAccount"
+msgstr "Konto lschen"
+
+msgid "MenuContactInfo"
+msgstr "kontaktieren"
+
+msgid "MenuEmail"
+msgstr "Email"
+
+msgid "MenuPartners"
+msgstr "Partner"
+
 msgid "MenuTransactions"
 msgstr "Benutzertransaktionen"
 
@@ -829,11 +893,17 @@ msgstr "Name"
 msgid "NewEmailText"
 msgstr "Neue Email Adresse"
 
+msgid "NewEmailConfirmationText"
+msgstr "e-Mail-Adresse besttigen"
+
 msgid "NewPasswordConfirmationText"
 msgstr "Neues Passwort bestätigen"
 
 msgid "NewPasswordText"
 msgstr "Neues Passwort"
+
+msgid "EnterPasswordText"
+msgstr "Passwort eingeben"
 
 msgid "News"
 msgstr "Nachrichten"
@@ -988,6 +1058,12 @@ msgstr "Partner"
 msgid "PartnersName"
 msgstr "Name des Partners"
 
+msgid "PartnerProposalText"
+msgstr "Vorschlag"
+
+msgid "SendProposalText"
+msgstr "Vorschlag senden"
+
 msgid "Password"
 msgstr "Passwort"
 
@@ -999,6 +1075,9 @@ msgstr "Passwort"
 
 msgid "PerformanceText"
 msgstr "Leistungsmittelwerte"
+
+msgid "PGText"
+msgstr "PG"
 
 msgid "PickNameText"
 msgstr "Wählen Sie Namen"
@@ -1261,6 +1340,9 @@ msgstr "Sonntag"
 msgid "SystemEstateNameText"
 msgstr "System Immobilienname"
 
+msgid "TagsText"
+msgstr "Stichworte"
+
 msgid "TaxFreeText"
 msgstr "Steuerfrei"
 
@@ -1281,6 +1363,9 @@ msgstr "Zeit"
 
 msgid "TimeUntilUnbannedText"
 msgstr "Zeit bis benutzer entsperrt wird"
+
+msgid "TitleText"
+msgstr "Titel"
 
 msgid "TooltipsMenuAbuse"
 msgstr "Benutzer abuser berichte"
@@ -1549,3 +1634,5 @@ msgstr "Vollbild"
 msgid "Yes"
 msgstr "ja"
 
+msgid "zh_CN"
+msgstr "简体中文"

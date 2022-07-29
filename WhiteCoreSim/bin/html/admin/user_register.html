@@ -1,10 +1,6 @@
-<!-- registration form -->
+<!-- Admin registration form -->
 
-{IfNoRegistrationsBegin}
-  <!--#include file="/noregistrations.html" -->
-{IfNoRegistrationsEnd}
 
-{IfRegistrationsBegin}
 <div class="container">
   <h2>{RegistrationText}</h2>
   <div class="row w-100 justify-content-center">
@@ -45,9 +41,8 @@
           <div class="col"></div>
         </div>
 
-        <!--
         {IsAdminAuthenticatedBegin}
-        <!- Only admins can set scope IDs ->
+        <!-- Only admins can set scope IDs -->
         <div class="row mb-1">
           <div class="col-3">
             <p>{AvatarScopeText}*</p>
@@ -55,10 +50,12 @@
           <div class="col-5">
             <input class="form-control" id="AvatarScope" maxlength="15" name="AvatarScope" size="40" type="text" placeholder="00000000-0000-0000-0000-000000000000" value=""/>
           </div>
-          <div class="col"></div>
+          <div class="col">
+            <small class="form-text text-light">Only if specific UUID required</small>
+          </div>
         </div>
         {IsAdminAuthenticatedEnd}
-        -->
+
         <div class="row mb-1">
           <div class="col-3">{FirstNameText}</div>
           <div class="col-5">
@@ -148,9 +145,8 @@
           <div class="col"></div>
         </div>
 
-        <!--
         {IsAdminAuthenticatedBegin}
-        <!- Only admins can set membership types --->
+        <!-- Only admins can set membership types -->
         <div class="row mb-1">
           <div class="col-3">{UserTypeText}*</div>
           <div class="col-5">
@@ -163,7 +159,7 @@
           <div class="col"></div>
         </div>
         {IsAdminAuthenticatedEnd}
-        -->
+
         <div class="row mb-1">
           <div class="col-3">Avatar Selection</div>
           <div class="col-8">
@@ -229,7 +225,7 @@
           <div class="col-9"></div>
           <div class="col-3" style="margin-top:15px;margin-bottom:15px;">
             <input name="action" type="hidden" value="check" />
-            <button class="btn btn-block btn-success" type="Submit" onclick="submitupdate('register_form');">
+            <button class="btn btn-block btn-success" type="Submit" onclick="submitupdate('admin-register_form');">
               {Submit}
             </button>
           </div>
@@ -254,4 +250,4 @@
 
   </script>
 </div>
-{IfRegistrationsEnd}
+

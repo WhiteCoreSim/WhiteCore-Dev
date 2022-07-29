@@ -38,16 +38,13 @@
   <!--#include file="/modal_profile.html" -->
 
   <section>
-    <div class="header-content">
-
-      <div class="d-inline text-center" style="padding-top:10px;">
+    <div class="header-content" style="margin-top:10px;">
+      <div class="d-inline text-center">
         <a href="{SystemURL}" alt="{SystemName}" title="{SystemName}">
-          <h1><bold>{SystemName}</bold></h1>
+          <h1><bold>{SystemName}</bold></h1> 
         </a>
       </div>
-
     </div>
-
     
     <!-- content -->
     <div class="container-fluid" id="container">
@@ -57,7 +54,7 @@
           <img src="/static/icons/loading.gif" alt="Loading..." />
         </div>
 
-        <div class="col-3" id="topleft">
+        <div class="col-3" id="topleft" style="min-width:350px;">
           <!--#include file="welcomescreen/region_box.html" -->
           <br />
           <!--#include file="welcomescreen/news.html" -->
@@ -65,7 +62,7 @@
 
         <div class="col"></div>
 
-        <div class="col-3 pull-right" id="topright">
+        <div class="col-3 pull-right" id="topright" style="min-width:320px;">
           <!--#include file="welcomescreen/gridstatus.html" -->
           <br />
           <!--#include file="welcomescreen/info_box.html" -->
@@ -83,6 +80,7 @@
           <img src="/static/images/logo.png" width="25" alt="WhiteCore Sim logo">
           <img class="logofade" height="30" src="/static/images/logo2.png" alt="WhiteCore Sim logo" />
         </a>
+        Copyright &copy; 2014-2022 WhiteCore Sim
       </div>
       
       <div class="col-2 pull-right" id="language">
@@ -125,7 +123,7 @@
 
 		$(function(){
 			bgImgRotate();
-			$( '#container, img#mainImage, #footer' ).fadeIn("slow");
+			$( '#container, img#mainImage, #footer' ).fadeIn("fast");
 
 		});
 

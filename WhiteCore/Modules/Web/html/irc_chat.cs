@@ -25,6 +25,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using System;
 using System.Collections.Generic;
 using WhiteCore.Framework.Servers.HttpServer.Implementation;
 
@@ -54,8 +55,12 @@ namespace WhiteCore.Modules.Web
                                                ITranslator translator, out string response)
         {
             response = null;
+            var rnd = new Random();
+            var guestNo = rnd.Next(1, 9999);
+
             var vars = new Dictionary<string, object> ();
             vars.Add ("ChatText", translator.GetTranslatedString ("ChatText"));
+            vars.Add("GuestNo", guestNo.ToString());
             return vars;
         }
 

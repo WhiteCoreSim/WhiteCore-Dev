@@ -70,20 +70,29 @@ namespace WhiteCore.Modules.Web
             var regions = regionData.GetList ((RegionFlags)0,
                                           RegionFlags.Hyperlink | RegionFlags.Foreign | RegionFlags.Hidden,
                                           null, null, sortBy);
-            foreach (var region in regions) {
-                string info;
-                info = (region.RegionArea < 1000000) ? region.RegionArea + " m2" : (region.RegionArea / 1000000) + " km2";
-                info = info + ", " + region.RegionTerrain;
+            if (regions.Count > 0) {
+                vars.Add("HaveData", true);
+                vars.Add("NoData", false);
 
-                RegionListVars.Add (new Dictionary<string, object> {
-                    { "RegionLocX", region.RegionLocX / Constants.RegionSize },
-                    { "RegionLocY", region.RegionLocY / Constants.RegionSize },
-                    { "RegionName", region.RegionName },
-                    { "RegionInfo", info},
-                    { "RegionStatus", WebHelpers.YesNo(translator, region.IsOnline)},
-                    { "RegionID", region.RegionID },
-                    { "RegionURI", region.RegionURI }
-                });
+                foreach (var region in regions) {
+                    string info;
+                    info = (region.RegionArea < 1000000) ? region.RegionArea + " m2" : (region.RegionArea / 1000000) + " km2";
+                    info = info + ", " + region.RegionTerrain;
+
+                    RegionListVars.Add(new Dictionary<string, object> {
+                        { "RegionLocX", region.RegionLocX / Constants.RegionSize },
+                        { "RegionLocY", region.RegionLocY / Constants.RegionSize },
+                        { "RegionName", region.RegionName },
+                        { "RegionInfo", info},
+                        { "RegionStatus", WebHelpers.YesNo(translator, region.IsOnline)},
+                        { "RegionID", region.RegionID },
+                        { "RegionURI", region.RegionURI }
+                    });
+                }
+            } else {
+                vars.Add("HaveData", false);
+                vars.Add("NoData", true);
+                vars.Add("NoDetails", translator.GetTranslatedString("NoDetailsText"));
             }
 
             vars.Add ("RegionList", RegionListVars);
@@ -100,7 +109,6 @@ namespace WhiteCore.Modules.Web
             vars.Add ("RegionLocXText", translator.GetTranslatedString ("RegionLocXText"));
             vars.Add ("RegionLocYText", translator.GetTranslatedString ("RegionLocYText"));
             vars.Add ("RegionOnlineText", translator.GetTranslatedString ("Online"));
-            vars.Add ("MainServerURL", webInterface.GridURL);
 
             return vars;
         }

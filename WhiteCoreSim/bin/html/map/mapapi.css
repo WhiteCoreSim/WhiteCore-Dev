@@ -36,7 +36,7 @@ div.mapregion img {
 }
 
 .leaflet-popup-content-wrapper, .leaflet-popup-tip {
-  background: #c8f5f0;
+  background: #789793;    /*#c8f5f0;*/
 }
 
 .btn-teleport {

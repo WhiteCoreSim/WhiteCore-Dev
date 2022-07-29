@@ -39,7 +39,7 @@ namespace WhiteCore.Modules.Web
         static GridPage _adminPage;
         static GridPage _modalPage;
         public static readonly string Schema = "WebPages";
-        public static readonly uint CurrentVersion = 16;
+        public static readonly uint CurrentVersion = 17;
 
         static void InitializeDefaults() {
             _rootPage = new GridPage();
@@ -103,7 +103,7 @@ namespace WhiteCore.Modules.Web
                 Location = "classifieds/classifieds.html",
                 MenuPosition = 4,
                 MenuTitle = "MenuClassifieds",
-                MenuToolTip = "TooltipsMenuClassifieds"
+               MenuToolTip = "TooltipsMenuClassifieds"
             });
 
             // help
@@ -462,6 +462,14 @@ namespace WhiteCore.Modules.Web
             });
 
             // User - non menu pages
+            _userPage.Children.Add(new GridPage {
+                ShowInMenu = false,
+                LoggedInRequired = true,
+                MenuID = "user-userhome",
+                Location = "user/userhome.html",
+                MenuPosition = 8
+            });
+
             _userPage.Children.Add(new GridPage
             {
                 ShowInMenu = false,
@@ -504,18 +512,6 @@ namespace WhiteCore.Modules.Web
                 MenuPosition = 8
             });
 
-
-            // logout
-            /*            _userPage.Children.Add (new GridPage {
-                            ShowInMenu = false,
-                            LoggedInRequired = true,
-                            MenuID = "logout",
-                            Location = "logout.html",
-                            MenuPosition = 10,
-                            MenuTitle = "MenuLogout",
-                            MenuToolTip = "TooltipsMenuLogout"
-                        });
-            */
             // User top menu pages
             _userTopPage.Children.Add(new GridPage
             {
@@ -590,7 +586,7 @@ namespace WhiteCore.Modules.Web
                         ShowInMenu = true,
                         AdminRequired = true,
                         MenuID = "admin-register",
-                        Location = "register.html",
+                        Location = "admin/user_register.html",
                         MenuPosition = 0,
                         MenuTitle = "MenuRegister",
                         MenuToolTip = "TooltipsMenuRegister"
@@ -669,7 +665,7 @@ namespace WhiteCore.Modules.Web
                         MenuToolTip = "TooltipsMenuStatistics"
                     },
                     /*new GridPage {
-                        ShowInMenu = false,
+                        ShowInMenu = true,
                         AdminRequired = true,
                         MenuID = "admin-sim_console",
                         Location = "admin/sim_console.html",
@@ -716,7 +712,7 @@ namespace WhiteCore.Modules.Web
                         Location = "admin/page_manager.html",
                         MenuPosition = 2,
                         MenuTitle = "MenuPageManager",
-                        MenuToolTip = "TooltipsMenuPageManager"
+                       MenuToolTip = "TooltipsMenuPageManager"
                     },
                     new GridPage {
                         ShowInMenu = true,

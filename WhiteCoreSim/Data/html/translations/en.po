@@ -1,11 +1,13 @@
-#
 # English translation for WhiteCore.
 # This file is distributed under the same license as the WhiteCore package.
 # greythane <greythane@gmail.com>, 2019.
+# Updated for v0.9.6 - greythane, 2022
 #
+
 msgid ""
 msgstr ""
-"Project-Id-Version: WhiteCore Version 0.9.5\n"
+
+"Project-Id-Version: WhiteCore Version 0.9.6\n"
 "Report-Msgid-Bugs-To: greythane <greythane@gmail.com>\n"
 "POT-Creation-Date: 2016-11-23 14:11:31Z\n"
 "PO-Revision-Date: 2020-07-02 14:35+1000\n"
@@ -16,7 +18,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Language: en\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 2.3.1\n"
+"X-Generator: WhiteCore V0.9.6 Dev\n"
 
 msgid "30daysPastText"
 msgstr "Previous 30 days"
@@ -147,6 +149,9 @@ msgstr "Back"
 msgid "BankerNameText"
 msgstr "System banker"
 
+msgid "BankBalanceText"
+msgstr "Bank Balance"
+
 msgid "BannedUntilText"
 msgstr "User banned until:"
 
@@ -259,10 +264,16 @@ msgid "CheckedText"
 msgstr "Checked"
 
 msgid "ClassifiedsText"
-msgstr "Classifieds"
+msgstr "Adverts"
 
 msgid "ClassifiedText"
-msgstr "Classified"
+msgstr "Advert"
+
+msgid "ClassifiedNewText"
+msgstr "New advert"
+
+msgid "ClassifiedRelistText"
+msgstr "Automatically relist"
 
 msgid "ClearStatsText"
 msgstr "Clear statistics data"
@@ -306,6 +317,9 @@ msgstr "Current Page"
 msgid "Custom"
 msgstr "Custom"
 
+msgid "DashboardNameText"
+msgstr "Dashboard"
+
 msgid "DateEndText"
 msgstr "Ending Date"
 
@@ -317,6 +331,9 @@ msgstr "Commencing Date"
 
 msgid "DateText"
 msgstr "Date"
+
+msgid "DaysText"
+msgstr "Days"
 
 msgid "de"
 msgstr "Deutsch"
@@ -676,7 +693,7 @@ msgid "MenuChat"
 msgstr "Chat"
 
 msgid "MenuClassifieds"
-msgstr "Classifieds"
+msgstr "Adverts"
 
 msgid "MenuEstateManager"
 msgstr "Estate Manager"
@@ -715,7 +732,7 @@ msgid "MenuManagerSimConsole"
 msgstr "Simulator console"
 
 msgid "MenuMyClassifieds"
-msgstr "My Classifieds"
+msgstr "My Adverts"
 
 msgid "MenuMyEvents"
 msgstr "My Events"
@@ -789,8 +806,20 @@ msgstr "Marketplace"
 msgid "MenuUserLand"
 msgstr "Regions"
 
+msgid "MenuUserBuyLand"
+msgstr "Buy land"
+
 msgid "MenuUserFriends"
 msgstr "Friends"
+
+msgid "MenuUserGroupLand"
+msgstr "Group land"
+
+msgid "MenuUserLandfees"
+msgstr "Land fees"
+
+msgid "MenuUserMainland"
+msgstr "Mainland"
 
 msgid "MenuUserProfile"
 msgstr "Profile"
@@ -1046,6 +1075,9 @@ msgstr "Password"
 
 msgid "PerformanceText"
 msgstr "Performance averages"
+
+msgid "PGText"
+msgstr "PG"
 
 msgid "PickNameText"
 msgstr "Pick name"
@@ -1308,6 +1340,9 @@ msgstr "Sunday"
 msgid "SystemEstateNameText"
 msgstr "System estate"
 
+msgid "TagsText"
+msgstr "Tags"
+
 msgid "TaxFreeText"
 msgstr "Tax Free"
 
@@ -1329,6 +1364,9 @@ msgstr "Time"
 msgid "TimeUntilUnbannedText"
 msgstr "Time until user is unbanned"
 
+msgid "TitleText"
+msgstr "Title"
+
 msgid "TooltipsMenuAbuse"
 msgstr "User abuse reports"
 
@@ -1339,7 +1377,7 @@ msgid "TooltipsMenuChat"
 msgstr "Chat"
 
 msgid "TooltipsMenuClassifieds"
-msgstr "Classifieds information"
+msgstr "Advertisment information"
 
 msgid "TooltipsMenuEstateManager"
 msgstr "Estate management"
@@ -1516,7 +1554,7 @@ msgid "UserCountryText"
 msgstr "Your Country"
 
 msgid "UserDOBText"
-msgstr "Your Date Of Birth (Month Day Year)"
+msgstr "Your Date Of Birth"
 
 msgid "UserEmailText"
 msgstr "Your Email"
@@ -1596,3 +1634,5 @@ msgstr "Full Screen"
 msgid "Yes"
 msgstr "Yes"
 
+msgid "zh_CN"
+msgstr "简体中文"

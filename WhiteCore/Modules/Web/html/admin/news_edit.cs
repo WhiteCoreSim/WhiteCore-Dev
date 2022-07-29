@@ -25,7 +25,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-
+using System;
 using System.Collections.Generic;
 using OpenMetaverse;
 using WhiteCore.Framework.DatabaseInterfaces;
@@ -85,18 +85,31 @@ namespace WhiteCore.Modules.Web
                 news = connector.GetGeneric<GridNewsItem>(UUID.Zero, "WebGridNews", id);
                 if (news != null)
                 {
-                    connector.RemoveGeneric (UUID.Zero, "WebGridNews", id);
+                    connector.RemoveGeneric (UUID.Zero, "WebGridNews", id);             // remove the existing news record
+                    /* this keeps the original posted date and time
                     GridNewsItem item = new GridNewsItem { 
+                        ID = int.Parse (id),
                         Text = text,
-                        NewsDateTime = news.NewsDateTime,
                         Title = title,
+                        NewsDateTime = news.NewsDateTime,
                         Day = news.NewsDateTime.ToString("dd"),
                         DayName = news.NewsDateTime.ToString ("dddd"),
-                        Month = news.NewsDateTime.ToString ("MMM"),
-                        ID = int.Parse (id)
+                        Month = news.NewsDateTime.ToString ("MMM")
                     };
-                    
-                    connector.AddGeneric (UUID.Zero, "WebGridNews", id, item.ToOSD ());
+                    */
+
+                    // save the update but use the current date and time
+                    GridNewsItem item = new GridNewsItem {
+                        ID = int.Parse(id),
+                        Text = text,
+                        Title = title,
+                        NewsDateTime = DateTime.Now,
+                        Day = DateTime.Now.ToString("dd"),
+                        DayName = DateTime.Now.ToString("dddd"),
+                        Month = DateTime.Now.ToString("MMM")
+                    };
+
+                    connector.AddGeneric (UUID.Zero, "WebGridNews", id, item.ToOSD ());     // add the updated record
                     response = webInterface.UserMsg("News item updated");
 
                 } else

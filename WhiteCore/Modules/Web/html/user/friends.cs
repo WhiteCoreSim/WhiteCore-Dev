@@ -149,7 +149,7 @@ namespace WhiteCore.Modules.Web
             }
 
             vars.Add("UserName", ourAccount.Name);
-            vars.Add("UserFriendsText", translator.GetTranslatedString("UserFriendsText"));
+            vars.Add("UserFriendsText", translator.GetTranslatedString("Friends"));
             vars.Add("UserFriendsList", friendsList);
             vars.Add("UserNameText", translator.GetTranslatedString("UserNameText"));
             vars.Add("OnlineLocationText", translator.GetTranslatedString("OnlineLocationText"));

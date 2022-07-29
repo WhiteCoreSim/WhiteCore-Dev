@@ -3,7 +3,7 @@ $(function(){
 	var topmenu = $("#topmenu li");
 	var members = $("#member-actions li");
 	var loading = $("#loading");
-	var content = $("#content");
+	var main_content = $("#main_content");
 
 	// Main menu click events
 	topmenu.click(function(event){
@@ -11,10 +11,10 @@ $(function(){
 		switch(this.id){
 			{MenuItemsArrayBegin}
 			case "{MenuItemID}":
-		    content.load("{MenuItemLocation}" + window.location.search, hideLoading);
-				/* content.slideUp('swing',  function() {
-				    content.load("{MenuItemLocation}" + window.location.search, hideLoading);
-				    content.slideDown();
+		    main_content.load("{MenuItemLocation}" + window.location.search, hideLoading);
+				/* main_content.slideUp('swing',  function() {
+				    main_content.load("{MenuItemLocation}" + window.location.search, hideLoading);
+				    main_content.slideDown();
 				}); */
 
 				break;
@@ -35,10 +35,10 @@ $(function(){
 		switch(this.id){
 		 	{MenuItemsArrayBegin}
 			case "{MenuItemID}":
-		    content.load("{MenuItemLocation}" + window.location.search, hideLoading);
-				/* content.slideUp('swing',  function() {
-				    content.load("{MenuItemLocation}" + window.location.search, hideLoading);
-				    content.slideDown();
+		    main_content.load("{MenuItemLocation}" + window.location.search, hideLoading);
+				/* main_content.slideUp('swing',  function() {
+				    main_content.load("{MenuItemLocation}" + window.location.search, hideLoading);
+				    main_content.slideDown();
 				}); */
 
 				break;
@@ -67,39 +67,45 @@ $(function(){
 
 // embedded page content
 function loadcontent(pageid, params=''){
-	var content = $("#content");
+	var main_content = $("#main_content");
 	if (params!= '') {
 		params = "?" + params;
 	}
 	//load selected page
 	switch(pageid){
 		{MenuItemsArrayBegin}
-		case "{MenuItemID}":
-	    content.load("{MenuItemLocation}" + params + window.location.search);
-			break;
+			case "{MenuItemID}":
+	    	main_content.load("{MenuItemLocation}" + params + window.location.search);
+				break;
 		{MenuItemsArrayEnd}
 		default:
 			break;
 	}
 };
 
-function loadmodalcontent(pageid, params='', title=''){
-	var content = $("#modalcontent");
+function loadmodalcontent(pageid, params='', title='', static=false){
+	var modal_content = $("#modalcontent");
 	if (params!= '') {
 		params = "?" + params;
 	}
-	content.html('');		// clear anything previously loaded
+	modal_content.html('');		// clear anything previously loaded
 
 	//load selected page
 	switch(pageid){
 		{ModalItemsArrayBegin}
-		case "{MenuItemID}":
-	    content.load("{MenuItemLocation}" + params + window.location.search);
-			break;
+			case "{MenuItemID}":
+		    modal_content.load("{MenuItemLocation}" + params + window.location.search);
+				break;
 		{ModalItemsArrayEnd}
 		default:
 			break;
 	}
 
+  if (static) {
+	  $("#profileModal").modal({
+	    backdrop: "static",
+	    keyboard: false
+	  });
+	}
 	$("#profileModal").modal("show");
 };

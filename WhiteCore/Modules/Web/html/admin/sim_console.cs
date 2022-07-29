@@ -26,6 +26,7 @@
  */
 
 using System.Collections.Generic;
+using WhiteCore.Framework.ConsoleFramework;
 using WhiteCore.Framework.Servers.HttpServer.Implementation;
 
 namespace WhiteCore.Modules.Web
@@ -71,10 +72,17 @@ namespace WhiteCore.Modules.Web
                  } else {
                     if (requestParameters.ContainsKey ("command")) {
                         command = requestParameters ["command"].ToString ();
-                        response = "Command in parameters";
+                        response = webInterface.UserMsg("Command in parameters", false);
                     } else {
-                        response = "<h3>Please enter a valid console command</h3>";
+                        response = webInterface.UserMsg("!Please enter a valid console command", false);
                     }
+                }
+
+                if (command != "") {
+                    // RunCommandScript(command);
+                    MainConsole.Instance.RunCommand(command);
+
+                    response = webInterface.UserMsg("The sim console is not yet implemented<br/>Command: " + command, false);
                 }
                 return null;
 

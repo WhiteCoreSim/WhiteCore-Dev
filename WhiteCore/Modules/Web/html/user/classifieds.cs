@@ -177,7 +177,7 @@ namespace WhiteCore.Modules.Web
             // labels
             vars.Add("UserName", user.Name);
             vars.Add ("ClassifiedsText", translator.GetTranslatedString("ClassifiedsText"));
-            vars.Add("AddClassifiedText", translator.GetTranslatedString("AddClassifiedText"));
+            vars.Add("ClassifiedNewText", translator.GetTranslatedString("ClassifiedNewText"));
             vars.Add ("CreationDateText", translator.GetTranslatedString ("CreationDateText"));
             vars.Add ("CategoryText", translator.GetTranslatedString ("CategoryText"));
             vars.Add ("ClassifiedNameText", translator.GetTranslatedString ("ClassifiedText"));

@@ -25,7 +25,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-
+using System;
 using System.Collections.Generic;
 using OpenMetaverse;
 using WhiteCore.Framework.DatabaseInterfaces;
@@ -61,6 +61,7 @@ namespace WhiteCore.Modules.Web
                                                ITranslator translator, out string response)
         {
             response = null;
+            var editing = false;            // assume not editing/add
             var vars = new Dictionary<string, object>();
 
             #region Find pages
@@ -78,9 +79,15 @@ namespace WhiteCore.Modules.Web
                 allPages.AddRange(page.Children);
             allPages.RemoveAll((a) => !a.ShowInMenu);
 
+            /* options are sent via the query, not request
             string MenuItem = requestParameters.ContainsKey("MenuItem")
                                   ? requestParameters["MenuItem"].ToString()
                                   : "";
+            */
+            string MenuItem = httpRequest.Query.ContainsKey("MenuItem")
+                                  ? httpRequest.Query["MenuItem"].ToString()
+                                  : "";
+
             foreach (GridPage page in allPages)
             {
                 pages.Add(new Dictionary<string, object>
@@ -98,21 +105,18 @@ namespace WhiteCore.Modules.Web
 
             #endregion
 
-            if (requestParameters.ContainsKey("deleteitem"))
+            if (httpRequest.Query.ContainsKey("deleteitem"))
             {
                 rootPage.RemovePageByLocation(MenuItem, null);
                 generics.AddGeneric(UUID.Zero, "WebPages", "Root", rootPage.ToOSD());
                 response = webInterface.UserMsg("Successfully updated menu", true);
-                return null;
+
+                //return null;
             }
-            if (requestParameters.ContainsKey("additem"))
+
+            if (httpRequest.Query.ContainsKey("selectitem"))
             {
-                //generics.AddGeneric(UUID.Zero, "WebPages", "Root", rootPage.ToOSD());
-                vars.Add("EdittingPageID", -2);
-                vars.Add("DisplayEdit", true);
-            }
-            if (requestParameters.ContainsKey("selectitem"))
-            {
+                editing = true;
                 GridPage page = rootPage.GetPageByLocation(MenuItem);
 
                 vars.Add("PageTitle", page.MenuTitle);
@@ -130,7 +134,6 @@ namespace WhiteCore.Modules.Web
                 vars.Add("RequiresAdminLevel", page.AdminLevelRequired);
                 vars.Add("DisplayInMenuYes", page.ShowInMenu ? "selected=\"selected\"" : "");
                 vars.Add("DisplayInMenuNo", !page.ShowInMenu ? "selected=\"selected\"" : "");
-                vars.Add("DisplayEdit", true);
 
                 pages = new List<Dictionary<string, object>>
                             {
@@ -158,15 +161,19 @@ namespace WhiteCore.Modules.Web
                 vars.Add("ParentPagesList", pages);
             }
 
-            if (requestParameters.ContainsKey("additem"))
+            if (httpRequest.Query.ContainsKey("additem"))
             {
+                editing = true;
+                //generics.AddGeneric(UUID.Zero, "WebPages", "Root", rootPage.ToOSD());
+                vars.Add("EdittingPageID", -2);
+
                 vars.Add("PageTitle", "");
                 vars.Add("PageTooltip", "");
                 vars.Add("PageID", "");
                 vars.Add("PagePosition", "");
                 vars.Add("PageLocation", "");
-                if (!vars.ContainsKey("EdittingPageID"))
-                    vars.Add("EdittingPageID", "");
+                //if (!vars.ContainsKey("EdittingPageID"))
+                //    vars.Add("EdittingPageID", "");
                 vars.Add("RequiresLoginYes", "");
                 vars.Add("RequiresLoginNo", "");
                 vars.Add("RequiresLogoutYes", "");
@@ -196,8 +203,9 @@ namespace WhiteCore.Modules.Web
                 vars.Add("ParentPagesList", pages);
             }
 
-            if (requestParameters.ContainsKey("savemenuitem"))
+            if (httpRequest.Query.ContainsKey("savemenuitem"))
             {
+                // get submitted details 
                 string edittingPageID = requestParameters["edittingpageid"].ToString();
 
                 string PageTitle = requestParameters["PageTitle"].ToString();
@@ -244,28 +252,42 @@ namespace WhiteCore.Modules.Web
                     response = webInterface.UserMsg("!" + translator.GetTranslatedString("CannotSetParentToChild"), false);
 
                 generics.AddGeneric(UUID.Zero, "WebPages", "Root", rootPage.ToOSD());
-                return null;
+
+
+                // return null;
             }
 
-            vars.Add("PageText", translator.GetTranslatedString("Page"));
-            vars.Add("PageTitleText", translator.GetTranslatedString("PageTitleText"));
-            vars.Add("PageTooltipText", translator.GetTranslatedString("PageTooltipText"));
-            vars.Add("PagePositionText", translator.GetTranslatedString("PagePositionText"));
-            vars.Add("PageIDText", translator.GetTranslatedString("PageIDText"));
-            vars.Add("PageLocationText", translator.GetTranslatedString("PageLocationText"));
-            vars.Add("SaveMenuItemChanges", translator.GetTranslatedString("SaveMenuItemChanges"));
-            vars.Add("RequiresLoginText", translator.GetTranslatedString("RequiresLoginText"));
-            vars.Add("RequiresLogoutText", translator.GetTranslatedString("RequiresLogoutText"));
-            vars.Add("RequiresAdminText", translator.GetTranslatedString("RequiresAdminText"));
-            vars.Add("RequiresAdminLevelText", translator.GetTranslatedString("RequiresAdminLevelText"));
-            vars.Add("DisplayInMenu", translator.GetTranslatedString("DisplayInMenu"));
-            vars.Add("SelectItem", translator.GetTranslatedString("SelectItem"));
-            vars.Add("DeleteItem", translator.GetTranslatedString("DeleteItem"));
+
+            // form labels
+            if (editing) {
+                vars.Add("PageTitleText", translator.GetTranslatedString("PageTitleText"));
+                vars.Add("PageTooltipText", translator.GetTranslatedString("PageTooltipText"));
+                vars.Add("PagePositionText", translator.GetTranslatedString("PagePositionText"));
+                vars.Add("PageIDText", translator.GetTranslatedString("PageIDText"));
+                vars.Add("PageLocationText", translator.GetTranslatedString("PageLocationText"));
+                vars.Add("SaveMenuItemChanges", translator.GetTranslatedString("SaveMenuItemChanges"));
+                vars.Add("RequiresLoginText", translator.GetTranslatedString("RequiresLoginText"));
+                vars.Add("RequiresLogoutText", translator.GetTranslatedString("RequiresLogoutText"));
+                vars.Add("RequiresAdminText", translator.GetTranslatedString("RequiresAdminText"));
+                vars.Add("RequiresAdminLevelText", translator.GetTranslatedString("RequiresAdminLevelText"));
+                vars.Add("DisplayInMenu", translator.GetTranslatedString("DisplayInMenu"));
+                vars.Add("ParentText", translator.GetTranslatedString("ParentText"));
+                vars.Add("Yes", translator.GetTranslatedString("Yes"));
+                vars.Add("No", translator.GetTranslatedString("No"));
+
+                vars.Add("DisplaySelect", false);
+                vars.Add("DisplayEdit", true);
+
+            } else {
+                vars.Add("DisplaySelect", true);
+                vars.Add("DisplayEdit", false);
+            }
+
+            // selection labels
+            vars.Add("PageText", translator.GetTranslatedString("Pages"));
             vars.Add("AddItem", translator.GetTranslatedString("AddItem"));
             vars.Add("PageManager", translator.GetTranslatedString("PageManager"));
-            vars.Add("ParentText", translator.GetTranslatedString("ParentText"));
-            vars.Add("Yes", translator.GetTranslatedString("Yes"));
-            vars.Add("No", translator.GetTranslatedString("No"));
+            vars.Add("Cancel", translator.GetTranslatedString("Cancel"));
 
             return vars;
         }

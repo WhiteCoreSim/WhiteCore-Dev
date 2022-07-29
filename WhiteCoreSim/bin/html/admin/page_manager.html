@@ -1,25 +1,25 @@
 <!-- Menu page manager -->
 
-{IsAdminAuthenticatedBegin}
 <div class="container-fluid" id="fullPage">
   <h2>{SystemName}: {PageManager}</h2>
 
-    <form class="form-inline" id="page_manager_add_form" action="admin/page_manager.html" method="post">
+  {IsAdminAuthenticatedBegin}
+   <!--  selection options -->
+    {IfDisplaySelectBegin}     
       <div class="row w-100 mb-3">
         <div class="col pull-right">
-          <button class="pull-right" id="add_news" onClick="submitupdate('page_manager_add_form', 'additem=true');">{AddItem}</button>
+          <button class="pull-right" id="add_news" onclick="loadusercontent('admin-page_manager', 'additem=true');">{AddItem}</button>
         </div>
         <div class="col-1"></div>
       </div>
-    </form>
 
-    <div class="div20"></div>
+      <div class="div20"></div>
 
-    <form class="form-inline" id="page_manager_select_form" action="admin/page_manager.html" method="post">
       <div class="row w-100">
-        <div class="col-8">
-          <div class="form-group mb-1">
-            <label for="MenuItem" class="col-5 col-form-label text-right mr-2">{PageText}</label>
+        <div class="col-2"></div>
+        <div class="col-6">
+          <div class="form-group inline-entry mb-1">
+            <label for="MenuItem" class="col-form-label mr-2">{PageText}</label>
             <div class="input-group" style="width:240px">
               <select class="custom-select form-control" id="MenuItem" name="MenuItem" require="true">
                 {PagesListArrayBegin}
@@ -31,97 +31,114 @@
         </div>
 
         <div class="col-4">
-              <a href="#" title="{EditText}" onclick="submitupdate('admin-page_manager_select_form','edititem=true');">
-                <i class="fa fa-edit fa-lg"></i>
-              </a>
-              &nbsp;&nbsp;
-              <a title="{DeleteItem}" href="#" onclick="submitupdate('admin-page_manager_select_form', 'deleteitem=true');">
-                 <i class="fa fa-trash fa-red fa-lg"></i>
-              </a>
+          <a href="#" title="{EditText}" onclick="pm_edit(false);">
+            <i class="fa fa-edit fa-lg"></i>
+          </a>
+          &nbsp;&nbsp;
+          <a title="{DeleteItem}" href="#" onclick="pm_edit(true);">
+             <i class="fa fa-trash fa-red fa-lg"></i>
+          </a>
         </div>
       </div>
-    </form>
+
+      <script>
+        function pm_edit(delete_item) {
+          var edpage = $("#MenuItem").val();
+          if (delete_item)
+            loadusercontent("admin-page_manager", "deleteitem=true&MenuItem=" + edpage)
+          else
+            loadusercontent("admin-page_manager", "selectitem=true&MenuItem=" + edpage);
+        }
+      </script>
+    {IfDisplaySelectEnd}
 
     <!-- selected page -->
     {IfDisplayEditBegin}
     <form id="page_manager_edit_form" action="admin/page_manager.html" method="post">
       <div class="row w-100">
-        <div class="col-md-8 offset-md-2">
+        <div class="col-2"></div>
+        <div class="col-8">
 
-          <div class="form-group mb-1">
-            <label for="PageTitle" class="col-3 col-form-label text-right mr-2">{PageTitleText}</label>
-            <input class="form-control" style="width:300px;"minlength="3" id="PageTitle" name="PageTitle" type="text" size="25" maxlength="30" value="{PageTitle}">
+          <div class="col form-group inline-entry mb-1">
+            <label for="PageTitle" class="col-4 col-form-label text-right mr-2">{PageTitleText}</label>
+            <input class="form-control" style="width:300px;"minlength="3" name="PageTitle" 
+                   type="text" size="25" maxlength="30" value="{PageTitle}">
           </div>
 
-          <div class="form-group mb-1">
-            <label for="PageTooltip" class="col-3 col-form-label text-right mr-2">{PageTooltipText}</label>
-            <input class="form-control" style="width:300px;"minlength="3" id="PageTooltip" name="PageTooltip" type="text" size="25" maxlength="30" value="{PageTooltip}">
+          <div class="col form-group inline-entry mb-1">
+            <label for="PageTooltip" class="col-4 col-form-label text-right mr-2">{PageTooltipText}</label>
+            <input class="form-control" style="width:300px;"minlength="3" name="PageTooltip" 
+                   type="text" size="25" maxlength="30" value="{PageTooltip}">
           </div>
 
-          <div class="form-group mb-1">
-            <label for="PagePosition" class="col-3 col-form-label text-right mr-2">{PagePositionText}</label>
-            <input class="form-control" style="width:300px;"minlength="3" id="PagePosition" name="PagePosition" type="text" size="25" maxlength="30" value="{PagePosition}">
+          <div class="col form-group inline-entry mb-1">
+            <label for="PagePosition" class="col-4 col-form-label text-right mr-2">{PagePositionText}</label>
+            <input class="form-control" style="width:300px;"minlength="3" name="PagePosition" 
+                   type="text" size="25" maxlength="30" value="{PagePosition}">
           </div>
 
-          <div class="form-group mb-1">
-            <label for="PageID" class="col-3 col-form-label text-right mr-2">{PageIDText}</label>
-            <input class="form-control" style="width:300px;"minlength="3" id="PageID" name="PageID" type="text" size="25" maxlength="30" value="{PageID}">
+          <div class="col form-group inline-entry mb-1">
+            <label for="PageID" class="col-4 col-form-label text-right mr-2">{PageIDText}</label>
+            <input class="form-control" style="width:300px;"minlength="3" name="PageID" 
+                   type="text" size="25" maxlength="30" value="{PageID}">
           </div>
 
-          <div class="form-group mb-1">
-            <label for="PageLocation" class="col-3 col-form-label text-right mr-2">{PageLocationText}</label>
-            <input class="form-control" style="width:300px;"minlength="3" id="PageLocation" name="PageLocation" type="text" size="25" maxlength="30" value="{PageLocation}">
+          <div class="col form-group inline-entry mb-1">
+            <label for="PageLocation" class="col-4 col-form-label text-right mr-2">{PageLocationText}</label>
+            <input class="form-control" style="width:300px;"minlength="3" name="PageLocation" 
+                   type="text" size="25" maxlength="30" value="{PageLocation}">
           </div>
 
-          <div class="form-group mb-1">
-            <label for="PublicAccess" class="col-3 col-form-label text-right mr-2">{DisplayInMenu}</label>
+          <div class="col form-group inline-entry mb-1">
+            <label for="PublicAccess" class="col-4 col-form-label text-right mr-2">{DisplayInMenu}</label>
             <div class="input-group" style="width:100px">
-              <select class="custom-select form-control" require="true" id="DisplayInMenu" name="DisplayInMenu">
+              <select class="custom-select form-control" require="true" name="DisplayInMenu">
                 <option value="false" {DisplayInMenuNo}>{No}</option>
                 <option value="true" {DisplayInMenuYes}>{Yes}</option>
               </select>
             </div>
           </div>
 
-          <div class="form-group mb-1">
-            <label for="RequiresLogin" class="col-3 col-form-label text-right mr-2">{RequiresLoginText}</label>
+          <div class="col form-group inline-entry mb-1">
+            <label for="RequiresLogin" class="col-4 col-form-label text-right mr-2">{RequiresLoginText}</label>
             <div class="input-group" style="width:100px">
-              <select class="custom-select form-control"require="true"  id="RequiresLogin" name="RequiresLogin">
+              <select class="custom-select form-control"require="true" name="RequiresLogin">
                 <option value="false" {RequiresLoginNo}>{No}</option>
                 <option value="true" {RequiresLoginYes}>{Yes}</option>
               </select>
             </div>
           </div>
 
-          <div class="form-group mb-1">
-            <label for="RequiresLogoutNo" class="col-3 col-form-label text-right mr-2">{RequiresLogoutText}</label>
+          <div class="col form-group inline-entry mb-1">
+            <label for="RequiresLogoutNo" class="col-4 col-form-label text-right mr-2">{RequiresLogoutText}</label>
             <div class="input-group" style="width:100px">
-              <select class="custom-select form-control" require="true" id="RequiresLogoutNo" name="RequiresLogoutNo">
+              <select class="custom-select form-control" require="true" name="RequiresLogoutNo">
                 <option value="false" {RequiresLogoutNo}>{No}</option>
                 <option value="true" {RequiresLogoutYes}>{Yes}</option>
               </select>
             </div>
           </div>
 
-          <div class="form-group mb-1">
-            <label for="RequiresAdmin" class="col-3 col-form-label text-right mr-2">{RequiresAdminText}</label>
+          <div class="col form-group inline-entry mb-1">
+            <label for="RequiresAdmin" class="col-4 col-form-label text-right mr-2">{RequiresAdminText}</label>
             <div class="input-group" style="width:100px">
-              <select class="custom-select form-control" require="true" id="RequiresAdmin" name="RequiresAdmin">
+              <select class="custom-select form-control" require="true" name="RequiresAdmin">
                 <option value="false" {RequiresAdminNo}>{No}</option>
                 <option value="true" {RequiresAdminYes}>{Yes}</option>
               </select>
             </div>
           </div>
 
-          <div class="form-group mb-1">
-            <label for="RequiredAdminLevel" class="col-3 col-form-label text-right mr-2">{RequiresAdminLevelText}</label>
-            <input class="form-control" style="width:300px;"minlength="3" id="RequiredAdminLevel" name="RequiredAdminLevel" type="text" size="25" maxlength="30" value="{RequiredAdminLevel}">
+          <div class="col form-group inline-entry mb-1">
+            <label for="RequiredAdminLevel" class="col-4 col-form-label text-right mr-2">{RequiresAdminLevelText}</label>
+            <input class="form-control" style="width:100px;"minlength="3" name="RequiredAdminLevel" 
+                   type="text" size="25" maxlength="30" value="{RequiresAdminLevel}">
           </div>
 
-          <div class="form-group mb-1">
-            <label for="ParentMenuItem" class="col-3 col-form-label text-right mr-2">{ParentText}</label>
-            <div class="input-group" style="width:100px">
-              <select class="custom-select form-control" require="true" id="ParentMenuItem" name="ParentMenuItem">
+          <div class="col form-group inline-entry mb-1">
+            <label for="ParentMenuItem" class="col-4 col-form-label text-right mr-2">{ParentText}</label>
+            <div class="input-group" style="width:250px">
+              <select class="custom-select form-control" require="true" name="ParentMenuItem">
                 {ParentPagesListArrayBegin}
                   <option value="{Value}" {PageSelected}>{Name}</option>
                 {ParentPagesListArrayEnd}
@@ -129,240 +146,24 @@
             </div>
           </div>
 
-          <div class="row w-100 mb-3">
+          <div class="row w-100 mt-3">
             <div class="col pull-right">
-              <button class="pull-right" id="add_news" onClick="submitupdate('page_manager_add_form', 'edittingpageid={EdittingPageID}&savemenuitem=true');">{SaveMenuItemChanges}</button>
+              <button class="btn-success" onclick="loadusercontent('admin-page_manager');">{Cancel}</button>
+              <button class="pull-right" id="add_news" 
+                      onclick="submitupdate('page_manager_add_form', 'edittingpageid={EdittingPageID}&savemenuitem=true');">
+                {SaveMenuItemChanges}
+              </button>
             </div>
             <div class="col-1"></div>
           </div>
 
-        </div>
+       </div>
       </div>
+      <div class="col-2"></div>
     </form>
     {IfDisplayEditEnd}
 
-  </div>  <!-- container -->
-{IsAdminAuthenticatedEnd}
 
+  {IsAdminAuthenticatedEnd}
 
-
-<!--
-
-<div >
-<h2>{SystemName}: {PageManager}</h2>
-<div id="info_message" class="info_message"></div>
-<table id="page_manager_select">
-  <caption></caption>
-
-  <thead>
-    <tr>
-      <th class="page_manager_select_left"></th>
-    </tr>
-  </thead>
-
-  <tfoot>
-    <tr>
-      <th class="page_manager_select_left"></th>
-    </tr>
-  </tfoot>
-
-  <tbody>
-    <tr>
-      <th class="page_manager_select_left"></th>
-        <form id="page_manager_add_form" action="admin/page_manager.html" method="post">
-      <input type="hidden" label="Submit" id="AddItem" name="AddItem" value="AddItem" />
-        <button id="AddItem" type="Submit" name="AddItem">{AddItem}</button>
-        </form>
-    </tr>
-    <tr>
-      <td class="page_manager_select_left">
-        <form id="page_manager_select_form" action="admin/page_manager.html" method="post">
-        <select id="MenuItem" require="true" name="MenuItem">
-{PagesListArrayBegin}
-        <option value="{Value}" {PageSelected}>{Name}</option>
-{PagesListArrayEnd}
-        </select>
-      <button id="SelectItem" type="Submit" name="SelectItem">{SelectItem}</button>
-        <button id="DeleteItem" type="Submit" name="DeleteItem">{DeleteItem}</button>
-        </form>
-    </td>
-    </tr>
-  </tbody>
-</table>
-
-<script>
-  /* attach a submit handler to the form */
-  $("#page_manager_add_form").submit(function(event) {
-
-    /* stop form from submitting normally */
-    event.preventDefault();
-    /* get some values from elements on the page: */
-    var $form = $( this ),
-        url = $form.attr( 'action' );
-    /* Send the data using post and put the results in a div */
-    $.post( url, $form.serialize(),
-      function( data ) {
-    $("#fullPage").empty().append(data);
-      }
-    );
-  });
-
-  $("#SelectItem").click(function(event) {
-
-    /* stop form from submitting normally */
-    event.preventDefault();
-    /* get some values from elements on the page: */
-    var $form = $(this).closest('form'),
-        url = $form.attr( 'action' );
-
-    var formData = $form.serializeArray();
-    formData.push({ name: this.name, value: this.value });
-    /* Send the data using post and put the results in a div */
-    $.post( url, formData,
-      function( data ) {
-    $("#fullPage").empty().append(data);
-      }
-    );
-  });
-
-  /* attach a submit handler to the form */
-  $("#DeleteItem").click(function(event) {
-
-    /* stop form from submitting normally */
-    event.preventDefault();
-    /* get some values from elements on the page: */
-    var $form = $(this).closest('form'),
-        url = $form.attr( 'action' );
-    var formData = $form.serializeArray();
-    formData.push({ name: this.name, value: this.value });
-    /* Send the data using post and put the results in a div */
-    $.post( url, formData,
-      function( data ) {
-    $("#info_message").empty().append("<h3>" + data + "</h3>");
-      }
-    );
-  });
-</script>
-
--->
-
-<!--
-{xIfDisplayEditBegin}
-<form id="page_manager_edit_form" action="admin/page_manager.html" method="post">
-<table id="page_manager">
-  <caption></caption>
-
-  <thead>
-    <tr>
-      <th class="page_manager_left"></th>
-      <th class="page_manager_right"></th>
-    </tr>
-  </thead>
-
-  <tfoot>
-    <tr>
-      <th class="page_manager_left"></th>
-      <th class="page_manager_right"></th>
-    </tr>
-  </tfoot>
-
-  <tbody>
-    <tr>
-      <td class="page_manager_left"><p>{PageTitleText}</p></td>
-      <td class="page_manager_right"><input name="PageTitle" type="text" id="PageTitle" size="119" value="{PageTitle}" /></td>
-    </tr>
-    <tr>
-      <td class="page_manager_left"><p>{PageTooltipText}</p></td>
-      <td class="page_manager_right"><input name="PageTooltip" type="text" id="PageTooltip" size="119" value="{PageTooltip}" /></td>
-    </tr>
-    <tr>
-      <td class="page_manager_left"><p>{PagePositionText}</p></td>
-      <td class="page_manager_right"><input name="PagePosition" type="text" id="PagePosition" size="119" value="{PagePosition}" /></td>
-    </tr>
-    <tr>
-      <td class="page_manager_left"><p>{PageIDText}</p></td>
-      <td class="page_manager_right"><input name="PageID" type="text" id="PageID" size="119" value="{PageID}" /></td>
-    </tr>
-    <tr>
-      <td class="page_manager_left"><p>{PageLocationText}</p></td>
-      <td class="page_manager_right"><input name="PageLocation" type="text" id="PageLocation" size="119" value="{PageLocation}" /></td>
-    </tr>
-    <tr>
-      <td class="page_manager_left"><p>{DisplayInMenu}</p></td>
-      <td class="page_manager_right">
-      <select id="DisplayInMenu" require="true" name="DisplayInMenu">
-      <option value="false" {DisplayInMenuNo}>{No}</option>
-      <option value="true" {DisplayInMenuYes}>{Yes}</option>
-    </select>
-    </td>
-    </tr>
-    <tr>
-      <td class="page_manager_left"><p>{RequiresLoginText}</p></td>
-      <td class="page_manager_right">
-      <select id="RequiresLogin" require="true" name="RequiresLogin">
-      <option value="false" {RequiresLoginNo}>{No}</option>
-      <option value="true" {RequiresLoginYes}>{Yes}</option>
-    </select>
-    </td>
-    </tr>
-    <tr>
-      <td class="page_manager_left"><p>{RequiresLogoutText}</p></td>
-      <td class="page_manager_right">
-      <select id="RequiresLogout" require="true" name="RequiresLogout">
-      <option value="false" {RequiresLogoutNo}>{No}</option>
-      <option value="true" {RequiresLogoutYes}>{Yes}</option>
-    </select>
-    </td>
-    </tr>
-    <tr>
-      <td class="page_manager_left"><p>{RequiresAdminText}</p></td>
-      <td class="page_manager_right">
-      <select id="RequiresAdmin" require="true" name="RequiresAdmin">
-      <option value="false" {RequiresAdminNo}>{No}</option>
-      <option value="true" {RequiresAdminYes}>{Yes}</option>
-    </select>
-    </td>
-    </tr>
-    <tr>
-      <td class="page_manager_left"><p>{RequiresAdminLevelText}</p></td>
-      <td class="page_manager_right"><input name="RequiredAdminLevel" type="text" id="RequiredAdminLevel" size="119" value="{RequiresAdminLevel}" /></td>
-    </tr>
-    <tr>
-      <td class="page_manager_left"><p>{ParentText}</p></td>
-      <td class="page_manager_select_right">
-      <select id="ParentMenuItem" require="true" name="ParentMenuItem">
-{ParentPagesListArrayBegin}
-      <option value="{Value}" {PageSelected}>{Name}</option>
-{ParentPagesListArrayEnd}
-    </td>
-    </tr>
-    <tr>
-      <td class="page_manager_left"><input name="EdittingPageID" type="text" id="EdittingPageID" hidden=true value="{EdittingPageID}" /></td>
-      <td class="page_manager_right"><button id="SaveMenuItem" type="Submit" name="SaveMenuItem">{SaveMenuItemChanges}</button></td>
-    </tr>
-  </tbody>
-</table>
-</form>
-
-<script>
-  /* attach a submit handler to the form */
-  $("#page_manager_edit_form").submit(function(event) {
-
-    /* stop form from submitting normally */
-    event.preventDefault();
-    /* get some values from elements on the page: */
-    var $form = $( this ),
-        url = $form.attr( 'action' );
-    /* Send the data using post and put the results in a div */
-    $.post( url, $form.serialize(),
-      function( data ) {
-    $("#info_message").empty().append("<h3>" + data + "</h3>");
-      }
-    );
-  });
-</script>
-
-  {xIfDisplayEditEnd}
-  </div>  
-{xIsAdminAuthenticatedEnd}
--->
+</div>  <!-- container -->

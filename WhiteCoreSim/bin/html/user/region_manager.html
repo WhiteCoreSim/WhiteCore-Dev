@@ -39,6 +39,22 @@
 
       </tbody>
     </table>
+  
+    <script>
+      $(function() {
+        $('#regionlist').dataTable( {
+          dom: 'frtip',
+          "order": [[ 0, "asc" ]],
+          "aoColumnDefs": [{"bSortable":false,"aTargets":["no-sort"]}],
+          "pageLength": 10,
+          "fixedHeader": {
+            header: true,
+             //footer: true
+          },
+        });
+      });
+    </script>
+
     {IsAuthenticatedEnd}
   {IfHaveDataEnd}
 
@@ -52,20 +68,6 @@
       </div>
     </div>
   {IfNoDataEnd}
-</div>
 
-<script>
-  $(function() {
-    $('#regionlist').dataTable( {
-      dom: 'frtip',
-      "order": [[ 0, "asc" ]],
-      "aoColumnDefs": [{"bSortable":false,"aTargets":["no-sort"]}],
-      "pageLength": 10,
-      "fixedHeader": {
-        header: true,
-         //footer: true
-      },
-    });
-  });
-</script>
+</div>
 

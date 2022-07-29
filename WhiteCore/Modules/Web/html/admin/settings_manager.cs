@@ -141,6 +141,7 @@ namespace WhiteCore.Modules.Web
             vars.Add("HideSlideshowBarText", translator.GetTranslatedString("HideSlideshowBarText"));
             vars.Add("HideLanguageBarText", translator.GetTranslatedString("HideLanguageBarText"));
             vars.Add("HideStyleBarText", translator.GetTranslatedString("HideStyleBarText"));
+            vars.Add("Cancel", translator.GetTranslatedString("Cancel"));
             vars.Add("Save", translator.GetTranslatedString("Save"));
             vars.Add("No", translator.GetTranslatedString("No"));
             vars.Add("Yes", translator.GetTranslatedString("Yes"));

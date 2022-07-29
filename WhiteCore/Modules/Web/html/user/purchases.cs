@@ -149,6 +149,7 @@ namespace WhiteCore.Modules.Web
             vars.Add("DateInfoText", translator.GetTranslatedString("DateInfoText"));
             vars.Add("DateStartText", translator.GetTranslatedString("DateStartText"));
             vars.Add("DateEndText", translator.GetTranslatedString("DateEndText"));
+            vars.Add("DaysText", translator.GetTranslatedString("DateEndText"));
             vars.Add("SearchUserText", translator.GetTranslatedString("AvatarNameText"));
             vars.Add("Search", translator.GetTranslatedString("Search"));
 

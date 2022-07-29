@@ -99,7 +99,7 @@ namespace WhiteCore.Modules.Web
             vars.Add("NewsItemText", translator.GetTranslatedString("NewsItemText"));
             vars.Add("AddNewsText", translator.GetTranslatedString("AddNewsText"));
             vars.Add("Cancel", translator.GetTranslatedString("Cancel"));
-            vars.Add("Submit", translator.GetTranslatedString("Submit"));
+            vars.Add("Submit", translator.GetTranslatedString("AddItem"));
 
             return vars;
         }

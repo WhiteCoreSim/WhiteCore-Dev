@@ -32,7 +32,7 @@
             </div>
           </div>
 
-          <div class="col-3 pull-right">
+          <div class="col-5 pull-right">
             <div class="form-group row">
               <label for="eventTime" class="col-form-label mr-2">{EventTimeText}</label>
               <select class="custom-select form-control" style="width:140px;" id="eventTime" name="eventTime">
@@ -40,8 +40,8 @@
                   <option value="{Index}" {selected}>{Value}</option>
                 {EventTimesArrayEnd}
               </select>
+              <small class="form-text text-light ml-2">{EventTimeInfoText}</small>
             </div>
-            <small class="form-text text-light">{EventTimeInfoText}</small>
           </div>
         </div>
 
@@ -103,7 +103,7 @@
           <div class="col-2"></div>
           <div class="col">
             <div class="pull-right">
-              <a class="btn btn-sm btn-success mr-3" style="width:100px;" onclick="loadusercontent('events-events');">{Cancel}</a>
+              <a class="btn btn-sm btn-success mr-3" style="width:100px;" onclick="loadusercontent('user-events');">{Cancel}</a>
               <a class="btn btn-sm btn-warning" style="width:100px;" 
                   onclick="submitupdate('add_event_form', 'additem=true');">
                 {Submit}

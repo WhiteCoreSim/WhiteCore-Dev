@@ -129,27 +129,26 @@ namespace WhiteCore.Modules.Web
 
             // classified item locations
             vars.Add("ClassifiedLocations", WebHelpers.UserLocations(ourAccount, webInterface.Registry, ""));
-
             vars.Add("ClassifiedCategories", WebHelpers.ClassifiedCategorySelections(-1, translator));
-            vars.Add("Maturity", WebHelpers.MaturitySelections(-1, translator));
+            vars.Add("MaturityLevels", WebHelpers.MaturitySelections(-1, translator));
             vars.Add("ClassifiedPrice", "0");
 
             // labels
-            vars.Add("AddClassifiedText", translator.GetTranslatedString("AddClassifiedText"));
-            vars.Add("ClassifiedtNameText", translator.GetTranslatedString("ClassifiedText"));
-            vars.Add("ClassifiedTagsText", translator.GetTranslatedString("TagsText"));
-            vars.Add("ClassifiedLocationText", translator.GetTranslatedString("LocationText"));
+            vars.Add("AddClassifiedText", translator.GetTranslatedString("ClassifiedNewText"));
+            vars.Add("TitleText", translator.GetTranslatedString("TitleText"));
+            vars.Add("PriceText", translator.GetTranslatedString("PriceOfListingText") + " " + currencySymbol);
+            vars.Add("LocationText", translator.GetTranslatedString("LocationText"));
             vars.Add("CategoryText", translator.GetTranslatedString("CategoryText"));
             vars.Add("MaturityText", translator.GetTranslatedString("MaturityText"));
-            vars.Add("ClassifiedPriceText", translator.GetTranslatedString("PriceOfListingText") + " " + currencySymbol);
             vars.Add("DescriptionText", translator.GetTranslatedString("DescriptionText"));
             vars.Add("AutoRelistText", translator.GetTranslatedString("ClassifiedRelistText"));
+            vars.Add("TagsText", translator.GetTranslatedString("TagsText"));
             vars.Add("YesText", translator.GetTranslatedString("Yes"));
 
 
             vars.Add("ErrorMessage", "");
             vars.Add("Cancel", translator.GetTranslatedString("Cancel"));
-            vars.Add("Submit", translator.GetTranslatedString("AddClassifiedText"));
+            vars.Add("Submit", translator.GetTranslatedString("AddItem"));
 
             return vars;
         }
