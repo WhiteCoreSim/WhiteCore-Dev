@@ -1,4 +1,5 @@
 # WhiteCore Sim
+Version 0.9.5 Snapshot
 
 The WhiteCore Development Team has moved the original Aurora virtual world server, derived from the OpenSim project, to a new level.
 
