@@ -1,18 +1,8 @@
-<!--
-UsersFriendsList
-	UserName
-	UserRegion
-	UserID
+<!-- User friends -->
 
-UserFriendsList  Online Users
-RegionNameText   Region Name
-UserNameText     User Name
-MoreInfoText     More Info
--->
 <style>
   .page-link {background-color: transparent !important;}
 </style>
-
 
 
 <div class="col98" id="fullPage">
@@ -32,21 +22,19 @@ MoreInfoText     More Info
       {UserFriendsListArrayBegin}
         <tr>
           <td>
-<!--            <a target="_blank" class='agentinfo' href="webprofile/?userid={UserID}">{UserName}</a>  -->
-            <a title="{UserName}" href="#"  onclick="loadmodalcontent('webprofile-modal_profile', 'userid={UserID}');">
-              <span class="agentlink">{UserName}</span>
+            <a title="{FriendName}" href="#"  onclick="loadmodalcontent('webprofile-modal_profile', 'userid={FriendID}');">
+              <span class="agentlink">{FriendName}</span>
             </a>
           </td>
           <td>
-<!--            <a target="_blank" class='regioninfo' href="regionprofile/?regionid={UserRegionID}">{UserRegion}</a> -->
-            <a title="{UserRegion}" href="#" onclick="loadmodalcontent('regionprofile-modal_profile', 'regionid={RegionID}');">
-            <span class="regionlink">{UserRegion}</span>
+            <a title="{FriendRegion}" href="#" 
+               onclick="loadmodalcontent('regionprofile-modal_profile', 'regionid={FriendRegionID}');">
+            <span class="regionlink">{FriendRegion}</span>
           </a>
         </td>
           <td>
-            <a class="regionslurl"
-              onclick="document.location.href='{HopUrl}'">
-              {UserLocation}
+            <a class="regionslurl" onclick="document.location.href='{HopUrl}'">
+              {FriendLocation}
             </a>
           </td>
         </tr>
