@@ -213,9 +213,16 @@ namespace WhiteCore.Services.DataService
                 landData.ScopeID = UUID.Parse (query [i + 23]);
 
                 // additional stuff 20190225 -greythane-
-                var laposX = (float)Convert.ToDecimal (query [i + 24], Culture.NumberFormatInfo);
-                var laposY = (float)Convert.ToDecimal (query [i + 25], Culture.NumberFormatInfo);
-                var laposZ = (float)Convert.ToDecimal (query [i + 26], Culture.NumberFormatInfo);
+                var laposX = 0.0f;           // ensure some defaults
+                var laposY = 1.0f;
+                var laposZ = 0.0f;
+                try {
+                    laposX = (float)Convert.ToDecimal(query[i + 24], Culture.NumberFormatInfo);
+                    laposY = (float)Convert.ToDecimal(query[i + 25], Culture.NumberFormatInfo);
+                    laposZ = (float)Convert.ToDecimal(query[i + 26], Culture.NumberFormatInfo);
+                } catch {
+                }
+
                 landData.UserLookAt = new Vector3 (laposX, laposY, laposZ);
 
                 landData.LandingType = (byte)int.Parse (query [i + 27]);
