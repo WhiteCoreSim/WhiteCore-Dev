@@ -172,11 +172,12 @@
   /*- load modal content -*/
   function loadmodalcontent(pageid, params='', title=''){
 
-  var content = $("#modalcontent");
-  if (params!= '') {
-    params = "?" + params;
+  if (params != '') {             // must have some parameters here
+    params = "?" + params;        // add query
   }
-  content.html('');   // clear anything previously loaded
+
+  var content = $("#modalcontent");
+  content.html('');               // clear anything previously loaded
 
   //load selected page
   switch(pageid){

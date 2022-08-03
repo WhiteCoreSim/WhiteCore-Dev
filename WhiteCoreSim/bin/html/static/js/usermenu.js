@@ -91,11 +91,12 @@ function loadusercontent(pageid, params=''){
 }
 
 function loadmodalcontent(pageid, params='', title='', static=false){
+	// load modal content
+	if (params != '') {				// must have some parameters here
+		params = "?" + params;		// add query
+	}
 
 	var usrmodal_content = $("#modalcontent");
-	if (params!= '') {
-		params = "?" + params;
-	}
 	usrmodal_content.html('');		// clear anything previously loaded
 
 	//load selected page

@@ -84,10 +84,11 @@ function loadcontent(pageid, params=''){
 };
 
 function loadmodalcontent(pageid, params='', title='', static=false){
-	var modal_content = $("#modalcontent");
-	if (params!= '') {
+	if (params != '') {			// must have some parameters here
 		params = "?" + params;
 	}
+	
+	var modal_content = $("#modalcontent");
 	modal_content.html('');		// clear anything previously loaded
 
 	//load selected page
