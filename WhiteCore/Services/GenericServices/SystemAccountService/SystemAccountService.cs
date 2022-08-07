@@ -150,6 +150,19 @@ namespace WhiteCore.Services.GenericServices.SystemAccountService
                 bankerName = settings.BankerName;
                 marketplaceOwnerName = settings.MarketplaceOwnerName;
             }
+
+            // final checks in case of configuration errors
+            if (string.IsNullOrEmpty(governorName))
+                governorName = Constants.GovernorName;
+            if (string.IsNullOrEmpty(realEstateOwnerName))
+                realEstateOwnerName = Constants.RealEstateOwnerName;
+            if (string.IsNullOrEmpty(bankerName))
+                bankerName = Constants.BankerName;
+            if (string.IsNullOrEmpty(marketplaceOwnerName))
+                marketplaceOwnerName = Constants.MarketplaceOwnerName;
+            if (string.IsNullOrEmpty(libraryOwnerName))
+                libraryOwnerName  = Constants.LibraryOwnerName;
+
         }
 
         public void Start (IConfigSource config, IRegistryCore registry)
