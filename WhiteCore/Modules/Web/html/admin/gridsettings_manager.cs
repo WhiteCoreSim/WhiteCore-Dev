@@ -75,7 +75,8 @@ namespace WhiteCore.Modules.Web
 
                 // update main grid setup
                 webInterface.SaveGridSettings(settings);
-                response = webInterface.UserMsg("Successfully updated grid settings.", true);
+                // response = webInterface.UserMsg("Successfully updated grid settings.", true);
+                response = webInterface.UserMsg("WebUI: " + translator.GetTranslatedString("ChangesSavedSuccessfully"), true);
 
                 return null;
             }
