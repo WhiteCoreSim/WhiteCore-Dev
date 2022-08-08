@@ -1,0 +1,8 @@
+For testing purposes only, please do NOT use this for a live grid
+
+* Open your MariaDB / MySQL client and run the following commands:
+
+CREATE DATABASE whitecore
+CREATE USER 'whitecore'@'localhost' IDENTIFIED BY 'whitecorepass';
+GRANT ALL PRIVILEGES ON whitecore.* TO 'whitecore'@'localhost' WITH GRANT OPTION;
+FLUSH PRIVILEGES;
