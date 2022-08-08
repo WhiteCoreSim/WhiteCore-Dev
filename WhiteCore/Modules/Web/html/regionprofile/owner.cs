@@ -96,7 +96,8 @@ namespace WhiteCore.Modules.Web
             //
             // greythane, Oct 2014 - Not sure why we need to keep the US format here?  A lot of us don't live there :)  
             //  vars.Add("UserBorn", Culture.LocaleDate(Util.ToDateTime(account.Created)));
-            vars.Add("UserBorn", Util.ToDateTime(userAcct.Created).ToShortDateString());  
+            // vars.Add("UserBorn", Util.ToDateTime(userAcct.Created).ToShortDateString());
+            vars.Add("UserBorn", Util.ToDateTime(userAcct.Created).ToString("ddd, dd MMM yyyy"));
 
             IUserProfileInfo profile = Framework.Utilities.DataManager.RequestPlugin<IProfileConnector>().
                                               GetUserProfile(userAcct.PrincipalID);

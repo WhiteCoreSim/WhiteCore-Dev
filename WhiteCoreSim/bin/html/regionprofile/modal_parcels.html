@@ -31,6 +31,16 @@
       </div>
 
       <div class="col-8">
+
+        <div class="row">
+          <div class="col-4 text-right">
+            {RegionNameText}:
+          </div>
+          <div class="col-8">
+            {RegionName}
+          </div>
+        </div>
+        
         <div class="row">
           <div class="col-4 text-right">
             {OwnerNameText}:
@@ -39,15 +49,6 @@
             <a title="{OwnerNameText}: {OwnerName}" href="#"  onclick="loadmodalcontent('webprofile-modal_profile', 'userid={OwnerUUID}');">
               <span class="agentlink">{OwnerName}</span>
             </a>
-          </div>
-        </div>
-
-        <div class="row">
-          <div class="col-4 text-right">
-            {RegionNameText}:
-          </div>
-          <div class="col-8">
-            {RegionName}
           </div>
         </div>
 
@@ -99,8 +100,8 @@
               <div class="carousel-item" data-interval="">
                 <img class="d-block rounded float-right" title="{ParcelName}" src="{ParcelSnapshotURL}" alt="{ParcelName}" style="width:128px;height:128px;" />
                 <div class="carousel-caption d-none d-md-block" style="right:50%;">
-                    <label>{ParcelName}</label>
-                    <a title="{ParcelOwnerNameText}: {ParcelOwnerName}" href="#"  onclick="loadmodalcontent('webprofile-modal_profile', 'userid={ParcelOwnerUUID}');">
+                    <label>{ParcelName}&nbsp;-&nbsp;</label>
+                    <a title="{ParcelOwnerText}: {ParcelOwnerName}" href="#"  onclick="loadmodalcontent('webprofile-modal_profile', 'userid={ParcelOwnerUUID}');">
                       <span class="agentlink">{ParcelOwnerName}</span>
                     </a>
                 </div>

@@ -162,7 +162,7 @@ namespace WhiteCore.Modules.Web
             vars.Add("UserNameText", translator.GetTranslatedString("UserNameText"));
             vars.Add("UserHomeRegionText", translator.GetTranslatedString("UserHomeRegionText"));
             vars.Add("UserTypeText", translator.GetTranslatedString("UserTypeText"));
-            vars.Add("LocationText", translator.GetTranslatedString("Location"));
+            vars.Add("LocationText", translator.GetTranslatedString("LocationText"));
             vars.Add("RegionText", translator.GetTranslatedString("Region"));
             vars.Add("OnlineText", translator.GetTranslatedString("Online"));
 

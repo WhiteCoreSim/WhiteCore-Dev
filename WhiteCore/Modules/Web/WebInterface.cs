@@ -922,25 +922,41 @@ namespace WhiteCore.Modules.Web
 
         public GridSettings GetGridSettings() {
             if (gridSettings == null) {
+                var sysAccts = Registry.RequestModuleInterface<ISystemAccountService>();
+                var sysEstates = Registry.RequestModuleInterface<ISystemEstateService>();
+
                 IGenericsConnector generics = Framework.Utilities.DataManager.RequestPlugin<IGenericsConnector>();
                 var settings = generics.GetGeneric<GridSettings>(UUID.Zero, "GridSettings", "Settings");
+
                 if (settings == null) {
                     settings = new GridSettings();
 
                     // nothing saved so get the current system setup
-                    var sysAccts = Registry.RequestModuleInterface<ISystemAccountService>();
                     if (sysAccts != null) {
                         settings.GovernorName = sysAccts.GovernorName;
                         settings.RealEstateOwnerName = sysAccts.SystemEstateOwnerName;
                         settings.BankerName = sysAccts.BankerName;
                         settings.MarketplaceOwnerName = sysAccts.MarketplaceOwnerName;
                     }
-                    var sysEstates = Registry.RequestModuleInterface<ISystemEstateService>();
-                    if (sysEstates != null) {
+                     if (sysEstates != null) {
                         settings.MainlandEstateName = sysEstates.MainlandEstateName;
                         settings.SystemEstateName = sysEstates.SystemEstateName;
                     }
                 }
+
+                // a bit of checking to ensure validity...
+                if (string.IsNullOrEmpty(settings.GovernorName))
+                    settings.GovernorName = sysAccts.GovernorName;
+                if (string.IsNullOrEmpty(settings.RealEstateOwnerName))
+                    settings.RealEstateOwnerName = sysAccts.SystemEstateOwnerName;
+                if (string.IsNullOrEmpty(settings.BankerName))
+                    settings.BankerName = sysAccts.BankerName;
+                if (string.IsNullOrEmpty(settings.MarketplaceOwnerName))
+                    settings.MarketplaceOwnerName = sysAccts.MarketplaceOwnerName;
+                if (string.IsNullOrEmpty(settings.MainlandEstateName))
+                    settings.MainlandEstateName = sysEstates.MainlandEstateName;
+                if (string.IsNullOrEmpty(settings.SystemEstateName))
+                    settings.SystemEstateName = sysEstates.SystemEstateName;
 
                 return settings;
             }

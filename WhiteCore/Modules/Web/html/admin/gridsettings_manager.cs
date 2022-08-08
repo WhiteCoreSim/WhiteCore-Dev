@@ -69,7 +69,7 @@ namespace WhiteCore.Modules.Web
                 settings.GovernorName = requestParameters["GovernorName"].ToString();
                 settings.RealEstateOwnerName = requestParameters["RealEstateOwnerName"].ToString();
                 settings.BankerName = requestParameters["BankerName"].ToString();
-                settings.MarketplaceOwnerName = requestParameters["MarketplaceOwnerName"].ToString();
+                settings.MarketplaceOwnerName = requestParameters["MarketPlaceOwnerName"].ToString();
                 settings.MainlandEstateName = requestParameters["MainlandEstateName"].ToString();
                 settings.SystemEstateName = requestParameters["SystemEstateName"].ToString();
 
@@ -103,7 +103,7 @@ namespace WhiteCore.Modules.Web
             vars.Add("SystemEstateNameText", translator.GetTranslatedString("SystemEstateNameText"));
 
 
-
+            vars.Add("Cancel", translator.GetTranslatedString("Cancel"));
             vars.Add("Save", translator.GetTranslatedString("Save"));
             // vars.Add("No", translator.GetTranslatedString("No"));
             // vars.Add("Yes", translator.GetTranslatedString("Yes"));

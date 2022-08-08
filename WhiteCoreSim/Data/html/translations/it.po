@@ -1,16 +1,14 @@
-#
 # Italian translation for WhiteCore.
 # This file is distributed under the same license as the WhiteCore package.
 # greythane <greythane@gmail.com>, 2016.
+# Updated for v0.9.6 - greythane, 2022
 #
-
 
 msgid ""
 msgstr ""
 
 "Project-Id-Version: WhiteCore Version 0.9.6\n"
 "Report-Msgid-Bugs-To: greythane <greythane@gmail.com>\n"
-
 "POT-Creation-Date: 2016-11-23 14:11:31Z\n"
 "PO-Revision-Date: 2016-11-23 14:11:31Z\n"
 "Last-Translator: greythane <greythane@gmail.com>\n"
@@ -151,6 +149,9 @@ msgstr "Precedente"
 msgid "BankerNameText"
 msgstr "Sistema bancario"
 
+msgid "BankBalanceText"
+msgstr "Saldo bancario"
+
 msgid "BannedUntilText"
 msgstr "Utente bloccato fino a"
 
@@ -215,7 +216,7 @@ msgid "CatPropertyRental"
 msgstr "Affitto di proprietà"
 
 msgid "CatSelect"
-msgstr ""
+msgstr "Selezionare"
 
 msgid "CatService"
 msgstr "Servizio"
@@ -247,6 +248,12 @@ msgstr "I cambiamenti saranno salvati in seguito"
 msgid "ChangeUserInformationText"
 msgstr "Modifica informazioni utente"
 
+msgid "ChangeContactText"
+msgstr "Modifica i dettagli di contatto"
+
+msgid "UpdateContactText"
+msgstr "Aggiorna contatto"
+
 msgid "Charter_Member"
 msgstr "Socio fondatore"
 
@@ -257,10 +264,16 @@ msgid "CheckedText"
 msgstr "Verificato"
 
 msgid "ClassifiedsText"
-msgstr "Inserzioni <NT>"
+msgstr "Pubblicità"
 
 msgid "ClassifiedText"
-msgstr "Inserzioni <NT>"
+msgstr "Pubblicità"
+
+msgid "ClassifiedNewText"
+msgstr "Nuova pubblicità"
+
+msgid "ClassifiedRelistText"
+msgstr "Rimetti in vendita automaticamente"
 
 msgid "ClearStatsText"
 msgstr "Cancella dati statistici"
@@ -304,6 +317,9 @@ msgstr "Pagina corrente"
 msgid "Custom"
 msgstr "Custom"
 
+msgid "DashboardNameText"
+msgstr "Pannello di controllo"
+
 msgid "DateEndText"
 msgstr "Data di Fine"
 
@@ -315,6 +331,9 @@ msgstr "Data di Inizio"
 
 msgid "DateText"
 msgstr "Data"
+
+msgid "DaysText"
+msgstr "Giorni"
 
 msgid "de"
 msgstr "Deutsch"
@@ -348,6 +367,12 @@ msgstr "Questa operazione eliminera i tuoi dati nella grid e non ti consentira d
 
 msgid "DeleteUserText"
 msgstr "Cancella il mio Account"
+
+msgid "DeleteUserNameText"
+msgstr "Elimina il nome dell'account"
+
+msgid "DeleteUserConfirmationText"
+msgstr "Conferma elimina il mio account"
 
 msgid "DescriptionText"
 msgstr "Description"
@@ -772,6 +797,45 @@ msgstr "Modifica delle Impostazioni"
 msgid "MenuStatistics"
 msgstr "Statistiche Viewer"
 
+msgid "MenuShopping"
+msgstr "Acquisti"
+
+msgid "MenuMarketplace"
+msgstr "Il mercato"
+
+msgid "MenuUserLand"
+msgstr "Regioni"
+
+msgid "MenuUserBuyLand"
+msgstr "Acquista terreno"
+
+msgid "MenuUserFriends"
+msgstr "Gli amici"
+
+msgid "MenuUserGroupLand"
+msgstr "Terreno del gruppo"
+
+msgid "MenuUserLandfees"
+msgstr "Tasse fondiarie"
+
+msgid "MenuUserMainland"
+msgstr "La Terraferma"
+
+msgid "MenuUserProfile"
+msgstr "Profilo"
+
+msgid "MenuDeleteAccount"
+msgstr "Eliminare l'accountt"
+
+msgid "MenuContactInfo"
+msgstr "Contatto"
+
+msgid "MenuEmail"
+msgstr "E-mail"
+
+msgid "MenuPartners"
+msgstr "Partner"
+
 msgid "MenuTransactions"
 msgstr "Operazioni utente"
 
@@ -829,11 +893,17 @@ msgstr "Nome"
 msgid "NewEmailText"
 msgstr "Nuovo indirizzo Email"
 
+msgid "NewEmailConfirmationText"
+msgstr "Conferma l'indirizzo e-mail"
+
 msgid "NewPasswordConfirmationText"
 msgstr "Nuova Password (Conferma)"
 
 msgid "NewPasswordText"
 msgstr "Nuova Password"
+
+msgid "EnterPasswordText"
+msgstr "Inserire la password"
 
 msgid "News"
 msgstr " Notizie"
@@ -988,6 +1058,12 @@ msgstr "Compagno"
 msgid "PartnersName"
 msgstr "Nome del Partner"
 
+msgid "PartnerProposalText"
+msgstr "Proposta"
+
+msgid "SendProposalText"
+msgstr "Invia proposta"
+
 msgid "Password"
 msgstr "Password"
 
@@ -999,6 +1075,9 @@ msgstr "Password"
 
 msgid "PerformanceText"
 msgstr "Medie prestazioni"
+
+msgid "PGText"
+msgstr "PG"
 
 msgid "PickNameText"
 msgstr "Scegli il nome"
@@ -1261,6 +1340,9 @@ msgstr "Domenica"
 msgid "SystemEstateNameText"
 msgstr "Nomi terreni del Governo"
 
+msgid "TagsText"
+msgstr "Tag"
+
 msgid "TaxFreeText"
 msgstr "Senza tasse"
 
@@ -1281,6 +1363,9 @@ msgstr "Tempo"
 
 msgid "TimeUntilUnbannedText"
 msgstr "Tempo mancante allo sblocco utente"
+
+msgid "TitleText"
+msgstr "Titolo"
 
 msgid "TooltipsMenuAbuse"
 msgstr "Utente denunciato"
@@ -1549,3 +1634,5 @@ msgstr "Schermo intero"
 msgid "Yes"
 msgstr "Si"
 
+msgid "zh_CN"
+msgstr "简体中文"

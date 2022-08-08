@@ -28,14 +28,14 @@ ChangesSavedSuccessfully      Changes saved successfully
 -->
 
 {IsAdminAuthenticatedBegin}
-<h2>{SystemName}: {WelcomeScreenManagerFor}</h2>
+<h2>{WelcomeScreenManagerFor} {SystemName}</h2>
 <form class="form-inline" id="welcomescreen_updater" action="admin/welcomescreen_manager.html" method="post">
     <div class="row w-100">
-      <div class="col-md-8 offset-md-2">
+      <div class="col-9 offset-2">
 
         <div class="form-group mb-1">
           <label for="GridStatus" class="col-4 col-form-label text-right mr-2">{GridStatus}</label>
-          <div class="input-group" style="width:100px">
+          <div class="input-group" style="width:120px">
             <select class="custom-select form-control" id="GridStatus" name="GridStatus">
               <option style="background-color: #00ff00;" value="1">{Online}</option>
               <option style="background-color: #ff0000;" value="0">{Offline}</option>
@@ -45,7 +45,7 @@ ChangesSavedSuccessfully      Changes saved successfully
 
         <div class="form-group mb-1">
           <label for="SpecialWindowStatus" class="col-4 col-form-label text-right mr-2">{SpecialWindowStatusText}</label>
-          <div class="input-group" style="width:100px">
+          <div class="input-group" style="width:120px">
             <select class="custom-select form-control" id="SpecialWindowStatus" name="SpecialWindowStatus">
               <option style="background-color: #00ff00;" value="1">{Enabled}</option>
               <option style="background-color: #ff0000;" value="0">{Disabled}</option>
@@ -79,138 +79,17 @@ ChangesSavedSuccessfully      Changes saved successfully
         </div>
 
         <div class="row w-100 mt-3">
-          <div class="col"></div>
-          <div class="col-6 pull-right">
-            <button onclick="gohome();">{Cancel}</button>
+          <div class="col pull-right">
+            <button class="btn-success" onclick="gohome();">{Cancel}</button>
             <button class="btn-info pull-right" style="width:200px;" 
                     onclick="submitupdate('welcomescreen_updater', 'update=true');">
               {Save}
             </button>
           </div>
+          <div class="col-1"></div>
         </div>
 
       </div>
     </div>
   </form>
-
-  <!--
-    <div class="rTableRow">
-      <div class="rTableCell">
-        <p>{SpecialWindowTitleText}</p>
-      </div>
-      <div class="rTableCell"><input id="SpecialWindowTitle" name="SpecialWindowTitle" size="119" type="text" value="{SpecialWindowTitle}" /></div>
-    </div>
-    <div class="rTableRow">
-      <div class="rTableCell">
-        <p>{SpecialWindowTextText}</p>
-      </div>
-      <div class="rTableCell"><textarea id="SpecialWindowText" cols="90" name="SpecialWindowText" rows="10">{SpecialWindowMessage}</textarea></div>
-    </div>
-
-    <div class="rTableRow">
-      <div class="rTableCell">
-        <p>{SpecialWindowColorText}</p>
-      </div>
-      <div class="rTableCell"><select id="boxcolor" name="SpecialWindowColor">
-        <option style="background-color: #ffffff;" value="white">white</option>
-        <option style="background-color: #00ff00;" value="green">green</option>
-        <option style="background-color: #ffff00;" value="yellow">yellow</option>
-        <option style="background-color: #ff0000;" value="red">red</option>
-      </select></div>
-    </div>
-    <div class="rTableRow">
-      <div class="rTableCell"> </div>
-      <div class="rTableCell"><button id="Submit" name="Submit" type="Submit">{Submit}</button></div>
-    </div>
-  </div>
-</div>
--->
-<!--
-<table id="welcomescreen_manager">
-  <caption></caption>
-
-  <thead>
-    <tr>
-      <th class="welcomescreen_managern_left"></th>
-      <th class="welcomescreen_manager_right"></th>
-    </tr>
-  </thead>
-
-  <tfoot>
-    <tr>
-      <th class="welcomescreen_managern_left"></th>
-      <th class="welcomescreen_manager_right"></th>
-    </tr>
-  </tfoot>
-
-  <tbody>
-    <tr>
-      <td class="welcomescreen_managern_left"><p id="gridstatus_label"><p>{GridStatus}</p></p></td>
-      <td class="welcomescreen_manager_right">
-	    <select name="GridStatus" id="GridStatus">
-		  <option value="1" style="background-color:#00FF00" {GridActive}>{Online}</option>
-		  <option value="0" style="background-color:#FF0000" {GridInactive}>{Offline}</option>
-	    </select>
-	  </td>
-    </tr>
-    <tr>
-      <td class="welcomescreen_managern_left"><p id="specialwinstatus_label">{SpecialWindowStatusText}</p></td>
-      <td class="welcomescreen_manager_right">
-	    <select name="SpecialWindowStatus" id="SpecialWindowStatus">
-		  <option value="1" style="background-color:#00FF00" {SpecialWindowActive}>{Enabled}</option>
-		  <option value="0" style="background-color:#FF0000" {SpecialWindowInactive}>{Disabled}</option>
-		</select>
-	  </td>
-    </tr>
-    <tr>
-      <td class="welcomescreen_managern_left"><p>{SpecialWindowTitleText}</p></td>
-      <td class="welcomescreen_manager_right"><input name="SpecialWindowTitle" type="text" id="SpecialWindowTitle" size="119" value="{SpecialWindowTitle}" /></td>
-    </tr>
-
-    <tr>
-      <td class="welcomescreen_managern_left"><p>{SpecialWindowTextText}</p></td>
-      <td class="welcomescreen_manager_right"><textarea name="SpecialWindowText" cols="90" rows="10" id="SpecialWindowText">{SpecialWindowMessage}</textarea></td>
-    </tr>
-
-    <tr>
-      <td class="welcomescreen_managern_left"><p>{SpecialWindowColorText}</p></td>
-      <td class="welcomescreen_manager_right">
-	    <select name="SpecialWindowColor" id="boxcolor">
-		  <option value="white" style=" background-color:#FFFFFF" {SpecialWindowColorWhite}>white</option>
-		  <option value="green" style="background-color:#00FF00"  {SpecialWindowColorGreen}>green</option>
-		  <option value="yellow" style="background-color:#FFFF00" {SpecialWindowColorYellow}>yellow</option>
-		  <option value="red" style="background-color:#FF0000" {SpecialWindowColorRed}>red</option>
-		</select>
-	  </td>
-    </tr>
-
-    <tr>
-      <td class="welcomescreen_managern_left"></td>
-	  <input hidden type="hidden" label="Submit" id="Submit" name="Submit" value="Submit" />
-      <td class="welcomescreen_manager_right"><button id="Submit" type="Submit" name="Submit">{Submit}</button></td>
-    </tr>
-  </tbody>
-</table>
--->
-<!--
-</form>
-
-<script>
-  /* attach a submit handler to the form */
-  $("#welcomescreen_updater").submit(function(event) {
-
-    /* stop form from submitting normally */
-    event.preventDefault();
-    /* get some values from elements on the page: */
-    var $form = $( this ),
-        url = $form.attr( 'action' );
-    /* Send the data using post and put the results in a div */
-    $.post( url, $form.serialize(),
-      function( data ) {
-		$("#info_message").empty().append("<h3>" + data + "</h3>");
-      }
-    );
-  });
-</script>
--->
 {IsAdminAuthenticatedEnd}

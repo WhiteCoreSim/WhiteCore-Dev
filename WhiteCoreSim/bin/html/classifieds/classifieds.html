@@ -56,8 +56,6 @@
     </form>
 </div>
 
-
-
 <!--  <table id="classifieds_list">
 	  <thead class="listhead">
    		<tr>
@@ -94,12 +92,7 @@
       <ul class="event-list">
         {ClassifiedListArrayBegin}
         <li>
-          <time datetime="{CreationDate}">
-            <!--<span class="day">{NewsDay}</span>
-            <span class="month">{NewsMonth}</span>
-            <span class="fullday">{NewsDayName}</span>  -->
-<!--                   <span class="time">{NewsDate}</span> -->
-          </time>
+          <time datetime="{CreationDate}"></time>
           <div class="info">
             <h2 class="title">{Name}</h2>
             <p class="desc">{Description}</p>
@@ -129,37 +122,4 @@
     submitpagesearch('classifieds_search_form', 'classfieds_page');
   });
 </script>
-
-<!--
-<script>
-/*  $(document).ready(function() {
-    $('#classifieds_list').dataTable({
-      "order": [[ 0, "asc" ]]
-    });
-  });
-*/
-  /*$('#classifieds-category').on('change',function(){
-    var $form = $( this );
-    var url = $form.attr( 'action' );
-    $.post( url, $form.serialize(), function( data ) {
-      $("#fullPage").empty().append(data);
-    });
-  });
-  */
-  /* attach a submit handler to the form */
-
-  $("#classifieds_search_form").submit(function(event) {
-
-    /* stop form from submitting normally */
-    event.preventDefault();
-    /* get some values from elements on the page: */
-    var $form = $( this ),
-        url = $form.attr( 'action' );
-    /* Send the data using post and put the results in a div */
-    $.post( url, $form.serialize(), function( data ) {
-      $("#fullPage").empty().append(data);
-    });
-  });
-</script>
--->
 

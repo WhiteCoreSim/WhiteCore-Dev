@@ -1,16 +1,14 @@
-#
 # French translation for WhiteCore.
 # This file is distributed under the same license as the WhiteCore package.
 # greythane <greythane@gmail.com>, 2016.
+# Updated for v0.9.6 - greythane, 2022
 #
-
 
 msgid ""
 msgstr ""
 
 "Project-Id-Version: WhiteCore Version 0.9.6\n"
 "Report-Msgid-Bugs-To: greythane <greythane@gmail.com>\n"
-
 "POT-Creation-Date: 2016-11-23 14:11:31Z\n"
 "PO-Revision-Date: 2016-11-23 14:11:31Z\n"
 "Last-Translator: greythane <greythane@gmail.com>\n"
@@ -151,6 +149,9 @@ msgstr "Précédent"
 msgid "BankerNameText"
 msgstr "Banquier du système"
 
+msgid "BankBalanceText"
+msgstr "Solde bancaire"
+
 msgid "BannedUntilText"
 msgstr "L'utilisateur est interdit jusqu'à ce que"
 
@@ -215,7 +216,7 @@ msgid "CatPropertyRental"
 msgstr "Location de la propriété"
 
 msgid "CatSelect"
-msgstr ""
+msgstr "Catégorie"
 
 msgid "CatService"
 msgstr "Un service"
@@ -247,6 +248,12 @@ msgstr "Changements enregistrés avec succès"
 msgid "ChangeUserInformationText"
 msgstr "Modifier les informations de l'utilisateur"
 
+msgid "ChangeContactText"
+msgstr "Modifier les coordonnes"
+
+msgid "UpdateContactText"
+msgstr "Mettre  jour le contact"
+
 msgid "Charter_Member"
 msgstr "Membre de la Charte"
 
@@ -261,6 +268,12 @@ msgstr "Annonce Catégorisée"
 
 msgid "ClassifiedText"
 msgstr "Petites annonces"
+
+msgid "ClassifiedNewText"
+msgstr "Nouvelle publicité"
+
+msgid "ClassifiedRelistText"
+msgstr "Automatically relist"
 
 msgid "ClearStatsText"
 msgstr "Effacer les statistiques sur"
@@ -304,6 +317,9 @@ msgstr "Page actuelle"
 msgid "Custom"
 msgstr "Coutume"
 
+msgid "DashboardNameText"
+msgstr "Tableau de bord"
+
 msgid "DateEndText"
 msgstr "Date de fin"
 
@@ -315,6 +331,9 @@ msgstr "Commençant date"
 
 msgid "DateText"
 msgstr "Date"
+
+msgid "DaysText"
+msgstr "Journes"
 
 msgid "de"
 msgstr "Deutsch"
@@ -348,6 +367,12 @@ msgstr "Cela permettra d'éliminer toutes les informations vous concernant dans 
 
 msgid "DeleteUserText"
 msgstr "Effacer mon Compte"
+
+msgid "DeleteUserNameText"
+msgstr "Supprimer le nom du compte"
+
+msgid "DeleteUserConfirmationText"
+msgstr "Confirmer la suppression de mon compte"
 
 msgid "DescriptionText"
 msgstr "La description"
@@ -772,6 +797,45 @@ msgstr "Gestion des paramètres"
 msgid "MenuStatistics"
 msgstr "Statistiques Viewer"
 
+msgid "MenuShopping"
+msgstr "Achats"
+
+msgid "MenuMarketplace"
+msgstr "March"
+
+msgid "MenuUserLand"
+msgstr "Rgions"
+
+msgid "MenuUserBuyLand"
+msgstr "Buy land"
+
+msgid "MenuUserFriends"
+msgstr "Amies"
+
+msgid "MenuUserGroupLand"
+msgstr "Terrain collectif"
+
+msgid "MenuUserLandfees"
+msgstr "Frais fonciers"
+
+msgid "MenuUserMainland"
+msgstr "Continent"
+
+msgid "MenuUserProfile"
+msgstr "Profil"
+
+msgid "MenuDeleteAccount"
+msgstr "Supprimer le compte"
+
+msgid "MenuContactInfo"
+msgstr "Contact"
+
+msgid "MenuEmail"
+msgstr "Email"
+
+msgid "MenuPartners"
+msgstr "Les partenaires"
+
 msgid "MenuTransactions"
 msgstr "Transactions de l'utilisateur"
 
@@ -829,11 +893,17 @@ msgstr "Name"
 msgid "NewEmailText"
 msgstr "Nouvelle Adresse Email"
 
+msgid "NewEmailConfirmationText"
+msgstr "Confirmez votre adresse email"
+
 msgid "NewPasswordConfirmationText"
 msgstr "Nouveau Mot de Passe {Confirmation)"
 
 msgid "NewPasswordText"
 msgstr "Nouveau Mot de Passe"
+
+msgid "EnterPasswordText"
+msgstr "Entrer le mot de passed"
 
 msgid "News"
 msgstr "Nouveautés"
@@ -988,6 +1058,12 @@ msgstr "Partner"
 msgid "PartnersName"
 msgstr "Nom des Partenaires"
 
+msgid "PartnerProposalText"
+msgstr "Proposition"
+
+msgid "SendProposalText"
+msgstr "Envoyer la proposition"
+
 msgid "Password"
 msgstr "Mot de passe"
 
@@ -999,6 +1075,9 @@ msgstr "Mot de passe"
 
 msgid "PerformanceText"
 msgstr "Moyennes de performance"
+
+msgid "PGText"
+msgstr "PG"
 
 msgid "PickNameText"
 msgstr "Choisissez nom"
@@ -1261,6 +1340,9 @@ msgstr "Dimanche"
 msgid "SystemEstateNameText"
 msgstr "Le nom du système de succession"
 
+msgid "TagsText"
+msgstr "Mots cls"
+
 msgid "TaxFreeText"
 msgstr "Tax Free"
 
@@ -1281,6 +1363,9 @@ msgstr "Temps"
 
 msgid "TimeUntilUnbannedText"
 msgstr "Temps jusqu'à la levée du Bannissement de l'utilisateur"
+
+msgid "TitleText"
+msgstr "Titre"
 
 msgid "TooltipsMenuAbuse"
 msgstr "Utilisateur abuse journaliste"
@@ -1549,3 +1634,5 @@ msgstr "Plein Ecran"
 msgid "Yes"
 msgstr "Oui"
 
+msgid "zh_CN"
+msgstr "简体中文"

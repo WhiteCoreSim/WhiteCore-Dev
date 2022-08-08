@@ -195,14 +195,11 @@
     {IfRegionNewEnd}
 
     <div class="row w-100 mt-3">
-<!--      <input hidden type="hidden" id="RegionServerURL" name="RegionServerURL" value="{RegionServerURL}" />
-      <input hidden type="hidden" id="RegionID" name="RegionID" value="{RegionID}" />
-        <input type="hidden" name="action" value="check">  -->
-        <div class="col"></div>
+      <div class="col"></div>
       <div class="col-6 pull-right">
         <button onclick="loadusercontent('userlandmanage');">{Cancel}</button>
-         <button class="btn-info pull-right" style="width:200px;" 
-                 onclick="submitupdate(
+        <button class="btn-info pull-right" style="width:200px;" 
+                onclick="submitupdate(
                   'region_edit_form',
                   'regionid={RegionID}&regionurl={RegionServerURL}&update=true',
                   'admin-region_manager');">
@@ -228,28 +225,6 @@
       $(this).prop('checked', true);
     });
 
-    /*  $('.regionarchivecarousel').jCarouselLite({
-          btnNext: '.next-horiz',
-          btnPrev: '.prev-horiz',
-          visible: 4
-      });
-      */
   });
-
-  /* attach a submit handler to the form */
-  //$("#region_form").submit(function(event) {
-
-    /* stop form from submitting normally */
-  //  event.preventDefault();
-    /* get some values from elements on the page: */
-  //  var $form = $( this ),
-  //      url = $form.attr( 'action' );
-    /* Send the data using post and put the results in a div */
-  //  $.post( url, $form.serialize(),
-  //    function( data ) {
-  //  $("#info_message").empty().append(data);
-  //    }
-  //  );
-  //});
 </script>
 {IsAuthenticatedEnd}

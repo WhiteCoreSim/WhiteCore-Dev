@@ -6,7 +6,8 @@
     </div>
     {IsAuthenticatedBegin}
       <div class="col">
-        <button class="btn btn-sm btn-default pull-right" onclick="loadmodalcontent('regionprofile-modal_parcels', 'regionid={RegionID}');">
+        <button class="btn btn-sm btn-default pull-right" 
+                onclick="loadmodalcontent('regionprofile-modal_parcels', 'regionid={RegionID}');">
           {MenuParcelTitle}
         </button>
       </div>
@@ -22,8 +23,10 @@
     <div class="row">
       <div class="col-4">
         <div class="region_info_picture" style="height: 256px;">
-          <a class="regionslurl" title="{RegionNameText}: {RegionName}" href="hop://{MainServerURL}/{RegionName}/128/128/50">
-            <img title="{RegionNameText}: {RegionName}" src="{RegionWorldViewURL}" alt="{RegionNameText}: {RegionName}" height="256" />
+          <a class="regionslurl" title="{RegionNameText}: {RegionName}" 
+             href="hop://{MainServerURL}/{RegionName}/128/128/50">
+            <img title="{RegionNameText}: {RegionName}" src="{RegionWorldViewURL}" 
+                 alt="{RegionNameText}: {RegionName}" height="256" />
           </a>
         </div>
       </div>
@@ -34,7 +37,8 @@
             {OwnerNameText}:
           </div>
           <div class="col-8">
-            <a title="{OwnerNameText}: {OwnerName}" href="#"  onclick="loadmodalcontent('webprofile-modal_profile', 'userid={OwnerUUID}');">
+            <a title="{OwnerNameText}: {OwnerName}" href="#"  
+               onclick="loadmodalcontent('webprofile-modal_profile', 'userid={OwnerUUID}');">
               <span class="agentlink">{OwnerName}</span>
             </a>
           </div>
@@ -97,14 +101,23 @@
           </div>
         </div>
 
+        <div class="row">
+          <div  class="col-4 text-right">
+            {RegionOnlineText}: 
+          </div>
+          <div class="col-8">
+            {RegionOnline}
+          </div>
+        </div>
+
         <div class="div20"></div>
 
         <div class="row">
-          <div class="col">
-            {RegionOnlineText}: {RegionOnline}
+          <div class="col-8 text-right">
+            {NumberOfUsersInRegionText}: 
           </div>
-          <div class="col">
-            {NumberOfUsersInRegionText}: {NumberOfUsersInRegion}
+          <div class="col-4">
+            {NumberOfUsersInRegion}
           </div>
         </div>
 

@@ -161,13 +161,13 @@ namespace WhiteCore.Modules.Web
 
             // Menus
             vars.Add("MenuProfileTitle", translator.GetTranslatedString("MenuProfileTitle"));
-            vars.Add("TooltipsMenuProfile", translator.GetTranslatedString("TooltipsMenuProfile"));
+            //vars.Add("TooltipsMenuProfile", translator.GetTranslatedString("TooltipsMenuProfile"));
             vars.Add("MenuGroupTitle", translator.GetTranslatedString("MenuGroupTitle"));
-            vars.Add("TooltipsMenuGroups", translator.GetTranslatedString("TooltipsMenuGroups"));
+            //vars.Add("TooltipsMenuGroups", translator.GetTranslatedString("TooltipsMenuGroups"));
             //vars.Add("MenuPicksTitle", translator.GetTranslatedString("MenuPicksTitle"));
             //vars.Add("TooltipsMenuPicks", translator.GetTranslatedString("TooltipsMenuPicks"));
             vars.Add("MenuRegionsTitle", translator.GetTranslatedString("MenuRegionsTitle"));
-            vars.Add("TooltipsMenuRegions", translator.GetTranslatedString("TooltipsMenuRegions"));
+            //vars.Add("TooltipsMenuRegions", translator.GetTranslatedString("TooltipsMenuRegions"));
 
             vars.Add("UsersPicksText", translator.GetTranslatedString("UsersPicksText"));
             vars.Add("PickNameText", translator.GetTranslatedString("PickNameText"));

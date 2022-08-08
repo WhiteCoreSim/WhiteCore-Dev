@@ -135,6 +135,7 @@ namespace WhiteCore.Modules.Web
                             parcels.Add(parcel);
                         }
                     }
+                    vars.Add("ParcelOwnerText", translator.GetTranslatedString("ParcelOwnerText"));
                     vars.Add("ParcelInRegion", parcels);
                     vars.Add("NumberOfParcelsInRegion", parcels.Count);
                 }

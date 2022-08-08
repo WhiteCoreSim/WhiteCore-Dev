@@ -106,7 +106,8 @@ namespace WhiteCore.Modules.Web
             vars.Add("SpecialWindowColorYellow", welcomeInfo.SpecialWindowMessageColor == "yellow" ? "selected" : "");
             vars.Add("SpecialWindowColorGreen", welcomeInfo.SpecialWindowMessageColor == "green" ? "selected" : "");
             vars.Add("SpecialWindowColorWhite", welcomeInfo.SpecialWindowMessageColor == "white" ? "selected" : "");
-            vars.Add("Submit", translator.GetTranslatedString("Submit"));
+            vars.Add("Cancel", translator.GetTranslatedString("Cancel"));
+            vars.Add("Save", translator.GetTranslatedString("SaveUpdates"));
 
             return vars;
         }

@@ -1,8 +1,52 @@
 <!-- viewer help -->
+<style>
+	.imageModalBackground {
+    display: none;
+    z-index: 1;
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.5);
+	}
+	.imageModalContent {
+    margin: 20% auto;
+    padding: 20px;
+    border-style: solid;
+    border-width: 2px;
+    border-color: black;
+    width: 50%;
+	}
+	.imageClose {
+    color: grey;
+    float: right;
+    font-size: 20px;
+    font-weight: bold;
+	}
+
+	.imageClose:hover {
+	  color: black;
+	  cursor: pointer;
+	}
+	.caption {
+		background-color:white;
+		color:black;
+		padding:2px;
+		font-weight:bold;
+		border-top-left-radius: 7px 15px;
+		border-top-right-radius: 20px 40px;
+		border-bottom-right-radius: 15px 7px;
+		border-bottom-left-radius: 20px 40px;
+		box-shadow: 0px 0px 10px 10px white;
+	}
+</style>
+
 <div class="container">
 	<div class="row text-right">
 		<div class="col pull-right">
-			<a class="btn btn-info" href="#" onclick=loadmodalcontent('irc_chat')>IRC support</a>
+			<a class="btn btn-info" href="#" onclick=loadmodalcontent("irc_chat","","",true)>IRC support</a>
 		</div>
 	</div>
 	<div class="col-12">
@@ -24,24 +68,20 @@
 
 	<div class="row justify-content-center">
 		<div class="col-3">
-			<a class="colorbox" href="static/viewers/alchemy.png">
-				<img class="viewerimage" title="{Alchemy}" src="static/viewers/alchemy_thumb.png" alt="{Alchemy}" />
-			</a>
+			<img class="viewerimage"  title="{Alchemy}" alt="{Alchemy}"
+			     src="static/viewers/alchemy_thumb.png" data-link="static/viewers/alchemy.png" />
 		</div>
 		<div class="col-3">
-			<a class="colorbox" href="static/viewers/firestorm_01.jpg">
-				<img class="viewerimage" title="{Firestorm}" src="static/viewers/firestorm_thumb_01.jpg" alt="{Firestorm}" />
-			</a>
+			<img class="viewerimage" title="{Firestorm}"  alt="{Firestorm}" 
+			     src="static/viewers/firestorm_thumb_01.jpg" data-link="static/viewers/firestorm_01.jpg"/>
 		</div>
 		<div class="col-3">
-			<a class="colorbox" href="static/viewers/kokua_01.jpg">
-				<img class="viewerimage" title="{Kokua}" src="static/viewers/kokua_thumb_01.jpg" alt="{Kokua}" />
-			</a>
+			<img class="viewerimage" title="{Kokua}" alt="{Kokua}"
+				 src="static/viewers/kokua_thumb_01.jpg"  data-link="static/viewers/kokua_01.jpg"/>
 		</div>
 		<div class="col-3">
-			<a class="colorbox" href="static/viewers/singularity_01.jpg">
-				<img class="viewerimage" title="{Singularity}" src="static/viewers/singularity_thumb_01.jpg" alt="{Singularity}" />
-			</a>
+			<img class="viewerimage" title="{Singularity}" alt="{Singularity}"
+				 src="static/viewers/singularity_thumb_01.jpg" data-link="static/viewers/singularity_01.jpg"/>
 		</div>
 	</div>
 	<div class="row div10"></div>
@@ -64,24 +104,20 @@
 
 	<div class="row justify-content-center-xs-12">
 		<div class="col-3">
-			<a class="colorbox" href="static/viewers/lumiya_01_ics_login.jpg">
-				<img class="viewerimage" title="{Lumiya}" src="static/viewers/lumiya_thumb.png" alt="{Lumiya}" />
-			</a>
+			<img class="viewerimage" title="{Lumiya}" alt="{Lumiya}"
+				 src="static/viewers/lumiya_thumb.png" data-link="static/viewers/lumiya_01_ics_login.jpg" />
 		</div>
 		<div class="col-3">
-			<a class="colorbox" href="static/viewers/mgcx-3.png">
-				<img class="viewerimage" title="{MobileGridClient}" src="static/viewers/mobilegridclient.png" alt="{MobileGridClient}" />
-			</a>
+			<img class="viewerimage" title="{MobileGridClient}" alt="{MobileGridClient}"
+				 src="static/viewers/mobilegridclient.png" data-link="static/viewers/mgcx-3.png" />
 		</div>
 		<div class="col-3">
-			<a class="colorbox" href="static/viewers/pocketmetaverse_01.png">
-				<img class="viewerimage" title="{PocketMetaverse}" src="static/viewers/pocketmetaverse.png" alt="{PocketMetaverse}" />
-			</a>
+			<img class="viewerimage" title="{PocketMetaverse}" alt="{PocketMetaverse}"
+				 src="static/viewers/pocketmetaverse.png" data-link="static/viewers/pocketmetaverse_01.png" />
 		</div>
 		<div class="col-3">
-			<a class="colorbox" href="static/viewers/radegast_01.jpg">
-				<img class="viewerimage" title="{Radegast}" src="static/viewers/radegast.png" alt="{Radegast}" />
-			</a>
+			<img class="viewerimage" title="{Radegast}" alt="{Radegast}"
+				src="static/viewers/radegast.png" data-link="static/viewers/radegast_01.jpg" />
 		</div>
 	</div>
 	<div class="row div10"></div>
@@ -102,9 +138,26 @@
 </div>
 <div class="row div10"></div>
 
+<div id="imageModal" class="modal imageModalBackground" style="display:none;">
+	<div class="imageModalContent" onclick="document.getElementById('imageModal').style.display='none'">
+	  	<span class="imageClose">✕</span>
+	  	<br>
+		<img id="imageSrc" src="" style="padding-left:10px;max-width:610px;">
+		<br>
+		<div class="caption"></div>
+	</div>
+	<br>
+</div>
+
 
 <script>
-  //$(document).ready(function(){$("a.colorbox").colorbox({rel:'a.colorbox'});});
+
+	$(".viewerimage").on("click", function(){
+		let datalink = $(this).attr("data-link");
+	  $("#imageSrc").attr("src", datalink);
+	  $(".caption").html(this.alt);
+	  $("#imageModal").css("display", "block");
+	});
 
   $('img.viewerimage').css('opacity', 0.6);
   $('img.viewerimage').hover(

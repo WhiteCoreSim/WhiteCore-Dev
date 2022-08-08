@@ -150,6 +150,19 @@ namespace WhiteCore.Services.GenericServices.SystemAccountService
                 bankerName = settings.BankerName;
                 marketplaceOwnerName = settings.MarketplaceOwnerName;
             }
+
+            // final checks in case of configuration errors
+            if (string.IsNullOrEmpty(governorName))
+                governorName = Constants.GovernorName;
+            if (string.IsNullOrEmpty(realEstateOwnerName))
+                realEstateOwnerName = Constants.RealEstateOwnerName;
+            if (string.IsNullOrEmpty(bankerName))
+                bankerName = Constants.BankerName;
+            if (string.IsNullOrEmpty(marketplaceOwnerName))
+                marketplaceOwnerName = Constants.MarketplaceOwnerName;
+            if (string.IsNullOrEmpty(libraryOwnerName))
+                libraryOwnerName  = Constants.LibraryOwnerName;
+
         }
 
         public void Start (IConfigSource config, IRegistryCore registry)
@@ -221,16 +234,28 @@ namespace WhiteCore.Services.GenericServices.SystemAccountService
         /// </summary>
         void CheckSystemUserInfo ()
         {
+            // a bit of protection in case of configuration errors
+            if (GovernorName == "")
+                governorName = Constants.GovernorName;
+            if (SystemEstateOwnerName == "")
+                realEstateOwnerName = Constants.RealEstateOwnerName;
+            if (BankerName == "")
+                bankerName = Constants.BankerName;
+            if (MarketplaceOwnerName == "")
+                marketplaceOwnerName = Constants.MarketplaceOwnerName;
+            if (LibraryOwnerName == "")
+                libraryOwnerName = Constants.LibraryOwnerName;
+
             if (m_accountService == null) {
                 MainConsole.Instance.Info ("No user account service available");
                 return;
             }
 
-            VerifySystemUserInfo ("Governor", GovernorUUID, GovernorName, Constants.USER_GOD_MAINTENANCE);
-            VerifySystemUserInfo ("RealEstate", SystemEstateOwnerUUID, SystemEstateOwnerName, Constants.USER_GOD_LIASON);
-            VerifySystemUserInfo ("Banker", BankerUUID, BankerName, Constants.USER_GOD_CUSTOMER_SERVICE);
-            VerifySystemUserInfo ("Marketplace", MarketplaceOwnerUUID, MarketplaceOwnerName, Constants.USER_DISABLED);
-            VerifySystemUserInfo ("Library", LibraryOwnerUUID, LibraryOwnerName, Constants.USER_DISABLED);
+            VerifySystemUserInfo("Governor", GovernorUUID, GovernorName, Constants.USER_GOD_MAINTENANCE);
+            VerifySystemUserInfo("RealEstate", SystemEstateOwnerUUID, SystemEstateOwnerName, Constants.USER_GOD_LIASON);
+            VerifySystemUserInfo("Banker", BankerUUID, BankerName, Constants.USER_GOD_CUSTOMER_SERVICE);
+            VerifySystemUserInfo("Marketplace", MarketplaceOwnerUUID, MarketplaceOwnerName, Constants.USER_DISABLED);
+            VerifySystemUserInfo("Library", LibraryOwnerUUID, LibraryOwnerName, Constants.USER_DISABLED);
         }
 
         void VerifySystemUserInfo (string usrType, UUID usrUUID, string usrName, int usrLevel)

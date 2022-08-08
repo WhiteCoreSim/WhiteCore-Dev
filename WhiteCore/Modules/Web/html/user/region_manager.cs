@@ -86,18 +86,6 @@ namespace WhiteCore.Modules.Web
             } else {
                 vars.Add("HaveData", false);
                 vars.Add("NoData", true);
-
-                /*
-                regionListVars.Add (new Dictionary<string, object> {
-                    { "RegionLocX", "" },
-                    { "RegionLocY", "" },
-                    { "RegionName", "" },
-                    { "RegionInfo", translator.GetTranslatedString("NoDetailsText")},
-                    { "RegionStatus", ""},
-                    { "RegionID", "" },
-                    { "RegionURI", "" }
-                });
-                */
             }
 
             vars.Add ("RegionList", regionListVars);
@@ -115,7 +103,6 @@ namespace WhiteCore.Modules.Web
             vars.Add ("RegionLocXText", translator.GetTranslatedString ("RegionLocXText"));
             vars.Add ("RegionLocYText", translator.GetTranslatedString ("RegionLocYText"));
             vars.Add ("RegionOnlineText", translator.GetTranslatedString ("Online"));
-            //vars.Add ("MainServerURL", webInterface.GridURL);
 
             return vars;
         }

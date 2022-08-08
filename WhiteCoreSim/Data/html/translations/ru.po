@@ -1,16 +1,14 @@
-#
 # Russian translation for WhiteCore.
 # This file is distributed under the same license as the WhiteCore package.
 # greythane <greythane@gmail.com>, 2016.
+# Updated for v0.9.6 - greythane, 2022
 #
-
 
 msgid ""
 msgstr ""
 
 "Project-Id-Version: WhiteCore Version 0.9.6\n"
 "Report-Msgid-Bugs-To: greythane <greythane@gmail.com>\n"
-
 "POT-Creation-Date: 2016-11-23 14:11:31Z\n"
 "PO-Revision-Date: 2016-11-23 14:11:31Z\n"
 "Last-Translator: greythane <greythane@gmail.com>\n"
@@ -151,6 +149,9 @@ msgstr "Назад"
 msgid "BankerNameText"
 msgstr "Системный Банкир"
 
+msgid "BankBalanceText"
+msgstr "банковский баланс"
+
 msgid "BannedUntilText"
 msgstr "Пользователь заблокирован до:"
 
@@ -215,7 +216,7 @@ msgid "CatPropertyRental"
 msgstr "Аренда Собственности"
 
 msgid "CatSelect"
-msgstr ""
+msgstr "Категория"
 
 msgid "CatService"
 msgstr "Сервис"
@@ -247,6 +248,12 @@ msgstr "Изменения сохранены успешно"
 msgid "ChangeUserInformationText"
 msgstr "Изменить Инфо Пользователя"
 
+msgid "ChangeContactText"
+msgstr "Изменить контактную информацию"
+
+msgid "UpdateContactText"
+msgstr "Обновить контакт"
+
 msgid "Charter_Member"
 msgstr "Представитель Администрации"
 
@@ -257,10 +264,16 @@ msgid "CheckedText"
 msgstr "Рассмотренные"
 
 msgid "ClassifiedsText"
-msgstr "Объявления"
+msgstr "Реклама"
 
 msgid "ClassifiedText"
-msgstr "Объявление"
+msgstr "Реклама"
+
+msgid "ClassifiedNewText"
+msgstr "Новая реклама"
+
+msgid "ClassifiedRelistText"
+msgstr "Автоматически перелистывать"
 
 msgid "ClearStatsText"
 msgstr "Очистить Статистику"
@@ -304,6 +317,9 @@ msgstr "Текущая страница"
 msgid "Custom"
 msgstr "Выборочный"
 
+msgid "DashboardNameText"
+msgstr "Приборная доска"
+
 msgid "DateEndText"
 msgstr "До"
 
@@ -315,6 +331,9 @@ msgstr "От"
 
 msgid "DateText"
 msgstr "Дата"
+
+msgid "DaysText"
+msgstr "Days"
 
 msgid "de"
 msgstr "Deutsch"
@@ -348,6 +367,12 @@ msgstr "Это удалит всю информацию о вас в сетке 
 
 msgid "DeleteUserText"
 msgstr "Удалить аккаунт"
+
+msgid "DeleteUserNameText"
+msgstr "Удалить имя учетной записиe"
+
+msgid "DeleteUserConfirmationText"
+msgstr "Подтвердить удаление моей учетной записи"
 
 msgid "DescriptionText"
 msgstr "Описание"
@@ -545,7 +570,7 @@ msgid "HourText"
 msgstr "час"
 
 msgid "HyperGrid"
-msgstr "HyperGrid (HG)"
+msgstr "Гиперсеть (HG)"
 
 msgid "IgnorePagesUpdatesText"
 msgstr "Игнорировать предупреждения об изменениях страниц до следующего обновления"
@@ -554,7 +579,7 @@ msgid "IgnoreSettingsUpdatesText"
 msgstr "Игнорировать предупреждения об изменениях настроек до следующего обновления"
 
 msgid "InterWorld"
-msgstr "Inter World (IWC)"
+msgstr "Интер мир (IWC)"
 
 msgid "Island"
 msgstr "Остров"
@@ -772,6 +797,45 @@ msgstr "Настройки Web Интерфейса"
 msgid "MenuStatistics"
 msgstr "Статистика"
 
+msgid "MenuShopping"
+msgstr "делать покупки"
+
+msgid "MenuMarketplace"
+msgstr "Торговая площадка"
+
+msgid "MenuUserLand"
+msgstr "Регионы"
+
+msgid "MenuUserBuyLand"
+msgstr "Купить землю"
+
+msgid "MenuUserFriends"
+msgstr "Друзья"
+
+msgid "MenuUserGroupLand"
+msgstr "Групповая земля"
+
+msgid "MenuUserLandfees"
+msgstr "Плата за землю"
+
+msgid "MenuUserMainland"
+msgstr "Материк"
+
+msgid "MenuUserProfile"
+msgstr "Профиль"
+
+msgid "MenuDeleteAccount"
+msgstr "Удалить аккаунт"
+
+msgid "MenuContactInfo"
+msgstr "Контакт"
+
+msgid "MenuEmail"
+msgstr "Эл. адрес"
+
+msgid "MenuPartners"
+msgstr "Партнеры"
+
 msgid "MenuTransactions"
 msgstr "Транзакции Пользователей"
 
@@ -829,11 +893,17 @@ msgstr "Имя"
 msgid "NewEmailText"
 msgstr "Новый Email адрес"
 
+msgid "NewEmailConfirmationText"
+msgstr "Confirm Email Address"
+
 msgid "NewPasswordConfirmationText"
 msgstr "Повторите пароль"
 
 msgid "NewPasswordText"
 msgstr "Новый пароль"
+
+msgid "EnterPasswordText"
+msgstr "Введите пароль"
 
 msgid "News"
 msgstr "Новости"
@@ -988,6 +1058,12 @@ msgstr "Нет партнёра"
 msgid "PartnersName"
 msgstr "Партнёр"
 
+msgid "PartnerProposalText"
+msgstr "Предложение"
+
+msgid "SendProposalText"
+msgstr "Отправить предложение"
+
 msgid "Password"
 msgstr "Пароль"
 
@@ -999,6 +1075,9 @@ msgstr "Пароль"
 
 msgid "PerformanceText"
 msgstr "Производительность в среднем:"
+
+msgid "PGText"
+msgstr "PG"
 
 msgid "PickNameText"
 msgstr "Название Избранного"
@@ -1261,6 +1340,9 @@ msgstr "Воскресенье"
 msgid "SystemEstateNameText"
 msgstr "Название Системного Имения"
 
+msgid "TagsText"
+msgstr "Теги"
+
 msgid "TaxFreeText"
 msgstr "Без входной платы"
 
@@ -1281,6 +1363,9 @@ msgstr "Время"
 
 msgid "TimeUntilUnbannedText"
 msgstr "Time until user is unbanned"
+
+msgid "TitleText"
+msgstr "название"
 
 msgid "TooltipsMenuAbuse"
 msgstr "Жалобы пользователей"
@@ -1549,3 +1634,5 @@ msgstr "Карта Мира"
 msgid "Yes"
 msgstr "Да"
 
+msgid "zh_CN"
+msgstr "简体中文"

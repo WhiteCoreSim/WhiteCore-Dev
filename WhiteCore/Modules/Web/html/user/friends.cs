@@ -90,14 +90,14 @@ namespace WhiteCore.Modules.Web
                     vars.Add("NoData", false);
 
                     foreach (var userfriendID in userFriendsList) {
-                        var isonline = false;
+                        //var isonline = false;
                         var friendPosition = Vector3.Zero;
-                        var regionName = "Offline";
+                        var regionName = "";
                         var regionID = "";
 
                         foreach (var online_user in activeUsers) {
                             if (online_user.UserID == userfriendID.ToString()) {
-                                isonline = true;
+                                //isonline = true;
                                 friendPosition = online_user.CurrentPosition;
                                 var region = gridService.GetRegionByUUID(null, online_user.CurrentRegionID);
                                 if (region != null) {
@@ -109,18 +109,26 @@ namespace WhiteCore.Modules.Web
                         }
 
                         // add details
-                        var userAcct = accountService.GetUserAccount(null, userfriendID);
-                        if (userAcct.Valid) {
+                        var friendAcct = accountService.GetUserAccount(null, userfriendID);
+                        if (friendAcct.Valid) {
+                            var frloc = "Offline";
+                            var frhop = "";
+
+                            if (regionID != "") {
+                                frloc = friendPosition.ToString();
+                                frhop = webInterface.HopVectorUrl(regionName, friendPosition);
+                            }
+
                             friendsList.Add(new Dictionary<string, object> {
-                                { "UserName", userAcct.Name },
-                                { "UserRegion", regionName },
-                                { "UserLocation",  friendPosition.ToString() },
-                                { "UserID", userfriendID },
-                                { "UserRegionID", regionID },
-                                { "IsOnline", isonline },
-                                {"HopUrl", webInterface.HopVectorUrl(regionName, friendPosition)}
+                                { "FriendName", friendAcct.Name },
+                                { "FriendRegion", regionName },
+                                { "FriendLocation",  frloc },
+                                { "FriendID", userfriendID },
+                                { "FriendRegionID", regionID },
+                                //{ "IsOnline", isonline },
+                                { "HopUrl", frhop}
                             });
-                        }
+                         }
                     }
                 }
             }
@@ -128,17 +136,6 @@ namespace WhiteCore.Modules.Web
             if (friendsList.Count == 0) {
                 vars.Add("HaveData", false);
                 vars.Add("NoData", true);
-                /*
-                friendsList.Add(
-                    new Dictionary<string, object>
-                {
-                    {"UserName", ""},
-                    {"UserRegion", "No friends found"},
-                    {"UserLocation", ""},
-                    {"UserID", ""},
-                    {"UserRegionID", ""},
-                    {"IsOnline", false }
-                });*/
             }
 
             if (requestParameters.ContainsKey("Order")) {
@@ -149,7 +146,7 @@ namespace WhiteCore.Modules.Web
             }
 
             vars.Add("UserName", ourAccount.Name);
-            vars.Add("UserFriendsText", translator.GetTranslatedString("UserFriendsText"));
+            vars.Add("UserFriendsText", translator.GetTranslatedString("Friends"));
             vars.Add("UserFriendsList", friendsList);
             vars.Add("UserNameText", translator.GetTranslatedString("UserNameText"));
             vars.Add("OnlineLocationText", translator.GetTranslatedString("OnlineLocationText"));

@@ -60,12 +60,12 @@ namespace WhiteCore.Modules.Web
             var estateConnector = Framework.Utilities.DataManager.RequestPlugin<IEstateConnector> ();
             var user = Authenticator.GetAuthentication (httpRequest);
 
-            int estateid;
+            int estateId;
 
             // the estate id can come in a number of ways
             bool idok = httpRequest.Query.ContainsKey("estateid")
-                ? int.TryParse(httpRequest.Query["estateid"].ToString(), out estateid)
-                : int.TryParse(requestParameters["estateid"].ToString(), out estateid);
+                ? int.TryParse(httpRequest.Query["estateid"].ToString(), out estateId)
+                : int.TryParse(requestParameters["estateid"].ToString(), out estateId);
 
             if (!idok)
             {
@@ -101,14 +101,18 @@ namespace WhiteCore.Modules.Web
                 return null;
             }
 
-            var estateSettings = estateConnector.GetEstateIDSettings (estateid);
+            var estateSettings = estateConnector.GetEstateIDSettings (estateId);
             if (estateSettings != null) {
                 if (requestParameters.ContainsKey ("update")) {
-
-                    var estateOwner = requestParameters ["EstateOwner"].ToString ();
+                    var estateOwner =estateSettings.EstateOwner;
+                    // in case of admin modification...
+                    if (requestParameters.ContainsKey("EstateOwner")) {             
+                        var newOwner = requestParameters["EstateOwner"].ToString();
+                        estateOwner = UUID.Parse(newOwner);
+                    };
 
                     estateSettings.EstateName = requestParameters ["EstateName"].ToString ();
-                    estateSettings.EstateOwner = UUID.Parse (estateOwner);
+                    estateSettings.EstateOwner = estateOwner;
                     estateSettings.PricePerMeter = int.Parse (requestParameters ["PricePerMeter"].ToString ());
                     estateSettings.PublicAccess = requestParameters ["PublicAccess"].ToString () == "1";
                     estateSettings.TaxFree = requestParameters ["TaxFree"].ToString () == "1";

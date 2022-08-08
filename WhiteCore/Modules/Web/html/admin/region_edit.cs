@@ -313,9 +313,9 @@ namespace WhiteCore.Modules.Web
 
             }
             #endregion
-            else
-            #region NewRegion    
-            {
+
+            #region NewRegion
+            if (requestParameters.ContainsKey("addregion")) {
                 // set some default/suggested values
                 // check for user region name  seed
                 string[] m_regionNameSeed = null;
@@ -366,7 +366,7 @@ namespace WhiteCore.Modules.Web
                 vars.Add ("RegionVisibility", WebHelpers.YesNoSelection (translator, true));
                 vars.Add ("RegionInfinite", WebHelpers.YesNoSelection (translator, true));
                 vars.Add ("RegionDelayStartup", WebHelpers.RegionStartupSelection (translator, StartupType.Normal)); // normal startup
-                vars.Add ("Submit", translator.GetTranslatedString ("Save"));
+                vars.Add ("Submit", translator.GetTranslatedString ("AddRegionText"));
 
             }
             #endregion

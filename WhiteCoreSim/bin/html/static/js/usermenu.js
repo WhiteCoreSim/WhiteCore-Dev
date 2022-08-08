@@ -4,7 +4,7 @@ $(function(){
 	var usermenu = $("#sidemenu li");
 	var members = $("#member-actions li");
 	var loading = $("#loading");
-	var content = $("#content");
+	var usr_content = $("#usr_content");
 
 	// Top menu
 	topmenu.click(function(event){
@@ -12,7 +12,7 @@ $(function(){
 		switch(this.id){
 		{MenuItemsArrayBegin}
 			case "{MenuItemID}":
-		    content.load("{MenuItemLocation}" + window.location.search, hideLoading);
+		    usr_content.load("{MenuItemLocation}" + window.location.search, hideLoading);
 				break;
 		{MenuItemsArrayEnd}
 			default:
@@ -29,7 +29,7 @@ $(function(){
 		switch(this.id){
 		{UserMenuItemsArrayBegin}
 			case "{MenuItemID}":
-		    content.load("{MenuItemLocation}" + window.location.search, hideLoading);
+		    usr_content.load("{MenuItemLocation}" + window.location.search, hideLoading);
 				break;
 		{UserMenuItemsArrayEnd}
 			default:
@@ -45,7 +45,7 @@ $(function(){
 		switch(this.id){
 		{MenuItemsArrayBegin}
 			case "{MenuItemID}":
-		    content.load("{MenuItemLocation}" + window.location.search, hideLoading);
+		    usr_content.load("{MenuItemLocation}" + window.location.search, hideLoading);
 				break;
 		{MenuItemsArrayEnd}
 			default:
@@ -71,18 +71,17 @@ $(function(){
 // embedded page content
 function loadusercontent(pageid, params=''){
 
-	var content = $("#content");
-	if (params!= '') {
+	var user_content = $("#usr_content");
+	if (params!= "") {
 		params = "?" + params;
 	}
-	content.html('');
+	user_content.html("");
 
 	// load selected page
 	switch(pageid){
 		{UserMenuItemsArrayBegin}
 		case "{MenuItemID}":
-			//console.log('loading {MenuItemLocation}')
-	    content.load("{MenuItemLocation}" + params + window.location.search);
+	    user_content.load("{MenuItemLocation}" + params + window.location.search);
 			break;
 		{UserMenuItemsArrayEnd}
 		default:
@@ -91,25 +90,32 @@ function loadusercontent(pageid, params=''){
 
 }
 
-function loadmodalcontent(pageid, params='', title=''){
-
-	var content = $("#modalcontent");
-	if (params!= '') {
-		params = "?" + params;
+function loadmodalcontent(pageid, params='', title='', static=false){
+	// load modal content
+	if (params != '') {				// must have some parameters here
+		params = "?" + params;		// add query
 	}
-	content.html('');		// clear anything previously loaded
+
+	var usrmodal_content = $("#modalcontent");
+	usrmodal_content.html('');		// clear anything previously loaded
 
 	//load selected page
 	switch(pageid){
 		{ModalItemsArrayBegin}
 		case "{MenuItemID}":
-	    content.load("{MenuItemLocation}" + params + window.location.search);
+	    usrmodal_content.load("{MenuItemLocation}" + params + window.location.search);
 			break;
 		{ModalItemsArrayEnd}
 		default:
 			break;
 	}
-  //event.stopPropagation();
+	//event.stopPropagation();
+	if (static) {
+    $("#profileModal").modal({
+      backdrop: "static",
+      keyboard: false
+    });
+	}
 
 	$("#profileModal").modal("show");
 };

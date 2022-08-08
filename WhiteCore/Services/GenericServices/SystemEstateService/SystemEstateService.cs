@@ -87,6 +87,13 @@ namespace WhiteCore.Services.GenericServices.SystemEstateService
                 mainlandEstateName = settings.MainlandEstateName;
                 systemEstateName = settings.SystemEstateName;
             }
+
+            // final checks in case of configuration errors
+            if (string.IsNullOrEmpty(mainlandEstateName))
+                mainlandEstateName = Constants.MainlandEstateName;
+            if (string.IsNullOrEmpty(systemEstateName))
+                systemEstateName = Constants.SystemEstateName;
+
         }
 
         public void Start (IConfigSource config, IRegistryCore registry)
