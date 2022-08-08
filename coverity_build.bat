@@ -24,10 +24,10 @@ rem ## Default "configuration" choice ((release, (debug)
 set configuration=debug
 
 rem ## Default Visual Studio edition
-set vstudio=2015
+set vstudio=2019
 
 rem ## Default Framework
-set framework=4_7_2
+set framework=4_8
 
 rem ## End user selections ##
 

@@ -3,7 +3,7 @@
 * Code cleanup of issues reported via Coverity
 * Implement the remaining Caps we might have missed
 * IWC implementation (even when it really basic)
-* Redesign the WebUI to use the WebAPI
+* Redesign the WebUI to use the WebAPI - Implemented Jul 2022
 
 #Scripting:
 --------

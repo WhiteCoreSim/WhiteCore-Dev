@@ -5,7 +5,7 @@
 # June 2021
 # Rowan Deppeler <greythane@gmail.com>
 #
-# Updated Dec 2018 to use NET 4.6 framework and msbuild (included in Mono V5+)
+# Updated Jul 2022 to use NET 4.8 framework (Mono V6+)
 
 # find and change to the current folder (bash does not start here by default)
 WCSDIR="${0%/*}"
@@ -96,7 +96,7 @@ fi
 # Configuring WhiteCore-Sim
 if ! ${VERSIONONLY:=true}; then
   echo "Configuring WhiteCore-Sim $ARCH $CONFIG build"
-  mono ./Prebuild.exe /target vs2015 /targetframework v4_6 /conditionals "LINUX"
+  mono ./Prebuild.exe /target vs2019 /targetframework v4_8 /conditionals "LINUX"
 fi
 
 # Update version info

@@ -4,8 +4,7 @@
 # June 2021
 # Rowan Deppeler <greythane@gmail.com>
 #
-# Updated Dec 2018 to use NET 4.6 framework and msbuild (included in Mono V5+)
-# Updated June 2012 to provide xbuild option
+# Updated Jul 2022 to use NET 4.8 framework (Mono V6+)
 
 ARCH="x64"
 CONFIG="Debug"
@@ -90,7 +89,7 @@ fi
 # Configuring WhiteCore-Sim
 if ! ${VERSIONONLY:=true}; then
   echo "Configuring WhiteCore-Sim $ARCH $CONFIG build"
-  mono ./Prebuild.exe /target vs2015 /targetframework v4_6 /conditionals "LINUX"
+  mono ./Prebuild.exe /target vs2019 /targetframework v4_8 /conditionals "LINUX"
 fi
 
 # Update version info
@@ -103,7 +102,6 @@ fi
 if $BUILD ; then
   echo Building WhiteCore-Sim
   msbuild WhiteCore.sln /property:Configuration="$CONFIG" /property:Platform="$ARCH"
-  # xbuild WhiteCore.sln /property:Configuration="$CONFIG" /property:Platform="$ARCH"
   echo Finished Building WhiteCore
   echo Thank you for choosing WhiteCore-Sim
   echo Please report any errors to our Github Issue Tracker https://github.com/WhiteCoreSim/WhiteCore-Dev/issues

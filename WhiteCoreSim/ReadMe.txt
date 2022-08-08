@@ -1,7 +1,8 @@
 WhiteCore-Dev 0.9.6+ (git)
 Rowan Deppeler <greythane@gmail.com>
 Fly-Man-
-June 2021
+
+July 2022
 ===============================================
 
 ** Simplified startup scripts **
@@ -23,8 +24,8 @@ Note:
    Linux (ubuntu variations) >> apt-get install screen;
    Mac >> already available
   
-run_standalonemode.sh     : Run WhiteCore standalone mode in background
-run_gridmode.sh           : Run WhiteCore grid mode in background
+run_standalonemode.sh           : Run WhiteCore standalone mode in background
+run_gridmode.sh                 : Run WhiteCore grid mode in background
 
 
 GUI scripts for Windows and Mac
@@ -34,9 +35,9 @@ GUI scripts for Windows and Mac
 The same commands are available as gui scripts, <double_click> to execute
 
 sim_console.command				: Mac
-sim_console.bat					  : Windows
+sim_console.bat					: Windows
 grid_console.command			: Mac
-grid_console.bat				  : Windows
+grid_console.bat				: Windows
 
 
 ** The default configuration **
@@ -75,8 +76,8 @@ Checkout the 'Build Your Own.txt' file in the 'WhiteCoreDocs' folder for details
  if you want to build from source.
 Re-compile and copy/paste the new 'WhiteCoreSim/bin' subdirectory from your build environment.
 
-Monthly 'Development' build snapshots will be available at the following link:
-https://drive.google.com/open?id=0BxMBE_reBR03QkZDSGI4NVVjcEk
+'Development' build snapshots will be available on the github repository/releases link:
+https://github.com/WhiteCoreSim/WhiteCore-Dev/releases
 
 Download your desired update snapshot.
 Delete or backup the existing 'WhiteCoreSim/bin' subdirectory.
@@ -87,15 +88,15 @@ Questions?
 ==========
 Checkout the #whitecore-support irc channel on Libera.Chat.
 Use your favourite IRC client or the simple web interface available at
-    https://web.libera.chat/gamja/#whitecore-support
+	https://web.libera.chat/gamja/#whitecore-support
 or check into the MeWe community for WhiteCore 
-    https://mewe.com/group/5cb284545da1780ba88ca30d 
+	https://mewe.com/group/5cb284545da1780ba88ca30d 
 where a friendly group is happy to answer questions.
 
 Rowan Deppeler
 <greythane @ gmail.com>
 
-June 2021
+July 2022
 =======================
 
 For licensing information, please see the relevant licenses.

@@ -8,13 +8,13 @@ There is a heavy emphasis on supporting all users, increased technology focus an
 
 ## Build Status
 
-Windows .Net 4.6 [![Build status](https://ci.appveyor.com/api/projects/status/tj3pr2xb4rg6ospe/branch/master?svg=true)](https://ci.appveyor.com/project/fly-man-/whitecore-dev/branch/master)
+Windows .Net 4.8 [![Build status](https://ci.appveyor.com/api/projects/status/tj3pr2xb4rg6ospe/branch/master?svg=true)](https://ci.appveyor.com/project/fly-man-/whitecore-dev/branch/master)
 
-Linux 64 Bit [![Build Status](https://travis-ci.org/WhiteCoreSim/WhiteCore-Dev.svg?branch=master)](https://travis-ci.org/WhiteCoreSim/WhiteCore-Dev)
+Linux 64 Bit (Mono 6) [![Build Status](https://travis-ci.org/WhiteCoreSim/WhiteCore-Dev.svg?branch=master)](https://travis-ci.org/WhiteCoreSim/WhiteCore-Dev)
 
 *NOTES:*
 
-*- As of December 2018 Whitecore is now compiled with .Net 4.6 (Mono / MSBuild) Please remember this when you are getting compilation errors.*
+*- As of July 20228 Whitecore is now compiled with .Net 4.8 (Mono / MSBuild) Please remember this if you are getting compilation errors.*
 
 *- As of January 2017, the LibOMV libraries are included as a submodule of the WhiteCore repo. When cloning, ensure that the submodules are included.*
 
