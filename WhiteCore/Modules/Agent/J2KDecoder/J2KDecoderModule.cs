@@ -138,14 +138,16 @@ namespace WhiteCore.Modules.Agent.J2KDecoder
 
         public Image DecodeToImage (byte [] j2kData)
         {
-            if (m_useCSJ2K)
-                return J2kImage.FromBytes (j2kData);
+            Image image;
+            if (m_useCSJ2K) {
+                image = J2kImage.FromBytes(j2kData);
+                return image;
+            }
 
             // decode using OpenJpeg
             ManagedImage mimage;
-            Image image;
+
             if (OpenJPEG.DecodeToImage (j2kData, out mimage, out image)) {
-                mimage = null;
                 return image;
             }
 

@@ -377,8 +377,10 @@ namespace WhiteCore.Services
             try {
                 // Taking our jpeg2000 data, decoding it, then saving it to a byte array with regular data
                 image = m_j2kDecoder.DecodeToImage (texture.Data);
-                if (image == null)
+                if (image == null) {
+                    MainConsole.Instance.DebugFormat("[AssetCAPS]: Unable to decode texture {0}", texture.ID);
                     return data;
+                }
                 
                 // Save to bitmap
                 image = new Bitmap (image);

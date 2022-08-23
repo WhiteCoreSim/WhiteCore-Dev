@@ -78,7 +78,9 @@ namespace WhiteCore.ScriptEngine.DotNetEngine.MiniModule
             asset.Dispose ();
 
             result.AssetData = assetData;
-            result.Decode();
+            if (!result.Decode()) {
+                MainConsole.Instance.ErrorFormat("[MRM] Asset {0} was not able to be decoded", AssetID.ToString());
+            }
             return result;
         }
 

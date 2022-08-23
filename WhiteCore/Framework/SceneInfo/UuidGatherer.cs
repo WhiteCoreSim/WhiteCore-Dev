@@ -282,7 +282,9 @@ namespace WhiteCore.Framework.SceneInfo
             if (null != assetBase) {
                 //MainConsole.Instance.Debug(new System.Text.ASCIIEncoding().GetString(bodypartAsset.Data));
                 AssetWearable wearableAsset = new AssetBodypart (wearableAssetUuid, assetBase.Data);
-                wearableAsset.Decode ();
+                if (!wearableAsset.Decode ()) {
+                    MainConsole.Instance.DebugFormat("[Wearable]: Unable to decode wearable {0}", wearableAssetUuid.ToString());
+                }
 
                 //MainConsole.Instance.DebugFormat(
                 //    "[Archiver]: Wearable asset {0} references {1} assets", wearableAssetUuid, wearableAsset.Textures.Count);

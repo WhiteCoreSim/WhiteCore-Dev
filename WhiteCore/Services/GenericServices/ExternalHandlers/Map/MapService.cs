@@ -61,52 +61,52 @@ namespace WhiteCore.Services
         IGridService m_gridService;
         IJ2KDecoder m_j2kDecoder;
         static Bitmap m_blankRegionTile = null;
-        MapTileIndex m_blankTiles = new MapTileIndex ();
-        byte [] m_blankRegionTileData;
+        MapTileIndex m_blankTiles = new MapTileIndex();
+        byte[] m_blankRegionTileData;
         int m_mapcenter_x = Constants.DEFAULT_REGIONSTART_X;
         int m_mapcenter_y = Constants.DEFAULT_REGIONSTART_Y;
 
-        public void Initialize (IConfigSource config, IRegistryCore registry)
+        public void Initialize(IConfigSource config, IRegistryCore registry)
         {
             m_registry = registry;
 
-            var simbase = registry.RequestModuleInterface<ISimulationBase> ();
+            var simbase = registry.RequestModuleInterface<ISimulationBase>();
             m_mapcenter_x = simbase.MapCenterX;
             m_mapcenter_y = simbase.MapCenterY;
 
-            var mapConfig = config.Configs ["MapService"];
+            var mapConfig = config.Configs["MapService"];
             if (mapConfig != null) {
-                m_enabled = mapConfig.GetBoolean ("Enabled", m_enabled);
-                m_port = mapConfig.GetUInt ("Port", m_port);
-                m_cacheEnabled = mapConfig.GetBoolean ("CacheEnabled", m_cacheEnabled);
-                m_cacheExpires = mapConfig.GetFloat ("CacheExpires", m_cacheExpires);
+                m_enabled = mapConfig.GetBoolean("Enabled", m_enabled);
+                m_port = mapConfig.GetUInt("Port", m_port);
+                m_cacheEnabled = mapConfig.GetBoolean("CacheEnabled", m_cacheEnabled);
+                m_cacheExpires = mapConfig.GetFloat("CacheExpires", m_cacheExpires);
             }
             if (!m_enabled)
                 return;
 
             if (m_cacheEnabled) {
-                m_assetCacheDir = config.Configs ["AssetCache"].GetString ("CacheDirectory", m_assetCacheDir);
+                m_assetCacheDir = config.Configs["AssetCache"].GetString("CacheDirectory", m_assetCacheDir);
                 if (m_assetCacheDir == "") {
-                    var defpath = registry.RequestModuleInterface<ISimulationBase> ().DefaultDataPath;
-                    m_assetCacheDir = Path.Combine (defpath, Constants.DEFAULT_ASSETCACHE_DIR);
+                    var defpath = registry.RequestModuleInterface<ISimulationBase>().DefaultDataPath;
+                    m_assetCacheDir = Path.Combine(defpath, Constants.DEFAULT_ASSETCACHE_DIR);
                 }
-                CreateCacheDirectories (m_assetCacheDir);
+                CreateCacheDirectories(m_assetCacheDir);
             }
 
-            m_server = registry.RequestModuleInterface<ISimulationBase> ().GetHttpServer (m_port);
-            m_server.AddStreamHandler (new GenericStreamHandler ("GET", "/MapService/", MapRequest));
-            m_server.AddStreamHandler (new GenericStreamHandler ("GET", "/MapAPI/", MapAPIRequest));
+            m_server = registry.RequestModuleInterface<ISimulationBase>().GetHttpServer(m_port);
+            m_server.AddStreamHandler(new GenericStreamHandler("GET", "/MapService/", MapRequest));
+            m_server.AddStreamHandler(new GenericStreamHandler("GET", "/MapAPI/", MapAPIRequest));
 
-            registry.RegisterModuleInterface<IMapService> (this);
+            registry.RegisterModuleInterface<IMapService>(this);
 
-            m_blankRegionTile = new Bitmap (256, 256);
+            m_blankRegionTile = new Bitmap(256, 256);
             m_blankRegionTile.Tag = "StaticBlank";
 
-            using (Graphics g = Graphics.FromImage (m_blankRegionTile)) {
-                SolidBrush sea = new SolidBrush (Color.FromArgb (29, 71, 95));
-                g.FillRectangle (sea, 0, 0, 256, 256);
+            using (Graphics g = Graphics.FromImage(m_blankRegionTile)) {
+                SolidBrush sea = new SolidBrush(Color.FromArgb(29, 71, 95));
+                g.FillRectangle(sea, 0, 0, 256, 256);
             }
-            m_blankRegionTileData = CacheMapTexture (1, 0, 0, m_blankRegionTile, true);
+            m_blankRegionTileData = CacheMapTexture(1, 0, 0, m_blankRegionTile, true);
             /*string path = Path.Combine(m_assetCacheDir, Path.Combine("mapzoomlevels", "blankMap.index"));
             if(File.Exists(path))
             {
@@ -116,35 +116,35 @@ namespace WhiteCore.Services
             }*/
         }
 
-        void CreateCacheDirectories (string cacheDir)
+        void CreateCacheDirectories(string cacheDir)
         {
-            if (!Directory.Exists (cacheDir))
-                Directory.CreateDirectory (cacheDir);
+            if (!Directory.Exists(cacheDir))
+                Directory.CreateDirectory(cacheDir);
 
             m_assetMapCacheDir = cacheDir + "/mapzoomlevels";
-            if (!Directory.Exists (m_assetMapCacheDir))
-                Directory.CreateDirectory (m_assetMapCacheDir);
+            if (!Directory.Exists(m_assetMapCacheDir))
+                Directory.CreateDirectory(m_assetMapCacheDir);
         }
 
-        public void Start (IConfigSource config, IRegistryCore registry)
+        public void Start(IConfigSource config, IRegistryCore registry)
         {
-            if (!m_enabled) 
+            if (!m_enabled)
                 return;
-            
-            m_assetService = m_registry.RequestModuleInterface<IAssetService> ();
-            m_gridService = m_registry.RequestModuleInterface<IGridService> ();
-            m_j2kDecoder = m_registry.RequestModuleInterface<IJ2KDecoder> ();
+
+            m_assetService = m_registry.RequestModuleInterface<IAssetService>();
+            m_gridService = m_registry.RequestModuleInterface<IGridService>();
+            m_j2kDecoder = m_registry.RequestModuleInterface<IJ2KDecoder>();
         }
 
-        public void FinishedStartup ()
+        public void FinishedStartup()
         {
-            if (!m_enabled) 
+            if (!m_enabled)
                 return;
-            
-            IGridServerInfoService serverInfo = m_registry.RequestModuleInterface<IGridServerInfoService> ();
+
+            IGridServerInfoService serverInfo = m_registry.RequestModuleInterface<IGridServerInfoService>();
             if (serverInfo != null)
-                serverInfo.AddURI ("MapAPIService", MapServiceAPIURL);
-            IGridInfo gridInfo = m_registry.RequestModuleInterface<IGridInfo> ();
+                serverInfo.AddURI("MapAPIService", MapServiceAPIURL);
+            IGridInfo gridInfo = m_registry.RequestModuleInterface<IGridInfo>();
             if (gridInfo != null)
                 gridInfo.GridMapTileURI = MapServiceURL;
         }
@@ -165,45 +165,45 @@ namespace WhiteCore.Services
             get { return m_mapcenter_y; }
         }
 
-        public byte [] MapAPIRequest (string path, Stream request, OSHttpRequest httpRequest, OSHttpResponse httpResponse)
+        public byte[] MapAPIRequest(string path, Stream request, OSHttpRequest httpRequest, OSHttpResponse httpResponse)
         {
-            byte [] response = MainServer.BlankResponse;
+            byte[] response = MainServer.BlankResponse;
 
             var resp = "var {0} = {{regionName:\"{1}\",xloc:\"{2}\",yloc:\"{3}\",xsize:\"{4}\",ysize:\"{5}\"}};";
-            var varName = httpRequest.Query ["var"].ToString ();
-            var requestType = path.Substring (0, path.IndexOf ("?", StringComparison.Ordinal));
+            var varName = httpRequest.Query["var"].ToString();
+            var requestType = path.Substring(0, path.IndexOf("?", StringComparison.Ordinal));
 
             if (requestType == "/MapAPI/get-region-coords-by-name") {
-                string sim_name = httpRequest.Query ["sim_name"].ToString ();
-                var region = m_gridService.GetRegionByName (null, sim_name);
+                string sim_name = httpRequest.Query["sim_name"].ToString();
+                var region = m_gridService.GetRegionByName(null, sim_name);
                 if (region == null)
                     resp = "var " + varName + "={error: true};";
                 else {
-                    resp = string.Format (resp, varName, region.RegionName,
-                                          region.RegionLocX / Constants.RegionSize , region.RegionLocY / Constants.RegionSize,
+                    resp = string.Format(resp, varName, region.RegionName,
+                                          region.RegionLocX / Constants.RegionSize, region.RegionLocY / Constants.RegionSize,
                                           region.RegionSizeX, region.RegionSizeY);
                 }
-                response = System.Text.Encoding.UTF8.GetBytes (resp);
+                response = System.Text.Encoding.UTF8.GetBytes(resp);
                 httpResponse.ContentType = "text/javascript";
             } else if (requestType == "/MapAPI/get-region-name-by-coords") {
-                int grid_x = int.Parse (httpRequest.Query ["grid_x"].ToString ());
-                int grid_y = int.Parse (httpRequest.Query ["grid_y"].ToString ());
-                var region = m_gridService.GetRegionByPosition (null,
+                int grid_x = int.Parse(httpRequest.Query["grid_x"].ToString());
+                int grid_y = int.Parse(httpRequest.Query["grid_y"].ToString());
+                var region = m_gridService.GetRegionByPosition(null,
                                                                grid_x * Constants.RegionSize,
                                                                grid_y * Constants.RegionSize);
                 if (region == null) {
-                    var maxRegionSize = m_gridService.GetMaxRegionSize ();
-                    List<GridRegion> regions = m_gridService.GetRegionRange (null,
+                    var maxRegionSize = m_gridService.GetMaxRegionSize();
+                    List<GridRegion> regions = m_gridService.GetRegionRange(null,
                                                                              (grid_x * Constants.RegionSize) - maxRegionSize,
                                                                              (grid_x * Constants.RegionSize) + maxRegionSize,
                                                                              (grid_y * Constants.RegionSize) - maxRegionSize,
                                                                              (grid_y * Constants.RegionSize) + maxRegionSize);
                     bool found = false;
                     foreach (var r in regions) {
-                        if (r.PointIsInRegion (grid_x * Constants.RegionSize, grid_y * Constants.RegionSize)) {
-                            resp = string.Format (resp, varName, r.RegionName,
-							        			  r.RegionLocX / Constants.RegionSize, r.RegionLocY / Constants.RegionSize,
-									        	  r.RegionSizeX, r.RegionSizeY);
+                        if (r.PointIsInRegion(grid_x * Constants.RegionSize, grid_y * Constants.RegionSize)) {
+                            resp = string.Format(resp, varName, r.RegionName,
+                                                  r.RegionLocX / Constants.RegionSize, r.RegionLocY / Constants.RegionSize,
+                                                  r.RegionSizeX, r.RegionSizeY);
                             found = true;
                             break;
                         }
@@ -211,22 +211,22 @@ namespace WhiteCore.Services
                     if (!found)
                         resp = "var " + varName + "={error: true};";
                 } else {
-                    resp = string.Format (resp, varName, region.RegionName,
-										  region.RegionLocX / Constants.RegionSize, region.RegionLocY / Constants.RegionSize,
-										  region.RegionSizeX, region.RegionSizeY);
+                    resp = string.Format(resp, varName, region.RegionName,
+                                          region.RegionLocX / Constants.RegionSize, region.RegionLocY / Constants.RegionSize,
+                                          region.RegionSizeX, region.RegionSizeY);
                 }
-                response = System.Text.Encoding.UTF8.GetBytes (resp);
+                response = System.Text.Encoding.UTF8.GetBytes(resp);
                 httpResponse.ContentType = "text/javascript";
             }
 
             return response;
         }
 
-        public byte [] MapRequest (string path, Stream request, OSHttpRequest httpRequest, OSHttpResponse httpResponse)
+        public byte[] MapRequest(string path, Stream request, OSHttpRequest httpRequest, OSHttpResponse httpResponse)
         {
             //Remove the /MapService/
-            string uri = httpRequest.RawUrl.Remove (0, 12);
-            if (!uri.StartsWith ("map", StringComparison.Ordinal)) {
+            string uri = httpRequest.RawUrl.Remove(0, 12);
+            if (!uri.StartsWith("map", StringComparison.Ordinal)) {
                 if (uri == "") {
                     string resp = "<ListBucketResult xmlns=\"http://s3.amazonaws.com/doc/2006-03-01/\">" +
                                   "<Name>map.secondlife.com</Name>" +
@@ -238,7 +238,7 @@ namespace WhiteCore.Services
                     var txSize = m_mapcenter_x * Constants.RegionSize;
                     var tySize = m_mapcenter_x * Constants.RegionSize;
                     var etSize = 8 * Constants.RegionSize;
-                    List<GridRegion> regions = m_gridService.GetRegionRange (
+                    List<GridRegion> regions = m_gridService.GetRegionRange(
                                                    null, (txSize - etSize), (txSize + etSize), (tySize - etSize), (tySize + etSize));
                     foreach (var region in regions) {
                         resp += "<Contents><Key>map-1-" + region.RegionLocX / Constants.RegionSize +
@@ -248,171 +248,173 @@ namespace WhiteCore.Services
                     }
                     resp += "</ListBucketResult>";
                     httpResponse.ContentType = "application/xml";
-                    return System.Text.Encoding.UTF8.GetBytes (resp);
+                    return System.Text.Encoding.UTF8.GetBytes(resp);
                 }
-                using (MemoryStream imgstream = new MemoryStream ()) {
-                    GridRegion region = m_gridService.GetRegionByName (null, uri.Remove (4));
+                using (MemoryStream imgstream = new MemoryStream()) {
+                    GridRegion region = m_gridService.GetRegionByName(null, uri.Remove(4));
                     if (region == null) {
-                        region = m_gridService.GetRegionByUUID (null, OpenMetaverse.UUID.Parse (uri.Remove (uri.Length - 4)));
+                        region = m_gridService.GetRegionByUUID(null, OpenMetaverse.UUID.Parse(uri.Remove(uri.Length - 4)));
                         if (region == null)         // unable to resoleve region details
-                            return new byte [0];
+                            return new byte[0];
                     }
 
                     // non-async because we know we have the asset immediately.
-                    byte [] mapasset = null;
-                    if (m_assetService.GetExists (region.TerrainMapImage.ToString ()))
-                        mapasset = m_assetService.GetData (region.TerrainMapImage.ToString ());
+                    byte[] mapasset = null;
+                    if (m_assetService.GetExists(region.TerrainMapImage.ToString()))
+                        mapasset = m_assetService.GetData(region.TerrainMapImage.ToString());
                     if (mapasset != null) {
                         try {
-                            Image image = m_j2kDecoder.DecodeToImage (mapasset);
-                            if (image == null)
-                                return new byte [0];
-                            // Decode image to System.Drawing.Image
+                            Image image = m_j2kDecoder.DecodeToImage(mapasset);
+                            if (image == null) {
+                                MainConsole.Instance.Debug("[Mapservice]: Unable to decode map asset " + region.TerrainMapImage.ToString());
+                                return new byte[0];
+                            }
 
-                            EncoderParameters myEncoderParameters = new EncoderParameters ();
-                            myEncoderParameters.Param [0] = new EncoderParameter (Encoder.Quality, 95L);
-                            var encInfo = GetEncoderInfo ("image/jpeg");
+                            // Decode image to System.Drawing.Image
+                            EncoderParameters myEncoderParameters = new EncoderParameters();
+                            myEncoderParameters.Param[0] = new EncoderParameter(Encoder.Quality, 95L);
+                            var encInfo = GetEncoderInfo("image/jpeg");
                             if (encInfo != null) {
                                 // Save bitmap to stream
-                                image.Save (imgstream, encInfo, myEncoderParameters);
+                                image.Save(imgstream, encInfo, myEncoderParameters);
                             }
-                            image.Dispose ();
-                            myEncoderParameters.Dispose ();
+                            image.Dispose();
+                            myEncoderParameters.Dispose();
 
                             // Write the stream to a byte array for output
-                            return imgstream.ToArray ();
+                            return imgstream.ToArray();
                         } catch (Exception e) {
-                            MainConsole.Instance.Debug ("Exception in Mapservice: " + e); 
+                            MainConsole.Instance.Debug("Exception in Mapservice: " + e);
                         }
 
                     }
                 }
-                return new byte [0];
+                return new byte[0];
             }
-            string [] splitUri = uri.Split ('-');
-            byte [] jpeg = FindCachedImage (uri);
+            string[] splitUri = uri.Split('-');
+            byte[] jpeg = FindCachedImage(uri);
             if (jpeg.Length != 0) {
                 httpResponse.ContentType = "image/jpeg";
                 return jpeg;
             }
             try {
-                int mapLayer = int.Parse (uri.Substring (4, 1));
-                int regionX = int.Parse (splitUri [2]);
-                int regionY = int.Parse (splitUri [3]);
-                int distance = (int)Math.Pow (2, mapLayer);
-                int maxRegionSize = m_gridService.GetMaxRegionSize ();
+                int mapLayer = int.Parse(uri.Substring(4, 1));
+                int regionX = int.Parse(splitUri[2]);
+                int regionY = int.Parse(splitUri[3]);
+                int distance = (int)Math.Pow(2, mapLayer);
+                int maxRegionSize = m_gridService.GetMaxRegionSize();
                 if (maxRegionSize == 0) maxRegionSize = Constants.MaxRegionSize;
-                List<GridRegion> regions = m_gridService.GetRegionRange (
+                List<GridRegion> regions = m_gridService.GetRegionRange(
                     null,
                     ((regionX) * Constants.RegionSize) - maxRegionSize,
                     ((regionX + distance) * Constants.RegionSize) + maxRegionSize,
                     ((regionY) * Constants.RegionSize) - maxRegionSize,
                     ((regionY + distance) * Constants.RegionSize) + maxRegionSize);
 
-                Bitmap mapTexture = BuildMapTile (mapLayer, regionX, regionY, regions);
-                jpeg = CacheMapTexture (mapLayer, regionX, regionY, mapTexture);
-                DisposeTexture (mapTexture);
+                Bitmap mapTexture = BuildMapTile(mapLayer, regionX, regionY, regions);
+                jpeg = CacheMapTexture(mapLayer, regionX, regionY, mapTexture);
+                DisposeTexture(mapTexture);
             } catch (Exception e) {
-                MainConsole.Instance.Debug ("Exception in Mapservice: " + e); 
+                MainConsole.Instance.Debug("Exception in Mapservice: " + e);
             }
             httpResponse.ContentType = "image/jpeg";
             return jpeg;
         }
 
-        Bitmap BuildMapTile (int mapView, int regionX, int regionY, List<GridRegion> regions)
+        Bitmap BuildMapTile(int mapView, int regionX, int regionY, List<GridRegion> regions)
         {
-            Bitmap mapTexture = FindCachedImage (mapView, regionX, regionY);
+            Bitmap mapTexture = FindCachedImage(mapView, regionX, regionY);
             if (mapTexture != null)
                 return mapTexture;
             if (mapView == 1)
-                return BuildMapTile (regionX, regionY, regions.ToList ());
+                return BuildMapTile(regionX, regionY, regions.ToList());
 
 
-            List<Bitmap> generatedMapTiles = new List<Bitmap> ();
-            int offset = (int)(Math.Pow (2, mapView - 1) / 2f);
-            generatedMapTiles.Add (BuildMapTile (mapView - 1, regionX, regionY, regions));
-            generatedMapTiles.Add (BuildMapTile (mapView - 1, regionX + offset, regionY, regions));
-            generatedMapTiles.Add (BuildMapTile (mapView - 1, regionX, regionY + offset, regions));
-            generatedMapTiles.Add (BuildMapTile (mapView - 1, regionX + offset, regionY + offset, regions));
+            List<Bitmap> generatedMapTiles = new List<Bitmap>();
+            int offset = (int)(Math.Pow(2, mapView - 1) / 2f);
+            generatedMapTiles.Add(BuildMapTile(mapView - 1, regionX, regionY, regions));
+            generatedMapTiles.Add(BuildMapTile(mapView - 1, regionX + offset, regionY, regions));
+            generatedMapTiles.Add(BuildMapTile(mapView - 1, regionX, regionY + offset, regions));
+            generatedMapTiles.Add(BuildMapTile(mapView - 1, regionX + offset, regionY + offset, regions));
             bool isStatic = true;
             for (int i = 0; i < 4; i++)
-                if (!IsStaticBlank (generatedMapTiles [i]))
+                if (!IsStaticBlank(generatedMapTiles[i]))
                     isStatic = false;
                 else
-                    generatedMapTiles [i] = null;
+                    generatedMapTiles[i] = null;
             if (isStatic) {
                 lock (m_blankTiles.BlankTilesLayers)
-                    m_blankTiles.BlankTilesLayers.Add (((long)Util.IntsToUlong (regionX, regionY) << 8) + mapView);
+                    m_blankTiles.BlankTilesLayers.Add(((long)Util.IntsToUlong(regionX, regionY) << 8) + mapView);
                 return m_blankRegionTile;
             }
 
-            mapTexture = new Bitmap (SIZE_OF_IMAGE, SIZE_OF_IMAGE);
-            using (Graphics g = Graphics.FromImage (mapTexture)) {
-                SolidBrush sea = new SolidBrush (Color.FromArgb (29, 71, 95));
-                g.FillRectangle (sea, 0, 0, SIZE_OF_IMAGE, SIZE_OF_IMAGE);
+            mapTexture = new Bitmap(SIZE_OF_IMAGE, SIZE_OF_IMAGE);
+            using (Graphics g = Graphics.FromImage(mapTexture)) {
+                SolidBrush sea = new SolidBrush(Color.FromArgb(29, 71, 95));
+                g.FillRectangle(sea, 0, 0, SIZE_OF_IMAGE, SIZE_OF_IMAGE);
 
-                if (generatedMapTiles [0] != null) {
-                    Bitmap texture = ResizeBitmap (generatedMapTiles [0], 128, 128);
-                    g.DrawImage (texture, new Point (0, 128));
-                    DisposeTexture (texture);
+                if (generatedMapTiles[0] != null) {
+                    Bitmap texture = ResizeBitmap(generatedMapTiles[0], 128, 128);
+                    g.DrawImage(texture, new Point(0, 128));
+                    DisposeTexture(texture);
                 }
 
-                if (generatedMapTiles [1] != null) {
-                    Bitmap texture = ResizeBitmap (generatedMapTiles [1], 128, 128);
-                    g.DrawImage (texture, new Point (128, 128));
-                    DisposeTexture (texture);
+                if (generatedMapTiles[1] != null) {
+                    Bitmap texture = ResizeBitmap(generatedMapTiles[1], 128, 128);
+                    g.DrawImage(texture, new Point(128, 128));
+                    DisposeTexture(texture);
                 }
 
-                if (generatedMapTiles [2] != null) {
-                    Bitmap texture = ResizeBitmap (generatedMapTiles [2], 128, 128);
-                    g.DrawImage (texture, new Point (0, 0));
-                    DisposeTexture (texture);
+                if (generatedMapTiles[2] != null) {
+                    Bitmap texture = ResizeBitmap(generatedMapTiles[2], 128, 128);
+                    g.DrawImage(texture, new Point(0, 0));
+                    DisposeTexture(texture);
                 }
 
-                if (generatedMapTiles [3] != null) {
-                    Bitmap texture = ResizeBitmap (generatedMapTiles [3], 128, 128);
-                    g.DrawImage (texture, new Point (128, 0));
-                    DisposeTexture (texture);
+                if (generatedMapTiles[3] != null) {
+                    Bitmap texture = ResizeBitmap(generatedMapTiles[3], 128, 128);
+                    g.DrawImage(texture, new Point(128, 0));
+                    DisposeTexture(texture);
                 }
             }
 
-            CacheMapTexture (mapView, regionX, regionY, mapTexture);
+            CacheMapTexture(mapView, regionX, regionY, mapTexture);
             return mapTexture;
         }
 
-        void DisposeTexture (Bitmap bitmap)
+        void DisposeTexture(Bitmap bitmap)
         {
-            if (!IsStaticBlank (bitmap))
-                bitmap.Dispose ();
+            if (!IsStaticBlank(bitmap))
+                bitmap.Dispose();
         }
 
-        bool IsStaticBlank (Bitmap bitmap)
+        bool IsStaticBlank(Bitmap bitmap)
         {
             bool isStatic = false;
             if ((bitmap != null) && (bitmap.Tag is string))
                 isStatic = ((string)bitmap.Tag == "StaticBlank");
-            
+
             return isStatic;
         }
 
-        Bitmap ResizeBitmap (Bitmap b, int nWidth, int nHeight)
+        Bitmap ResizeBitmap(Bitmap b, int nWidth, int nHeight)
         {
-            Bitmap newsize = new Bitmap (nWidth, nHeight);
-            using (Graphics temp = Graphics.FromImage (newsize)) {
-                temp.DrawImage (b, 0, 0, nWidth, nHeight);
+            Bitmap newsize = new Bitmap(nWidth, nHeight);
+            using (Graphics temp = Graphics.FromImage(newsize)) {
+                temp.DrawImage(b, 0, 0, nWidth, nHeight);
                 temp.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
             }
 
-            DisposeTexture (b);
+            DisposeTexture(b);
             return newsize;
         }
 
-        Bitmap BuildMapTile (int regionX, int regionY, List<GridRegion> regions)
+        Bitmap BuildMapTile(int regionX, int regionY, List<GridRegion> regions)
         {
             if (regions == null) {
-                int maxRegionSize = m_gridService.GetMaxRegionSize ();
+                int maxRegionSize = m_gridService.GetMaxRegionSize();
                 if (maxRegionSize == 0) maxRegionSize = Constants.MaxRegionSize;
-                regions = m_gridService.GetRegionRange (
+                regions = m_gridService.GetRegionRange(
                     null,
                     (regionX * Constants.RegionSize) - maxRegionSize,
                     (regionX * Constants.RegionSize) + maxRegionSize,
@@ -420,167 +422,167 @@ namespace WhiteCore.Services
                     (regionY * Constants.RegionSize) + maxRegionSize);
             }
 
-            List<Image> bitImages = new List<Image> ();
-            List<GridRegion> badRegions = new List<GridRegion> ();
-            Rectangle mapRect = new Rectangle (regionX * Constants.RegionSize, regionY * Constants.RegionSize, Constants.RegionSize, Constants.RegionSize);
+            List<Image> bitImages = new List<Image>();
+            List<GridRegion> badRegions = new List<GridRegion>();
+            Rectangle mapRect = new Rectangle(regionX * Constants.RegionSize, regionY * Constants.RegionSize, Constants.RegionSize, Constants.RegionSize);
             foreach (GridRegion r in regions) {
-                Rectangle regionRect = new Rectangle (r.RegionLocX, r.RegionLocY, r.RegionSizeX, r.RegionSizeY);
-                if (!mapRect.IntersectsWith (regionRect))
-                    badRegions.Add (r);
+                Rectangle regionRect = new Rectangle(r.RegionLocX, r.RegionLocY, r.RegionSizeX, r.RegionSizeY);
+                if (!mapRect.IntersectsWith(regionRect))
+                    badRegions.Add(r);
             }
             foreach (GridRegion r in badRegions)
-                regions.Remove (r);
-            
-            badRegions.Clear ();
-            IJ2KDecoder decoder = m_registry.RequestModuleInterface<IJ2KDecoder> ();
+                regions.Remove(r);
+
+            badRegions.Clear();
+            IJ2KDecoder decoder = m_registry.RequestModuleInterface<IJ2KDecoder>();
             foreach (GridRegion rgn in regions) {
-                byte [] texAsset = null;
-                if (m_assetService.GetExists (rgn.TerrainMapImage.ToString ()))
-                    texAsset = m_assetService.GetData (rgn.TerrainMapImage.ToString ());
+                byte[] texAsset = null;
+                if (m_assetService.GetExists(rgn.TerrainMapImage.ToString()))
+                    texAsset = m_assetService.GetData(rgn.TerrainMapImage.ToString());
 
                 if (texAsset != null) {
-                    Image image = decoder.DecodeToImage (texAsset);
+                    Image image = decoder.DecodeToImage(texAsset);
                     if (image != null)
-                        bitImages.Add (image);
+                        bitImages.Add(image);
                     else
-                        badRegions.Add (rgn);
+                        badRegions.Add(rgn);
                 } else
-                    badRegions.Add (rgn);
+                    badRegions.Add(rgn);
             }
             foreach (GridRegion rgn in badRegions)
-                regions.Remove (rgn);
+                regions.Remove(rgn);
 
             if (regions.Count == 0) {
                 lock (m_blankTiles.BlankTiles)
-                    m_blankTiles.BlankTiles.Add (Util.IntsToUlong (regionX, regionY));
+                    m_blankTiles.BlankTiles.Add(Util.IntsToUlong(regionX, regionY));
                 return m_blankRegionTile;
             }
 
-            Bitmap mapTexture = new Bitmap (SIZE_OF_IMAGE, SIZE_OF_IMAGE);
-            using (Graphics g = Graphics.FromImage (mapTexture)) {
-                SolidBrush sea = new SolidBrush (Color.FromArgb (29, 71, 95));
-                g.FillRectangle (sea, 0, 0, SIZE_OF_IMAGE, SIZE_OF_IMAGE);
+            Bitmap mapTexture = new Bitmap(SIZE_OF_IMAGE, SIZE_OF_IMAGE);
+            using (Graphics g = Graphics.FromImage(mapTexture)) {
+                SolidBrush sea = new SolidBrush(Color.FromArgb(29, 71, 95));
+                g.FillRectangle(sea, 0, 0, SIZE_OF_IMAGE, SIZE_OF_IMAGE);
 
                 for (int i = 0; i < regions.Count; i++) {
                     // Find the offsets first
-                    float x = (regions [i].RegionLocX - (regionX * (float)Constants.RegionSize)) / Constants.RegionSize;
-                    float y = (regions [i].RegionLocY - (regionY * (float)Constants.RegionSize)) / Constants.RegionSize;
-                    y += (regions [i].RegionSizeY - Constants.RegionSize) / Constants.RegionSize;
+                    float x = (regions[i].RegionLocX - (regionX * (float)Constants.RegionSize)) / Constants.RegionSize;
+                    float y = (regions[i].RegionLocY - (regionY * (float)Constants.RegionSize)) / Constants.RegionSize;
+                    y += (regions[i].RegionSizeY - Constants.RegionSize) / Constants.RegionSize;
                     float xx = (x * (SIZE_OF_IMAGE));
                     float yy = SIZE_OF_IMAGE - (y * (SIZE_OF_IMAGE) + (SIZE_OF_IMAGE));
-                    g.DrawImage (bitImages [i], xx, yy,
-                        (int)(SIZE_OF_IMAGE * ((float)regions [i].RegionSizeX / Constants.RegionSize)),
-                        (int)(SIZE_OF_IMAGE * (regions [i].RegionSizeY / (float)Constants.RegionSize)));    // y origin is top
+                    g.DrawImage(bitImages[i], xx, yy,
+                        (int)(SIZE_OF_IMAGE * ((float)regions[i].RegionSizeX / Constants.RegionSize)),
+                        (int)(SIZE_OF_IMAGE * (regions[i].RegionSizeY / (float)Constants.RegionSize)));    // y origin is top
                 }
             }
 
             foreach (var bmp in bitImages)
-                bmp.Dispose ();
+                bmp.Dispose();
 
-            CacheMapTexture (1, regionX, regionY, mapTexture);
+            CacheMapTexture(1, regionX, regionY, mapTexture);
             // mapTexture = ResizeBitmap(mapTexture, 128, 128);
             return mapTexture;
         }
 
         // From MSDN
-        static ImageCodecInfo GetEncoderInfo (string mimeType)
+        static ImageCodecInfo GetEncoderInfo(string mimeType)
         {
-            ImageCodecInfo [] encoders;
+            ImageCodecInfo[] encoders;
             try {
-                encoders = ImageCodecInfo.GetImageEncoders ();
+                encoders = ImageCodecInfo.GetImageEncoders();
             } catch {
                 return null;
             }
 
-            return encoders.FirstOrDefault (t => t.MimeType == mimeType);
+            return encoders.FirstOrDefault(t => t.MimeType == mimeType);
         }
 
-        byte [] FindCachedImage (string name)
+        byte[] FindCachedImage(string name)
         {
             if (!m_cacheEnabled)
-                return new byte [0];
+                return new byte[0];
 
-            string fullPath = Path.Combine (m_assetMapCacheDir, name);
-            if (File.Exists (fullPath)) {
+            string fullPath = Path.Combine(m_assetMapCacheDir, name);
+            if (File.Exists(fullPath)) {
                 // Make sure the time is ok
-                if (DateTime.Now < File.GetLastWriteTime (fullPath).AddHours (m_cacheExpires))
-                    return File.ReadAllBytes (fullPath);
+                if (DateTime.Now < File.GetLastWriteTime(fullPath).AddHours(m_cacheExpires))
+                    return File.ReadAllBytes(fullPath);
             }
-            return new byte [0];
+            return new byte[0];
         }
 
-        Bitmap FindCachedImage (int maplayer, int regionX, int regionY)
+        Bitmap FindCachedImage(int maplayer, int regionX, int regionY)
         {
             if (!m_cacheEnabled)
                 return null;
 
             if (maplayer == 1) {
                 lock (m_blankTiles.BlankTiles)
-                    if (m_blankTiles.BlankTiles.Contains (Util.IntsToUlong (regionX, regionY)))
+                    if (m_blankTiles.BlankTiles.Contains(Util.IntsToUlong(regionX, regionY)))
                         return m_blankRegionTile;
             } else {
                 lock (m_blankTiles.BlankTilesLayers)
-                    if (m_blankTiles.BlankTilesLayers.Contains (((long)Util.IntsToUlong (regionX, regionY) << 8) + maplayer))
+                    if (m_blankTiles.BlankTilesLayers.Contains(((long)Util.IntsToUlong(regionX, regionY) << 8) + maplayer))
                         return m_blankRegionTile;
             }
 
-            string name = string.Format ("map-{0}-{1}-{2}-objects.jpg", maplayer, regionX, regionY);
-            string fullPath = Path.Combine (m_assetMapCacheDir, name);
-            if (File.Exists (fullPath)) {
+            string name = string.Format("map-{0}-{1}-{2}-objects.jpg", maplayer, regionX, regionY);
+            string fullPath = Path.Combine(m_assetMapCacheDir, name);
+            if (File.Exists(fullPath)) {
                 // Make sure the time is ok
-                if (DateTime.Now < File.GetLastWriteTime (fullPath).AddHours (m_cacheExpires)) {
-                    using (MemoryStream imgstream = new MemoryStream (File.ReadAllBytes (fullPath))) {
-                        return new Bitmap (imgstream);
+                if (DateTime.Now < File.GetLastWriteTime(fullPath).AddHours(m_cacheExpires)) {
+                    using (MemoryStream imgstream = new MemoryStream(File.ReadAllBytes(fullPath))) {
+                        return new Bitmap(imgstream);
                     }
                 }
             }
             return null;
         }
 
-        byte [] CacheMapTexture (int maplayer, int regionX, int regionY, Bitmap mapTexture, bool forced = false)
+        byte[] CacheMapTexture(int maplayer, int regionX, int regionY, Bitmap mapTexture, bool forced = false)
         {
-            if (!forced && IsStaticBlank (mapTexture))
+            if (!forced && IsStaticBlank(mapTexture))
                 return m_blankRegionTileData;
 
-            byte [] jpeg;
-            EncoderParameters myEncoderParameters = new EncoderParameters ();
-            myEncoderParameters.Param [0] = new EncoderParameter (Encoder.Quality, 95L);
+            byte[] jpeg;
+            EncoderParameters myEncoderParameters = new EncoderParameters();
+            myEncoderParameters.Param[0] = new EncoderParameter(Encoder.Quality, 95L);
 
-            using (MemoryStream imgstream = new MemoryStream ()) {
-                var encInfo = GetEncoderInfo ("image/jpeg");
+            using (MemoryStream imgstream = new MemoryStream()) {
+                var encInfo = GetEncoderInfo("image/jpeg");
                 if (encInfo != null) {
                     // Save bitmap to stream
                     lock (mapTexture)
-                        mapTexture.Save (imgstream, encInfo, myEncoderParameters);
+                        mapTexture.Save(imgstream, encInfo, myEncoderParameters);
                 }
                 // Write the stream to a byte array for output
-                jpeg = imgstream.ToArray ();
+                jpeg = imgstream.ToArray();
 
             }
 
-            myEncoderParameters.Dispose ();
-            SaveCachedImage (maplayer, regionX, regionY, jpeg);
+            myEncoderParameters.Dispose();
+            SaveCachedImage(maplayer, regionX, regionY, jpeg);
             return jpeg;
         }
 
-        void SaveCachedImage (int maplayer, int regionX, int regionY, byte [] data)
+        void SaveCachedImage(int maplayer, int regionX, int regionY, byte[] data)
         {
             if (!m_cacheEnabled)
                 return;
 
-            string name = string.Format ("map-{0}-{1}-{2}-objects.jpg", maplayer, regionX, regionY);
+            string name = string.Format("map-{0}-{1}-{2}-objects.jpg", maplayer, regionX, regionY);
             // string fullPath = Path.Combine(m_assetCacheDir, Path.Combine("mapzoomlevels", name));
-            string fullPath = Path.Combine (m_assetMapCacheDir, name);
-            File.WriteAllBytes (fullPath, data);
+            string fullPath = Path.Combine(m_assetMapCacheDir, name);
+            File.WriteAllBytes(fullPath, data);
         }
     }
 
-    [ProtoContract ()]
+    [ProtoContract()]
     class MapTileIndex
     {
-        [ProtoMember (1)]
-        public HashSet<ulong> BlankTiles = new HashSet<ulong> ();
-        [ProtoMember (2)]
-        public HashSet<long> BlankTilesLayers = new HashSet<long> ();
+        [ProtoMember(1)]
+        public HashSet<ulong> BlankTiles = new HashSet<ulong>();
+        [ProtoMember(2)]
+        public HashSet<long> BlankTilesLayers = new HashSet<long>();
     }
 }

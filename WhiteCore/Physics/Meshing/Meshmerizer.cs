@@ -549,7 +549,10 @@ namespace WhiteCore.Physics.Meshing
                 try {
                     //idata = m_j2kDecoder.DecodeToImage (primShape.SculptData);
                     ManagedImage mImage;
-                    OpenJPEG.DecodeToImage (primShape.SculptData, out mImage);
+                    if (!OpenJPEG.DecodeToImage(primShape.SculptData, out mImage)) {
+                        MainConsole.Instance.WarnFormat("[Sculpt]: OpenJPEG was not able to decode the scuplt data for {0}. Ignoring.", primName);
+                        return null;
+                    }
 
                     if (mImage == null) {
                         // In some cases it seems that the decode can return a null bitmap without throwing an exception
