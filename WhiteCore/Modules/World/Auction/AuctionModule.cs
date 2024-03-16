@@ -147,7 +147,23 @@ namespace WhiteCore.Modules.Auction
  
                 // During an Auction, the Status of an parcel stays "Leased"
                 // 20160204 -greythane- maybe this could be set to 'pending'?
-                landObject.LandData.Status = ParcelStatus.Leased;
+
+                // 20240316 - Fly-Man- Setting this to Abandoned, Governor owns them
+                // during the Auction
+                landObject.LandData.Status = ParcelStatus.Abandoned;
+
+                // 20240316 - Fly-Man- Name of the Parcel is build up from multiple pieces
+                // * Name of region
+                // * Middle point of the parcel being auctioned
+                // * Maturity of the parcel
+                // * Size of the parcel
+                // Example: Marunogere (64,140) General 6736m
+                int area = landObject.LandData.Area;
+                int maturity = landObject.LandData.Maturity;
+                Vector3 landing = landObject.LandData.UserLocation;
+                string region = m_scene.RegionInfo.RegionName;
+                landObject.LandData.Name = region + " (" + landing + ") " + maturity + " " + area + "m";
+                // Send the land update
                 landObject.SendLandUpdateToAvatarsOverMe();
             }
         }
